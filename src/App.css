@@ -1,0 +1,36 @@
+body {
+    margin: 0px;
+}
+
+.page {
+    height: 100vh;
+}
+
+.tiled {
+    background-color: #1d1a54;
+}
+
+.title {
+    font-size: 4em;
+    color: green;
+    text-align: center;
+}
+
+.panel {
+    display: inline-block;
+}
+
+.left {
+    width: calc((100vw - 1004px) / 2);
+}
+
+.center {
+    min-width: 1004px;
+    max-width: 1004px;
+    margin: 0px;
+    border: 2px solid black;
+}
+
+.right {
+    width: calc((100vw - 1004px) / 2);
+}

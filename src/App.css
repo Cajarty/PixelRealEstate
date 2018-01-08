@@ -21,7 +21,8 @@ body {
 }
 
 .left {
-    width: calc((100vw - 1004px) / 2);
+    width: calc((100vw - 1024px) / 2);
+    float: left;
 }
 
 .center {
@@ -32,5 +33,11 @@ body {
 }
 
 .right {
-    width: calc((100vw - 1004px) / 2);
+    width: calc((100vw - 1024px) / 2);
+    float: right;
+}
+
+.contractAction {
+    border-radius: 4px;
+    border: 2px black solid;
 }

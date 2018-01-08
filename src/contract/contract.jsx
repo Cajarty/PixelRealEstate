@@ -13,6 +13,10 @@ export class Contract {
         this.account;
         this.VRE = contract(VirtualRealEstate);
         this.setup();
+        this.pixelsOwned = {};
+        this.pixelsRented = {};
+        this.pixelsForSale = {};
+        this.pixelsForRent = {};
     }
 
     setup() {
@@ -67,7 +71,15 @@ export class Contract {
         });
     }
 
-    buyPixel(x, y, price) {
+    toID(x, y) {
+
+    }
+
+    fromID(id) {
+        
+    }
+
+    buyProperty(x, y, price) {
         this.VRE.deployed().then((i) => {
             let pos = (y * Const.CANVAS_HEIGHT) + x;
             return i.buy(pos, { value: price, from: this.account });
@@ -77,6 +89,86 @@ export class Contract {
             console.log(e);
             console.info("Error buying pixel.");
         });
+    }
+
+    sellProperty(x, y, price) {
+        this.VRE.deployed().then((i) => {
+            let pos = (y * Const.CANVAS_HEIGHT) + x;
+            return i.listforSale(pos, { value: price, from: this.account });
+        }).then(function() {
+            console.info("Pixel " + x + "x" + y + " purchase complete.");
+        }).catch((e) => {
+            console.log(e);
+            console.info("Error buying pixel.");
+        });
+    }
+
+    //array of 2 32 bytes of string
+    setHoverText() {
+        this.VRE.deployed().then((i) => {
+            let pos = (y * Const.CANVAS_HEIGHT) + x;
+            return i.listforSale(pos, { value: price, from: this.account });
+        }).then(function() {
+            console.info("Pixel " + x + "x" + y + " purchase complete.");
+        }).catch((e) => {
+            console.log(e);
+            console.info("Error buying pixel.");
+        });
+    }
+
+    //array of 2 32 bytes
+    setLink() {
+
+    }
+
+    getForSalePrice(x, y) {
+        //return price
+    }
+
+    getForRentPrice(x, y) {
+        //returns price
+    }
+
+    getHoverText(x, y) {
+        //returns array of 2 32 bytes of string
+    }
+
+    getLink(x, y) {
+        //returns array of 2 32 bytes of string
+    }
+
+    getPropertyColors(x, y) {
+        //returns array of 10 256 bits
+    }
+
+    getPropertyData(x, y) {
+        //returns address, price, renter, rent length, rentedUntil, rentPrice
+    }
+
+    setColors(x, y/*, array of 10 of big ints (256)*/) {
+
+    }
+
+    rentProperty(x, y, price) {
+
+    }
+
+    stopRenting(x, y) {
+
+    }
+
+    /*
+    duration == seconds
+    */
+    listForRent(x, y, price, duration) {
+
+    }
+
+    /*
+    Stop renting/selling a pixel you own.
+    */
+    delist(x, y, delistFromSale, delistFromRent) {
+
     }
 }
 

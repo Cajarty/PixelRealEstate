@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Canvas from './Canvas.jsx'
 import ManagePanel from './ManagePanel.jsx'
+import ActionPanel from './ActionPanel.jsx'
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -16,8 +17,8 @@ class CanvasPage extends Component {
                 <div className='center panel'>
                     <Canvas/>
                 </div>
-                <div className='left panel'>
-
+                <div className='right panel'>
+                    <ActionPanel/>
                 </div>
             </div>
         );

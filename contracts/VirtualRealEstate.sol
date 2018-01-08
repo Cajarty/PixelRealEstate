@@ -3,11 +3,11 @@ contract VirtualRealEstate {
     address owner;
     uint256 ownerEth = 0;
     
-    //Mapping of pixelID to pixel
-    mapping (uint24 => Pixel) map;
-    //PixelOwner to link
+    //Mapping of propertyID to property
+    mapping (uint24 => Property) map;
+    //propertyOwner to link
     mapping (address => bytes32[2]) ownerLink;
-    //PixelRenter to link
+    //propertyRenter to link
     mapping (address => bytes32[2]) ownerHoverText;
     
     uint128 DEFAULT_PRICE = 10000000000000000;
@@ -15,11 +15,11 @@ contract VirtualRealEstate {
     uint128 USER_BUY_CUT_PERCENT = 98; //%
     uint128 USER_RENT_CUT_PERCENT = 98; //%;
     
-    event PixelColorUpdate(uint24 indexed pixel, uint24 color);
+    event PropertyColorUpdate(uint24 indexed property, uint256[10] colors);
     
-    struct Pixel {
+    struct Property {
         address owner;
-        uint24 color;
+        uint256[10] colors; //10x10 rgb pixel colors per property
         uint128 salePrice;
         address renter;
         uint256 rentAvailableUntil;
@@ -32,8 +32,8 @@ contract VirtualRealEstate {
         _;
     }
     
-    modifier validPixelID(uint24 pixelID) {
-        if (pixelID < 1000000) {
+    modifier validpropertyID(uint24 propertyID) {
+        if (propertyID < 1000000) {
             _;
         }
     }
@@ -44,159 +44,143 @@ contract VirtualRealEstate {
     function setHoverText(bytes32[2] text) public {
         ownerHoverText[msg.sender] = text;
     }
-    function setLinkShort(bytes32[2] link) public {
+    function setLink(bytes32[2] link) public {
         ownerLink[msg.sender] = link;
     }
     
-    //256bits = 32 bytes or 32 uint8's
-    function getNext100PixelsInRowColors(uint16 row, uint16 startColumn) public view returns(uint256[10]) {
-        uint256[10] results;
-        uint24 startPoint = uint24(row * 1000 + startColumn);
-        
-        for(uint24 j = 0; j < 10; j++) {
-            uint256 result = 0;
-            for(uint24 i = 0; i < 10; i++) {
-                result = (result * (2 ^ 24));
-                result = (result | uint256(map[startPoint + i + j * 10].color));
-            }
-            results[j] = result;
-        }
-        
-        return results;
+    function getForSalePrice(uint24 propertyID) public view returns(uint128) {
+        Property property = map[propertyID];
+        require(property.salePrice != 0);
+        return property.salePrice;
     }
     
-    function getForSalePrice(uint24 pixelID) public view returns(uint128) {
-        Pixel pixel = map[pixelID];
-        require(pixel.salePrice != 0);
-        return pixel.salePrice;
+    function getForRentPrice(uint24 propertyID) public view returns(uint128) {
+        Property property = map[propertyID];
+        require(property.rentPrice != 0);
+        return property.rentPrice;
     }
-    
-    function getForRentPrice(uint24 pixelID) public view returns(uint128) {
-        Pixel pixel = map[pixelID];
-        require(pixel.rentPrice != 0);
-        return pixel.rentPrice;
-    }
-    function getHoverText(uint24 pixelID) public view returns(bytes32[2]) {
-        Pixel pixel = map[pixelID];
+    function getHoverText(uint24 propertyID) public view returns(bytes32[2]) {
+        Property property = map[propertyID];
         
-        if (pixel.rentPrice != 0 && pixel.renter != 0 && pixel.rentedUntil < now) {
-            map[pixelID].renter = 0;
+        if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
+            map[propertyID].renter = 0;
         }
         //Must have a owner or renter, and that owner/renter must have a short or long hover text
-        require(pixel.renter != 0 || pixel.owner != 0);
-        address pixelResident;
-        if (pixel.renter == 0) {
-            pixelResident = pixel.owner;
+        require(property.renter != 0 || property.owner != 0);
+        address propertyResident;
+        if (property.renter == 0) {
+            propertyResident = property.owner;
         } else {
-            pixelResident = pixel.renter;
+            propertyResident = property.renter;
         }
-        return ownerHoverText[pixelResident];
+        return ownerHoverText[propertyResident];
     }
-    function getLink(uint24 pixelID) public view returns(bytes32[2]) {
-        Pixel pixel = map[pixelID];
+    
+    function getLink(uint24 propertyID) public view returns(bytes32[2]) {
+        Property property = map[propertyID];
         
-        if (pixel.rentPrice != 0 && pixel.renter != 0 && pixel.rentedUntil < now) {
-            map[pixelID].renter = 0;
+        if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
+            map[propertyID].renter = 0;
         }
         //Must have a owner or renter, and that owner/renter must have a short or long hover text
-        require(pixel.renter != 0 || pixel.owner != 0);
-        address pixelResident;
-        if (pixel.renter == 0) {
-            pixelResident = pixel.owner;
+        require(property.renter != 0 || property.owner != 0);
+        address propertyResident;
+        if (property.renter == 0) {
+            propertyResident = property.owner;
         } else {
-            pixelResident = pixel.renter;
+            propertyResident = property.renter;
         }
-        return ownerLink[pixelResident];
+        return ownerLink[propertyResident];
     }
     
-    function getColor(uint24 pixelID) public validPixelID(pixelID) view returns(uint24) {
-        return map[pixelID].color;
+    function getPropertyColors(uint24 propertyID) public validpropertyID(propertyID) view returns(uint256[10]) {
+        return map[propertyID].colors;
     }
     
-    function getPixelData(uint24 pixelID) public validPixelID(pixelID) view returns(address, uint24, uint128, address, uint256, uint256, uint128) {
-        Pixel pixel = map[pixelID];
-        return (pixel.owner, pixel.color, pixel.salePrice, pixel.renter, pixel.rentAvailableUntil, pixel.rentedUntil, pixel.rentPrice);
+    function getPropertyData(uint24 propertyID) public validpropertyID(propertyID) view returns(address, uint128, address, uint256, uint256, uint128) {
+        Property property = map[propertyID];
+        return (property.owner, property.salePrice, property.renter, property.rentAvailableUntil, property.rentedUntil, property.rentPrice);
     }
     
-    function setColor(uint24 pixelID, uint24 newColor) public validPixelID(pixelID) returns(bool) {
-        Pixel pixel = map[pixelID];
+    function setColors(uint24 propertyID, uint256[10] newColors) public validpropertyID(propertyID) returns(bool) {
+        Property property = map[propertyID];
         
-        if (pixel.rentPrice != 0 && pixel.renter != 0 && pixel.rentedUntil < now) {
-            map[pixelID].renter = 0;
+        if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
+            map[propertyID].renter = 0;
         }
         
-        require((msg.sender == pixel.owner && pixel.renter == 0) || (msg.sender == pixel.renter));
+        require((msg.sender == property.owner && property.renter == 0) || (msg.sender == property.renter));
         
-        pixel.color = newColor;
+        property.colors = newColors;
         
-        PixelColorUpdate(pixelID, newColor);
+        PropertyColorUpdate(propertyID, newColors);
         
         return true;
     }
     
-    //Use Case: Buyer wants to buy a pixel
-    function buy(uint24 pixelID) public validPixelID(pixelID) payable returns(bool) {
-        Pixel pixel = map[pixelID];
+    //Use Case: Buyer wants to buy a property
+    function buyProperty(uint24 propertyID) public validpropertyID(propertyID) payable returns(bool) {
+        //If this is the first ever purchase, the property hasn't been made yet, property.owner is just default
+        if (map[propertyID].owner == 0) {
+            map[propertyID].owner = owner;
+            map[propertyID].salePrice = DEFAULT_PRICE;
+        }
         
-        //If this is the first ever purchase, the pixel hasn't been made yet, pixel.owner is just default
-        if (pixel.owner == 0) {
-            map[pixelID] = Pixel(msg.sender, 0, DEFAULT_PRICE, 0, 0, 0, 0);
-            pixel = map[pixelID];
+        Property property = map[propertyID];
+      
+        if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
+            map[propertyID].renter = 0;
         }
       
-        if (pixel.rentPrice != 0 && pixel.renter != 0 && pixel.rentedUntil < now) {
-            map[pixelID].renter = 0;
-        }
-      
-        require(pixel.salePrice != 0);//Pixel must be for sale
-        require(pixel.renter == 0);//Pixel cannot be being rented
-        require(msg.value >= pixel.salePrice);//Amount paid must be at least the price
+        require(property.salePrice != 0);//property must be for sale
+        require(property.renter == 0);//property cannot be being rented
+        require(msg.value >= property.salePrice);//Amount paid must be at least the price
       
         //User gets the majority of the listed price's sale
         uint128 amountTransfered = 0;
         
-        if (pixel.owner != 0) {
-            amountTransfered = pixel.salePrice * USER_BUY_CUT_PERCENT / 100;
-            pixel.owner.transfer(amountTransfered);
+        if (property.owner != 0) {
+            amountTransfered = property.salePrice * USER_BUY_CUT_PERCENT / 100;
+            property.owner.transfer(amountTransfered);
         }
         
-        map[pixelID].rentPrice = 0;
-        map[pixelID].renter = 0;
-        map[pixelID].salePrice = 0;
-        map[pixelID].owner = msg.sender;
+        map[propertyID].rentPrice = 0;
+        map[propertyID].renter = 0;
+        map[propertyID].salePrice = 0;
+        map[propertyID].owner = msg.sender;
         
         ownerEth += msg.value - amountTransfered;
         
         return true;
     }
     
-    //Use Case: Renter wants to rent a pixel
-    function rent(uint24 pixelID) public validPixelID(pixelID) payable returns(bool) {
-        Pixel pixel = map[pixelID];
+    //Use Case: Renter wants to rent a property
+    function rentProperty(uint24 propertyID) public validpropertyID(propertyID) payable returns(bool) {
+        Property property = map[propertyID];
         
         //How many units they paid to rent
-        uint256 timeToRent = msg.value / pixel.rentPrice;
+        uint256 timeToRent = msg.value / property.rentPrice;
         
-        if (pixel.rentPrice != 0 && pixel.renter != 0 && pixel.rentedUntil < now) {
-            map[pixelID].renter = 0;
+        if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
+            map[propertyID].renter = 0;
         }
       
-        require(pixel.owner != 0); //Must have been owned
-        require(pixel.rentPrice != 0);//Pixel must be for sale
+        require(property.owner != 0); //Must have been owned
+        require(property.rentPrice != 0);//property must be for sale
         require(timeToRent >= 1);//The renting must be for at least one unit
-        require(pixel.renter == 0);//Pixel cannot be being rented already
+        require(property.renter == 0);//property cannot be being rented already
       
         //User gets the majority of the listed price's sale
         uint256 amountTransfered = msg.value * USER_RENT_CUT_PERCENT / 100;
         
-        pixel.owner.transfer(amountTransfered);
+        property.owner.transfer(amountTransfered);
         
-        map[pixelID].renter = msg.sender;
+        map[propertyID].renter = msg.sender;
       
-        if (map[pixelID].rentAvailableUntil < now + timeToRent) {
-            map[pixelID].rentedUntil = map[pixelID].rentAvailableUntil;
+        if (map[propertyID].rentAvailableUntil < now + timeToRent) {
+            map[propertyID].rentedUntil = map[propertyID].rentAvailableUntil;
         } else {
-            map[pixelID].rentedUntil = now + timeToRent;
+            map[propertyID].rentedUntil = now + timeToRent;
         }
         
         ownerEth += msg.value - amountTransfered;
@@ -204,67 +188,70 @@ contract VirtualRealEstate {
         return true;
     }
     
-    //Use Case: Renter wants to stop renting the pixel
-    function cancelRent(uint24 pixelID) public validPixelID(pixelID) returns(bool) {
-        Pixel pixel = map[pixelID];
+    //Use Case: Renter wants to stop renting the property
+    function stopRenting(uint24 propertyID) public validpropertyID(propertyID) returns(bool) {
+        Property property = map[propertyID];
         
-        require(msg.sender == pixel.renter);
+        require(msg.sender == property.renter);
         
-        pixel.renter = 0;
+        property.renter = 0;
         
         return true;
     }
     
-    //Use Case: Owner of a pixel lists for sale at a given price
-    function listForSale(uint24 pixelID, uint128 price ) public validPixelID(pixelID) returns(bool) {
-        Pixel pixel = map[pixelID];
+    //Use Case: Owner of a property lists for sale at a given price
+    function listForSale(uint24 propertyID, uint128 price ) public validpropertyID(propertyID) returns(bool) {
+        Property property = map[propertyID];
       
-        if (pixel.rentPrice != 0 && pixel.renter != 0 && pixel.rentedUntil < now) {
-            map[pixelID].renter = 0;
+        require(price != 0);
+      
+        if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
+            map[propertyID].renter = 0;
         }
       
-        require(msg.sender == pixel.owner); //Must be the owner
-        require(pixel.renter == 0); //Must not currently be already rented out
+        require(msg.sender == property.owner); //Must be the owner
+        require(property.renter == 0); //Must not currently be already rented out
         //You can listForSale an already listed item to update the listing
-        map[pixelID].salePrice = price;
+        map[propertyID].salePrice = price;
         
         return true;
     }
-    //Use Case: Owner of a pixel lists for rent at a given price
-    function listForRent(uint24 pixelID, uint128 rentPrice, uint128 rentDuration) public validPixelID(pixelID) returns(bool)  {
-        Pixel pixel = map[pixelID];
+    //Use Case: Owner of a property lists for rent at a given price
+    function listForRent(uint24 propertyID, uint128 rentPrice, uint128 rentDuration) public validpropertyID(propertyID) returns(bool)  {
+        Property property = map[propertyID];
       
-        if (pixel.rentPrice != 0 && pixel.renter != 0 && pixel.rentedUntil < now) {
-            map[pixelID].renter = 0;
+        if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
+            map[propertyID].renter = 0;
         }
       
-        require(msg.sender == pixel.owner); //Must be the owner
-        require(pixel.renter == 0); //Must not currently be already rented out
+        require(rentPrice != 0);
+        require(msg.sender == property.owner); //Must be the owner
+        require(property.renter == 0); //Must not currently be already rented out
         require(rentDuration > 0); //Must be renting for a proper duration
         //You can listForRent an already listed item to update the listing
       
-        map[pixelID].rentPrice = rentPrice;
-        map[pixelID].rentAvailableUntil = now + rentDuration;
+        map[propertyID].rentPrice = rentPrice;
+        map[propertyID].rentAvailableUntil = now + rentDuration;
         
         return true;
     }
-    //Use Case: Owner of a pixel delists from both renting offer and sale offer
-    function delistEntirely(uint24 pixelID, bool delistFromSale, bool delistFromRent) public validPixelID(pixelID) returns(bool) {
-        Pixel pixel = map[pixelID];
+    //Use Case: Owner of a property delists from both renting offer and sale offer
+    function delist(uint24 propertyID, bool delistFromSale, bool delistFromRent) public validpropertyID(propertyID) returns(bool) {
+        Property property = map[propertyID];
       
-        if (pixel.rentPrice != 0 && pixel.renter != 0 && pixel.rentedUntil < now) {
-            map[pixelID].renter = 0;
+        if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
+            map[propertyID].renter = 0;
         }
         
-        require(msg.sender == pixel.owner); //Must be the owner
-        require(pixel.renter == 0); //Must have no current renter
+        require(msg.sender == property.owner); //Must be the owner
+        require(property.renter == 0); //Must have no current renter
         
         if (delistFromRent) {
-            map[pixelID].rentPrice = 0;
-            map[pixelID].renter = 0;
+            map[propertyID].rentPrice = 0;
+            map[propertyID].renter = 0;
         }
         if (delistFromSale) {
-            map[pixelID].salePrice = 0;
+            map[propertyID].salePrice = 0;
         }
         return true;
     }

@@ -23,12 +23,17 @@ class Alerts extends Component {
     receiveMessage(data, message) {
         let now = new Date().getTime();
         let update = this.state.alerts;
-        update[now] = message;
+        update[now] = {className: 'alert', message: message};
         setTimeout(() => {
+            setTimeout(() => {
+                let update = this.state.alerts;
+                delete update[now];
+                this.setState({alerts: update});
+            }, 990);
             let update = this.state.alerts;
-            delete update[now];
+            update[now] = {className: 'alert fadeOut', message: message};
             this.setState({alerts: update});
-        }, 5000);
+        }, 4000);
         this.setState({alerts: update});
     }
 
@@ -36,7 +41,7 @@ class Alerts extends Component {
         return (
             <div className='alertContainer'>
                {Object.keys(this.state.alerts).map((i) => 
-                   <div className='alert' key={i}>{this.state.alerts[i]}</div>
+                   <div key={i} className={this.state.alerts[i].className}>{this.state.alerts[i].message}</div>
                )}
             </div>
         );

@@ -86,14 +86,12 @@ export class Contract {
     }
 
     buyProperty(x, y, price) {
-        this.sendResults(true, "Property " + x + "x" + y + " purchase complete.");
-        return;
         this.VRE.deployed().then((i) => {
             return i.buy(this.toID(x, y), { value: price, from: this.account });
         }).then(() => {
-            this.sendResults("Property " + x + "x" + y + " purchase complete.");
+            this.sendResults(true, "Property " + x + "x" + y + " purchase complete.");
         }).catch((e) => {
-            this.sendResults("Unable to purchase property " + x + "x" + y + ".");
+            this.sendResults(false, "Unable to purchase property " + x + "x" + y + ".");
         });
     }
 

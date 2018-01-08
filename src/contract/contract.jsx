@@ -9,14 +9,17 @@ import VirtualRealEstate from '../../build/contracts/VirtualRealEstate.json'
 
 export class Contract {
     constructor() {
-        this.accounts;
-        this.account;
+        this.listeners = {};
+
+        this.accounts = null;
+        this.account = null;
         this.VRE = contract(VirtualRealEstate);
         this.setup();
         this.pixelsOwned = {};
         this.pixelsRented = {};
         this.pixelsForSale = {};
         this.pixelsForRent = {};
+        this.test();
     }
 
     setup() {
@@ -72,77 +75,125 @@ export class Contract {
     }
 
     toID(x, y) {
-
+        return y * Const.CANVAS_WIDTH + x;
     }
 
     fromID(id) {
-        
+        let obj = {x: 0, y: 0};
+        obj.x = id % Const.CANVAS_WIDTH;
+        obj.y = Math.floor(id / 1000);
+        return obj;
     }
 
     buyProperty(x, y, price) {
+        this.sendResults(true, "Property " + x + "x" + y + " purchase complete.");
+        return;
         this.VRE.deployed().then((i) => {
-            let pos = (y * Const.CANVAS_HEIGHT) + x;
-            return i.buy(pos, { value: price, from: this.account });
-        }).then(function() {
-            console.info("Pixel " + x + "x" + y + " purchase complete.");
+            return i.buy(this.toID(x, y), { value: price, from: this.account });
+        }).then(() => {
+            this.sendResults("Property " + x + "x" + y + " purchase complete.");
         }).catch((e) => {
-            console.log(e);
-            console.info("Error buying pixel.");
+            this.sendResults("Unable to purchase property " + x + "x" + y + ".");
         });
     }
 
     sellProperty(x, y, price) {
         this.VRE.deployed().then((i) => {
-            let pos = (y * Const.CANVAS_HEIGHT) + x;
-            return i.listforSale(pos, { value: price, from: this.account });
-        }).then(function() {
+            return i.listforSale(this.toID(x, y), {from: this.account });
+        }).then(() => {
             console.info("Pixel " + x + "x" + y + " purchase complete.");
         }).catch((e) => {
             console.log(e);
-            console.info("Error buying pixel.");
         });
     }
 
     //array of 2 32 bytes of string
-    setHoverText() {
+    setHoverText(x, y, text) {
+        let strs = [];
+        strs.push(text.slice(0, 32));
+        strs.push(text.slice(33, 64));
         this.VRE.deployed().then((i) => {
-            let pos = (y * Const.CANVAS_HEIGHT) + x;
-            return i.listforSale(pos, { value: price, from: this.account });
+            return i.setHoverText(this.toID(x, y), strs, {from: this.account });
         }).then(function() {
-            console.info("Pixel " + x + "x" + y + " purchase complete.");
+            console.info("Pixel " + x + "x" + y + " update complete.");
         }).catch((e) => {
             console.log(e);
-            console.info("Error buying pixel.");
         });
     }
 
     //array of 2 32 bytes
-    setLink() {
-
+    setLink(x, y, text) {
+        let strs = [];
+        strs.push(text.slice(0, 32));
+        strs.push(text.slice(33, 64));
+        this.VRE.deployed().then((i) => {
+            return i.setLink(this.toID(x, y), strs, {from: this.account });
+        }).then(function() {
+            console.info("Pixel " + x + "x" + y + " update complete.");
+        }).catch((e) => {
+            console.log(e);
+        });
     }
 
     getForSalePrice(x, y) {
-        //return price
+        this.VRE.deployed().then((i) => {
+            return i.getForSalePrice.call(this.toID(x, y)).then((r) => {
+                return r;
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
     }
 
     getForRentPrice(x, y) {
-        //returns price
+        this.VRE.deployed().then((i) => {
+            return i.getForRentPrice.call(this.toID(x, y)).then((r) => {
+                return r;
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
     }
 
     getHoverText(x, y) {
-        //returns array of 2 32 bytes of string
+        this.VRE.deployed().then((i) => {
+            return i.getHoverText.call(this.toID(x, y)).then((r) => {
+                return r;
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
     }
 
     getLink(x, y) {
-        //returns array of 2 32 bytes of string
+        this.VRE.deployed().then((i) => {
+            return i.getLink.call(this.toID(x, y)).then((r) => {
+                return r;
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
     }
 
     getPropertyColors(x, y) {
-        //returns array of 10 256 bits
+        this.VRE.deployed().then((i) => {
+            return i.getPropertyColors.call(this.toID(x, y)).then((r) => {
+                return r;
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
     }
 
     getPropertyData(x, y) {
         //returns address, price, renter, rent length, rentedUntil, rentPrice
+        this.VRE.deployed().then((i) => {
+            return i.getPropertyData.call(this.toID(x, y)).then((r) => {
+                return r;
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
     }
 
     setColors(x, y/*, array of 10 of big ints (256)*/) {
@@ -150,11 +201,23 @@ export class Contract {
     }
 
     rentProperty(x, y, price) {
-
+        this.VRE.deployed().then((i) => {
+            return i.setLink(this.toID(x, y), {value: price, from: this.account });
+        }).then(function() {
+            console.info("Pixel " + x + "x" + y + " update complete.");
+        }).catch((e) => {
+            console.log(e);
+        });
     }
 
     stopRenting(x, y) {
-
+        this.VRE.deployed().then((i) => {
+            return i.setLink(this.toID(x, y), {from: this.account });
+        }).then(function() {
+            console.info("Pixel " + x + "x" + y + " update complete.");
+        }).catch((e) => {
+            console.log(e);
+        });
     }
 
     /*
@@ -170,6 +233,41 @@ export class Contract {
     delist(x, y, delistFromSale, delistFromRent) {
 
     }
+
+    /*
+    Subscriber functions for function call returns on the contract so the
+    ui can update when it sees a change.
+    */
+    listenForResults(key, callback) {
+        this.listeners[key] = callback;
+    }
+
+    stopListeningForResults(key) {
+        delete this.listeners[key];
+    }
+
+    sendResults(result, message) {
+        Object.keys(this.listeners).map((i) => {
+            this.listeners[i](result, message);
+        });
+    }
+
+    test() {
+       // this.buyProperty(46, 20, 10000000000000000);
+    }
 }
+/*
+class Test {
+    constructor(test, expected) {
+        this.test = test;
+        this.expected = expected;
+    }
+
+    assert() {
+        if (this.test !== this.expected)
+            throw new Error('Test Failed!');
+        return this.test + ' === ' + this.expected;
+    }
+}*/
 
 export const ctr = new Contract();

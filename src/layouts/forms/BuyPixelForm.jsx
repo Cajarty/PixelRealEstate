@@ -32,7 +32,7 @@ class BuyPixelForm extends Component {
                     Price: <input id='buyPrice' type='number' onChange={(e) => this.handleInput('valuePrice', e)} value={this.state.valuePrice}></input>
                 </div>
                 <div>
-                    <input type='button' value='Buy Pixel' onClick={() => ctr.buyPixel(this.state.valueX, this.state.valueY, this.state.valuePrice)}></input>
+                    <input type='button' value='Buy Pixel' onClick={() => ctr.buyProperty(this.state.valueX, this.state.valueY, this.state.valuePrice)}></input>
                 </div>
             </div>
         );

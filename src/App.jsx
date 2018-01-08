@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router'
 import { HiddenOnlyAuth, VisibleOnlyAuth } from './util/wrappers.js'
+import Alerts from './layouts/Alerts';
 
 // // Styles
 // import './css/oswald.css'
@@ -13,6 +14,7 @@ class App extends Component {
     return (
       <div>
         {this.props.children}
+        <Alerts/>
       </div>
     );
   }

@@ -22,7 +22,7 @@ class ManagePanel extends Component {
                     forRent={0}
                 ></PixelDescriptionBox>
                 <PixelsOwned
-                
+                    ownedProperty={{0: {x: 0, y: 0}}}
                 ></PixelsOwned>
             </div>
         );

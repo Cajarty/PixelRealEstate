@@ -1,0 +1,153 @@
+.alertContainer {
+    width: 30%;
+    position: fixed;
+    right: 12px;
+    bottom: 4px;
+}
+
+.alert {
+    @include animation(fadein, 1s);
+    text-align: center;
+    width: 100%;
+    height: 32px;
+    font-size: 24px;
+    background-color: rgb(182, 245, 193);
+    margin: auto;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    border-width: 2px;
+    border-style: solid;
+    border-color: green;
+    border-image: initial;
+    border-radius: 8px;
+}
+
+// ---- fadein ----
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@-moz-keyframes fadein {
+    /* Firefox */
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes fadein {
+    /* Safari and Chrome */
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@-o-keyframes fadein {
+    /* Opera */
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+// ---- END fadein ----
+// ---- fadeout ----
+@keyframes fadeout {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@-moz-keyframes fadeout {
+    /* Firefox */
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes fadeout {
+    /* Safari and Chrome */
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@-o-keyframes fadeout {
+    /* Opera */
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+// ---- END fadeout ----
+// ---- growDown ----
+@keyframes growDown {
+    from {
+        transform: scaleY(0);
+    }
+    to {
+        transform: scaleY(1);
+    }
+}
+
+@-moz-keyframes growDown {
+    /* Firefox */
+    from {
+        transform: scaleY(0);
+    }
+    to {
+        transform: scaleY(1);
+    }
+}
+
+@-webkit-keyframes growDown {
+    /* Safari and Chrome */
+    from {
+        transform: scaleY(0);
+    }
+    to {
+        transform: scaleY(1);
+    }
+}
+
+@-o-keyframes growDown {
+    /* Opera */
+    from {
+        transform: scaleY(0);
+    }
+    to {
+        transform: scaleY(1);
+    }
+}
+
+// ---- END growDown ----
+@mixin animation($type, $duration) {
+    animation: $type $duration;
+    -moz-animation: $type $duration;
+    -webkit-animation: $type $duration;
+    -o-animation: $type $duration;
+}

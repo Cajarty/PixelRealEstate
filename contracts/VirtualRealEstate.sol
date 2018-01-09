@@ -1,4 +1,5 @@
 pragma solidity ^0.4.2;
+
 contract VirtualRealEstate {
     address owner;
     uint256 ownerEth = 0;

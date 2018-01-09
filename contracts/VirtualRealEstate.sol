@@ -1,5 +1,4 @@
-pragma solidity ^0.4.19;
-
+pragma solidity ^0.4.2;
 contract VirtualRealEstate {
     address owner;
     uint256 ownerEth = 0;
@@ -11,7 +10,7 @@ contract VirtualRealEstate {
     //propertyRenter to link
     mapping (address => bytes32[2]) ownerHoverText;
     
-    uint128 DEFAULT_PRICE = 1000000000000000000;
+    uint128 DEFAULT_PRICE = 100000000000000000;
     
     uint128 USER_BUY_CUT_PERCENT = 98; //%
     uint128 USER_RENT_CUT_PERCENT = 98; //%;
@@ -76,7 +75,6 @@ contract VirtualRealEstate {
     
     function getLink(uint24 propertyID) public validPropertyID(propertyID) view returns(bytes32[2]) {
         Property storage property = map[propertyID];
-
         //Must have a owner or renter, and that owner/renter must have a short or long hover text
         require(property.renter != 0 || property.owner != 0);
         address propertyResident;
@@ -88,19 +86,13 @@ contract VirtualRealEstate {
         return ownerLink[propertyResident];
     }
     
-    function get200PixelColorsOfRow(uint24 startPropertyX, uint24 row) public validPropertyID(propertyID) view returns(uint256[20]) {
-        uint256[20] result;
-        uint24 propertyID = startPixelX + row * 1000;
+    function getPropertyColorsOfRow(uint24 x, uint24 row) public validPropertyID(x + (row / 10) * 100) view returns(uint256[10]) {
+        uint256[10] result;
+        uint24 propertyID = x + (row / 10) * 100;
         uint24 pixelRow = row % 10;
-        for(uint24 i = 0; i < 20; i++) {
+        for(uint24 i = 0; i < 10; i++) {
             result[i] = map[propertyID + i].colors[pixelRow];
         }
-        /*for(uint24 i = 0; i < 10; i++) {
-            uint256[10] colors = map[propertyID + i].colors;
-            for(uint24 j = 0; j < 10; j++) {
-                result[i * 10 + j] = colors[j];
-            }
-        }*/
         return result;
     }
     

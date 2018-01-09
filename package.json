@@ -51,6 +51,7 @@
   },
   "dependencies": {
     "big-integer": "^1.6.26",
+    "bignumber.js": "^5.0.0",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-redux": "^5.0.2",

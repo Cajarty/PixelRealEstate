@@ -7,7 +7,7 @@ class BuyPixelForm extends Component {
         this.state = {
             valueX: 0,
             valueY: 0,
-            valuePrice: 10000000000000000,
+            valuePrice: 100000000000000000,
         };
     }
 

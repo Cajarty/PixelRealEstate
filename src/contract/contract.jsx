@@ -2,6 +2,7 @@
 // Import libraries we need.
 import { default as Web3 } from 'web3';
 import * as Const from '../const/const.jsx';
+import * as Func from '../functions/functions.jsx';
 import { default as contract } from 'truffle-contract';
 
 // Import our contract artifacts and turn them into usable abstractions.
@@ -14,11 +15,12 @@ export class Contract {
         this.accounts = null;
         this.account = null;
         this.VRE = contract(VirtualRealEstate);
-        this.setup();
         this.pixelsOwned = {};
         this.pixelsRented = {};
         this.pixelsForSale = {};
         this.pixelsForRent = {};
+        
+        this.setup();
         this.test();
     }
 
@@ -75,22 +77,23 @@ export class Contract {
     }
 
     toID(x, y) {
-        return y * Const.CANVAS_WIDTH + x;
+        return y * Const.PROPERTIES_WIDTH + x;
     }
 
     fromID(id) {
         let obj = {x: 0, y: 0};
-        obj.x = id % Const.CANVAS_WIDTH;
+        obj.x = id % Const.PROPERTIES_WIDTH;
         obj.y = Math.floor(id / 1000);
         return obj;
     }
 
     buyProperty(x, y, price) {
         this.VRE.deployed().then((i) => {
-            return i.buy(this.toID(x, y), { value: price, from: this.account });
+            return i.buyProperty(this.toID(x, y), { value: price, from: this.account });
         }).then(() => {
             this.sendResults(true, "Property " + x + "x" + y + " purchase complete.");
         }).catch((e) => {
+            console.info(e);
             this.sendResults(false, "Unable to purchase property " + x + "x" + y + ".");
         });
     }
@@ -173,10 +176,20 @@ export class Contract {
         });
     }
 
-    getPropertyColors(x, y) {
+    getPropertyColorsOfRow(x, row, callback) {
+        this.VRE.deployed().then((i) => {
+            return i.getPropertyColorsOfRow.call(x, row).then((r) => {
+                callback(x, row, Func.ContractDataToRGBAArray(r));
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
+    }
+
+    getPropertyColors(x, y, callback) {
         this.VRE.deployed().then((i) => {
             return i.getPropertyColors.call(this.toID(x, y)).then((r) => {
-                return r;
+                callback(x, y, Func.ContractDataToRGBAArray(r));
             });
         }).catch((e) => {
             console.log(e);
@@ -194,8 +207,14 @@ export class Contract {
         });
     }
 
-    setColors(x, y/*, array of 10 of big ints (256)*/) {
-
+    setColors(x, y, data) {
+        this.VRE.deployed().then((i) => {
+            return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), {from: this.account });
+        }).then(() => {
+            this.sendResults(true, "Property " + x + "x" + y + " pixels changed.");
+        }).catch((e) => {
+            this.sendResults(false, "Error uploadimg pixels.");
+        });
     }
 
     rentProperty(x, y, price) {

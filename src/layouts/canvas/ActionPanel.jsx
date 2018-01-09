@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import BuyPixelForm from '../forms/BuyPixelForm.jsx';
+import SetPixelColorForm from '../forms/SetPixelColorForm';
 
 class ActionPanel extends Component {
     constructor(props) {
@@ -11,6 +12,7 @@ class ActionPanel extends Component {
             <div>
                 <div className='contractAction'>
                     <BuyPixelForm/>
+                    <SetPixelColorForm/>
                 </div>
             </div>
         );

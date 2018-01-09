@@ -1,19 +1,21 @@
 import { browserHistory } from 'react-router';
 var bigInt = require("big-integer");
+var BigNumber = require('bignumber.js');
 
 export const VisitPage = (path) => {
     browserHistory.push('/' + path);
 }
 
 export const ContractDataToRGBAArray = (/*uint256[10]*/ contractDataArray) => {
+
     let result = [];
     let contractDataArraySize = 10;
     let pixelsPerBigInt = 10;
      
     for(let i = contractDataArraySize - 1; i >= 0; i--) {
-        let uint256 = contractDataArray[i]; //Big ass number
+        let uint256 = bigInt(contractDataArray[i].toString(10), 10); //Big ass number
         for (let j = 0; j < pixelsPerBigInt; j++) {
-            result.unshift(0);
+            result.unshift(255);
             result.unshift(uint256.and(255).toJSNumber());
             uint256 = uint256.shiftRight(8); 
             result.unshift(uint256.and(255).toJSNumber());
@@ -30,13 +32,14 @@ export const RGBArrayToContractData = (rgbArray) => {
     let result = [];
     let counter = 0;
     for(let i = 0; i < 10; i++) { //Foreach uint256 in uint256[10]
-        let innerResult = bigInt("0", 10);
+        let innerResult = new bigInt("0", 10);
         for(let j = 0; j < 10; j++) { //Foreach 24 bits for the uint256
             let binary = RGBToBinary(rgbArray[counter++], rgbArray[counter++], rgbArray[counter++]);
+            counter++;
             innerResult = innerResult.shiftLeft(24);
             innerResult = innerResult.or(binary);
         }
-        result.push(innerResult);
+        result.push(new BigNumber(innerResult.toString(), 10));
     }
     return result;
 }

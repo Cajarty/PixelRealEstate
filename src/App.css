@@ -26,8 +26,9 @@ body {
 }
 
 .center {
-    min-width: 1004px;
-    max-width: 1004px;
+    min-width: 1000px;
+    max-width: 1000px;
+    height: 1000px;
     margin: 0px;
     border: 2px solid black;
 }

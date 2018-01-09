@@ -1,4 +1,5 @@
-pragma solidity ^0.4.2;
+pragma solidity ^0.4.19;
+
 contract VirtualRealEstate {
     address owner;
     uint256 ownerEth = 0;
@@ -10,7 +11,7 @@ contract VirtualRealEstate {
     //propertyRenter to link
     mapping (address => bytes32[2]) ownerHoverText;
     
-    uint128 DEFAULT_PRICE = 10000000000000000;
+    uint128 DEFAULT_PRICE = 1000000000000000000;
     
     uint128 USER_BUY_CUT_PERCENT = 98; //%
     uint128 USER_RENT_CUT_PERCENT = 98; //%;
@@ -32,8 +33,8 @@ contract VirtualRealEstate {
         _;
     }
     
-    modifier validpropertyID(uint24 propertyID) {
-        if (propertyID < 1000000) {
+    modifier validPropertyID(uint24 propertyID) {
+        if (propertyID < 10000) {
             _;
         }
     }
@@ -48,23 +49,20 @@ contract VirtualRealEstate {
         ownerLink[msg.sender] = link;
     }
     
-    function getForSalePrice(uint24 propertyID) public view returns(uint128) {
-        Property property = map[propertyID];
+    function getForSalePrice(uint24 propertyID) public validPropertyID(propertyID) view returns(uint128) {
+        Property storage property = map[propertyID];
         require(property.salePrice != 0);
         return property.salePrice;
     }
     
-    function getForRentPrice(uint24 propertyID) public view returns(uint128) {
-        Property property = map[propertyID];
+    function getForRentPrice(uint24 propertyID) public validPropertyID(propertyID) view returns(uint128) {
+        Property storage property = map[propertyID];
         require(property.rentPrice != 0);
         return property.rentPrice;
     }
-    function getHoverText(uint24 propertyID) public view returns(bytes32[2]) {
-        Property property = map[propertyID];
+    function getHoverText(uint24 propertyID) public validPropertyID(propertyID) view returns(bytes32[2]) {
+        Property storage property = map[propertyID];
         
-        if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
-            map[propertyID].renter = 0;
-        }
         //Must have a owner or renter, and that owner/renter must have a short or long hover text
         require(property.renter != 0 || property.owner != 0);
         address propertyResident;
@@ -76,12 +74,9 @@ contract VirtualRealEstate {
         return ownerHoverText[propertyResident];
     }
     
-    function getLink(uint24 propertyID) public view returns(bytes32[2]) {
-        Property property = map[propertyID];
-        
-        if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
-            map[propertyID].renter = 0;
-        }
+    function getLink(uint24 propertyID) public validPropertyID(propertyID) view returns(bytes32[2]) {
+        Property storage property = map[propertyID];
+
         //Must have a owner or renter, and that owner/renter must have a short or long hover text
         require(property.renter != 0 || property.owner != 0);
         address propertyResident;
@@ -93,20 +88,36 @@ contract VirtualRealEstate {
         return ownerLink[propertyResident];
     }
     
-    function getPropertyColors(uint24 propertyID) public validpropertyID(propertyID) view returns(uint256[10]) {
+    function get20PropertyColorsOfRow(uint24 col, uint24 row) public validPropertyID(propertyID) view returns(uint256[20]) {
+        uint256[20] result;
+        uint24 propertyID = col + row * 1000;
+        uint24 pixelRow = row % 10;
+        for(uint24 i = 0; i < 20; i++) {
+            result[i] = map[propertyID + i].colors[pixelRow];
+        }
+        /*for(uint24 i = 0; i < 10; i++) {
+            uint256[10] colors = map[propertyID + i].colors;
+            for(uint24 j = 0; j < 10; j++) {
+                result[i * 10 + j] = colors[j];
+            }
+        }*/
+        return result;
+    }
+    
+    function getPropertyColors(uint24 propertyID) public validPropertyID(propertyID) view returns(uint256[10]) {
         return map[propertyID].colors;
     }
     
-    function getPropertyData(uint24 propertyID) public validpropertyID(propertyID) view returns(address, uint128, address, uint256, uint256, uint128) {
-        Property property = map[propertyID];
+    function getPropertyData(uint24 propertyID) public validPropertyID(propertyID) view returns(address, uint128, address, uint256, uint256, uint128) {
+        Property storage property = map[propertyID];
         return (property.owner, property.salePrice, property.renter, property.rentAvailableUntil, property.rentedUntil, property.rentPrice);
     }
     
-    function setColors(uint24 propertyID, uint256[10] newColors) public validpropertyID(propertyID) returns(bool) {
-        Property property = map[propertyID];
+    function setColors(uint24 propertyID, uint256[10] newColors) public validPropertyID(propertyID) returns(bool) {
+        Property storage property = map[propertyID];
         
         if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
-            map[propertyID].renter = 0;
+            property.renter = 0;
         }
         
         require((msg.sender == property.owner && property.renter == 0) || (msg.sender == property.renter));
@@ -119,17 +130,17 @@ contract VirtualRealEstate {
     }
     
     //Use Case: Buyer wants to buy a property
-    function buyProperty(uint24 propertyID) public validpropertyID(propertyID) payable returns(bool) {
+    function buyProperty(uint24 propertyID) public validPropertyID(propertyID) payable returns(bool) {
         //If this is the first ever purchase, the property hasn't been made yet, property.owner is just default
         if (map[propertyID].owner == 0) {
             map[propertyID].owner = owner;
             map[propertyID].salePrice = DEFAULT_PRICE;
         }
         
-        Property property = map[propertyID];
+        Property storage property = map[propertyID];
       
         if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
-            map[propertyID].renter = 0;
+            property.renter = 0;
         }
       
         require(property.salePrice != 0);//property must be for sale
@@ -144,10 +155,10 @@ contract VirtualRealEstate {
             property.owner.transfer(amountTransfered);
         }
         
-        map[propertyID].rentPrice = 0;
-        map[propertyID].renter = 0;
-        map[propertyID].salePrice = 0;
-        map[propertyID].owner = msg.sender;
+        property.rentPrice = 0;
+        property.renter = 0;
+        property.salePrice = 0;
+        property.owner = msg.sender;
         
         ownerEth += msg.value - amountTransfered;
         
@@ -155,14 +166,14 @@ contract VirtualRealEstate {
     }
     
     //Use Case: Renter wants to rent a property
-    function rentProperty(uint24 propertyID) public validpropertyID(propertyID) payable returns(bool) {
-        Property property = map[propertyID];
+    function rentProperty(uint24 propertyID) public validPropertyID(propertyID) payable returns(bool) {
+        Property storage property = map[propertyID];
         
         //How many units they paid to rent
         uint256 timeToRent = msg.value / property.rentPrice;
         
         if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
-            map[propertyID].renter = 0;
+            property.renter = 0;
         }
       
         require(property.owner != 0); //Must have been owned
@@ -175,12 +186,12 @@ contract VirtualRealEstate {
         
         property.owner.transfer(amountTransfered);
         
-        map[propertyID].renter = msg.sender;
+        property.renter = msg.sender;
       
-        if (map[propertyID].rentAvailableUntil < now + timeToRent) {
-            map[propertyID].rentedUntil = map[propertyID].rentAvailableUntil;
+        if (property.rentAvailableUntil < now + timeToRent) {
+            property.rentedUntil = property.rentAvailableUntil;
         } else {
-            map[propertyID].rentedUntil = now + timeToRent;
+            property.rentedUntil = now + timeToRent;
         }
         
         ownerEth += msg.value - amountTransfered;
@@ -189,8 +200,8 @@ contract VirtualRealEstate {
     }
     
     //Use Case: Renter wants to stop renting the property
-    function stopRenting(uint24 propertyID) public validpropertyID(propertyID) returns(bool) {
-        Property property = map[propertyID];
+    function stopRenting(uint24 propertyID) public validPropertyID(propertyID) returns(bool) {
+        Property storage property = map[propertyID];
         
         require(msg.sender == property.renter);
         
@@ -200,28 +211,28 @@ contract VirtualRealEstate {
     }
     
     //Use Case: Owner of a property lists for sale at a given price
-    function listForSale(uint24 propertyID, uint128 price ) public validpropertyID(propertyID) returns(bool) {
-        Property property = map[propertyID];
+    function listForSale(uint24 propertyID, uint128 price ) public validPropertyID(propertyID) returns(bool) {
+        Property storage property = map[propertyID];
       
         require(price != 0);
       
         if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
-            map[propertyID].renter = 0;
+            property.renter = 0;
         }
       
         require(msg.sender == property.owner); //Must be the owner
         require(property.renter == 0); //Must not currently be already rented out
         //You can listForSale an already listed item to update the listing
-        map[propertyID].salePrice = price;
+        property.salePrice = price;
         
         return true;
     }
     //Use Case: Owner of a property lists for rent at a given price
-    function listForRent(uint24 propertyID, uint128 rentPrice, uint128 rentDuration) public validpropertyID(propertyID) returns(bool)  {
-        Property property = map[propertyID];
+    function listForRent(uint24 propertyID, uint128 rentPrice, uint128 rentDuration) public validPropertyID(propertyID) returns(bool)  {
+        Property storage property = map[propertyID];
       
         if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
-            map[propertyID].renter = 0;
+            property.renter = 0;
         }
       
         require(rentPrice != 0);
@@ -230,28 +241,28 @@ contract VirtualRealEstate {
         require(rentDuration > 0); //Must be renting for a proper duration
         //You can listForRent an already listed item to update the listing
       
-        map[propertyID].rentPrice = rentPrice;
-        map[propertyID].rentAvailableUntil = now + rentDuration;
+        property.rentPrice = rentPrice;
+        property.rentAvailableUntil = now + rentDuration;
         
         return true;
     }
     //Use Case: Owner of a property delists from both renting offer and sale offer
-    function delist(uint24 propertyID, bool delistFromSale, bool delistFromRent) public validpropertyID(propertyID) returns(bool) {
-        Property property = map[propertyID];
+    function delist(uint24 propertyID, bool delistFromSale, bool delistFromRent) public validPropertyID(propertyID) returns(bool) {
+        Property storage property = map[propertyID];
       
         if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
-            map[propertyID].renter = 0;
+            property.renter = 0;
         }
         
         require(msg.sender == property.owner); //Must be the owner
         require(property.renter == 0); //Must have no current renter
         
         if (delistFromRent) {
-            map[propertyID].rentPrice = 0;
-            map[propertyID].renter = 0;
+            property.rentPrice = 0;
+            property.renter = 0;
         }
         if (delistFromSale) {
-            map[propertyID].salePrice = 0;
+            property.salePrice = 0;
         }
         return true;
     }
@@ -271,5 +282,9 @@ contract VirtualRealEstate {
     
     function changeOwners(address newOwner) public ownerOnly() {
         owner = newOwner;
+    }
+    
+    function changeDefaultPrice(uint128 defaultPrice) public ownerOnly() {
+        DEFAULT_PRICE = defaultPrice;
     }
 }

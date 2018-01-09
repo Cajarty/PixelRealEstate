@@ -88,9 +88,9 @@ contract VirtualRealEstate {
         return ownerLink[propertyResident];
     }
     
-    function get20PropertyColorsOfRow(uint24 col, uint24 row) public validPropertyID(propertyID) view returns(uint256[20]) {
+    function get200PixelColorsOfRow(uint24 startPixelX, uint24 row) public validPropertyID(propertyID) view returns(uint256[20]) {
         uint256[20] result;
-        uint24 propertyID = col + row * 1000;
+        uint24 propertyID = startPixelX + row * 1000;
         uint24 pixelRow = row % 10;
         for(uint24 i = 0; i < 20; i++) {
             result[i] = map[propertyID + i].colors[pixelRow];

@@ -34,7 +34,7 @@ contract VirtualRealEstate {
     }
     
     modifier validPropertyID(uint24 propertyID) {
-        if (propertyID < 1000000) {
+        if (propertyID < 10000) {
             _;
         }
     }
@@ -49,18 +49,18 @@ contract VirtualRealEstate {
         ownerLink[msg.sender] = link;
     }
     
-    function getForSalePrice(uint24 propertyID) public view returns(uint128) {
+    function getForSalePrice(uint24 propertyID) public validPropertyID(propertyID) view returns(uint128) {
         Property storage property = map[propertyID];
         require(property.salePrice != 0);
         return property.salePrice;
     }
     
-    function getForRentPrice(uint24 propertyID) public view returns(uint128) {
+    function getForRentPrice(uint24 propertyID) public validPropertyID(propertyID) view returns(uint128) {
         Property storage property = map[propertyID];
         require(property.rentPrice != 0);
         return property.rentPrice;
     }
-    function getHoverText(uint24 propertyID) public view returns(bytes32[2]) {
+    function getHoverText(uint24 propertyID) public validPropertyID(propertyID) view returns(bytes32[2]) {
         Property storage property = map[propertyID];
         
         //Must have a owner or renter, and that owner/renter must have a short or long hover text
@@ -74,7 +74,7 @@ contract VirtualRealEstate {
         return ownerHoverText[propertyResident];
     }
     
-    function getLink(uint24 propertyID) public view returns(bytes32[2]) {
+    function getLink(uint24 propertyID) public validPropertyID(propertyID) view returns(bytes32[2]) {
         Property storage property = map[propertyID];
 
         //Must have a owner or renter, and that owner/renter must have a short or long hover text

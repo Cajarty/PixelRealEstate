@@ -6,6 +6,40 @@ export const VisitPage = (path) => {
     browserHistory.push('/' + path);
 }
 
+export const ImageDataToBase64 = ( /*obj[0..999][0..4000]*/ data) => {
+    let result = {};
+
+    for (let i = 0; i < Object.keys(data).length; i++) {
+        result[i] = [];
+        for (let p = 0; p < result[i].length; p += 4) {
+            let a = data[i][p];
+            for (let char = 1; char < 3; char++) {
+                a = a << 8;
+                a |= data[i][char];
+            }
+            result[i].push(ToBase64(a));
+        }
+        return result;
+    }
+}
+
+export const Base64ToImageData = ( /*obj[0..999][0..500]*/ data) => {   
+    let result = {};
+
+    for (let i = 0; i < Object.keys(data).length; i++) {
+        result[i] = [];
+        for (let p = 0; p < data[i].length; p++) {
+            let tmp = [];
+            let a = parseInt(FromBase64(data[i][p]));
+            tmp[2] = (a & 255 * 256 * 256) >> 16;
+            tmp[1] = (a & 255 * 256) >> 8;
+            tmp[0] = (a & 255);
+            result[i].push(tmp[2], tmp[1], tmp[0], 255);
+        }
+    }
+    return result;
+}
+
 export const ContractDataToRGBAArray = (/*uint256[10]*/ contractDataArray) => {
 
     let result = [];
@@ -60,3 +94,11 @@ export const BinaryToRGB = (value) => {
     obj.r = (obj.r & value) >> 16;
     return obj;
 }
+
+export const ToBase64 = ((data) => {
+    return Buffer.from(data).toString('base64');
+});
+
+export const FromBase64 = ((data) => {
+    return Buffer.from(data, 'base64').toString();
+});

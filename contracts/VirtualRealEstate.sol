@@ -1,5 +1,6 @@
 pragma solidity ^0.4.2;
 
+//////TODO: Transfer ownership
 contract VirtualRealEstate {
     address owner;
     uint256 ownerEth = 0;
@@ -14,9 +15,13 @@ contract VirtualRealEstate {
     uint128 DEFAULT_PRICE_INCREMENTATION_INCREMENTATION = 100000000000000; //0.0001
     uint128 DEFAULT_PRICE_INCREMENTATION = 500000000000000; //0.0005
     uint128 DEFAULT_PRICE = 10000000000000000; //0.01 ETH
+    uint128 DEFAULT_RENT_PRICE = 231481481481; //0.001 ETH per day on block-by-block rate
     
     uint128 USER_BUY_CUT_PERCENT = 98; //%
     uint128 USER_RENT_CUT_PERCENT = 98; //%;
+    
+    
+    uint256 BUYABLE_AS_OF_DATE;
     
     event PropertyColorUpdate(uint24 indexed property, uint256[10] colors);
     
@@ -43,6 +48,7 @@ contract VirtualRealEstate {
     
     function VirtualRealEstate() public {
         owner = msg.sender;
+        BUYABLE_AS_OF_DATE = now + 7 days;
     }
     function setHoverText(bytes32[2] text) public {
         ownerHoverText[msg.sender] = text;
@@ -116,7 +122,9 @@ contract VirtualRealEstate {
             property.renter = 0;
         }
         
-        require((msg.sender == property.owner && property.renter == 0) || (msg.sender == property.renter));
+        if (property.owner != 0) {
+            require((msg.sender == property.owner && property.renter == 0) || (msg.sender == property.renter));
+        }
         
         property.colors = newColors;
         
@@ -125,18 +133,36 @@ contract VirtualRealEstate {
         return true;
     }
     
+    function transferProperty(uint24 propertyID, address newOwner) public validPropertyID(propertyID) returns(bool) {
+        Property storage property = map[propertyID];
+        
+        if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
+            property.renter = 0;
+        }
+        
+        require(property.owner == msg.sender);
+        require(property.renter == 0);
+        require(newOwner != 0);
+        
+        property.owner = newOwner;
+        
+        return true;
+    }
+    
     //Use Case: Buyer wants to buy a property
     function buyProperty(uint24 propertyID) public validPropertyID(propertyID) payable returns(bool) {
+        require(now < BUYABLE_AS_OF_DATE);
+        
+        Property storage property = map[propertyID];
+        
         //If this is the first ever purchase, the property hasn't been made yet, property.owner is just default
-        if (map[propertyID].owner == 0) {
-            map[propertyID].owner = owner;
-            
-            map[propertyID].salePrice = DEFAULT_PRICE;
+        if (property.owner == 0) {
+            property.owner = owner;
+            property.salePrice = DEFAULT_PRICE;
             DEFAULT_PRICE += DEFAULT_PRICE_INCREMENTATION;
             DEFAULT_PRICE_INCREMENTATION += DEFAULT_PRICE_INCREMENTATION_INCREMENTATION;
         }
         
-        Property storage property = map[propertyID];
       
         if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
             property.renter = 0;
@@ -149,6 +175,7 @@ contract VirtualRealEstate {
         //User gets the majority of the listed price's sale
         uint128 amountTransfered = 0;
         
+        //If there is someone to get paid, they get the purchase. Otherwise, the contract gets it as initial purchase payment
         if (property.owner != 0) {
             amountTransfered = property.salePrice * USER_BUY_CUT_PERCENT / 100;
             property.owner.transfer(amountTransfered);
@@ -168,22 +195,28 @@ contract VirtualRealEstate {
     function rentProperty(uint24 propertyID) public validPropertyID(propertyID) payable returns(bool) {
         Property storage property = map[propertyID];
         
-        //How many units they paid to rent
+        uint256 rentPrice = property.owner == 0 ? property.rentPrice : DEFAULT_RENT_PRICE;
+        
+        //How many units they paid to rent. Truncates to zero if not enough money for one day
         uint256 timeToRent = msg.value / property.rentPrice;
         
-        if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
+        if (rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
             property.renter = 0;
         }
       
-        require(property.owner != 0); //Must have been owned
-        require(property.rentPrice != 0);//property must be for sale
+        //require(property.owner != 0); //Must have been owned
+        require(rentPrice != 0);//property must be for sale
         require(timeToRent >= 1);//The renting must be for at least one unit
         require(property.renter == 0);//property cannot be being rented already
       
         //User gets the majority of the listed price's sale
         uint256 amountTransfered = msg.value * USER_RENT_CUT_PERCENT / 100;
         
-        property.owner.transfer(amountTransfered);
+        //If there is someone to transfer the funds to, transfer it, otherwise, they rented from the owners initially
+        //
+        if (property.owner != 0) {
+            property.owner.transfer(amountTransfered);
+        }
         
         property.renter = msg.sender;
       

@@ -1,4 +1,6 @@
 import { browserHistory } from 'react-router';
+import _Base64 from 'js-base64';
+var Base64 = _Base64.Base64;
 var bigInt = require("big-integer");
 var BigNumber = require('bignumber.js');
 
@@ -8,16 +10,15 @@ export const VisitPage = (path) => {
 
 export const ImageDataToBase64 = ( /*obj[0..999][0..4000]*/ data) => {
     let result = {};
-
     for (let i = 0; i < Object.keys(data).length; i++) {
         result[i] = [];
         for (let p = 0; p < result[i].length; p += 4) {
             let a = data[i][p];
-            for (let char = 1; char < 3; char++) {
+            for (let char = p + 1; char < p + 3; char++) {
                 a = a << 8;
                 a |= data[i][char];
             }
-            result[i].push(ToBase64(a));
+            result[i].push(Base64.btoa(a));
         }
         return result;
     }
@@ -26,14 +27,17 @@ export const ImageDataToBase64 = ( /*obj[0..999][0..4000]*/ data) => {
 export const Base64ToImageData = ( /*obj[0..999][0..500]*/ data) => {   
     let result = {};
 
+    console.info(data)
     for (let i = 0; i < Object.keys(data).length; i++) {
         result[i] = [];
         for (let p = 0; p < data[i].length; p++) {
             let tmp = [];
-            let a = parseInt(FromBase64(data[i][p]));
+            let a = parseInt(Base64.atob(data[i][p]));
             tmp[2] = (a & 255 * 256 * 256) >> 16;
             tmp[1] = (a & 255 * 256) >> 8;
             tmp[0] = (a & 255);
+            if (i == 0 && p == 1)
+            console.info(data[i], data[i][p], Base64.atob(data[i][p]), a, tmp);
             result[i].push(tmp[2], tmp[1], tmp[0], 255);
         }
     }
@@ -94,11 +98,3 @@ export const BinaryToRGB = (value) => {
     obj.r = (obj.r & value) >> 16;
     return obj;
 }
-
-export const ToBase64 = ((data) => {
-    return Buffer.from(data).toString('base64');
-});
-
-export const FromBase64 = ((data) => {
-    return Buffer.from(data, 'base64').toString();
-});

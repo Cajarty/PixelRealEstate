@@ -30,8 +30,8 @@ class Canvas extends Component {
 
     loadCanvas() {
         let cancelToken = null;
-        Axios.getInstance().get('/getCanvas', cancelToken).then((result) => {
-            this.setCanvas(Func.Base64ToImageData(result.data));
+        Axios.getInstance().get('/getPixelData', cancelToken).then((result) => {
+            this.setCanvas(result.data);
         });
         this.setState({cancelToken: cancelToken});
     }

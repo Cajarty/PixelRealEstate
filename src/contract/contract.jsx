@@ -213,7 +213,7 @@ export class Contract {
         }).then(() => {
             this.sendResults(true, "Property " + x + "x" + y + " pixels changed.");
         }).catch((e) => {
-            this.sendResults(false, "Error uploadimg pixels.");
+            this.sendResults(false, "Error uploading pixels.");
         });
     }
 

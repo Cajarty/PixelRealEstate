@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import * as Const from '../../const/const.jsx';
-import {ctr, Contract} from '../../contract/contract.jsx';
+import {EVENTS, ctr, Contract} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions.jsx';
 import Axios from '../../network/Axios.jsx';
 import * as Compress from 'lzwcompress';
@@ -26,17 +26,22 @@ class Canvas extends Component {
         ctx.imageSmoothingEnabled = false;
         this.setState({ ctx });
         this.loadCanvas();
+        ctr.listenForEvent(EVENTS.ColorChange, 'canvas', (data) => {
+            this.setCanvasProperty(data.x, data.y, data.data);
+        });
     }
 
     loadCanvas() {
         let cancelToken = null;
         Axios.getInstance().get('/getPixelData', cancelToken).then((result) => {
             this.setCanvas(result.data);
+            ctr.setupEvents();
         });
         this.setState({cancelToken: cancelToken});
     }
 
     setCanvasProperty(x, y, rgbArr) {
+        console.info(x, y, rgbArr);
         let ctxID = this.state.ctx.createImageData(10, 10);
         for (let i = 0; i < rgbArr.length; i++) {
             ctxID.data[i] = rgbArr[i];

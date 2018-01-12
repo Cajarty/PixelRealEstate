@@ -4,6 +4,10 @@ var Base64 = _Base64.Base64;
 var bigInt = require("big-integer");
 var BigNumber = require('bignumber.js');
 
+export const BigNumberToNumber = (big) => {
+    return big.toNumber();
+}
+
 export const VisitPage = (path) => {
     browserHistory.push('/' + path);
 }

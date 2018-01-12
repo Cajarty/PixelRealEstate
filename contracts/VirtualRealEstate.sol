@@ -11,9 +11,7 @@ contract VirtualRealEstate {
     //propertyRenter to link
     mapping (address => bytes32[2]) ownerHoverText;
     
-    uint128 DEFAULT_PRICE_INCREMENTATION_INCREMENTATION = 100000000000000; //0.0001
-    uint128 DEFAULT_PRICE_INCREMENTATION = 500000000000000; //0.0005
-    uint128 DEFAULT_PRICE = 10000000000000000; //0.01 ETH
+    uint128 DEFAULT_PRICE = 100000000000000000;
     
     uint128 USER_BUY_CUT_PERCENT = 98; //%
     uint128 USER_RENT_CUT_PERCENT = 98; //%;
@@ -78,7 +76,6 @@ contract VirtualRealEstate {
     
     function getLink(uint24 propertyID) public validPropertyID(propertyID) view returns(bytes32[2]) {
         Property storage property = map[propertyID];
-
         //Must have a owner or renter, and that owner/renter must have a short or long hover text
         require(property.renter != 0 || property.owner != 0);
         address propertyResident;
@@ -90,9 +87,9 @@ contract VirtualRealEstate {
         return ownerLink[propertyResident];
     }
     
-    function getPropertyColorsOfRow(uint24 x, uint24 row) public validPropertyID(propertyID) view returns(uint256[10]) {
+    function getPropertyColorsOfRow(uint24 x, uint24 row) public validPropertyID(x + (row / 10) * 100) view returns(uint256[10]) {
         uint256[10] result;
-        uint24 propertyID = row * 10 + x;
+        uint24 propertyID = x + row * 10;
         uint24 pixelRow = row % 10;
         for(uint24 i = 0; i < 10; i++) {
             result[i] = map[propertyID + i].colors[pixelRow];
@@ -130,10 +127,7 @@ contract VirtualRealEstate {
         //If this is the first ever purchase, the property hasn't been made yet, property.owner is just default
         if (map[propertyID].owner == 0) {
             map[propertyID].owner = owner;
-            
             map[propertyID].salePrice = DEFAULT_PRICE;
-            DEFAULT_PRICE += DEFAULT_PRICE_INCREMENTATION;
-            DEFAULT_PRICE_INCREMENTATION += DEFAULT_PRICE_INCREMENTATION_INCREMENTATION;
         }
         
         Property storage property = map[propertyID];

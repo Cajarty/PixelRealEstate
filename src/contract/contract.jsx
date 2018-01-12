@@ -8,6 +8,11 @@ import { default as contract } from 'truffle-contract';
 // Import our contract artifacts and turn them into usable abstractions.
 import VirtualRealEstate from '../../build/contracts/VirtualRealEstate.json'
 
+    
+export const EVENTS = { 
+    ColorChange: 'ColorChange'
+};
+
 export class Contract {
     constructor() {
         this.listeners = {};
@@ -19,6 +24,14 @@ export class Contract {
         this.pixelsRented = {};
         this.pixelsForSale = {};
         this.pixelsForRent = {};
+
+        this.events = {
+            ColorChange: {
+                event: null,
+                listeners: {},
+            },
+
+        }
         
         this.setup();
         this.test();
@@ -51,28 +64,23 @@ export class Contract {
 
             this.accounts = accs;
             this.account = this.accounts[0];
-            /*
-            VRE.deployed().then((instance) => {
+        });
+    }
 
-                for (let i = 0; i < WIDTH * HEIGHT; i++) {
-                    instance.getColor.call(i, { from: account }).then((r) => {
-                        setCanvasPixel(i % WIDTH, Math.floor(i / WIDTH), r[0], r[1], r[2]);
-                    });
+    setupEvents() {
+        this.VRE.deployed().then((instance) => {
+            this.events.ColorChange.event = instance.PropertyColorUpdate({fromBlock: 0, toBlock: 'latest'});
+            this.events.ColorChange.event.watch((error, result) => {
+                console.info("Event: " + EVENTS.ColorChange, this.fromID(Func.BigNumberToNumber(result.args.property)), Func.BigNumberToNumber(result.args.property), Func.ContractDataToRGBAArray(result.args.colors));
+                if (error)
+                    console.info(result, error);
+                else {
+                    let id = this.fromID(Func.BigNumberToNumber(result.args.property));
+                    this.sendEvent(EVENTS.ColorChange, {x: id.x, y: id.y, data: Func.ContractDataToRGBAArray(result.args.colors)});
                 }
-
-                event = instance.PixelColorUpdate();
-                event.watch((error, result) => {
-                    if (error)
-                        console.info(result, error);
-                    let x = result.args.pixel.c[0] % WIDTH;
-                    let y = Math.floor(result.args.pixel.c[0] / WIDTH);
-                    console.info('pixel update: ', x, y);
-                    setCanvasPixel(x, y, result.args.red.c[0], result.args.green.c[0], result.args.blue.c[0]);
-                });
-            }).catch((c) => {
-                console.info(c);
             });
-        });*/
+        }).catch((c) => {
+            console.info(c);
         });
     }
 
@@ -252,8 +260,9 @@ export class Contract {
     }
 
     /*
-    Subscriber functions for function call returns on the contract so the
-    ui can update when it sees a change.
+    Subscriber functions for gnereal updates.
+    Events that are being used:
+        Alerts
     */
     listenForResults(key, callback) {
         this.listeners[key] = callback;
@@ -266,6 +275,24 @@ export class Contract {
     sendResults(result, message) {
         Object.keys(this.listeners).map((i) => {
             this.listeners[i](result, message);
+        });
+    }
+
+    /*
+    Subscriber functions for function call returns from events fired on the 
+    contract.
+    */
+    listenForEvent(event, key, callback) {
+        this.events[event].listeners[key] = callback;
+    }
+
+    stopListeningForEvent(event, key) {
+        delete this.events[event].listeners[key];
+    }
+
+    sendEvent(event, result) {
+        Object.keys(this.events[event].listeners).map((i) => {
+            this.events[event].listeners[i](result);
         });
     }
 

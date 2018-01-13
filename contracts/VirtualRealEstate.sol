@@ -1,6 +1,27 @@
 pragma solidity ^0.4.2;
 
-contract VirtualRealEstate {
+/* taking ideas from BatToken token */
+contract SafeMath {
+    function safeAdd(uint256 x, uint256 y) internal returns(uint256) {
+      uint256 z = x + y;
+      assert((z >= x) && (z >= y));
+      return z;
+    }
+
+    function safeSubtract(uint256 x, uint256 y) internal returns(uint256) {
+      assert(x >= y);
+      uint256 z = x - y;
+      return z;
+    }
+
+    function safeMult(uint256 x, uint256 y) internal returns(uint256) {
+      uint256 z = x * y;
+      assert((x == 0)||(z/x == y));
+      return z;
+    }
+}
+
+contract VirtualRealEstate is SafeMath {
     address owner;
     uint256 ownerEth = 0;
     
@@ -11,19 +32,34 @@ contract VirtualRealEstate {
     //propertyRenter to link
     mapping (address => bytes32[2]) ownerHoverText;
     
-    uint128 DEFAULT_PRICE = 100000000000000000;
+    uint128 DEFAULT_PRICE_INCREMENTATION_INCREMENTATION = 100000000000000; //0.0001
+    uint128 DEFAULT_PRICE_INCREMENTATION = 500000000000000; //0.0005
+    uint128 DEFAULT_PRICE = 10000000000000000; //0.01 ETH
+    uint128 DEFAULT_RENT_PRICE = 231481481481; //0.001 ETH per day on block-by-block rate
+    uint128 DEFAULT_MAX_RENT_DURATION = 72; 
     
     uint128 USER_BUY_CUT_PERCENT = 98; //%
     uint128 USER_RENT_CUT_PERCENT = 98; //%;
     
+    uint256 BUYABLE_AS_OF_DATE;
+    
     event PropertyColorUpdate(uint24 indexed property, uint256[10] colors);
+    event PropertyColorUpdatePixel(uint24 indexed property, uint8 row, uint24 rgb);
+    event PropertyBought(uint24 indexed property,  address newOwner);
+    event PropertyRented(uint24 indexed property, address newRenter, uint256 expiration );
+    event SetUserHoverText(address indexed user, bytes32[2] newHoverText);
+    event SetUserSetLink(address indexed user, bytes32[2] newLink);
+    event PropertySetForSale(uint24 indexed property);
+    event PropertySetForRent(uint24 indexed property); //
+    event RenterLeaves(uint24 indexed property);
+    event DelistProperty(uint24 propertyID, bool delistFromSale, bool delistFromRent);
     
     struct Property {
         address owner;
         uint256[10] colors; //10x10 rgb pixel colors per property
         uint128 salePrice;
         address renter;
-        uint256 rentAvailableUntil;
+        uint256 maxRentDuration;
         uint256 rentedUntil;
         uint128 rentPrice;
     }
@@ -39,14 +75,24 @@ contract VirtualRealEstate {
         }
     }
     
+    modifier tryEvict(Property property) {
+        if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
+            property.renter = 0;
+        }
+        _;
+    }
+    
     function VirtualRealEstate() public {
         owner = msg.sender;
+        BUYABLE_AS_OF_DATE = now + 7 days;
     }
     function setHoverText(bytes32[2] text) public {
         ownerHoverText[msg.sender] = text;
+        SetUserHoverText(msg.sender, text);
     }
     function setLink(bytes32[2] link) public {
         ownerLink[msg.sender] = link;
+        SetUserSetLink(msg.sender, link);
     }
     
     function getForSalePrice(uint24 propertyID) public validPropertyID(propertyID) view returns(uint128) {
@@ -71,6 +117,7 @@ contract VirtualRealEstate {
         } else {
             propertyResident = property.renter;
         }
+        
         return ownerHoverText[propertyResident];
     }
     
@@ -87,33 +134,21 @@ contract VirtualRealEstate {
         return ownerLink[propertyResident];
     }
     
-    function getPropertyColorsOfRow(uint24 x, uint24 row) public validPropertyID(x + (row / 10) * 100) view returns(uint256[10]) {
-        uint256[10] result;
-        uint24 propertyID = x + row * 10;
-        uint24 pixelRow = row % 10;
-        for(uint24 i = 0; i < 10; i++) {
-            result[i] = map[propertyID + i].colors[pixelRow];
-        }
-        return result;
-    }
-    
     function getPropertyColors(uint24 propertyID) public validPropertyID(propertyID) view returns(uint256[10]) {
         return map[propertyID].colors;
     }
     
     function getPropertyData(uint24 propertyID) public validPropertyID(propertyID) view returns(address, uint128, address, uint256, uint256, uint128) {
         Property storage property = map[propertyID];
-        return (property.owner, property.salePrice, property.renter, property.rentAvailableUntil, property.rentedUntil, property.rentPrice);
+        return (property.owner, property.salePrice, property.renter, property.maxRentDuration, property.rentedUntil, property.rentPrice);
     }
     
-    function setColors(uint24 propertyID, uint256[10] newColors) public validPropertyID(propertyID) returns(bool) {
+    function setColors(uint24 propertyID, uint256[10] newColors) public validPropertyID(propertyID) tryEvict(property) returns(bool) {
         Property storage property = map[propertyID];
         
-        if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
-            property.renter = 0;
+        if (property.owner != 0) {
+            require((msg.sender == property.owner && property.renter == 0) || (msg.sender == property.renter));
         }
-        
-        require((msg.sender == property.owner && property.renter == 0) || (msg.sender == property.renter));
         
         property.colors = newColors;
         
@@ -122,18 +157,42 @@ contract VirtualRealEstate {
         return true;
     }
     
+    function setRowColors(uint24 propertyID, uint8 row, uint24 newColorData) public validPropertyID(propertyID) tryEvict(property) returns(bool) {
+        Property storage property = map[propertyID];
+        
+        require(row >= 0 && row <= 9);
+        
+        property.colors[row] = newColorData;
+        
+        PropertyColorUpdatePixel(propertyID, row, newColorData);
+        
+        return true;
+    }
+    
+    function transferProperty(uint24 propertyID, address newOwner) public validPropertyID(propertyID)  tryEvict(property) returns(bool) {
+        Property storage property = map[propertyID];
+        
+        require(property.owner == msg.sender);
+        require(property.renter == 0);
+        require(newOwner != 0);
+        
+        property.owner = newOwner;
+        
+        return true;
+    }
+    
     //Use Case: Buyer wants to buy a property
-    function buyProperty(uint24 propertyID) public validPropertyID(propertyID) payable returns(bool) {
-        //If this is the first ever purchase, the property hasn't been made yet, property.owner is just default
-        if (map[propertyID].owner == 0) {
-            map[propertyID].owner = owner;
-            map[propertyID].salePrice = DEFAULT_PRICE;
-        }
+    function buyProperty(uint24 propertyID) public validPropertyID(propertyID) tryEvict(property) payable returns(bool) {
+        require(now < BUYABLE_AS_OF_DATE);
         
         Property storage property = map[propertyID];
-      
-        if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
-            property.renter = 0;
+        
+        //If this is the first ever purchase, the property hasn't been made yet, property.owner is just default
+        if (property.owner == 0) {
+            property.owner = owner;
+            property.salePrice = DEFAULT_PRICE;
+            DEFAULT_PRICE += DEFAULT_PRICE_INCREMENTATION;
+            DEFAULT_PRICE_INCREMENTATION += DEFAULT_PRICE_INCREMENTATION_INCREMENTATION;
         }
       
         require(property.salePrice != 0);//property must be for sale
@@ -143,6 +202,7 @@ contract VirtualRealEstate {
         //User gets the majority of the listed price's sale
         uint128 amountTransfered = 0;
         
+        //If there is someone to get paid, they get the purchase. Otherwise, the contract gets it as initial purchase payment
         if (property.owner != 0) {
             amountTransfered = property.salePrice * USER_BUY_CUT_PERCENT / 100;
             property.owner.transfer(amountTransfered);
@@ -155,39 +215,42 @@ contract VirtualRealEstate {
         
         ownerEth += msg.value - amountTransfered;
         
+        PropertyBought(propertyID, property.owner);
+        
         return true;
     }
     
     //Use Case: Renter wants to rent a property
-    function rentProperty(uint24 propertyID) public validPropertyID(propertyID) payable returns(bool) {
+    function rentProperty(uint24 propertyID, uint32 hoursToRentFor) public validPropertyID(propertyID) tryEvict(property) payable returns(bool) {
         Property storage property = map[propertyID];
         
-        //How many units they paid to rent
-        uint256 timeToRent = msg.value / property.rentPrice;
+        uint256 rentPrice = property.owner == 0 ? property.rentPrice : DEFAULT_RENT_PRICE;
         
-        if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
-            property.renter = 0;
-        }
+        //How many units they paid to rent. Truncates to zero if not enough money for one day
+        uint256 timeToRent = msg.value / property.rentPrice;
       
-        require(property.owner != 0); //Must have been owned
-        require(property.rentPrice != 0);//property must be for sale
+        //require(property.owner != 0); //Must have been owned
+        require(rentPrice != 0);//property must be for sale
         require(timeToRent >= 1);//The renting must be for at least one unit
         require(property.renter == 0);//property cannot be being rented already
       
         //User gets the majority of the listed price's sale
         uint256 amountTransfered = msg.value * USER_RENT_CUT_PERCENT / 100;
         
-        property.owner.transfer(amountTransfered);
-        
-        property.renter = msg.sender;
-      
-        if (property.rentAvailableUntil < now + timeToRent) {
-            property.rentedUntil = property.rentAvailableUntil;
-        } else {
-            property.rentedUntil = now + timeToRent;
+        //If there is someone to transfer the funds to, transfer it, otherwise, they rented from the owners initially
+        if (property.owner != 0) {
+            property.owner.transfer(amountTransfered);
         }
         
+        //TODO: moving rent systems over. Double check I'm not missing cases
+        require(hoursToRentFor <= timeToRent);
+        require(timeToRent <= hoursToRentFor);
+        
+        property.rentedUntil = now + (1 hours) * hoursToRentFor;
+        property.renter = msg.sender;
         ownerEth += msg.value - amountTransfered;
+        
+        PropertyRented(propertyID, property.renter, property.rentedUntil );
         
         return true;
     }
@@ -200,52 +263,47 @@ contract VirtualRealEstate {
         
         property.renter = 0;
         
+        RenterLeaves(propertyID);
+        
         return true;
     }
     
     //Use Case: Owner of a property lists for sale at a given price
-    function listForSale(uint24 propertyID, uint128 price ) public validPropertyID(propertyID) returns(bool) {
+    function listForSale(uint24 propertyID, uint128 price ) public validPropertyID(propertyID) tryEvict(property) returns(bool) {
         Property storage property = map[propertyID];
       
         require(price != 0);
-      
-        if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
-            property.renter = 0;
-        }
       
         require(msg.sender == property.owner); //Must be the owner
         require(property.renter == 0); //Must not currently be already rented out
         //You can listForSale an already listed item to update the listing
         property.salePrice = price;
         
+        PropertySetForSale(propertyID);
+        
         return true;
     }
     //Use Case: Owner of a property lists for rent at a given price
-    function listForRent(uint24 propertyID, uint128 rentPrice, uint128 rentDuration) public validPropertyID(propertyID) returns(bool)  {
+    function listForRent(uint24 propertyID, uint128 rentPrice, uint128 maxRentDuration) public validPropertyID(propertyID) tryEvict(property) returns(bool)  {
         Property storage property = map[propertyID];
-      
-        if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
-            property.renter = 0;
-        }
       
         require(rentPrice != 0);
         require(msg.sender == property.owner); //Must be the owner
         require(property.renter == 0); //Must not currently be already rented out
-        require(rentDuration > 0); //Must be renting for a proper duration
+        require(maxRentDuration > 0); //Must be renting for a proper duration
         //You can listForRent an already listed item to update the listing
       
         property.rentPrice = rentPrice;
-        property.rentAvailableUntil = now + rentDuration;
+        property.maxRentDuration = maxRentDuration;
+        property.rentedUntil = 0;
+        
+        PropertySetForRent(propertyID);
         
         return true;
     }
     //Use Case: Owner of a property delists from both renting offer and sale offer
-    function delist(uint24 propertyID, bool delistFromSale, bool delistFromRent) public validPropertyID(propertyID) returns(bool) {
+    function delist(uint24 propertyID, bool delistFromSale, bool delistFromRent) public validPropertyID(propertyID) tryEvict(property) returns(bool) {
         Property storage property = map[propertyID];
-      
-        if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
-            property.renter = 0;
-        }
         
         require(msg.sender == property.owner); //Must be the owner
         require(property.renter == 0); //Must have no current renter
@@ -257,6 +315,9 @@ contract VirtualRealEstate {
         if (delistFromSale) {
             property.salePrice = 0;
         }
+        
+        DelistProperty(propertyID, delistFromSale, delistFromRent);
+        
         return true;
     }
     

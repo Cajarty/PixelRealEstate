@@ -14,12 +14,18 @@ class ActionPanel extends Component {
         return (
             <div>
                 <div className='contractAction'>
-                    <Pullout>
+                    <Pullout top={10} side='right'>
+                        <BuyPixelForm/>
                     </Pullout>
-                    <BuyPixelForm/>
-                    <SellPixelForm/>
-                    <SetPixelColorForm/>
-                    <GetPixelColorForm/>
+                    <Pullout top={30} side='right'>
+                        <SellPixelForm/>
+                    </Pullout>
+                    <Pullout top={50} side='right'>
+                        <SetPixelColorForm/>
+                    </Pullout>
+                    <Pullout top={70} side='right'>
+                        <GetPixelColorForm/>
+                    </Pullout>
                 </div>
             </div>
         );

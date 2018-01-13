@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-import './ui.css'
+import './ui.scss'
 
 class PixelsOwned extends Component {
     constructor(props) {
@@ -9,7 +9,7 @@ class PixelsOwned extends Component {
 
     render() {
         return (
-            <div className='panel '>
+            <div>
                 <div>
                     <canvas id='colorPreviewCanvas'></canvas>
                 </div>

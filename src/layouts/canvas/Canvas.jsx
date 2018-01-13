@@ -41,7 +41,6 @@ class Canvas extends Component {
     }
 
     setCanvasProperty(x, y, rgbArr) {
-        console.info(x, y, rgbArr);
         let ctxID = this.state.ctx.createImageData(10, 10);
         for (let i = 0; i < rgbArr.length; i++) {
             ctxID.data[i] = rgbArr[i];

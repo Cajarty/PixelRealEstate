@@ -10,7 +10,7 @@ class PixelDescriptionBox extends Component {
 
     render() {
         return (
-            <div className='panel '>
+            <div>
                 <div>
                     <canvas id='colorPreviewCanvas'></canvas>
                 </div>

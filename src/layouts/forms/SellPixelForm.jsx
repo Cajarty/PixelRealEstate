@@ -13,7 +13,7 @@ class SellPixelForm extends Component {
 
     handleInput(key, event) {
         let obj = {};
-        obj[key] = event.target.value;
+        obj[key] = parseInt(event.target.value);
         this.setState(obj);
     }
 

@@ -69,9 +69,8 @@ export class Contract {
 
     setupEvents() {
         this.VRE.deployed().then((instance) => {
-            this.events.ColorChange.event = instance.PropertyColorUpdate({fromBlock: 0, toBlock: 'latest'});
+            this.events.ColorChange.event = instance.allEvents({fromBlock: 0, toBlock: 'latest'});
             this.events.ColorChange.event.watch((error, result) => {
-                console.info("Event: " + EVENTS.ColorChange, this.fromID(Func.BigNumberToNumber(result.args.property)), Func.BigNumberToNumber(result.args.property), Func.ContractDataToRGBAArray(result.args.colors));
                 if (error)
                     console.info(result, error);
                 else {
@@ -91,7 +90,7 @@ export class Contract {
     fromID(id) {
         let obj = {x: 0, y: 0};
         obj.x = id % Const.PROPERTIES_WIDTH;
-        obj.y = Math.floor(id / 1000);
+        obj.y = Math.floor(id / 100);
         return obj;
     }
 
@@ -220,6 +219,7 @@ export class Contract {
             return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), {from: this.account });
         }).then(() => {
             this.sendResults(true, "Property " + x + "x" + y + " pixels changed.");
+            this.sendEvent(EVENTS.ColorChange, {x: x, y: y, data: data});
         }).catch((e) => {
             this.sendResults(false, "Error uploading pixels.");
         });

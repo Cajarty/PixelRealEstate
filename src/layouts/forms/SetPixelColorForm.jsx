@@ -27,7 +27,7 @@ class SetPixelColorForm extends Component {
 
     handleInput(key, event) {
         let obj = {};
-        obj[key] = event.target.value;
+        obj[key] = parseInt(event.target.value);
         this.setState(obj);
     }
 
@@ -61,28 +61,51 @@ class SetPixelColorForm extends Component {
 
     render() {
         return (
-            <div className='form'>
-                Change Property Image:
-                <br/>
-                <div>
-                    <canvas id='large' width={PREVIEW_WIDTH} height={PREVIEW_HEIGHT} ref={(canvasLrg) => { this.canvasLrg = canvasLrg; }}></canvas>
-                </div>
-                <div>
-                    <canvas id='normal' width={Const.PROPERTY_LENGTH} height={Const.PROPERTY_LENGTH} ref={(canvasSml) => { this.canvasSml = canvasSml; }}></canvas>
-                </div>
-                <div>
-                    X: <input id='xInput' type='number' onChange={(e) => this.handleInput('valueX', e)} value={this.state.valueX}></input>
-                </div>
-                <div>
-                    Y: <input id='yInput' type='number' onChange={(e) => this.handleInput('valueY', e)} value={this.state.valueY}></input>
-                </div>
-                <div>
-                    <input id='imageInput' type='file' onChange={(e) => this.uploadImage(e)}></input>
-                </div>
-                <div>
-                    <input type='button' value='Change Image' onClick={() => this.sendColors()}></input>
-                </div>
-            </div>
+            <table className='form'>
+                <tbody>
+                    <tr>
+                        <td colSpan={2}>
+                            <div className='title'>
+                                Change Property Image:
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <canvas id='large' width={PREVIEW_WIDTH} height={PREVIEW_HEIGHT} ref={(canvasLrg) => { this.canvasLrg = canvasLrg; }}></canvas>
+                        </td>
+                        <td>
+                            <canvas id='normal' width={Const.PROPERTY_LENGTH} height={Const.PROPERTY_LENGTH} ref={(canvasSml) => { this.canvasSml = canvasSml; }}></canvas>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div className='inputTitle'> X: </div>
+                        </td>
+                        <td>
+                            <input id='xInput' type='number' onChange={(e) => this.handleInput('valueX', e)} value={this.state.valueX}></input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div className='inputTitle'> Y: </div>
+                        </td>
+                        <td>
+                            <input id='yInput' type='number' onChange={(e) => this.handleInput('valueY', e)} value={this.state.valueY}></input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colSpan={2}>
+                            <input id='imageInput' type='file' onChange={(e) => this.uploadImage(e)}></input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colSpan={2}>
+                            <input type='button' value='Change Image' onClick={() => this.sendColors()}></input>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         );
     }
 }

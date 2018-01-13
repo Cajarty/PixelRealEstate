@@ -15,13 +15,13 @@ class CanvasPage extends Component {
     render() {
         return (
             <div>
-                <div className='left panel'>
+                <div className='left'>
                     <ManagePanel/>
                 </div>
-                <div className='center panel'>
+                <div className='center'>
                     <Canvas/>
                 </div>
-                <div className='right panel'>
+                <div className='right'>
                     <ActionPanel/>
                 </div>
             </div>

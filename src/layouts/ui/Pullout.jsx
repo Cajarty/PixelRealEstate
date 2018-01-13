@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-import './ui.css'
+import './ui.scss'
 
 class Pullout extends Component {
     constructor(props) {
@@ -13,9 +13,12 @@ class Pullout extends Component {
 
     render() {
         return (
-            <div className={'pullout ' + this.props.side}>
-                <div>
+            <div className='pullout' style={{ top: this.props.top + '%', zIndex: this.props.top }}>
+                <div className='tab'>
 
+                </div>
+                <div className='panel'>
+                    {this.props.children}
                 </div>
             </div>
         );

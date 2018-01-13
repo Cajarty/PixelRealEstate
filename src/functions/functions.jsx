@@ -31,7 +31,6 @@ export const ImageDataToBase64 = ( /*obj[0..999][0..4000]*/ data) => {
 export const Base64ToImageData = ( /*obj[0..999][0..500]*/ data) => {   
     let result = {};
 
-    console.info(data)
     for (let i = 0; i < Object.keys(data).length; i++) {
         result[i] = [];
         for (let p = 0; p < data[i].length; p++) {
@@ -41,7 +40,6 @@ export const Base64ToImageData = ( /*obj[0..999][0..500]*/ data) => {
             tmp[1] = (a & 255 * 256) >> 8;
             tmp[0] = (a & 255);
             if (i == 0 && p == 1)
-            console.info(data[i], data[i][p], Base64.atob(data[i][p]), a, tmp);
             result[i].push(tmp[2], tmp[1], tmp[0], 255);
         }
     }

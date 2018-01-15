@@ -61,8 +61,13 @@ class Canvas extends Component {
 
     render() {
         return (
-            <div className='canvas'>
-                <canvas className={this.state.loaded ? '' : 'hidden'} ref={(canvas) => { this.canvas = canvas; }} width={Const.CANVAS_WIDTH} height={Const.CANVAS_HEIGHT}></canvas>
+            <div className='canvasContainer'>
+                <canvas 
+                    className={'canvas zoom-6 ' + (this.state.loaded ? '' : 'hidden')} 
+                    ref={(canvas) => { this.canvas = canvas; }} 
+                    width={Const.CANVAS_WIDTH} 
+                    height={Const.CANVAS_HEIGHT}
+                ></canvas>
                 <div className={!this.state.loaded ? '' : 'hidden'}>Loading... Please wait.</div>
             </div>
         );

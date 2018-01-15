@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 
 
-import './PixelDescriptionBox.css'
-
 class PixelDescriptionBox extends Component {
     constructor(props) {
         super(props);

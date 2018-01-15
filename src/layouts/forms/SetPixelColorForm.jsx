@@ -2,8 +2,8 @@ import React, { Component } from 'react'
 import {Contract, ctr} from '../../contract/contract.jsx';
 import * as Const from '../../const/const.jsx';
 
-const PREVIEW_WIDTH = 40;
-const PREVIEW_HEIGHT = 40;
+const PREVIEW_WIDTH = 100;
+const PREVIEW_HEIGHT = 100;
 
 class SetPixelColorForm extends Component {
     constructor(props) {
@@ -96,7 +96,19 @@ class SetPixelColorForm extends Component {
                     </tr>
                     <tr>
                         <td colSpan={2}>
-                            <input id='imageInput' type='file' onChange={(e) => this.uploadImage(e)}></input>
+                            <input 
+                                id='imageInput' 
+                                type='file' 
+                                onChange={(e) => this.uploadImage(e)} 
+                                style={{display: 'none'}} 
+                                ref={(input) => { this.input = input; }}
+                            ></input>
+                            <input 
+                                id='imageInputButton' 
+                                value='Upload Image' 
+                                type='button' 
+                                onClick={(e) => {this.input.click()}}
+                            ></input>
                         </td>
                     </tr>
                     <tr>

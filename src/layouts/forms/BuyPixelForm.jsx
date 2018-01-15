@@ -22,7 +22,7 @@ class BuyPixelForm extends Component {
             <table className='form'>
                 <tbody>
                     <tr>
-                        <td colSpan={2}>
+                        <td>
                             <div className='title'>
                                 Buy Pixel:
                             </div>
@@ -31,29 +31,23 @@ class BuyPixelForm extends Component {
                     <tr>
                         <td>
                             <div className='inputTitle'> X: </div>
-                        </td>
-                        <td>
                             <input id='buyPixelX' type='number' onChange={(e) => this.handleInput('valueX', e)} value={this.state.valueX}></input>
                         </td>
                     </tr>
                     <tr>
                         <td>
                             <div className='inputTitle'> Y: </div>
-                        </td>
-                        <td>
                             <input id='buyPixelY' type='number' onChange={(e) => this.handleInput('valueY', e)} value={this.state.valueY}></input>
                         </td>
                     </tr>
                     <tr>
                         <td>
                             <div className='inputTitle'> Price: </div>
-                        </td>
-                        <td>
                             <input id='buyPrice' type='number' onChange={(e) => this.handleInput('valuePrice', e)} value={this.state.valuePrice}></input>
                         </td>
                     </tr>
                     <tr>
-                        <td colSpan={2}>
+                        <td>
                             <input type='button' value='Buy Pixel' onClick={() => ctr.buyProperty(this.state.valueX, this.state.valueY, this.state.valuePrice)}></input>
                         </td>
                     </tr>

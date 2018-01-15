@@ -120,6 +120,80 @@
     }
 }
 
+// ---- openTab ----
+@keyframes openTab {
+    from {
+        right: -340px;
+    }
+    to {
+        right: -120px;
+    }
+}
+
+@-moz-keyframes openTab {
+    from {
+        right: -340px;
+    }
+    to {
+        right: -120px;
+    }
+}
+
+@-webkit-keyframes openTab {
+    from {
+        right: -340px;
+    }
+    to {
+        right: -120px;
+    }
+}
+
+@-o-keyframes openTab {
+    from {
+        right: -340px;
+    }
+    to {
+        right: -120px;
+    }
+}
+
+// ---- closeTab ----
+@keyframes closeTab {
+    from {
+        right: -120px
+    }
+    to {
+        right: -340px;
+    }
+}
+
+@-moz-keyframes closeTab {
+    from {
+        right: -340px;
+    }
+    to {
+        right: -120px;
+    }
+}
+
+@-webkit-keyframes closeTab {
+    from {
+        right: -340px;
+    }
+    to {
+        right: -120px;
+    }
+}
+
+@-o-keyframes closeTab {
+    from {
+        right: -340px;
+    }
+    to {
+        right: -120px;
+    }
+}
+
 // ---- END growDown ----
 @mixin animation($type, $duration) {
     animation: $type $duration;

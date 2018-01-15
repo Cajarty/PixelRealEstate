@@ -1,7 +1,5 @@
 import React, { Component } from 'react'
 
-import './ui.scss'
-
 class PixelsOwned extends Component {
     constructor(props) {
         super(props);

@@ -3,29 +3,35 @@ import BuyPixelForm from '../forms/BuyPixelForm.jsx';
 import SetPixelColorForm from '../forms/SetPixelColorForm';
 import SellPixelForm from '../forms/SellPixelForm';
 import Pullout from '../ui/Pullout';
+import PulloutTab from '../ui/PulloutTab';
 import GetPixelColorForm from '../forms/GetPixelColorForm';
+import * as Assets from '../../const/assets.jsx';
 
 class ActionPanel extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+        }
     }
 
     render() {
         return (
             <div>
                 <div className='contractAction'>
-                    <Pullout top={10} side='right'>
+                 <Pullout side='right' >
+                    <PulloutTab icon={Assets.ICON_MONEY} tabName='Buy'>
                         <BuyPixelForm/>
-                    </Pullout>
-                    <Pullout top={30} side='right'>
+                    </PulloutTab>
+                    <PulloutTab icon={Assets.ICON_MONEY} tabName='Rent'>
                         <SellPixelForm/>
-                    </Pullout>
-                    <Pullout top={50} side='right'>
+                    </PulloutTab>
+                    <PulloutTab icon={Assets.ICON_MONEY} tabName='Sell'>
                         <SetPixelColorForm/>
-                    </Pullout>
-                    <Pullout top={70} side='right'>
+                    </PulloutTab>
+                    <PulloutTab icon={Assets.ICON_MONEY} tabName='Update'>
                         <GetPixelColorForm/>
-                    </Pullout>
+                    </PulloutTab>
+                 </Pullout>
                 </div>
             </div>
         );

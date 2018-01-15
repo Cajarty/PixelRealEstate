@@ -6,11 +6,7 @@ import Axios from './network/Axios.jsx';
 
 Axios.getInstance();
 
-// // Styles
-// import './css/oswald.css'
-// import './css/open-sans.css'
-// import './css/pure-min.css'
-import './App.css'
+import './css/index.scss';
 
 class App extends Component {
   render() {

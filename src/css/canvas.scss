@@ -1,0 +1,21 @@
+.canvas {
+    &.zoom-0 {
+        height: 250px;
+    }
+    &.zoom-1 {
+        height: 500px;
+    }
+    &.zoom-2 {
+        height: 1000px;
+    }
+    &.zoom-3 {
+        height: 100vh;
+    }
+    &.zoom-4,
+    &.zoom-5,
+    &.zoom-6,
+    &.zoom-7 {
+        height: 90vh;
+        overflow: scroll;
+    }
+}

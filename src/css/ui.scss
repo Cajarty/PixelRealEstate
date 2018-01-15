@@ -1,0 +1,132 @@
+@import './animation.scss';
+.pullout {
+    width: 400px;
+    height: 90vh;
+    position: fixed;
+    top: 50%;
+    transform: translate(0, -50%);
+    background-color: rgb(28, 30, 61);
+    border-radius: 16px;
+}
+
+.pullout.open {
+    right: -120px;
+    @include animation(openTab, 1s);
+}
+
+.pullout.close {
+    right: -340px;
+    @include animation(closeTab, 1s);
+}
+
+.child.open {
+    right: -120px;
+    * {
+        opacity: 1;
+        @include animation(fadein, .5s);
+    }
+}
+
+.child.close {
+    right: -340px;
+    * {
+        opacity: 0;
+        @include animation(fadeout, 1s);
+    }
+}
+
+.child.closed,
+.pullout.closed {
+    right: -340px;
+}
+
+.tab:not(:last-child) {
+    border-bottom: solid black 1px;
+}
+
+.tabContainer {
+    display: inline-block;
+    background-color: rgb(28, 30, 61);
+    float: left;
+    width: 57px;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: calc(100% - 6px);
+    border-bottom-left-radius: 16px;
+    border-top-left-radius: 16px;
+    border-left: black solid 3px;
+    border-top: black solid 3px;
+    border-bottom: black solid 3px;
+    color: rgb(34, 190, 190);
+    font-weight: 400;
+}
+
+.iconContainer {
+    width: 100%;
+    text-align: center;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    &:hover {}
+}
+
+.tab:hover,
+.tab.selected {
+    background: linear-gradient(to right, rgb(46, 50, 100), rgb(28, 30, 61))
+}
+
+.tab.unselected {
+    //border-right: 1px solid black;
+}
+
+.tab:hover:first-child,
+.tab.selected:first-child {
+    border-top-left-radius: 16px;
+}
+
+.tab:hover:last-child,
+.tab.selected:last-child {
+    border-bottom-left-radius: 16px;
+}
+
+.panel {
+    float: left;
+    margin-left: 60px;
+    width: 220px;
+    height: calc(100% - 6px);
+    display: inline-block;
+    border-top: 3px solid black;
+    border-bottom: 3px solid black;
+    background-color: rgb(28, 30, 61);
+    color: rgb(34, 190, 190);
+    font-weight: 400;
+}
+
+.title {
+    text-decoration: underline;
+}
+
+.inputTitle {
+    font-size: 22px;
+    display: inline-block
+}
+
+input {
+    font-size: 22px;
+    border-radius: 6px;
+    border: lightblue solid 2px;
+    background-color: darkgrey;
+    display: inline-block;
+    width: calc(100% - 14px);
+    text-align: center;
+    &[type=button] {
+        width: calc(100% - 8px);
+    }
+}
+
+td {
+    text-align: center;
+}

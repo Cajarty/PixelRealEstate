@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import {Contract, ctr} from '../contract/contract.jsx';
 
-import './alerts.scss'
-
 class Alerts extends Component {
     constructor(props) {
         super(props);

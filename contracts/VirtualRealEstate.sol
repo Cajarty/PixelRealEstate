@@ -1,5 +1,7 @@
 pragma solidity ^0.4.2;
 
+import "truffle/Assert.sol";
+
 /*
 
 //- 2 PXL released per hour per property if set to "Public Use"
@@ -28,8 +30,6 @@ contract Token {
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
-
-
 /*  ERC 20 token */
 contract StandardToken is Token {
 

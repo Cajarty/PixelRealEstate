@@ -1,6 +1,5 @@
 pragma solidity ^0.4.2;
 
-import "truffle/Assert.sol";
 
 /*
 
@@ -95,8 +94,6 @@ contract VirtualRealEstate is StandardToken {
     
     uint128 USER_BUY_CUT_PERCENT = 98; //%
     
-    uint256 BUYABLE_AS_OF_DATE;
-    
     uint256 PROPERTY_GENERATES_PER_HOUR = 2;
     uint256 FREE_COLOR_SETTING_UNTIL;
     
@@ -142,7 +139,6 @@ contract VirtualRealEstate is StandardToken {
     
     function VirtualRealEstate() public {
         owner = msg.sender;
-        BUYABLE_AS_OF_DATE = now + 7 days;
         totalSupply = 0;
         FREE_COLOR_SETTING_UNTIL = now + 3 days;
     }
@@ -392,8 +388,6 @@ contract VirtualRealEstate is StandardToken {
     
     //Use Case: Buyer wants to buy a property
     function buyProperty(uint24 propertyID) public validPropertyID(propertyID) payable returns(bool) {
-        require(now >= BUYABLE_AS_OF_DATE);
-        
         Property storage property = map[propertyID];
         
         //If this is the first ever purchase, the property hasn't been made yet, property.owner is just default

@@ -22,13 +22,13 @@ class ActionPanel extends Component {
                     <PulloutTab icon={Assets.ICON_MONEY} tabName='Buy'>
                         <BuyPixelForm/>
                     </PulloutTab>
-                    <PulloutTab icon={Assets.ICON_MONEY} tabName='Rent'>
+                    <PulloutTab icon={Assets.ICON_MONEY} tabName='Sell'>
                         <SellPixelForm/>
                     </PulloutTab>
-                    <PulloutTab icon={Assets.ICON_MONEY} tabName='Sell'>
+                    <PulloutTab icon={Assets.ICON_MONEY} tabName='Update'>
                         <SetPixelColorForm/>
                     </PulloutTab>
-                    <PulloutTab icon={Assets.ICON_MONEY} tabName='Update'>
+                    <PulloutTab icon={Assets.ICON_MONEY} tabName='Set Status'>
                         <GetPixelColorForm/>
                     </PulloutTab>
                  </Pullout>

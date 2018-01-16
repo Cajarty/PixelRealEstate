@@ -10,7 +10,8 @@ import VirtualRealEstate from '../../build/contracts/VirtualRealEstate.json'
 
     
 export const EVENTS = { 
-    ColorChange: 'ColorChange'
+    PropertyColorUpdate: 'PropertyColorUpdate',
+    PropertyBought: 'PropertyBought'
 };
 
 export class Contract {
@@ -25,11 +26,12 @@ export class Contract {
         this.pixelsForSale = {};
         this.pixelsForRent = {};
 
+        this.propertyTradeLog = [];
+
         this.events = {
-            ColorChange: {
-                event: null,
-                listeners: {},
-            },
+            event: null,
+            PropertyColorUpdate: {},
+            PropertyBought: {},
 
         }
         
@@ -69,13 +71,16 @@ export class Contract {
 
     setupEvents() {
         this.VRE.deployed().then((instance) => {
-            this.events.ColorChange.event = instance.allEvents({fromBlock: 0, toBlock: 'latest'});
-            this.events.ColorChange.event.watch((error, result) => {
-                if (error)
+
+            /*
+            Event for when a color is changed.
+            */
+            this.events.event = instance.allEvents({fromBlock: 0, toBlock: 'latest'});
+            this.events.event.watch((error, result) => {
+                if (error) {
                     console.info(result, error);
-                else {
-                    let id = this.fromID(Func.BigNumberToNumber(result.args.property));
-                    this.sendEvent(EVENTS.ColorChange, {x: id.x, y: id.y, data: Func.ContractDataToRGBAArray(result.args.colors)});
+                } else {
+                    this.sendEvent(result.event, result);
                 }
             });
         }).catch((c) => {
@@ -203,11 +208,11 @@ export class Contract {
         });
     }
 
-    getPropertyData(x, y) {
+    getPropertyData(x, y, callback) {
         //returns address, price, renter, rent length, rentedUntil, rentPrice
         this.VRE.deployed().then((i) => {
-            return i.getPropertyData.call(this.toID(x, y)).then((r) => {
-                return r;
+            i.getPropertyData.call(this.toID(x, y)).then((r) => {
+                return callback(r);
             });
         }).catch((e) => {
             console.log(e);
@@ -219,8 +224,9 @@ export class Contract {
             return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), {from: this.account });
         }).then(() => {
             this.sendResults(true, "Property " + x + "x" + y + " pixels changed.");
-            this.sendEvent(EVENTS.ColorChange, {x: x, y: y, data: data});
+            this.sendEvent(EVENTS.PropertyColorUpdate, {args: {x: x, y: y, colorsRGB: data}});
         }).catch((e) => {
+            console.info(e);
             this.sendResults(false, "Error uploading pixels.");
         });
     }
@@ -283,16 +289,16 @@ export class Contract {
     contract.
     */
     listenForEvent(event, key, callback) {
-        this.events[event].listeners[key] = callback;
+        this.events[event][key] = callback;
     }
 
     stopListeningForEvent(event, key) {
-        delete this.events[event].listeners[key];
+        delete this.events[event][key];
     }
 
     sendEvent(event, result) {
-        Object.keys(this.events[event].listeners).map((i) => {
-            this.events[event].listeners[i](result);
+        Object.keys(this.events[event]).map((i) => {
+            this.events[event][i](result);
         });
     }
 

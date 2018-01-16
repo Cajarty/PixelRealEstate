@@ -1,5 +1,6 @@
 body {
     margin: 0px;
+    background-color: #1d1a54;
 }
 
 .page {
@@ -17,12 +18,8 @@ body {
 }
 
 .center {
-    min-width: 1000px;
-    max-width: 1000px;
-    height: 1000px;
-    margin: 0px;
-    border: 2px solid black;
-    display: inline-block;
+    width: 100%;
+    text-align: center;
 }
 
 .right {

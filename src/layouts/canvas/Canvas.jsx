@@ -26,8 +26,18 @@ class Canvas extends Component {
         ctx.imageSmoothingEnabled = false;
         this.setState({ ctx });
         this.loadCanvas();
-        ctr.listenForEvent(EVENTS.ColorChange, 'canvas', (data) => {
-            this.setCanvasProperty(data.x, data.y, data.data);
+        ctr.listenForEvent(EVENTS.PropertyColorUpdate, 'canvas', (data) => {
+            let xy = {x: 0, y: 0};
+            if (data.args.x == null || data.args.y == null)
+                xy = ctr.fromID(Func.BigNumberToNumber(data.args.property));
+            else {
+                xy.x = data.args.x;
+                xy.y = data.args.y;
+            }
+            if (data.args.colorsRGB == null)
+                this.setCanvasProperty(xy.x, xy.y, Func.ContractDataToRGBAArray(data.args.colors));
+            else
+                this.setCanvasProperty(xy.x, xy.y, data.args.colorsRGB);
         });
     }
 

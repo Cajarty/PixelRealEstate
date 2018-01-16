@@ -3,6 +3,7 @@ import Canvas from './Canvas.jsx'
 import ManagePanel from './ManagePanel.jsx'
 import ActionPanel from './ActionPanel.jsx'
 import {Contract, ctr} from '../../contract/contract.jsx';
+import PropertySalesLog from '../ui/PropertySalesLog';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -15,14 +16,21 @@ class CanvasPage extends Component {
     render() {
         return (
             <div>
-                <div className='left'>
-                    <ManagePanel/>
+                <div className='top'>
+                    <div className='left'>
+                        <ManagePanel/>
+                    </div>
+                    <div className='center'>
+                        <Canvas/>
+                    </div>
+                    <div className='right'>
+                        <ActionPanel/>
+                    </div>
                 </div>
-                <div className='center'>
-                    <Canvas/>
+                <div className='middle'>
+                    <PropertySalesLog/>
                 </div>
-                <div className='right'>
-                    <ActionPanel/>
+                <div className='bottom'>
                 </div>
             </div>
         );

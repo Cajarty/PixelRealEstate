@@ -18,14 +18,14 @@ class Pullout extends Component {
 
     render() {
         return (
-            <div className={'pullout ' + (this.state.tabOpen >= 0 ? 'open' : this.state.tabOpen != -2 ? 'close' : 'closed' )}>
-                <div className='tabContainer'>
+            <div className={this.props.side + ' pullout ' + (this.state.tabOpen >= 0 ? 'open' : this.state.tabOpen != -2 ? 'close' : 'closed' )}>
+                <div className={'tabContainer ' + this.props.side}>
                 {this.props.children.map((child, id) => {
                     return (
                         <div 
-                            className={'tab ' + (this.state.tabOpen == id ? 'selected' : 'unselected')}
+                            className={this.props.side + ' tab ' + (this.state.tabOpen == id ? 'selected' : 'unselected')}
                             style={{
-                                height: (1 / this.props.children.length) * 100 + '%',
+                                height: 'calc(' + (1 / this.props.children.length) * 100 + '% - ' + (id == 0 ? 0 : 1) + 'px)',
                             }}
                             key={id}
                             onClick={() => this.tabSelected(id)}
@@ -45,7 +45,7 @@ class Pullout extends Component {
                     );
                 })}
                 </div>
-                <div className='panel'>
+                <div className={this.props.side + ' panel'}>
                         {this.props.children[this.state.tabOpen < 0 ? 0 : this.state.tabOpen].props.children}
                 </div>
             </div>

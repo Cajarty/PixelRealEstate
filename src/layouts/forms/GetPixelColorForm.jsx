@@ -56,9 +56,6 @@ class GetPixelColorForm extends Component {
     }
 
     getColors() {
-        ctr.getPropertyColors(this.state.valueX, this.state.valueY, (x, y, result) => {
-            console.info(result);
-        });
     }
 
     render() {

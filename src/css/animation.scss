@@ -120,8 +120,8 @@
     }
 }
 
-// ---- openTab ----
-@keyframes openTab {
+// ---- openRightTab ----
+@keyframes openRightTab {
     from {
         right: -340px;
     }
@@ -130,7 +130,7 @@
     }
 }
 
-@-moz-keyframes openTab {
+@-moz-keyframes openRightTab {
     from {
         right: -340px;
     }
@@ -139,7 +139,7 @@
     }
 }
 
-@-webkit-keyframes openTab {
+@-webkit-keyframes openRightTab {
     from {
         right: -340px;
     }
@@ -148,7 +148,7 @@
     }
 }
 
-@-o-keyframes openTab {
+@-o-keyframes openRightTab {
     from {
         right: -340px;
     }
@@ -157,8 +157,8 @@
     }
 }
 
-// ---- closeTab ----
-@keyframes closeTab {
+// ---- closeRightTab ----
+@keyframes closeRightTab {
     from {
         right: -120px
     }
@@ -167,7 +167,7 @@
     }
 }
 
-@-moz-keyframes closeTab {
+@-moz-keyframes closeRightTab {
     from {
         right: -340px;
     }
@@ -176,7 +176,7 @@
     }
 }
 
-@-webkit-keyframes closeTab {
+@-webkit-keyframes closeRightTab {
     from {
         right: -340px;
     }
@@ -185,12 +185,86 @@
     }
 }
 
-@-o-keyframes closeTab {
+@-o-keyframes closeRightTab {
     from {
         right: -340px;
     }
     to {
         right: -120px;
+    }
+}
+
+// ---- openLeftTab ----
+@keyframes openLeftTab {
+    from {
+        left: -340px;
+    }
+    to {
+        left: -120px;
+    }
+}
+
+@-moz-keyframes openLeftTab {
+    from {
+        left: -340px;
+    }
+    to {
+        left: -120px;
+    }
+}
+
+@-webkit-keyframes openLeftTab {
+    from {
+        left: -340px;
+    }
+    to {
+        left: -120px;
+    }
+}
+
+@-o-keyframes openLeftTab {
+    from {
+        left: -340px;
+    }
+    to {
+        left: -120px;
+    }
+}
+
+// ---- closeLeftTab ----
+@keyframes closeLeftTab {
+    from {
+        left: -120px
+    }
+    to {
+        left: -340px;
+    }
+}
+
+@-moz-keyframes closeLeftTab {
+    from {
+        left: -340px;
+    }
+    to {
+        left: -120px;
+    }
+}
+
+@-webkit-keyframes closeLeftTab {
+    from {
+        left: -340px;
+    }
+    to {
+        left: -120px;
+    }
+}
+
+@-o-keyframes closeLeftTab {
+    from {
+        left: -340px;
+    }
+    to {
+        left: -120px;
     }
 }
 

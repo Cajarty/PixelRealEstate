@@ -1,26 +1,43 @@
 @import './animation.scss';
 .pullout {
-    width: 400px;
-    height: 90vh;
-    position: fixed;
-    top: 50%;
-    transform: translate(0, -50%);
     background-color: rgb(28, 30, 61);
     border-radius: 16px;
+    top: 50%;
+    position: absolute;
+    width: 400px;
+    height: 90vh;
+    transform: translate(0, -50%);
 }
 
 .pullout.open {
-    right: -120px;
-    @include animation(openTab, 1s);
+    &.right {
+        right: -120px;
+        @include animation(openRightTab, 1s);
+    }
+    &.left {
+        left: -120px;
+        @include animation(openLeftTab, 1s);
+    }
 }
 
 .pullout.close {
-    right: -340px;
-    @include animation(closeTab, 1s);
+    &.right {
+        right: -340px;
+        @include animation(closeRightTab, 1s);
+    }
+    &.left {
+        left: -340px;
+        @include animation(closeLeftTab, 1s);
+    }
 }
 
 .child.open {
-    right: -120px;
+    &.right {
+        right: -120px;
+    }
+    &.left {
+        left: -120px;
+    }
     * {
         opacity: 1;
         @include animation(fadein, .5s);
@@ -28,7 +45,12 @@
 }
 
 .child.close {
-    right: -340px;
+    &.right {
+        right: -340px;
+    }
+    &.left {
+        left: -340px;
+    }
     * {
         opacity: 0;
         @include animation(fadeout, 1s);
@@ -37,7 +59,12 @@
 
 .child.closed,
 .pullout.closed {
-    right: -340px;
+    &.right {
+        right: -340px;
+    }
+    &.left {
+        left: -340px;
+    }
 }
 
 .tab:not(:last-child) {
@@ -47,16 +74,25 @@
 .tabContainer {
     display: inline-block;
     background-color: rgb(28, 30, 61);
-    float: left;
+    &.right {
+        float: left;
+        left: 0;
+        border-bottom-left-radius: 16px;
+        border-top-left-radius: 16px;
+        border-left: black solid 3px;
+    }
+    &.left {
+        float: right;
+        right: 0;
+        border-bottom-right-radius: 16px;
+        border-top-right-radius: 16px;
+        border-right: black solid 3px;
+    }
     width: 57px;
     height: 100%;
     position: absolute;
-    left: 0;
     top: 0;
     height: calc(100% - 6px);
-    border-bottom-left-radius: 16px;
-    border-top-left-radius: 16px;
-    border-left: black solid 3px;
     border-top: black solid 3px;
     border-bottom: black solid 3px;
     color: rgb(34, 190, 190);
@@ -73,28 +109,54 @@
     &:hover {}
 }
 
-.tab:hover,
-.tab.selected {
-    background: linear-gradient(to right, rgb(46, 50, 100), rgb(28, 30, 61))
+.tab {
+    &.right:hover,
+    &.right.selected {
+        background: linear-gradient(to right, rgb(46, 50, 100), rgb(28, 30, 61));
+    }
+    &.left:hover,
+    &.left.selected {
+        background: linear-gradient(to left, rgb(46, 50, 100), rgb(28, 30, 61));
+    }
+}
+
+.tab {
+    width: 100%;
 }
 
 .tab.unselected {
     //border-right: 1px solid black;
 }
 
-.tab:hover:first-child,
-.tab.selected:first-child {
-    border-top-left-radius: 16px;
+.tab:first-child,
+.tab:first-child {
+    &.left {
+        border-top-right-radius: 14px;
+    }
+    &.right {
+        border-top-left-radius: 14px;
+    }
 }
 
-.tab:hover:last-child,
-.tab.selected:last-child {
-    border-bottom-left-radius: 16px;
+.tab:last-child,
+.tab:last-child {
+    &.left {
+        border-bottom-right-radius: 14px;
+    }
+    &.right {
+        border-bottom-left-radius: 14px;
+    }
 }
 
 .panel {
-    float: left;
-    margin-left: 60px;
+    &.left {
+        float: right;
+        margin-right: 60px;
+    }
+    &.right {
+        float: left;
+        margin-left: 60px;
+    }
     width: 220px;
     height: calc(100% - 6px);
     display: inline-block;
@@ -106,7 +168,9 @@
 }
 
 .title {
-    text-decoration: underline;
+    background-color: green;
+    line-height: 3em;
+    font-size: 1em;
 }
 
 .inputTitle {
@@ -129,4 +193,26 @@ input {
 
 td {
     text-align: center;
+}
+
+div.tableDataContainer {
+    width: 80%;
+    margin: auto;
+    background-color: green;
+    tr {
+        width: 100%;
+    }
+    .dataContainer {
+        max-height: 250px;
+        min-height: 250px;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        table.data {
+            width: 100%;
+        }
+    }
+    table.header {
+        text-align: center;
+        width: 100%;
+    }
 }

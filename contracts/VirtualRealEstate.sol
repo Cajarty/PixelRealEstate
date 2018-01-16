@@ -1,29 +1,84 @@
 pragma solidity ^0.4.2;
 
-/* taking ideas from BatToken token */
-contract SafeMath {
-    function safeAdd(uint256 x, uint256 y) internal returns(uint256) {
-      uint256 z = x + y;
-      assert((z >= x) && (z >= y));
-      return z;
-    }
+/*
 
-    function safeSubtract(uint256 x, uint256 y) internal returns(uint256) {
-      assert(x >= y);
-      uint256 z = x - y;
-      return z;
-    }
+//- 2 PXL released per hour per property if set to "Public Use"
+//    - 1 allocated for owner
+//    - 1 allocated for contributor
+//    - if there is no owner, contributor gets both
+//    - if no contributor or owner (AKA, first pixel set ever for each property), get get both cuts
+//- 0 PXL released to "Private Use"
+  //  - Pay 2 PXL to us devs per hour for using Private Use
+//- Setting colour free at start
+//- Trade offers are a 1-per-user thing.
+//- Trade orders can be made. User ABC's "I have 1k PXL, I want 0.1 ETH" vs "I ha ve 0.2 ETH, I want 2.5k PXL"
+- Properties in "Public Use" have the last-color changers hover text get shown, while "Private" has the owners hover text shown
+- PropertyOffers can be made. "I offer 1000 PXL for propertyID 20". 
+- Owners can "AcceptOffer(offers[otherOwner][pixelID])"
+- Update GetPropertyData
+*/
 
-    function safeMult(uint256 x, uint256 y) internal returns(uint256) {
-      uint256 z = x * y;
-      assert((x == 0)||(z/x == y));
-      return z;
-    }
+contract Token {
+    uint256 public totalSupply;
+    function balanceOf(address _owner) public constant returns (uint256 balance);
+    function transfer(address _to, uint256 _value) public returns (bool success);
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
+    function approve(address _spender, uint256 _value) public returns (bool success);
+    function allowance(address _owner, address _spender) public constant returns (uint256 remaining);
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
+    event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 
-contract VirtualRealEstate is SafeMath {
+
+/*  ERC 20 token */
+contract StandardToken is Token {
+
+    function transfer(address _to, uint256 _value) public returns (bool success) {
+      if (balances[msg.sender] >= _value && _value > 0) {
+        balances[msg.sender] -= _value;
+        balances[_to] += _value;
+        Transfer(msg.sender, _to, _value);
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
+      if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
+        balances[_to] += _value;
+        balances[_from] -= _value;
+        allowed[_from][msg.sender] -= _value;
+        Transfer(_from, _to, _value);
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    function balanceOf(address _owner) public constant returns (uint256 balance) {
+        return balances[_owner];
+    }
+
+    function approve(address _spender, uint256 _value) public returns (bool success) {
+        allowed[msg.sender][_spender] = _value;
+        Approval(msg.sender, _spender, _value);
+        return true;
+    }
+
+    function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
+      return allowed[_owner][_spender];
+    }
+
+    mapping (address => uint256) balances;
+    mapping (address => mapping (address => uint256)) allowed;
+}
+
+contract VirtualRealEstate is StandardToken {
     address owner;
     uint256 ownerEth = 0;
+    
+    uint256 pixelPot;
     
     //Mapping of propertyID to property
     mapping (uint24 => Property) map;
@@ -31,37 +86,47 @@ contract VirtualRealEstate is SafeMath {
     mapping (address => bytes32[2]) ownerLink;
     //propertyRenter to link
     mapping (address => bytes32[2]) ownerHoverText;
+    //trade offers
+    mapping (address => TradeOffer) pxlTradeStatus;
     
     uint128 DEFAULT_PRICE_INCREMENTATION_INCREMENTATION = 100000000000000; //0.0001
     uint128 DEFAULT_PRICE_INCREMENTATION = 500000000000000; //0.0005
     uint128 DEFAULT_PRICE = 10000000000000000; //0.01 ETH
-    uint128 DEFAULT_RENT_PRICE = 231481481481; //0.001 ETH per day on block-by-block rate
-    uint128 DEFAULT_MAX_RENT_DURATION = 72; 
     
     uint128 USER_BUY_CUT_PERCENT = 98; //%
-    uint128 USER_RENT_CUT_PERCENT = 98; //%;
     
     uint256 BUYABLE_AS_OF_DATE;
     
-    event PropertyColorUpdate(uint24 indexed property, uint256[10] colors);
+    uint256 PROPERTY_GENERATES_PER_HOUR = 2;
+    uint256 FREE_COLOR_SETTING_UNTIL;
+    
+    event PropertyColorUpdate(uint24 indexed property, uint256[10] colors, address propertyOwnerPayee, address lastUpdaterPayee);
     event PropertyColorUpdatePixel(uint24 indexed property, uint8 row, uint24 rgb);
     event PropertyBought(uint24 indexed property,  address newOwner);
-    event PropertyRented(uint24 indexed property, address newRenter, uint256 expiration );
     event SetUserHoverText(address indexed user, bytes32[2] newHoverText);
     event SetUserSetLink(address indexed user, bytes32[2] newLink);
     event PropertySetForSale(uint24 indexed property);
-    event PropertySetForRent(uint24 indexed property); //
-    event RenterLeaves(uint24 indexed property);
-    event DelistProperty(uint24 propertyID, bool delistFromSale, bool delistFromRent);
+    event DelistProperty(uint24 indexed propertyID);
+    event ListTradeOffer(address indexed offerOwner, uint256 eth, uint256 pxl, bool isBuyingPxl);
+    event AcceptTradeOffer(address indexed accepter, address indexed offerOwner);
+    event CancelTradeOffer(address indexed offerOwner);
+    event SetPropertyPublic(uint24 indexed property);
+    event SetPropertyPrivate(uint24 indexed property, uint32 numHoursPrivate);
+    
+    struct TradeOffer {
+        uint256 eth;
+        uint256 pxl;
+        bool buyingPxl;
+    }
     
     struct Property {
         address owner;
         uint256[10] colors; //10x10 rgb pixel colors per property
         uint128 salePrice;
-        address renter;
-        uint256 maxRentDuration;
-        uint256 rentedUntil;
-        uint128 rentPrice;
+        address lastUpdater;
+        bool isInPrivateMode;
+        uint256 lastUpdate;
+        uint256 becomePublic;
     }
     
     modifier ownerOnly() {
@@ -75,16 +140,11 @@ contract VirtualRealEstate is SafeMath {
         }
     }
     
-    modifier tryEvict(Property property) {
-        if (property.rentPrice != 0 && property.renter != 0 && property.rentedUntil < now) {
-            property.renter = 0;
-        }
-        _;
-    }
-    
     function VirtualRealEstate() public {
         owner = msg.sender;
         BUYABLE_AS_OF_DATE = now + 7 days;
+        totalSupply = 0;
+        FREE_COLOR_SETTING_UNTIL = now + 3 days;
     }
     function setHoverText(bytes32[2] text) public {
         ownerHoverText[msg.sender] = text;
@@ -100,80 +160,229 @@ contract VirtualRealEstate is SafeMath {
         require(property.salePrice != 0);
         return property.salePrice;
     }
-    
-    function getForRentPrice(uint24 propertyID) public validPropertyID(propertyID) view returns(uint128) {
-        Property storage property = map[propertyID];
-        require(property.rentPrice != 0);
-        return property.rentPrice;
-    }
     function getHoverText(uint24 propertyID) public validPropertyID(propertyID) view returns(bytes32[2]) {
         Property storage property = map[propertyID];
         
         //Must have a owner or renter, and that owner/renter must have a short or long hover text
-        require(property.renter != 0 || property.owner != 0);
-        address propertyResident;
-        if (property.renter == 0) {
-            propertyResident = property.owner;
-        } else {
-            propertyResident = property.renter;
-        }
+        require(property.owner != 0);
         
-        return ownerHoverText[propertyResident];
+        return ownerHoverText[property.owner];
     }
     
     function getLink(uint24 propertyID) public validPropertyID(propertyID) view returns(bytes32[2]) {
         Property storage property = map[propertyID];
         //Must have a owner or renter, and that owner/renter must have a short or long hover text
-        require(property.renter != 0 || property.owner != 0);
-        address propertyResident;
-        if (property.renter == 0) {
-            propertyResident = property.owner;
-        } else {
-            propertyResident = property.renter;
-        }
-        return ownerLink[propertyResident];
+        require(property.owner != 0);
+        
+        return ownerLink[property.owner];
     }
     
     function getPropertyColors(uint24 propertyID) public validPropertyID(propertyID) view returns(uint256[10]) {
         return map[propertyID].colors;
     }
     
-    function getPropertyData(uint24 propertyID) public validPropertyID(propertyID) view returns(address, uint128, address, uint256, uint256, uint128) {
+    function getPropertyData(uint24 propertyID) public validPropertyID(propertyID) view returns(address, uint128, address, bool) {
         Property storage property = map[propertyID];
-        return (property.owner, property.salePrice, property.renter, property.maxRentDuration, property.rentedUntil, property.rentPrice);
+        return (property.owner, property.salePrice, property.lastUpdater, property.isInPrivateMode);
     }
     
-    function setColors(uint24 propertyID, uint256[10] newColors) public validPropertyID(propertyID) tryEvict(property) returns(bool) {
+    //Change a 10x10 == 70 | 30 | 0 cost
+    function setColors(uint24 propertyID, uint256[10] newColors) public validPropertyID(propertyID) returns(bool) {
         Property storage property = map[propertyID];
         
-        if (property.owner != 0) {
-            require((msg.sender == property.owner && property.renter == 0) || (msg.sender == property.renter));
+        //Cost 2 if no owner, 1 if owned
+        uint256 cost = property.owner != 0 ? 1 : 2;
+        
+        //If it's in private mode, we must be the owner, but it's free
+        if (property.isInPrivateMode) {
+            //If it's still privately owned
+            if (property.becomePublic > now) {
+                require(msg.sender == property.owner);
+                cost = 0;
+            }
+            //No long erin private mode, ran out
+            else {
+                property.isInPrivateMode = false;
+                property.becomePublic = 0;
+            }
+        } 
+        //If we're in the first few days, setting the color is free
+        else if (now <= FREE_COLOR_SETTING_UNTIL) {
+            cost = 0;
         }
         
-        property.colors = newColors;
+        require(balances[msg.sender] >= cost);
         
-        PropertyColorUpdate(propertyID, newColors);
+        //If we're in Public Mode, payouts occur
+        
+        if (!property.isInPrivateMode && property.lastUpdate != 0) {
+            uint256 hoursSinceLastColorChange = (now - property.lastUpdate) / (1 seconds); //ERRORs on property.lastUpdate = 0
+            uint256 payout = hoursSinceLastColorChange * PROPERTY_GENERATES_PER_HOUR;
+    
+            if (payout > 0) {
+                address propertyOwnerPayee = property.owner;
+                address lastUpdaterPayee = property.lastUpdater;
+                if (propertyOwnerPayee == 0) {
+                    if (lastUpdaterPayee != 0) {
+                        propertyOwnerPayee = lastUpdaterPayee;
+                    }
+                }
+                //Payout half to ownerPayee and half to updaterPayee
+                if (propertyOwnerPayee != 0) {
+                    balances[propertyOwnerPayee] += payout / 2;
+                }
+                if (lastUpdaterPayee != 0) {
+                    balances[lastUpdaterPayee] += payout / 2;
+                }
+                totalSupply += payout;
+            }
+        }
+        
+        //Burn the coins from the sender
+        balances[msg.sender] -= cost; //Burn the coin to set the color
+        
+        property.colors = newColors;
+        property.lastUpdater = msg.sender;
+        property.lastUpdate = now;
+        
+        PropertyColorUpdate(propertyID, newColors, propertyOwnerPayee, lastUpdaterPayee);
         
         return true;
     }
+    function setPropertyMode(uint24 propertyID, bool isInPrivateMode, uint32 numHoursPrivate) public validPropertyID(propertyID) {
+        Property storage property = map[propertyID];
+        require(msg.sender == property.owner);
+        if (isInPrivateMode) {
+            require(numHoursPrivate > 0);
+            require(balances[msg.sender] >= numHoursPrivate);
+            balances[msg.sender] -= numHoursPrivate;
+            property.becomePublic = now + (1 hours) * numHoursPrivate;
+        } else {
+            property.becomePublic = 0;
+        }
+        property.isInPrivateMode = isInPrivateMode;
+        
+        if (isInPrivateMode) {
+            SetPropertyPrivate(propertyID, numHoursPrivate);
+        } else {
+            SetPropertyPublic(propertyID);
+        }
+    }
+    function setBuyETHOffer(uint256 ethToBuy, uint256 offeredPxl) public {
+        //Require we have the pxl to offer
+        require(balances[msg.sender] >= offeredPxl);
+        require(ethToBuy > 0 && offeredPxl > 0);
+        
+        //Cancel old TradeOffer if present
+        cancelTradeOffer();
+        
+        //Set Offer
+        pxlTradeStatus[msg.sender].eth = ethToBuy;
+        pxlTradeStatus[msg.sender].pxl = offeredPxl;
+        pxlTradeStatus[msg.sender].buyingPxl = false;
+        
+        //Lose offered pxl
+        balances[msg.sender] -= offeredPxl;
+        
+        ListTradeOffer(msg.sender, ethToBuy, offeredPxl, false);
+    }
+    function setBuyPXLOffer(uint256 pxlToBuy, uint256 offeredEth) public payable {
+        //Require we have the eth to offer
+        require(msg.value >= offeredEth);
+        require(pxlToBuy > 0 && offeredEth > 0);
+        
+        //Cancel old TradeOffer if present
+        cancelTradeOffer();
+        
+        //Set Offer
+        TradeOffer storage tradeOffer = pxlTradeStatus[msg.sender];
+        tradeOffer.pxl = pxlToBuy;
+        tradeOffer.eth = offeredEth;
+        tradeOffer.buyingPxl = true;
+        
+        ListTradeOffer(msg.sender, offeredEth, pxlToBuy, true);
+    }
+    function cancelTradeOffer() public {
+        TradeOffer storage tradeOffer = pxlTradeStatus[msg.sender];
+        //If we have a trade offer
+        if (tradeOffer.eth > 0 && tradeOffer.pxl > 0) {
+            //We already deposited ETH. Return it back
+            if (tradeOffer.buyingPxl) {
+                msg.sender.transfer(tradeOffer.eth);
+            }
+            //We already deposited PXL. Return it back
+            else {
+                balances[msg.sender] += tradeOffer.pxl;
+            }
+            CancelTradeOffer(msg.sender);
+        }
+    }
+    function acceptOfferBuyingETH(address ownerOfTradeOffer) public payable {
+        TradeOffer storage tradeOffer = pxlTradeStatus[ownerOfTradeOffer];
+        //Make sure the accepter has enough to justify accepting
+        require(tradeOffer.eth <= msg.value);
+        require(ownerOfTradeOffer != 0);
+        
+        //Give them our money. We are deposited it by this being "payable"
+        ownerOfTradeOffer.transfer(msg.value);
+        
+        //Take their money. They already deposited their coins
+        balances[msg.sender] += tradeOffer.pxl;
+        
+        //Clear trade offer
+        tradeOffer.eth = 0;
+        tradeOffer.pxl = 0;
+        
+        AcceptTradeOffer(msg.sender, ownerOfTradeOffer);
+    }
+    function acceptOfferBuyingPXL(address ownerOfTradeOffer) public {
+        TradeOffer storage tradeOffer = pxlTradeStatus[ownerOfTradeOffer];
+        //Make sure the accepter has enough to justify accepting
+        require(tradeOffer.pxl <= balances[msg.sender]);
+        require(ownerOfTradeOffer != 0);
+        
+        //Give them our money
+        balances[ownerOfTradeOffer] += tradeOffer.pxl;
+        balances[msg.sender] -= tradeOffer.pxl;
+        
+        //Take their money. They already deposited ETH
+        msg.sender.transfer(tradeOffer.eth);
+        
+        //Clear trade offer
+        tradeOffer.eth = 0;
+        tradeOffer.pxl = 0;
+        
+        AcceptTradeOffer(msg.sender, ownerOfTradeOffer);
+    }
     
-    function setRowColors(uint24 propertyID, uint8 row, uint24 newColorData) public validPropertyID(propertyID) tryEvict(property) returns(bool) {
+    //Change pixel or 10x1 costs 7 | 3 | 0
+    function setRowColors(uint24 propertyID, uint8 row, uint24 newColorData) public validPropertyID(propertyID) returns(bool) {
         Property storage property = map[propertyID];
         
         require(row >= 0 && row <= 9);
         
-        property.colors[row] = newColorData;
+        uint256 cost = property.owner != 0 ? 1 : 2;
         
+        if (property.isInPrivateMode) {
+                require(msg.sender == property.owner);
+                cost = 0;
+        } 
+        
+        require(balances[msg.sender] >= cost);
+        
+        balances[msg.sender] -= cost; //Burn the coin to set the color
+        
+        property.colors[row] = newColorData;
+        property.lastUpdater = msg.sender;
         PropertyColorUpdatePixel(propertyID, row, newColorData);
         
         return true;
     }
     
-    function transferProperty(uint24 propertyID, address newOwner) public validPropertyID(propertyID)  tryEvict(property) returns(bool) {
+    function transferProperty(uint24 propertyID, address newOwner) public validPropertyID(propertyID) returns(bool) {
         Property storage property = map[propertyID];
         
         require(property.owner == msg.sender);
-        require(property.renter == 0);
         require(newOwner != 0);
         
         property.owner = newOwner;
@@ -182,8 +391,8 @@ contract VirtualRealEstate is SafeMath {
     }
     
     //Use Case: Buyer wants to buy a property
-    function buyProperty(uint24 propertyID) public validPropertyID(propertyID) tryEvict(property) payable returns(bool) {
-        require(now < BUYABLE_AS_OF_DATE);
+    function buyProperty(uint24 propertyID) public validPropertyID(propertyID) payable returns(bool) {
+        require(now >= BUYABLE_AS_OF_DATE);
         
         Property storage property = map[propertyID];
         
@@ -196,7 +405,6 @@ contract VirtualRealEstate is SafeMath {
         }
       
         require(property.salePrice != 0);//property must be for sale
-        require(property.renter == 0);//property cannot be being rented
         require(msg.value >= property.salePrice);//Amount paid must be at least the price
       
         //User gets the majority of the listed price's sale
@@ -208,10 +416,9 @@ contract VirtualRealEstate is SafeMath {
             property.owner.transfer(amountTransfered);
         }
         
-        property.rentPrice = 0;
-        property.renter = 0;
         property.salePrice = 0;
         property.owner = msg.sender;
+        property.isInPrivateMode = false;
         
         ownerEth += msg.value - amountTransfered;
         
@@ -220,62 +427,13 @@ contract VirtualRealEstate is SafeMath {
         return true;
     }
     
-    //Use Case: Renter wants to rent a property
-    function rentProperty(uint24 propertyID, uint32 hoursToRentFor) public validPropertyID(propertyID) tryEvict(property) payable returns(bool) {
-        Property storage property = map[propertyID];
-        
-        uint256 rentPrice = property.owner == 0 ? property.rentPrice : DEFAULT_RENT_PRICE;
-        
-        //How many units they paid to rent. Truncates to zero if not enough money for one day
-        uint256 timeToRent = msg.value / property.rentPrice;
-      
-        //require(property.owner != 0); //Must have been owned
-        require(rentPrice != 0);//property must be for sale
-        require(timeToRent >= 1);//The renting must be for at least one unit
-        require(property.renter == 0);//property cannot be being rented already
-      
-        //User gets the majority of the listed price's sale
-        uint256 amountTransfered = msg.value * USER_RENT_CUT_PERCENT / 100;
-        
-        //If there is someone to transfer the funds to, transfer it, otherwise, they rented from the owners initially
-        if (property.owner != 0) {
-            property.owner.transfer(amountTransfered);
-        }
-        
-        //TODO: moving rent systems over. Double check I'm not missing cases
-        require(hoursToRentFor <= timeToRent);
-        require(timeToRent <= hoursToRentFor);
-        
-        property.rentedUntil = now + (1 hours) * hoursToRentFor;
-        property.renter = msg.sender;
-        ownerEth += msg.value - amountTransfered;
-        
-        PropertyRented(propertyID, property.renter, property.rentedUntil );
-        
-        return true;
-    }
-    
-    //Use Case: Renter wants to stop renting the property
-    function stopRenting(uint24 propertyID) public validPropertyID(propertyID) returns(bool) {
-        Property storage property = map[propertyID];
-        
-        require(msg.sender == property.renter);
-        
-        property.renter = 0;
-        
-        RenterLeaves(propertyID);
-        
-        return true;
-    }
-    
     //Use Case: Owner of a property lists for sale at a given price
-    function listForSale(uint24 propertyID, uint128 price ) public validPropertyID(propertyID) tryEvict(property) returns(bool) {
+    function listForSale(uint24 propertyID, uint128 price ) public validPropertyID(propertyID) returns(bool) {
         Property storage property = map[propertyID];
       
         require(price != 0);
       
         require(msg.sender == property.owner); //Must be the owner
-        require(property.renter == 0); //Must not currently be already rented out
         //You can listForSale an already listed item to update the listing
         property.salePrice = price;
         
@@ -283,40 +441,16 @@ contract VirtualRealEstate is SafeMath {
         
         return true;
     }
-    //Use Case: Owner of a property lists for rent at a given price
-    function listForRent(uint24 propertyID, uint128 rentPrice, uint128 maxRentDuration) public validPropertyID(propertyID) tryEvict(property) returns(bool)  {
-        Property storage property = map[propertyID];
-      
-        require(rentPrice != 0);
-        require(msg.sender == property.owner); //Must be the owner
-        require(property.renter == 0); //Must not currently be already rented out
-        require(maxRentDuration > 0); //Must be renting for a proper duration
-        //You can listForRent an already listed item to update the listing
-      
-        property.rentPrice = rentPrice;
-        property.maxRentDuration = maxRentDuration;
-        property.rentedUntil = 0;
-        
-        PropertySetForRent(propertyID);
-        
-        return true;
-    }
+    
     //Use Case: Owner of a property delists from both renting offer and sale offer
-    function delist(uint24 propertyID, bool delistFromSale, bool delistFromRent) public validPropertyID(propertyID) tryEvict(property) returns(bool) {
+    function delist(uint24 propertyID) public validPropertyID(propertyID) returns(bool) {
         Property storage property = map[propertyID];
         
         require(msg.sender == property.owner); //Must be the owner
-        require(property.renter == 0); //Must have no current renter
         
-        if (delistFromRent) {
-            property.rentPrice = 0;
-            property.renter = 0;
-        }
-        if (delistFromSale) {
-            property.salePrice = 0;
-        }
+        property.salePrice = 0;
         
-        DelistProperty(propertyID, delistFromSale, delistFromRent);
+        DelistProperty(propertyID);
         
         return true;
     }

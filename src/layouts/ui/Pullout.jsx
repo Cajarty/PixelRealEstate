@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import ReactSVG from 'react-svg';
 //import test from '../../assets/icons/test.png'; is coorecrt
 
 class Pullout extends Component {

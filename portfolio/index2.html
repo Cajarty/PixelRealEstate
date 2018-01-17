@@ -1,12 +1,7 @@
 <!DOCTYPE HTML>
-<!--
-    Photon by HTML5 UP
-    html5up.net | @ajlkn
-    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
 <html>
     <head>
-        <title>Photon by HTML5 UP</title>
+        <title>PixelProperty</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
@@ -14,445 +9,82 @@
         <!-- <link rel="stylesheet" href="assets/css/overrides.css" /> -->
         <!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
         <!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
-
-        <!-- TODO move to overrides -->
-         <style>
-            * Style the navbar */
-             #navbar {
-                  overflow: hidden;
-                  background-color: #e5e5e5;
-                  z-index: 1;
-                  border-bottom: 1px solid grey;
-             }
-             /* Navbar links */
-             #navbar a {
-                  float: left;
-                  display: block;
-                  color: #f2f2f2;
-                  text-align: center;
-                  padding: 14px;
-                  text-decoration: none;
-             }
-             ul.nav {
-                 list-style-type: none;
-                 margin: 0;
-                 padding: 0;
-                 overflow: hidden;
-                 background-color: #e5e5e5;
-                 float: right;
-                 margin-right: 15px;
-             }
-             ul.nav li {
-                 float: left;
-             }
-             ul.nav li a {
-                 display: block;
-                 color: black !important;
-                 text-align: center;
-                 padding: 16px;
-                 text-decoration: none;
-                 border-bottom: none;
-             }
-             
-             /* Page content */
-             .content {
-                  padding: 16px;
-             }
-             /* The sticky class is added to the navbar with JS when it reaches its scroll position */
-             .sticky {
-                  position: fixed;
-                  top: 0;
-                  width: 100%
-             }
-             /* Add some top padding to the page content to prevent sudden quick movement (as the navigation bar gets a new position at the top of the page (position:fixed and top:0) */
-             .sticky + .content {
-                  padding-top: 60px;
-             }
-       </style>
     </head>
+
+    <!-- temp override -->
+    <style>
+
+    @font-face {
+        font-family: 'Unibody8Pro-Bold';
+        src: url('assets/fonts/Unibody8Pro-Bold.otf') format('opentype');
+    }
+
+    @font-face {
+        font-family: 'Roboto-Regular';
+        src: url('assets/fonts/Roboto-Regular.ttf');
+    }
+
+    .pixel-span {
+        font-family: 'Unibody8Pro-Bold';
+        font-size: 2.5em;
+        /*-webkit-text-stroke: .5px black; */
+        /*text-stroke: .5px black;*/
+        color:white;
+    }
+
+    .roboto-span {
+        font-family: 'Roboto-Regular';
+        font-size: 3em;
+        /*-webkit-text-stroke: 1px black; */
+        /*text-stroke: 1px black;*/
+        color:white;
+    }
+
+    #header-title {
+        margin-top: 100px !important;
+    }
+    #header-slogan {
+        margin-top: 200px !important;
+        margin-bottom: 200px !important;
+        font-family: 'Roboto-Regular';
+        font-size: 3em;
+    }
+
+    #header {
+        min-height: 900px !important;;
+    }
+
+    </style>
+
     <body>
 
-        <div id="navbar">
-            <ul class="nav">
-                <li><a href="#pixel-real-estate">PixelRealEstate</a></li>
-                <li><a href="#setup">Setup</a></li>
-                <li><a href="#press">Press</a></li>
-                <li><a href="#team">Team</a></li>
-                <li><a href="#faq">FAQ</a></li>
-            </ul>
-        </div>
-
        <!-- Header -->
-         <section id="header">
-          <div class="inner">
-              <h1 style="padding-bottom:150px; font-size:4em">P I X E L &nbsp; R E A L &nbsp; E S T A T E</h1>
-              <h2 style="padding-bottom:125px;"><i>An Evolving Digital Canvas</i></h2>
-
-              <svg width="85" height="200" style="border:.5px solid black;">
-               <rect x="0"     y="190"    rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="175"    rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="160"    rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="145"    rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="130"    rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="115"    rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="100"    rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="85"        rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="70"        rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="55"        rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="15"    y="190"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="175"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="160"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="145"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="130"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="115"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="100"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="85"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="70"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="55"      rx="0"    ry="0"      width="10"        height="10" />
-
-               <rect x="30"    y="130"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="115"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="70"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="55"      rx="0"    ry="0"      width="10"        height="10" />
-
-               <rect x="45"    y="130"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="115"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="70"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="55"      rx="0"    ry="0"      width="10"        height="10" />
-
-               <rect x="60"    y="130"     rx="0"    ry="0"   width="10"      height="10" />
-               <rect x="60"    y="115"     rx="0"    ry="0"   width="10"      height="10" />
-               <rect x="60"    y="100"     rx="0"    ry="0"   width="10"      height="10" />
-               <rect x="60"    y="85"      rx="0"    ry="0"       width="10"        height="10" />
-               <rect x="60"    y="70"      rx="0"    ry="0"       width="10"        height="10" />
-               <rect x="60"    y="55"      rx="0"    ry="0"       width="10"      height="10" />
-
-               <rect x="75"    y="115"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="75"    y="100"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="75"    y="85"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="75"    y="70"      rx="0"    ry="0"      width="10"        height="10" />
-              </svg>
-              <svg width="85" height="200" style="border:.5px solid black;">
-
-                 <!-- <rect x="15"     y="190"    rx="0"      ry="0"    width="10"      height="10" /> -->
-                 <!-- <rect x="15"     y="175"    rx="0"      ry="0"    width="10"      height="10" /> -->
-               <!-- <rect x="15"   y="55"    rx="0"      ry="0"        width="10"      height="10" /> -->
-               <!-- <rect x="15"   y="70"    rx="0"      ry="0"        width="10"      height="10" /> -->
-
-               <!-- <rect x="0"    y="190"   rx="0"    ry="0"      width="10"        height="10" /> -->
-                 <!-- <rect x="0"  y="175"     rx="0"        ry="0"      width="10"    height="10" /> -->
-               <!-- <rect x="0"    y="55"      rx="0"    ry="0"      width="10"        height="10" /> -->
-               <!-- <rect x="0"    y="70"      rx="0"    ry="0"      width="10"        height="10" /> -->
-
-               <rect x="30"    y="190"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="175"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="160"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="145"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="130"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="115"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="100"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="85"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="70"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="55"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="190"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="175"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="160"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="145"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="130"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="115"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="100"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="85"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="70"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="55"      rx="0"    ry="0"      width="10"        height="10" />
-
-               <!-- <rect x="60"   y="190"  rx="0"      ry="0"        width="10"      height="10" /> -->
-                 <!-- <rect x="60"     y="175"    rx="0"      ry="0"    width="10"      height="10" /> -->
-               <!-- <rect x="60"   y="55"    rx="0"      ry="0"        width="10"      height="10" /> -->
-               <!-- <rect x="60"   y="70"    rx="0"      ry="0"        width="10"      height="10" /> -->
-
-               <!-- <rect x="75"   y="190"  rx="0"      ry="0"        width="10"      height="10" /> -->
-                 <!-- <rect x="75"     y="175"    rx="0"      ry="0"    width="10"      height="10" /> -->
-               <!-- <rect x="75"   y="55"    rx="0"      ry="0"        width="10"      height="10" /> -->
-               <!-- <rect x="75"   y="70"    rx="0"      ry="0"        width="10"      height="10" /> -->                 
-              </svg>
-              <svg width="10" height="200"></svg>
-              <svg width="85" height="200" style="border:.5px solid black;">
-
-                 <rect x="0"   y="190"  rx="0"      ry="0"        width="10"      height="10" />
-               <rect x="0"     y="175"    rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="55"        rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="70"        rx="0"      ry="0"    width="10"      height="10" />
-
-               <rect x="15"    y="160"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="175"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="85"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="70"      rx="0"    ry="0"      width="10"        height="10" />
-
-               <rect x="30"    y="160"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="145"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="85"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="100"   rx="0"    ry="0"      width="10"        height="10" />
-
-               <rect x="75"    y="190"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="75"    y="175"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="75"    y="55"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="75"    y="70"      rx="0"    ry="0"      width="10"        height="10" />
-
-               <rect x="60"    y="160"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="60"    y="175"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="60"    y="85"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="60"    y="70"      rx="0"    ry="0"      width="10"        height="10" />
-
-               <rect x="45"    y="160"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="145"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="85"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="100"   rx="0"    ry="0"      width="10"        height="10" />
-
-               <rect x="45"    y="130"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="115"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="130"    rx="0"      ry="0"        width="10"      height="10" />
-               <rect x="30"    y="115"   rx="0"    ry="0"      width="10"        height="10" />
-
-
-              </svg>
-              <svg width="10" height="200"></svg>
-              <svg width="85" height="200" style="border:.5px solid black;">
-
-                 <rect x="0"   y="190"  rx="0"      ry="0"        width="10"      height="10" />
-               <rect x="0"     y="175"    rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="160"    rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="145"    rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="130"    rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="115"    rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="100"    rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="85"        rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="70"        rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="55"        rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="15"    y="190"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="175"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="160"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="145"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="130"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="115"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="100"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="85"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="70"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="55"      rx="0"    ry="0"      width="10"        height="10" />
-
-                 <rect x="30"  y="130"     rx="0"        ry="0"      width="10"    height="10" />
-               <rect x="30"    y="115"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="70"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="55"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="190"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="175"   rx="0"    ry="0"      width="10"        height="10" />
-
-               <rect x="45"    y="190"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="175"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="130"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="115"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="70"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="55"      rx="0"    ry="0"      width="10"        height="10" />
-
-               <rect x="60"    y="130"     rx="0"    ry="0"   width="10"      height="10" />
-               <rect x="60"    y="115"     rx="0"    ry="0"   width="10"      height="10" />
-               <rect x="60"    y="70"      rx="0"    ry="0"       width="10"        height="10" />
-               <rect x="60"    y="55"      rx="0"    ry="0"       width="10"        height="10" />
-               <rect x="60"    y="190"    rx="0"      ry="0"     width="10"      height="10" />
-               <rect x="60"    y="175"    rx="0"      ry="0"     width="10"      height="10" />
-
-               <rect x="75"    y="55"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="75"    y="70"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="75"    y="190"    rx="0"      ry="0"        width="10"      height="10" />
-               <rect x="75"    y="175"    rx="0"      ry="0"        width="10"      height="10" />
-
-              </svg>
-              <svg width="10" height="200"></svg>
-              <svg width="85" height="200" style="border:.5px solid black;">
-
-                 <rect x="0"   y="190"  rx="0"      ry="0"        width="10"      height="10" />
-               <rect x="0"     y="175"    rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="160"    rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="145"    rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="130"    rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="115"    rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="100"    rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="85"        rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="70"        rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="0"     y="55"        rx="0"      ry="0"    width="10"      height="10" />
-               <rect x="15"    y="190"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="175"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="160"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="145"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="130"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="115"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="100"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="85"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="70"      rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="15"    y="55"      rx="0"    ry="0"      width="10"        height="10" />    
-
-               <rect x="30"    y="190"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="30"    y="175"   rx="0"    ry="0"      width="10"        height="10" />
-
-               <rect x="45"    y="190"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="45"    y="175"   rx="0"    ry="0"      width="10"        height="10" />
-
-               <rect x="60"    y="190"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="60"    y="175"   rx="0"    ry="0"      width="10"        height="10" />
-
-               <rect x="75"    y="190"   rx="0"    ry="0"      width="10"        height="10" />
-               <rect x="75"    y="175"   rx="0"    ry="0"      width="10"        height="10" />
-
-              </svg>
-
-
-
-              <svg height="200" width="600">
-
-                 <g class="letter p">
-                     <g>
-                         <rect x="0" y="0" fill="#2B282D" width="20" height="20"></rect>
-                         <line x1="10" y1="0" x2="10" y2="20" stroke-width="1" stroke="#f96d6d"/>
-                         <line x1="0" y1="10" x2="20" y2="10" stroke-width="1" stroke="#f96d6d"/>
-                         <rect x="0" y="25" fill="#2B282D" width="20" height="20"></rect>
-                         <line x1="10" y1="25" x2="10" y2="50" stroke-width="1" stroke="#f96d6d"/>
-                         <line x1="10" y1="25" x2="10" y2="50" stroke-width="1" stroke="white"/>
-                         <rect x="0" y="50" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="0" y="75" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="0" y="100" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="0" y="125" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="0" y="150" fill="#2B282D" width="20" height="20"></rect>
-
-                         <rect x="25" y="0" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="25" y="75" fill="#2B282D" width="20" height="20"></rect>
-
-                         <rect x="50" y="0" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="50" y="75" fill="#2B282D" width="20" height="20"></rect>
-
-                         <rect x="75" y="10" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="75" y="35" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="75" y="60" fill="#2B282D" width="20" height="20"></rect>
-                  </g>
-                 </g>
-                 <g class="letter i">
-                     <g>
-                         <rect x="130" y="0" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="130" y="25" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="130" y="50" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="130" y="75" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="130" y="100" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="130" y="125" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="130" y="150" fill="#2B282D" width="20" height="20"></rect>
-                  </g>
-                 </g>
-                 <g class="letter x">
-                     <g>
-                         <rect x="185" y="0" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="185" y="150" fill="#2B282D" width="20" height="20"></rect>                       
-                         <rect x="185" y="0" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="185" y="150" fill="#2B282D" width="20" height="20"></rect>
-
-                         <rect x="200" y="25" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="200" y="125" fill="#2B282D" width="20" height="20"></rect>                       
-                         <rect x="200" y="25" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="200" y="125" fill="#2B282D" width="20" height="20"></rect>
-
-                         <rect x="215" y="50" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="215" y="100" fill="#2B282D" width="20" height="20"></rect>                       
-                         <rect x="215" y="50" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="215" y="100" fill="#2B282D" width="20" height="20"></rect>
-
-                         <rect x="270" y="0" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="270" y="150" fill="#2B282D" width="20" height="20"></rect>                       
-                         <rect x="270" y="0" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="270" y="150" fill="#2B282D" width="20" height="20"></rect>
-
-                         <rect x="255" y="25" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="255" y="125" fill="#2B282D" width="20" height="20"></rect>                       
-                         <rect x="255" y="25" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="255" y="125" fill="#2B282D" width="20" height="20"></rect>
-
-                         <rect x="240" y="50" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="240" y="100" fill="#2B282D" width="20" height="20"></rect>                       
-                         <rect x="240" y="50" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="240" y="100" fill="#2B282D" width="20" height="20"></rect>
-
-                         <rect x="227.5" y="75" fill="#2B282D" width="20" height="20"></rect>
-                  </g>
-                 </g>
-
-                 <g class="letter e">
-                     <g>
-                         <rect x="325" y="0" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="325" y="25" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="325" y="50" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="325" y="75" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="325" y="100" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="325" y="125" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="325" y="150" fill="#2B282D" width="20" height="20"></rect>
-
-                   <rect x="325" y="0" fill="#2B282D" width="20" height="20"></rect>
-                   <rect x="350" y="0" fill="#2B282D" width="20" height="20"></rect>
-                   <rect x="375" y="0" fill="#2B282D" width="20" height="20"></rect>
-                   <rect x="400" y="0" fill="#2B282D" width="20" height="20"></rect>
-
-                   <rect x="325" y="150" fill="#2B282D" width="20" height="20"></rect>
-                   <rect x="350" y="150" fill="#2B282D" width="20" height="20"></rect>
-                   <rect x="375" y="150" fill="#2B282D" width="20" height="20"></rect>
-                   <rect x="400" y="150" fill="#2B282D" width="20" height="20"></rect>
-
-                   <rect x="325" y="75" fill="#2B282D" width="20" height="20"></rect>
-                   <rect x="350" y="75" fill="#2B282D" width="20" height="20"></rect>
-                   <rect x="375" y="75" fill="#2B282D" width="20" height="20"></rect>
-
-                  </g>
-                 </g>
-
-                 <g class="letter l">
-                     <g>
-                         <rect x="450" y="0" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="450" y="25" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="450" y="50" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="450" y="75" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="450" y="100" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="450" y="125" fill="#2B282D" width="20" height="20"></rect>
-                         <rect x="450" y="150" fill="#2B282D" width="20" height="20"></rect>
-
-                   <rect x="450" y="150" fill="#2B282D" width="20" height="20"></rect>
-                   <rect x="475" y="150" fill="#2B282D" width="20" height="20"></rect>
-                   <rect x="500" y="150" fill="#2B282D" width="20" height="20"></rect>
-                   <rect x="525" y="150" fill="#2B282D" width="20" height="20"></rect>
-
-                  </g>
-                 </g>
-
-                 <g class="line p">
-                  <g>
-                      <!-- <line x1="10" y1="0" x2="10" y2="170" stroke-width="1" stroke="white"/> -->
-                  </g>
-                 </g>
-
-              </svg>
-
-              <ul class="actions">
-                 <li><a href="#pixel-real-estate" class="button scrolly">Explore</a></li>
-              </ul>
-              <br/>
-              <br/>
-              <br/>
-          </div>
-         </section>
+        <section id="header">
+            <div class="inner">
+                <h1 id="header-title">
+                    <span class="pixel-span">PIXEL</span>
+                    &nbsp;
+                    <span class="roboto-span">PROPERTY</span>
+                </h1>
+                <!-- <h2 id="header-slogan"><i>An Evolving Digital Canvas</i></h2> -->
+                <h1 id="header-slogan">Coming Soon</h1>
+                <ul class="actions">
+                    <li><a href="#pixel-real-estate" class="button scrolly">Learn More</a></li>
+                </ul>
+            </div>
+        </section>
 
        <!-- Landing -->
          <div id="pixel-real-estate"></div>
-         <section id="one" class="main style2">
+         <section id="one" class="main style1">
           <div class="container">
               <div class="row 150%">
                  <div class="6u 12u$(medium)">
-                   <header class="major">
+                   <!-- <header class="major">
                     <h2>What is PixelRealEstate?</h2>
-                   </header>
+                   </header> -->
                    <p>
-                    <strong>PixelRealEstate</strong> is a constantly evolving canvas of a tradable digital property where the owners of property may upload any image they like, or rent their property to other users.
+                    <strong>PixelProperty</strong> is a constantly evolving canvas of a tradable digital property where the owners of property may upload any image they like, or rent their property to other users.
                    </p>
                  </div>
                  <div class="6u$ 12u$(medium) important(medium)">
@@ -462,7 +94,7 @@
           </div>
          </section>
 
-         <section id="two" class="main style1 special">
+        <!--  <section id="two" class="main style1 special">
           <div class="container">
               <header class="major">
                  <h2>What is Digital Property?</h2>
@@ -471,9 +103,9 @@
                  Digital properties in PixelRealEstate are tradable blockchain tokens powered by Ethereum. Each property is a separate individual token, which can have its appearance altered to its owners desire. Where Bitcoin and Ethereum are cryptocurrencies, these are cryptocollectables. Cryptocollectables can be bought, sold, or traded like any collectable item.
               </p>
           </div>
-         </section>
+         </section> -->
 
-         <section id="two" class="main style2">
+         <!-- <section id="two" class="main style2">
           <div class="container">
               <div class="row 150%">
                  <div class="6u 12u$(medium)">
@@ -496,10 +128,10 @@
                  </div>
               </div>
           </div>
-         </section>
+         </section> -->
 
        <!-- Setting Up -->
-         <div id="setup"></div>
+         <!-- <div id="setup"></div>
          <section id="three" class="main style1 special">
           <div class="container">
               <header class="major">
@@ -523,7 +155,7 @@
               <p>
                  To use PixelRealEstate through [PixelRealEstate.io] you will need
               </p>
-              <!-- TODO fudged css -->
+              
               <ul style="text-align:left; margin-left:175px;">
                  <li>A computer running [Brave], [FireFox], or [Chrome]</li>
                  <li>[MetaMask] installed, which allows us to mor easily communicate with the digital real estate market</li>
@@ -585,16 +217,16 @@
                  <li><a href="#faq" class="button">Frequently Asked Questions</a></li>
               </ul>
           </div>
-         </section>
+         </section> -->
 
        <!-- Press Info / Clarification -->
-         <div id="press"></div>
+        <!--  <div id="press"></div>
          <section id="eight" class="main style2 special">
           <div class="container">
               <header class="major">
                  <h2>For Press</h2>
               </header>
-              <!-- TODO fudged css -->
+
               <span style="text-align:left;">
                  <p>
                    PixelRealEstate are tradable, collectable, digital property. Where each cryptocurrency token is the same as the next (that is, each Bitcoin is is just like any other Bitcoin), each digital property is a unique, non-fungible token. These properties cannot be created, and each represent a different region on the digital real estate market.
@@ -651,10 +283,10 @@
                  When referencing PixelRealEstate, it is always written with a capital P, R and E, without any spaces or hyphens.
               </p>
           </div>
-         </section>
+         </section> -->
 
        <!-- About Us -->
-         <div id="team"></div>
+  <!--        <div id="team"></div>
          <section id="twelve" class="main style2 special">
           <div class="container">
               <header class="major">
@@ -669,23 +301,20 @@
               <br/>
               <div class="row 150%">
                  <div class="4u 12u$(medium)">
-                   <!-- <span class="image fit"><img src="images/team/cr.png" alt="" /></span> -->
                    <img style="height:200px" src="images/team/cr.png" alt="" />
                  </div>
                  <div class="4u 12u$(medium)">
-                   <!-- <span class="image fit"><img src="images/team/js.png" alt="" /></span> -->
                    <img style="height:200px" src="images/team/js.png" alt="" />
                  </div>
                  <div class="4u$ 12u$(medium)">
-                   <!-- <span class="image fit"><img src="images/team/ap.png" alt="" /></span> -->
                    <img style="height:200px" src="images/team/ap.png" alt="" />
                  </div>
               </div>
           </div>
-         </section>
+         </section> -->
 
        <!-- Technical Details / Road Map -->
-         <section id="thirteen" class="main style1">
+ <!--         <section id="thirteen" class="main style1">
           <div class="container">
               <header class="major">
                  <h2>Technical Details</h2>
@@ -717,10 +346,10 @@
                  <li>Q3 2018 - …</li>
               </ul>
           </div>
-         </section>
+         </section> -->
 
        <!-- FAQ -->
-         <div id="faq"></div>
+<!--          <div id="faq"></div>
          <section id="fourteen" class="main style2">
           <div class="container">
               <header class="major">
@@ -736,14 +365,15 @@
                  <li>Question Answer Accordion</li><br/>
               </ul>
           </div>
-         </section>
+         </section> -->
 
        <!-- Footer -->
          <section id="footer">
           <ul class="icons">
               <li><a href="#" class="icon alt fa-twitter"><span class="label">Twitter</span></a></li>
-              <li><a href="#" class="icon alt fa-facebook"><span class="label">Facebook</span></a></li>
-              <li><a href="#" class="icon alt fa-instagram"><span class="label">Instagram</span></a></li>
+              <!-- <li><a href="#" class="icon alt fa-facebook"><span class="label">Facebook</span></a></li> -->
+              <li><a href="#" class="icon alt fa-reddit"><span class="label">Reddit</span></a></li>
+              <!-- <li><a href="#" class="icon alt fa-instagram"><span class="label">Instagram</span></a></li> -->
               <li><a href="#" class="icon alt fa-github"><span class="label">GitHub</span></a></li>
               <li><a href="#" class="icon alt fa-envelope"><span class="label">Email</span></a></li>
           </ul>
@@ -758,20 +388,4 @@
          <script src="assets/js/main.js"></script>
 
     </body>
-         <script type="text/javascript">
-         // When the user scrolls the page, execute myFunction 
-         window.onscroll = function() {myFunction()};
-         // Get the navbar
-         var navbar = document.getElementById("navbar");
-         // Get the offset position of the navbar
-         var sticky = navbar.offsetTop;
-         // Add the sticky class to the navbar when you reach its scroll position. Remove "sticky" when you leave the scroll position
-         function myFunction() {
-          if (window.pageYOffset >= sticky) {
-              navbar.classList.add("sticky")
-              } else {
-              navbar.classList.remove("sticky");
-              }
-         }
-       </script>
 </html>

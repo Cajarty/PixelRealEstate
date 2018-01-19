@@ -1,6 +1,6 @@
 @import './animation.scss';
 .pullout {
-    background-color: rgb(28, 30, 61);
+    background-color: $color2;
     border-radius: 16px;
     top: 50%;
     position: absolute;
@@ -68,12 +68,12 @@
 }
 
 .tab:not(:last-child) {
-    border-bottom: solid black 1px;
+    border-bottom: solid $color5 1px;
 }
 
 .tabContainer {
     display: inline-block;
-    background-color: rgb(28, 30, 61);
+    background-color: $color3;
     &.right {
         float: left;
         left: 0;
@@ -95,7 +95,7 @@
     height: calc(100% - 6px);
     border-top: black solid 3px;
     border-bottom: black solid 3px;
-    color: rgb(34, 190, 190);
+    color: $color4;
     font-weight: 400;
 }
 
@@ -112,11 +112,11 @@
 .tab {
     &.right:hover,
     &.right.selected {
-        background: linear-gradient(to right, rgb(46, 50, 100), rgb(28, 30, 61));
+        background: linear-gradient(to right, $color2, $color3);
     }
     &.left:hover,
     &.left.selected {
-        background: linear-gradient(to left, rgb(46, 50, 100), rgb(28, 30, 61));
+        background: linear-gradient(to left, $color2, $color3);
     }
 }
 
@@ -125,7 +125,7 @@
 }
 
 .tab.unselected {
-    //border-right: 1px solid black;
+    //border-right: 1px solid $color5;
 }
 
 .tab:first-child,
@@ -160,29 +160,29 @@
     width: 220px;
     height: calc(100% - 6px);
     display: inline-block;
-    border-top: 3px solid black;
-    border-bottom: 3px solid black;
-    background-color: rgb(28, 30, 61);
-    color: rgb(34, 190, 190);
+    border-top: 3px solid $color5;
+    border-bottom: 3px solid $color5;
+    background-color: $color3;
+    color: $color2;
     font-weight: 400;
 }
 
 .title {
-    background-color: green;
+    background-color: $color3;
     line-height: 3em;
-    font-size: 1em;
+    font: $font2;
 }
 
 .inputTitle {
-    font-size: 22px;
+    font: $font3;
     display: inline-block
 }
 
 input {
     font-size: 22px;
     border-radius: 6px;
-    border: lightblue solid 2px;
-    background-color: darkgrey;
+    border: $color5 solid 2px;
+    background-color: $color4;
     display: inline-block;
     width: calc(100% - 14px);
     text-align: center;
@@ -198,15 +198,13 @@ td {
 div.tableDataContainer {
     width: 80%;
     margin: auto;
-    background-color: green;
+    background-color: $color3;
     tr {
         width: 100%;
     }
     .dataContainer {
         max-height: 250px;
         min-height: 250px;
-        overflow-y: scroll;
-        overflow-x: hidden;
         table.data {
             width: 100%;
         }
@@ -215,4 +213,19 @@ div.tableDataContainer {
         text-align: center;
         width: 100%;
     }
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+input:focus {
+    background-color: darken($color3, 10%);
+    outline: none;
 }

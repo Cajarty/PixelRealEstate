@@ -4,6 +4,7 @@ import ManagePanel from './ManagePanel.jsx'
 import ActionPanel from './ActionPanel.jsx'
 import {Contract, ctr} from '../../contract/contract.jsx';
 import PropertySalesLog from '../ui/PropertySalesLog';
+import ErrorBox from '../ErrorBox';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -26,6 +27,10 @@ class CanvasPage extends Component {
                     <div className='right'>
                         <ActionPanel/>
                     </div>
+                </div>
+                <div className='middle-top'>
+
+                    <ErrorBox/>
                 </div>
                 <div className='middle'>
                     <PropertySalesLog/>

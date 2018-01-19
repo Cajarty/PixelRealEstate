@@ -4,6 +4,7 @@ import {EVENTS, ctr, Contract} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions.jsx';
 import Axios from '../../network/Axios.jsx';
 import * as Compress from 'lzwcompress';
+import Zoom from './Zoom';
 
 
 class Canvas extends Component {
@@ -13,18 +14,24 @@ class Canvas extends Component {
             ctx: null,
             pixelData: {},
             loadValue: 0,
+            currentZoom: 1,
             cancelToken: null,
             loaded: false,
         }
         this.setCanvasProperty = this.setCanvasProperty.bind(this);
+        this.zoomCanvas = this.zoomCanvas.bind(this);
 //this.appendPixelData = this.appendPixelData.bind(this);
         this.pixelData = [];
     }
 
     componentDidMount() {
+        let dataCtx = this.dataCanvas.getContext("2d");
+        dataCtx.imageSmoothingEnabled = false;
+        dataCtx.webkitImageSmoothingEnabled = false;
         let ctx = this.canvas.getContext("2d");
         ctx.imageSmoothingEnabled = false;
-        this.setState({ ctx });
+        ctx.webkitImageSmoothingEnabled = false;
+        this.setState({ dataCtx, ctx });
         this.loadCanvas();
         ctr.listenForEvent(EVENTS.PropertyColorUpdate, 'canvas', (data) => {
             let xy = {x: 0, y: 0};
@@ -51,33 +58,45 @@ class Canvas extends Component {
     }
 
     setCanvasProperty(x, y, rgbArr) {
-        let ctxID = this.state.ctx.createImageData(10, 10);
+        let ctxID = this.state.dataCtx.createImageData(10, 10);
         for (let i = 0; i < rgbArr.length; i++) {
             ctxID.data[i] = rgbArr[i];
         }
-        this.state.ctx.putImageData(ctxID, x * 10, y * 10);
+        this.state.dataCtx.putImageData(ctxID, x * 10, y * 10);
     }
 
     setCanvas(rgbArr) {
-        let ctxID = this.state.ctx.createImageData(Const.CANVAS_WIDTH, Const.CANVAS_HEIGHT);
+        let ctxID = this.state.dataCtx.createImageData(Const.CANVAS_WIDTH, Const.CANVAS_HEIGHT);
         for (let i = 0; i < Object.keys(rgbArr).length; i++) {
             for (let j = 0; j < rgbArr[i].length; j++) {
                 ctxID.data[i * rgbArr[i].length + j] = rgbArr[i][j];
             }
         }
-        this.state.ctx.putImageData(ctxID, 0, 0);
+        this.state.dataCtx.putImageData(ctxID, 0, 0);
         this.setState({loaded: true});
+    }
+
+    zoomCanvas(zoom) {
+        this.state.ctx.scale(zoom / this.state.currentZoom, zoom / this.state.currentZoom);
+        this.state.ctx.drawImage(this.dataCanvas, 0, 0);
+        this.setState({currentZoom: zoom});
     }
 
     render() {
         return (
             <div className='canvasContainer'>
+                <canvas className='dataCanvas hidden'
+                    width={1000}
+                    height={1000}
+                    ref={(dataCanvas) => { this.dataCanvas = dataCanvas; }} 
+                ></canvas>
                 <canvas 
                     className={'canvas zoom-6 ' + (this.state.loaded ? '' : 'hidden')} 
                     ref={(canvas) => { this.canvas = canvas; }} 
                     width={Const.CANVAS_WIDTH} 
                     height={Const.CANVAS_HEIGHT}
                 ></canvas>
+                <Zoom onZoom={(zoom) => this.zoomCanvas(zoom)}/>
                 <div className={!this.state.loaded ? '' : 'hidden'}>Loading... Please wait.</div>
             </div>
         );
@@ -85,87 +104,3 @@ class Canvas extends Component {
 }
 
 export default Canvas
-
-
-
-/*
-
-
-
-    componentDidMount() {
-        let ctx = this.canvas.getContext("2d");
-        let imageData = ctx.createImageData(Const.CANVAS_WIDTH, Const.CANVAS_HEIGHT);
-        this.setState({ ctx, imageData });
-        ctx.imageSmoothingEnabled = false;
-        //ctr.getPropertyColors(x, y, this.appendPixelData);
-        start = new Date().getTime();
-        this.loadPixels(0);
-    }
-
-    loadPixels(x) {
-        for(let row = 0; row < 1000; row++) {
-            console.info('calls');
-            ctr.getPropertyColorsOfRow(x, row, this.appendPixelData);
-        }
-    }
-
-    appendPixelData(x, row, data) {
-        if (this.state.pixelData[row] == null)
-            this.state.pixelData[row] = [];
-        for (let i = 0; i < data.length; i++)
-            this.state.pixelData[row].push(data[i]);
-        let loadValue = this.state.loadValue + 10;
-        this.setState({loadValue});
-        if (loadValue == (x + 10) * 1000 && loadValue < 100000) {
-            this.completePixelDataLoad(x);
-            this.loadPixels(x + 10);
-        }
-    }
-
-    completePixelDataLoad(x) {
-        let ctxID = this.state.ctx.createImageData(100, Const.CANVAS_HEIGHT);
-        let counter = 0;
-        for(let row = 0; row < 1000; row++) {
-            for (let i = 0; i < 400; i++) {
-                ctxID.data[counter++] = this.state.pixelData[row][i + (x * 40)];
-            }
-        }
-        this.state.ctx.putImageData(ctxID, x * 10, 0);
-        if (x >= 99) {
-            console.info("Time passed: ", new Date().getTime() - start);
-            console.info(this.state.pixelData);
-        }
-    }
-
-    // setCanvasPixel(x, y, r, g, b) {
-    //     this.state.ctx.clearRect(x, y, 1, 1);
-    //     let single = this.state.ctx.createImageData(1, 1);
-    //     single.data[0] = r;
-    //     single.data[1] = g;
-    //     single.data[2] = b;
-    //     single.data[3] = 255;
-    //     this.state.ctx.putImageData(single, x, y);
-    // }
-
-    /*
-    Creates chunks in only rows, meaning the canvas has its data loaded in
-    as n by 1 lines. Ensure it isn't out of bounds of the width of the canvas.
-    */
-    /*
-    setCanvasProperty(x, y, rgbArr) {
-        let ctxID = this.state.ctx.createImageData(10, 10);
-        for (let i = 0; i < rgbArr.length; i++) {
-            ctxID.data[i] = rgbArr[i];
-        }
-        this.state.ctx.putImageData(ctxID, x * 10, y * 10);
-    }
-
-    setCanvas(rgbArr) {
-        let ctxID = this.state.ctx.createImageData(Const.CANVAS_WIDTH, Const.CANVAS_HEIGHT);
-        for (let i = 0; i < rgbArr.length; i++) {
-            ctxID.data[i] = rgbArr[i];
-        }
-        this.state.ctx.putImageData(ctxID, 0, 0);
-    }
-
-    */

@@ -1,5 +1,11 @@
 .canvas {
     display: block;
+    image-rendering: optimizeSpeed;
+    image-rendering: crisp-edges;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -o-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    -ms-interpolation-mode: nearest-neighbor;
     &.zoom-0 {
         height: 250px;
     }
@@ -24,6 +30,6 @@
 .canvasContainer {
     margin-top: 5vh !important;
     margin: 0px;
-    border: 2px solid black;
+    border: 10px solid $color5;
     display: inline-block;
 }

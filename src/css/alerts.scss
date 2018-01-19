@@ -11,14 +11,14 @@
     text-align: center;
     width: 100%;
     height: 32px;
-    font-size: 24px;
-    background-color: rgb(182, 245, 193);
+    font: $font2;
+    background-color: $color4;
     margin: auto;
     margin-top: 4px;
     margin-bottom: 4px;
     border-width: 2px;
     border-style: solid;
-    border-color: green;
+    border-color: $color5;
     border-image: initial;
     border-radius: 8px;
 }

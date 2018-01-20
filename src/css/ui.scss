@@ -203,6 +203,7 @@ div.tableDataContainer {
         width: 100%;
     }
     .dataContainer {
+        overflow-y: scroll;
         max-height: 250px;
         min-height: 250px;
         table.data {

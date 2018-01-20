@@ -20,16 +20,28 @@ class ActionPanel extends Component {
                 <div className='contractAction'>
                  <Pullout side='right' >
                     <PulloutTab icon={Assets.ICON_MONEY} tabName='Buy'>
-                        <BuyPixelForm/>
+                        <BuyPixelForm
+                            valueX={this.props.clickX}
+                            valueY={this.props.clickY}
+                        />
                     </PulloutTab>
                     <PulloutTab icon={Assets.ICON_MONEY} tabName='Sell'>
-                        <SellPixelForm/>
+                        <SellPixelForm
+                            valueX={this.props.clickX}
+                            valueY={this.props.clickY}
+                        />
                     </PulloutTab>
                     <PulloutTab icon={Assets.ICON_MONEY} tabName='Update'>
-                        <SetPixelColorForm/>
+                        <SetPixelColorForm
+                            valueX={this.props.clickX}
+                            valueY={this.props.clickY}
+                        />
                     </PulloutTab>
                     <PulloutTab icon={Assets.ICON_MONEY} tabName='Set Status'>
-                        <GetPixelColorForm/>
+                        <GetPixelColorForm
+                            valueX={this.props.clickX}
+                            valueY={this.props.clickY}
+                        />
                     </PulloutTab>
                  </Pullout>
                 </div>

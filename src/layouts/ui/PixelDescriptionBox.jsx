@@ -6,8 +6,10 @@ class PixelDescriptionBox extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            x: 0, 
-            y: 0,
+            x: '', 
+            y: '',
+            ctx: null,
+            dataCtx: null,
             owner: "",
             isForSale: false,
             salePrice: 0,
@@ -17,25 +19,56 @@ class PixelDescriptionBox extends Component {
     }
 
     componentWillReceiveProps(newProps) {
-        let update = this.state;
-        for (let i = 0; i < Object.keys(newProps).length; i++) {
+        let update = {};
+        Object.keys(newProps).map((i) => {
             if (newProps[i] != this.props[i])
                 update[i] = newProps[i];
-        }
+        })
+        if (update.x != null || update.y != null)
+            this.loadProperty(newProps.x, newProps.y);
         this.setState(update);
     }
 
+    componentDidMount() {
+        let ctx = this.canvas.getContext('2d');
+        ctx.scale(10, 10);
+        ctx.imageSmoothingEnabled = false;
+        ctx.webkitImageSmoothingEnabled = false;
+        let dataCtx = this.dataCanvas.getContext('2d');
+        dataCtx.imageSmoothingEnabled = false;
+        dataCtx.webkitImageSmoothingEnabled = false;
+        if (this.props.x != null && this.props.y != -1 && this.props.x != null && this.props.y != -1) 
+            this.loadProperty(this.props.x, this.props.y);
+        this.setState({
+            ctx, 
+            dataCtx,
+            valueX: this.props.valueX,
+            valueY: this.props.valueY,
+        });
+    }
+
     setXY(key, event) {
-        let obj = this.state;
+        let obj = {
+            x: this.state.x == '' ? 0 : this.state.x, 
+            y: this.state.y == '' ? 0 : this.state.y
+        };
         obj[key] = Math.max(0 ,Math.min(100, event.target.value));
-        console.info(obj);
-        this.loadProperty(obj[key].x, obj[key].y);
+        this.loadProperty(obj.x, obj.y);
         this.setState(obj);
+    }
+
+    setCanvas(rgbArr) {
+        let ctxID = this.state.dataCtx.createImageData(10, 10);
+        for (let i = 0; i < rgbArr.length; i++) {
+            ctxID.data[i] = rgbArr[i];
+        }
+        this.state.dataCtx.putImageData(ctxID, 0, 0);
+        this.state.ctx.drawImage(this.dataCanvas, 0, 0);
     }
 
     loadProperty(x, y) {
         ctr.getPropertyData(x, y, (data) => {
-            console.info(data)
+            //console.info(data)
             let price = Func.BigNumberToNumber(data[1]);
             this.setState({
                 owner: data[0],
@@ -45,14 +78,17 @@ class PixelDescriptionBox extends Component {
                 isInPrivate: data[3],
             })
         });
+        ctr.getPropertyColors(x, y, (x, y, data) => {
+            this.setCanvas(data);
+        });
     }
 
     render() {
-        console.info(this.state);
         return (
             <div>
-                <div>
-                    <canvas id='colorPreviewCanvas'></canvas>
+                <div className='colorPreview'>
+                    <canvas id='colorPreviewCanvas' width={100} height={100} ref={(canvas) => { this.canvas = canvas; }} ></canvas>
+                    <canvas className='hidden' width={10} height={10} ref={(dataCanvas) => { this.dataCanvas = dataCanvas; }} ></canvas>
                 </div>
                 <table className='data'>
                     <tbody>
@@ -84,7 +120,7 @@ class PixelDescriptionBox extends Component {
                         </tr>
                         <tr>
                             <th>Is Private</th>
-                            <td>{this.state.isInPrivate}</td>
+                            <td>{this.state.isInPrivate ? 'Yes' : 'No'}</td>
                         </tr>
                     </tbody>
                 </table>

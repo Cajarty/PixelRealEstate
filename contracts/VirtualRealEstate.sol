@@ -2,21 +2,7 @@ pragma solidity ^0.4.2;
 
 
 /*
-
-//- 2 PXL released per hour per property if set to "Public Use"
-//    - 1 allocated for owner
-//    - 1 allocated for contributor
-//    - if there is no owner, contributor gets both
-//    - if no contributor or owner (AKA, first pixel set ever for each property), get get both cuts
-//- 0 PXL released to "Private Use"
-  //  - Pay 2 PXL to us devs per hour for using Private Use
-//- Setting colour free at start
-//- Trade offers are a 1-per-user thing.
-//- Trade orders can be made. User ABC's "I have 1k PXL, I want 0.1 ETH" vs "I ha ve 0.2 ETH, I want 2.5k PXL"
-- Properties in "Public Use" have the last-color changers hover text get shown, while "Private" has the owners hover text shown
-- PropertyOffers can be made. "I offer 1000 PXL for propertyID 20". 
-- Owners can "AcceptOffer(offers[otherOwner][pixelID])"
-- Update GetPropertyData
+- ethPrice, pxlPrice. 
 */
 
 contract Token {
@@ -88,11 +74,14 @@ contract VirtualRealEstate is StandardToken {
     //trade offers
     mapping (address => TradeOffer) pxlTradeStatus;
     
-    uint128 DEFAULT_PRICE_INCREMENTATION_INCREMENTATION = 100000000000000; //0.0001
-    uint128 DEFAULT_PRICE_INCREMENTATION = 500000000000000; //0.0005
-    uint128 DEFAULT_PRICE = 10000000000000000; //0.01 ETH
+    uint256 priceEth;
+    uint256 PRICE_ETH_MIN_INCREASE = 1000;//10000000000000000000000; //0.0001 ETH
+    uint256 PRICE_ETH_MIN_PERCENT = 20; //0.0001 ETH
+    uint256 pricePxl;
+    uint256 PRICE_PXL_MIN_INCREASE = 10;
+    uint256 PRICE_PXL_MIN_PERCENT = 20;
     
-    uint128 USER_BUY_CUT_PERCENT = 98; //%
+    uint256 USER_BUY_CUT_PERCENT = 98; //%
     
     uint256 PROPERTY_GENERATES_PER_HOUR = 2;
     uint256 FREE_COLOR_SETTING_UNTIL;
@@ -119,7 +108,7 @@ contract VirtualRealEstate is StandardToken {
     struct Property {
         address owner;
         uint256[10] colors; //10x10 rgb pixel colors per property
-        uint128 salePrice;
+        uint256 salePrice;
         address lastUpdater;
         bool isInPrivateMode;
         uint256 lastUpdate;
@@ -141,6 +130,8 @@ contract VirtualRealEstate is StandardToken {
         owner = msg.sender;
         totalSupply = 0;
         FREE_COLOR_SETTING_UNTIL = now + 3 days;
+        pricePxl = 10;
+        priceEth = 10000;//1000000000000000000; //0.001 ETH
     }
     function setHoverText(bytes32[2] text) public {
         ownerHoverText[msg.sender] = text;
@@ -151,7 +142,7 @@ contract VirtualRealEstate is StandardToken {
         SetUserSetLink(msg.sender, link);
     }
     
-    function getForSalePrice(uint24 propertyID) public validPropertyID(propertyID) view returns(uint128) {
+    function getForSalePrice(uint24 propertyID) public validPropertyID(propertyID) view returns(uint256) {
         Property storage property = map[propertyID];
         require(property.salePrice != 0);
         return property.salePrice;
@@ -160,9 +151,13 @@ contract VirtualRealEstate is StandardToken {
         Property storage property = map[propertyID];
         
         //Must have a owner or renter, and that owner/renter must have a short or long hover text
-        require(property.owner != 0);
-        
-        return ownerHoverText[property.owner];
+        if (property.isInPrivateMode) {
+            require(property.owner != 0);
+            return ownerHoverText[property.owner];
+        } else {
+            require(property.lastUpdater != 0);
+            return ownerHoverText[property.lastUpdater];
+        }
     }
     
     function getLink(uint24 propertyID) public validPropertyID(propertyID) view returns(bytes32[2]) {
@@ -177,9 +172,12 @@ contract VirtualRealEstate is StandardToken {
         return map[propertyID].colors;
     }
     
-    function getPropertyData(uint24 propertyID) public validPropertyID(propertyID) view returns(address, uint128, address, bool) {
+    function getPropertyData(uint24 propertyID) public validPropertyID(propertyID) view returns(address, uint256, address, bool) {
         Property storage property = map[propertyID];
         return (property.owner, property.salePrice, property.lastUpdater, property.isInPrivateMode);
+    }
+    function getPurchaseETHandPXLPrice() public view returns(uint256, uint256) {
+        return (priceEth, pricePxl);
     }
     
     //Change a 10x10 == 70 | 30 | 0 cost
@@ -385,36 +383,48 @@ contract VirtualRealEstate is StandardToken {
         
         return true;
     }
-    
-    //Use Case: Buyer wants to buy a property
-    function buyProperty(uint24 propertyID) public validPropertyID(propertyID) payable returns(bool) {
+    function buyPropertyInPXL(uint24 propertyID, uint256 pxlValue) public validPropertyID(propertyID) returns(bool) {
         Property storage property = map[propertyID];
         
-        //If this is the first ever purchase, the property hasn't been made yet, property.owner is just default
+        //If they have no owner, do the PXL price and update it
         if (property.owner == 0) {
+            property.salePrice = pricePxl;
             property.owner = owner;
-            property.salePrice = DEFAULT_PRICE;
-            DEFAULT_PRICE += DEFAULT_PRICE_INCREMENTATION;
-            DEFAULT_PRICE_INCREMENTATION += DEFAULT_PRICE_INCREMENTATION_INCREMENTATION;
+            uint256 minPercent = pricePxl * PRICE_PXL_MIN_PERCENT / 100;
+            pricePxl += (minPercent < PRICE_PXL_MIN_INCREASE) ? minPercent : PRICE_PXL_MIN_INCREASE;
         }
-      
-        require(property.salePrice != 0);//property must be for sale
-        require(msg.value >= property.salePrice);//Amount paid must be at least the price
-      
-        //User gets the majority of the listed price's sale
-        uint128 amountTransfered = 0;
         
-        //If there is someone to get paid, they get the purchase. Otherwise, the contract gets it as initial purchase payment
-        if (property.owner != 0) {
-            amountTransfered = property.salePrice * USER_BUY_CUT_PERCENT / 100;
-            property.owner.transfer(amountTransfered);
-        }
+        require(property.salePrice <= pxlValue);
+        require(balances[msg.sender] >= property.salePrice);
+        
+        uint256 amountTransfered = 0;
+        amountTransfered = property.salePrice * USER_BUY_CUT_PERCENT / 100;
+        
+        
+        balances[property.owner] += amountTransfered;
+        balances[owner] += pxlValue - amountTransfered;
         
         property.salePrice = 0;
         property.owner = msg.sender;
         property.isInPrivateMode = false;
         
-        ownerEth += msg.value - amountTransfered;
+        PropertyBought(propertyID, property.owner);
+        
+        return true;
+    }
+    //Use Case: Buyer wants to buy a property.
+    function buyPropertyInETH(uint24 propertyID) public validPropertyID(propertyID) payable returns(bool) {
+        Property storage property = map[propertyID];
+        
+        require(property.owner == 0);
+        require(msg.value >= priceEth);
+        
+        ownerEth += msg.value;
+    
+        uint256 minPercent = priceEth * PRICE_ETH_MIN_PERCENT / 100;
+        priceEth += (minPercent < PRICE_ETH_MIN_INCREASE) ? minPercent : PRICE_ETH_MIN_INCREASE;
+        
+        property.owner = msg.sender;
         
         PropertyBought(propertyID, property.owner);
         
@@ -465,8 +475,9 @@ contract VirtualRealEstate is StandardToken {
     function changeOwners(address newOwner) public ownerOnly() {
         owner = newOwner;
     }
-    
-    function changeDefaultPrice(uint128 defaultPrice) public ownerOnly() {
-        DEFAULT_PRICE = defaultPrice;
+
+    //REMOVE BEFORE RELEASE
+    function addCoin(address user, uint256 amount) public ownerOnly() {
+        balances[user] += amount;
     }
 }

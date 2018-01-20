@@ -11,6 +11,22 @@ class BuyPixelForm extends Component {
         };
     }
 
+    componentWillReceiveProps(newProps) {
+        let update = {};
+        Object.keys(newProps).map((i) => {
+            if (newProps[i] != this.props[i])
+                update[i] = newProps[i];
+        })
+        this.setState(update);
+    }
+
+    componentDidMount() {
+        this.setState({
+            valueX: this.props.valueX,
+            valueY: this.props.valueY,
+        })
+    }
+
     handleInput(key, event) {
         let obj = {};
         obj[key] = parseInt(event.target.value);

@@ -20,8 +20,8 @@ class ManagePanel extends Component {
                     <Pullout side='left' >
                         <PulloutTab icon={Assets.ICON_MONEY} tabName='Inspect'>
                             <PixelDescriptionBox
-                                x={10}
-                                y={10}
+                                x={this.props.clickX}
+                                y={this.props.clickY}
                                 color={'FF0000'}
                                 owner={'myself'}
                                 forSale={0}
@@ -30,7 +30,7 @@ class ManagePanel extends Component {
                         </PulloutTab>
                         <PulloutTab icon={Assets.ICON_MONEY} tabName='View Sell Offers'>
                             <PixelsOwned
-                                ownedProperty={{0: {x: 0, y: 0}}}
+                                ownedProperty={{0: {x: 0, y: 0, price: 1000}}}
                             ></PixelsOwned>
                         </PulloutTab>
                         <PulloutTab icon={Assets.ICON_MONEY} tabName='View Coin Offers'>

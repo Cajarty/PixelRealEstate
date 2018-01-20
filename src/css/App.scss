@@ -1,6 +1,6 @@
 body {
     margin: 0px;
-    background-color: #1d1a54;
+    background-color: $color1;
 }
 
 .page {
@@ -8,24 +8,27 @@ body {
 }
 
 .tiled {
-    background-color: #1d1a54;
+    background-color: $color2;
 }
 
 .left {
-    width: calc((100vw - 1024px) / 2);
+    width: calc((100vw - 20px - 90vh) / 2);
     float: left;
     display: inline-block;
+    z-index: 10000;
 }
 
 .center {
-    width: 100%;
+    width: calc(90vh + 20px);
     text-align: center;
+    display: inline-block;
 }
 
 .right {
-    width: calc((100vw - 1024px) / 2);
+    width: calc((100vw - 20px - 90vh) / 2);
     float: right;
     display: inline-block;
+    z-index: 10000;
 }
 
 .contractAction {

@@ -17,12 +17,26 @@ class GetPixelColorForm extends Component {
         };
     }
 
+    componentWillReceiveProps(newProps) {
+        let update = {};
+        Object.keys(newProps).map((i) => {
+            if (newProps[i] != this.props[i])
+                update[i] = newProps[i];
+        })
+        this.setState(update);
+    }
+
     componentDidMount() {
         let ctxLrg = this.canvasLrg.getContext("2d");
         let ctxSml = this.canvasSml.getContext("2d");
         ctxLrg.imageSmoothingEnabled = false;
         ctxSml.imageSmoothingEnabled = false;
-        this.setState({ctxLrg, ctxSml });
+        this.setState({
+            ctxLrg, 
+            ctxSml,
+            valueX: this.props.valueX,
+            valueY: this.props.valueY,
+        })
     }
 
     handleInput(key, event) {

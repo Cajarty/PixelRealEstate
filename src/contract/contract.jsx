@@ -8,7 +8,17 @@ import { default as contract } from 'truffle-contract';
 // Import our contract artifacts and turn them into usable abstractions.
 import VirtualRealEstate from '../../build/contracts/VirtualRealEstate.json'
 
-    
+
+export const ERROR_TYPE = {
+    success: 'success',
+    warning: 'warning',
+    error: 'error',
+}
+export const LISTENERS = {
+    Error: 'error',
+    Alert: 'alert',
+}; 
+
 export const EVENTS = { 
     PropertyColorUpdate: 'PropertyColorUpdate',
     PropertyBought: 'PropertyBought'
@@ -27,6 +37,8 @@ export class Contract {
         this.pixelsForRent = {};
 
         this.propertyTradeLog = [];
+
+        this.getAccountsInterval = null;
 
         this.events = {
             event: null,
@@ -52,17 +64,24 @@ export class Contract {
         }
         this.VRE.setProvider(window.web3.currentProvider);
 
-        // Get the initial account balance so it can be displayed.
+        this.getAccounts();
+        
+        this.getAccountsInterval = setInterval(() => this.getAccounts(), 1000);
+    }
+
+    getAccounts() {
         window.web3.eth.getAccounts((err, accs) => {
             if (err != null) {
-                alert("There was an error fetching your accounts.");
+                this.sendResults({errorId: 1, errorType: ERROR_TYPE.Error, message: "There was an error fetching your accounts."}, [LISTENERS.Error]);
                 return;
             }
 
             if (accs.length == 0) {
-                alert("Couldn't get any accounts! Make sure your Ethereum client is configured correctly.");
+                this.sendResults({errorId: 0, errorType: ERROR_TYPE.Error, message: "Couldn't get any accounts! Make sure you're logged into Metamask."}, [LISTENERS.Error]);
                 return;
             }
+
+            this.sendResults({removeErrors: [0, 1], message: ''}, [LISTENERS.Error]);
 
             this.accounts = accs;
             this.account = this.accounts[0];
@@ -71,10 +90,6 @@ export class Contract {
 
     setupEvents() {
         this.VRE.deployed().then((instance) => {
-
-            /*
-            Event for when a color is changed.
-            */
             this.events.event = instance.allEvents({fromBlock: 0, toBlock: 'latest'});
             this.events.event.watch((error, result) => {
                 if (error) {
@@ -103,7 +118,7 @@ export class Contract {
         this.VRE.deployed().then((i) => {
             return i.buyProperty(this.toID(x, y), { value: price, from: this.account });
         }).then(() => {
-            this.sendResults(true, "Property " + x + "x" + y + " purchase complete.");
+            this.sendResults({result: true, message: "Property " + x + "x" + y + " purchase complete."});
         }).catch((e) => {
             console.info(e);
             this.sendResults(false, "Unable to purchase property " + x + "x" + y + ".");
@@ -114,7 +129,7 @@ export class Contract {
         this.VRE.deployed().then((i) => {
             return i.listforSale(this.toID(x, y), {from: this.account });
         }).then(() => {
-            console.info("Pixel " + x + "x" + y + " purchase complete.");
+            console.info({result: true, message: "Pixel " + x + "x" + y + " purchase complete."});
         }).catch((e) => {
             console.log(e);
         });
@@ -278,9 +293,15 @@ export class Contract {
         delete this.listeners[key];
     }
 
-    sendResults(result, message) {
+    sendResults(result, include = [], exclude = []) {
         Object.keys(this.listeners).map((i) => {
-            this.listeners[i](result, message);
+            for (let b = 0; b < Math.max(exclude.length, include.length); b++) {
+                if (include.length > b && include[b] !== i)
+                    return;
+                if (exclude.length > b && exclude[b] === i)
+                    return;
+            }
+            this.listeners[i](result);
         });
     }
 

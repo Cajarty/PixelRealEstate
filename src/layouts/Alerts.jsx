@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {Contract, ctr} from '../contract/contract.jsx';
+import {Contract, ctr, LISTENERS} from '../contract/contract.jsx';
 
 class Alerts extends Component {
     constructor(props) {
@@ -11,25 +11,25 @@ class Alerts extends Component {
     }
 
     componentDidMount() {
-        ctr.listenForResults('alert', this.receiveMessage);
+        ctr.listenForResults(LISTENERS.Alert, this.receiveMessage);
     }
 
     componentWillUnmount() {
-        ctr.stopListeningForResults('alert');
+        ctr.stopListeningForResults(LISTENERS.Alert);
     }
 
-    receiveMessage(data, message) {
+    receiveMessage(data) {
         let now = new Date().getTime();
         let update = this.state.alerts;
-        update[now] = {className: 'alert', message: message};
+        update[now] = {className: 'alert', message: data.message};
         setTimeout(() => {
             setTimeout(() => {
                 let update = this.state.alerts;
                 delete update[now];
                 this.setState({alerts: update});
-            }, 990);
+            }, 985);
             let update = this.state.alerts;
-            update[now] = {className: 'alert fadeOut', message: message};
+            update[now] = {className: 'alert fadeOut', message: data.message};
             this.setState({alerts: update});
         }, 4000);
         this.setState({alerts: update});

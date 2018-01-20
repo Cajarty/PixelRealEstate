@@ -220,7 +220,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 1697,
+                                  "referencedDeclaration": 1808,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -357,7 +357,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 1697,
+                                  "referencedDeclaration": 1808,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -815,78 +815,7 @@
     "name": "solc",
     "version": "0.4.18+commit.9cf6e910.Emscripten.clang"
   },
-  "networks": {
-    "1515313965242": {
-      "events": {},
-      "links": {},
-      "address": "0x26a995d578db96e8859f20ddd8d45e95a6b0fee1"
-    },
-    "1515322770705": {
-      "events": {},
-      "links": {},
-      "address": "0xdfe1813cee06a480057c0786a747aaac6f67ed94"
-    },
-    "1515458066323": {
-      "events": {},
-      "links": {},
-      "address": "0x310fe32b3b7927708c31806e3836ac8582c3f636"
-    },
-    "1515467026034": {
-      "events": {},
-      "links": {},
-      "address": "0xa1963367fc7aa51e230fe373a9dd0bce42427725"
-    },
-    "1515474146889": {
-      "events": {},
-      "links": {},
-      "address": "0xa64814a6c6f5b8f4633265f30333ed99a20cb608"
-    },
-    "1515475109733": {
-      "events": {},
-      "links": {},
-      "address": "0xa1728afa27f5e4ae315072201ba0bcada4c1986e"
-    },
-    "1515475553623": {
-      "events": {},
-      "links": {},
-      "address": "0xb7ed7193c3be512242150c7267b83820c00e3f2d"
-    },
-    "1515475947000": {
-      "events": {},
-      "links": {},
-      "address": "0xc9aeea7f7865a0471e51155a04a34773fefd7ee1"
-    },
-    "1515481691061": {
-      "events": {},
-      "links": {},
-      "address": "0x9b53d874707b637f8ae83093a139db79da7e7325"
-    },
-    "1515620301557": {
-      "events": {},
-      "links": {},
-      "address": "0x23b8744950d23a0712b13ddbe47e0a988be17a62"
-    },
-    "1515990218803": {
-      "events": {},
-      "links": {},
-      "address": "0xc4f8cf713bbb12770f19d6782eae9cb3ee690b13"
-    },
-    "1515992378027": {
-      "events": {},
-      "links": {},
-      "address": "0x64a5d0cf0f93d166d39d83ba8dbf5099438f1c91"
-    },
-    "1516312040300": {
-      "events": {},
-      "links": {},
-      "address": "0xf154d3fae6c34dd83a6cd2fa3467ca7581f75686"
-    },
-    "1516314438904": {
-      "events": {},
-      "links": {},
-      "address": "0x23bd2d6673ba2b611ad207ecd60f75000aa421f8"
-    }
-  },
+  "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-18T22:32:13.203Z"
+  "updatedAt": "2018-01-20T21:23:56.508Z"
 }

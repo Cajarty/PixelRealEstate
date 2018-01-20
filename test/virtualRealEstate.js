@@ -168,8 +168,6 @@ contract('VirtualRealEstate', function(accounts) {
     return VirtualRealEstate.deployed().then(function(instance) {
       pixelPropertyInstance = instance;
       return pixelPropertyInstance.setLink([0x1,0x2], { from: accounts[0] });
-    }).then(function() {
-      return pixelPropertyInstance.setColors(0, [1,2,3,4,5,6,7,8,9,10], {  from: accounts[0] })
     }).then(function(setText) {
       return pixelPropertyInstance.getLink(0, { from: accounts[0] });
     }).then(function(link) {
@@ -227,8 +225,6 @@ contract('VirtualRealEstate', function(accounts) {
   it("A property's link is the owners if in private mode", function() {
     return VirtualRealEstate.deployed().then(function(instance) {
       pixelPropertyInstance = instance;
-      return pixelPropertyInstance.setColors(0, [1,2,3,4,5,6,7,8,9,10], {  from: accounts[1] }) //Make the last updater not the owner
-    }).then(function(s) {
       return pixelPropertyInstance.setPropertyMode(0, true, 1, { from: accounts[0] }); //Put it in private mode
     }).then(function(link) {
       return pixelPropertyInstance.setLink([0x7,0x8], { from: accounts[0] });

@@ -34,7 +34,8 @@
 
     .roboto-span {
         font-family: 'Roboto-Regular';
-        font-size: 3em;
+        font-size: 4em;
+        padding-bottom:20px;
         /*-webkit-text-stroke: 1px black; */
         /*text-stroke: 1px black;*/
         color:white;
@@ -54,6 +55,10 @@
         min-height: 900px !important;;
     }
 
+    #header {
+        height: 100vh !important ;
+    }
+
     </style>
 
     <body>
@@ -62,48 +67,67 @@
         <section id="header">
             <div class="inner">
                 <h1 id="header-title">
-                    <span class="pixel-span">PIXEL</span>
-                    &nbsp;
-                    <span class="roboto-span">PROPERTY</span>
+                    <div id="div-pixels"></div>    
                 </h1>
                 <!-- <h2 id="header-slogan"><i>An Evolving Digital Canvas</i></h2> -->
                 <h1 id="header-slogan">Coming Soon</h1>
-                <ul class="actions">
-                    <li><a href="#pixel-real-estate" class="button scrolly">Learn More</a></li>
-                </ul>
+               <!--  <ul class="actions">
+                    <li><a href="#pixelproperty" class="button scrolly">Learn More</a></li>
+                </ul> -->
             </div>
         </section>
 
        <!-- Landing -->
-         <div id="pixel-real-estate"></div>
+         <div id="pixelproperty"></div>
          <section id="one" class="main style1">
           <div class="container">
               <div class="row 150%">
                  <div class="6u 12u$(medium)">
-                   <!-- <header class="major">
-                    <h2>What is PixelRealEstate?</h2>
-                   </header> -->
+                   <header class="major">
+                    <h2>What is PixelProperty?</h2>
+                   </header>
                    <p>
-                    <strong>PixelProperty</strong> is a constantly evolving canvas of a tradable digital property where the owners of property may upload any image they like, or rent their property to other users.
+                    PixelProperty is a constantly evolving canvas of a tradable digital property where the owners of property may upload any image they like, or rent their property to other users.
                    </p>
                  </div>
-                 <div class="6u$ 12u$(medium) important(medium)">
-                   <span class="image fit"><img src="images/pic01.jpg" alt="" /></span>
+                 <div class="6u$ 12u$(medium) important(medium)" style="text-align:center">
+                 <!-- <div class="6u$ 12u$(medium) important(medium)"> -->
+                   <!-- <span class="image fit"><img src="images/pic01.jpg" alt="" /></span> -->
+                    <div id="trigger1"></div>
+                    <img id="pin1" src="http://via.placeholder.com/300x300">
                  </div>
               </div>
           </div>
          </section>
 
-        <!--  <section id="two" class="main style1 special">
+         <section id="two" class="main style2 special">
           <div class="container">
               <header class="major">
                  <h2>What is Digital Property?</h2>
               </header>
               <p>
-                 Digital properties in PixelRealEstate are tradable blockchain tokens powered by Ethereum. Each property is a separate individual token, which can have its appearance altered to its owners desire. Where Bitcoin and Ethereum are cryptocurrencies, these are cryptocollectables. Cryptocollectables can be bought, sold, or traded like any collectable item.
+                 Digital properties in PixelProperty are tradable blockchain tokens powered by Ethereum. Each property is a separate individual token, which can have its appearance altered to its owners desire. Where Bitcoin and Ethereum are cryptocurrencies, these are cryptocollectables. Cryptocollectables can be bought, sold, or traded like any collectable item.
               </p>
           </div>
-         </section> -->
+         </section>
+
+         <section id="three" class="main style1 special">
+          <div class="container">
+            <!-- <div class="row 150%"> -->
+                 <!-- <div class="6u 12u$(medium)"> -->
+                <header class="major">
+                     <h2>Interested in jumping in?</h2>
+                </header>
+                <p>
+                    Viewing the digital canvas does not require any extra setup. You can checkout the canvas on our [Canvas] page.
+                </p>
+                <p>
+                    When you want to interact with the canvas through our website, you must have an Ethereum account, as well as have [MetaMask] installed. You can view the [Setting Up] page for simple instructions on installing MetaMask.
+                </p>
+            </div>
+        <!-- </div> -->
+            <!-- </div> -->
+         </section>
 
          <!-- <section id="two" class="main style2">
           <div class="container">
@@ -385,7 +409,21 @@
          <script src="assets/js/skel.min.js"></script>
          <script src="assets/js/util.js"></script>
          <!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+         <script src="assets/js/ScrollMagic.min.js"></script>
+         <script src="assets/js/jquery.svg.min.js"></script>
+         <script src="assets/js/jquery.svganim.min.js"></script>
          <script src="assets/js/main.js"></script>
+         <script src="assets/js/pixel.js"></script>
+
+        <script type="text/javascript">
+            $(function() {
+                // var controller = new ScrollMagic.Controller();
+
+                // var scene = new ScrollMagic.Scene({triggerElement: "#trigger1", duration: 950})
+                //                                 .setPin('#pin1')
+                //                                 .addTo(controller);
+            });
+        </script>
 
     </body>
 </html>

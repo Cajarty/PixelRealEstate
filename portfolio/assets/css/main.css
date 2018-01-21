@@ -2704,14 +2704,17 @@
 	}
 
 		.main.style1 {
-			background: #f9f9f9;
+			/*background: #f9f9f9;*/
+			background: #EDE9D8;
 		}
 
 		.main.style2 {
-			background-color: #333;
-			color: rgba(255, 255, 255, 0.75);
+			/*background-color: black;*/
+			background-color: #990033;
+			/*color: rgba(255, 255, 255, 0.75);*/
+			color: rgba(255, 255, 255, 1);
 			background-attachment: fixed,							fixed;
-			background-image: url("images/overlay1.png"), url("../../images/header.jpg");
+			/*background-image: url("images/overlay1.png"), url("../../images/header.jpg");*/
 			background-size: auto,							cover;
 		}
 
@@ -2799,10 +2802,11 @@
 
 	#header {
 		padding: 9em 0 9em 0 ;
-		background-color: #4686a0;
+		/*background-color: #4686a0;*/
+		background-color: black;
 		color: rgba(255, 255, 255, 0.75);
 		background-attachment: fixed,							fixed,							fixed;
-		background-image: url("images/overlay2.png"), url("images/overlay3.svg"), linear-gradient(45deg, #f98b8b 5%, #f96d6d 30%, #f44242);
+		/*background-image: url("images/overlay2.png"), url("images/overlay3.svg"), linear-gradient(45deg, #f98b8b 5%, #f96d6d 30%, #f44242);*/
 		background-position: top left,						center center,					center center;
 		background-size: auto,							cover,							cover;
 		overflow: hidden;
@@ -2986,10 +2990,11 @@
 
 	#footer {
 		padding: 6em 0 6em 0 ;
-		background-color: #4686a0;
+		/*background-color: #4686a0;*/
+		background-color: black;
 		color: rgba(255, 255, 255, 0.75);
 		background-attachment: fixed,							fixed,							fixed;
-		background-image: url("images/overlay2.png"), url("images/overlay4.svg"), linear-gradient(45deg, #f44242, #f96d6d 50%, #f98b8b 95%);
+		/*background-image: url("images/overlay2.png"), url("images/overlay4.svg"), linear-gradient(45deg, #f44242, #f96d6d 50%, #f98b8b 95%);*/
 		background-position: top left,						center center,					center center;
 		background-size: auto,							cover,							cover;
 		text-align: center;

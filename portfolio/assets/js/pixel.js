@@ -127,7 +127,8 @@ $(function() {
     }
 
     // have to refresh the div when placing svg with jquery
-    $("#div-pixels").html($("#div-pixels").html());
+    // $("#div-pixels").html($("#div-pixels").html());
+    $("#header").html($("#header").html());
 
     $('.svg-letter').mouseenter(function() {
         var index = this.id;

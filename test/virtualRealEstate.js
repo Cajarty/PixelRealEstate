@@ -254,7 +254,19 @@ contract('VirtualRealEstate', function(accounts) {
   });
 
   //####PROPERTY MODES####
-  //#Owners of properties can change the property mode
+  it("Owners of properties can change the property mode", function() {
+    return VirtualRealEstate.deployed().then(function(instance) {
+      pixelPropertyInstance = instance;
+      return pixelPropertyInstance.setPropertyMode(0, true, 1, { from: accounts[0] }); //Set to private
+    }).then(function(s) {
+      return pixelPropertyInstance.getPropertyData(0, { from: accounts[0] });
+    }).then(function(s) {
+      //Assert that its in private mode
+      return pixelPropertyInstance.setPropertyMode(0, false, 0, { from: accounts[0] }); //Set to public
+    }).then(function(s) {
+      return pixelPropertyInstance.getPropertyData(0, { from: accounts[0] });
+    });
+  });
   //#Non-owners can not change it
   //#Private-Mode makes it private for a short amount of time
   //#SetColor on PrivateMode property that's expired changes it to Free-iuse mode

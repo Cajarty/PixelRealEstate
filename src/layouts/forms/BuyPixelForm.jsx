@@ -7,6 +7,7 @@ class BuyPixelForm extends Component {
         this.state = {
             valueX: 0,
             valueY: 0,
+            payWithETH: true,
             valuePrice: 100000000000000000,
         };
     }
@@ -27,9 +28,10 @@ class BuyPixelForm extends Component {
         })
     }
 
-    handleInput(key, event) {
+    handleInput(key, value) {
+        console.info(key, value)
         let obj = {};
-        obj[key] = parseInt(event.target.value);
+        obj[key] = value;
         this.setState(obj);
     }
 
@@ -47,19 +49,23 @@ class BuyPixelForm extends Component {
                     <tr>
                         <td>
                             <div className='inputTitle'> X: </div>
-                            <input id='buyPixelX' type='number' onChange={(e) => this.handleInput('valueX', e)} value={this.state.valueX}></input>
+                            <input id='buyPixelX' type='number' onChange={(e) => this.handleInput('valueX', parseInt(e.target.value))} value={this.state.valueX}></input>
                         </td>
                     </tr>
                     <tr>
                         <td>
                             <div className='inputTitle'> Y: </div>
-                            <input id='buyPixelY' type='number' onChange={(e) => this.handleInput('valueY', e)} value={this.state.valueY}></input>
+                            <input id='buyPixelY' type='number' onChange={(e) => this.handleInput('valueY', parseInt(e.target.value))} value={this.state.valueY}></input>
                         </td>
                     </tr>
                     <tr>
                         <td>
                             <div className='inputTitle'> Price: </div>
-                            <input id='buyPrice' type='number' onChange={(e) => this.handleInput('valuePrice', e)} value={this.state.valuePrice}></input>
+                            <label className="switch">
+                                <input type="checkbox" checked={this.state.payWithETH} onChange={(e) => this.handleInput('payWithETH', e.target.checked)}></input>
+                                <span className="slider"></span>
+                            </label>
+                            <input id='buyPrice' type='number' disabled onChange={(e) => {}} value={this.state.valuePrice}></input>
                         </td>
                     </tr>
                     <tr>

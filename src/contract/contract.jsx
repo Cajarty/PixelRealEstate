@@ -20,8 +20,18 @@ export const LISTENERS = {
 }; 
 
 export const EVENTS = { 
-    PropertyColorUpdate: 'PropertyColorUpdate',
-    PropertyBought: 'PropertyBought'
+    PropertyColorUpdate: 'PropertyColorUpdate',                     //(uint24 indexed property, uint256[10] colors, address propertyOwnerPayee, address lastUpdaterPayee);
+    PropertyColorUpdatePixel: 'PropertyColorUpdatePixel',           //(uint24 indexed property, uint8 row, uint24 rgb);
+    PropertyBought: 'PropertyBought',                               //(uint24 indexed property,  address newOwner);
+    SetUserHoverText: 'SetUserHoverText',                           //(address indexed user, bytes32[2] newHoverText);
+    SetUserSetLink: 'SetUserSetLink',                               //(address indexed user, bytes32[2] newLink);
+    PropertySetForSale: 'PropertySetForSale',                       //(uint24 indexed property);
+    DelistProperty: 'DelistProperty',                               //(uint24 indexed propertyID);
+    ListTradeOffer: 'ListTradeOffer',                               //(address indexed offerOwner, uint256 eth, uint256 pxl, bool isBuyingPxl);
+    AcceptTradeOffer: 'AcceptTradeOffer',                           //(address indexed accepter, address indexed offerOwner);
+    CancelTradeOffer: 'CancelTradeOffer',                           //(address indexed offerOwner);
+    SetPropertyPublic: 'SetPropertyPublic',                         //(uint24 indexed property);
+    SetPropertyPrivate: 'SetPropertyPrivate',                       //(uint24 indexed property, uint32 numHoursPrivate);
 };
 
 export class Contract {
@@ -42,10 +52,10 @@ export class Contract {
 
         this.events = {
             event: null,
-            PropertyColorUpdate: {},
-            PropertyBought: {},
-
         }
+        Object.keys(EVENTS).map((index) => {
+            this.events[index] = {};
+        });
         
         this.setup();
         this.test();
@@ -114,24 +124,28 @@ export class Contract {
         return obj;
     }
 
-    buyProperty(x, y, price) {
+    buyProperty(x, y, price, useEth = true) {
         this.VRE.deployed().then((i) => {
-            return i.buyProperty(this.toID(x, y), { value: price, from: this.account });
+            if (useEth)
+                return i.buyPropertyInETH(this.toID(x, y), { value: price, from: this.account });
+            else
+                return i.buyPropertyInPXL(this.toID(x, y), price, { from: this.account });
         }).then(() => {
             this.sendResults({result: true, message: "Property " + x + "x" + y + " purchase complete."});
         }).catch((e) => {
             console.info(e);
-            this.sendResults(false, "Unable to purchase property " + x + "x" + y + ".");
+            this.sendResults({result: false, message: "Unable to purchase property " + x + "x" + y + "."});
         });
     }
 
     sellProperty(x, y, price) {
         this.VRE.deployed().then((i) => {
-            return i.listforSale(this.toID(x, y), {from: this.account });
+            return i.listForSale(this.toID(x, y), price, {from: this.account });
         }).then(() => {
-            console.info({result: true, message: "Pixel " + x + "x" + y + " purchase complete."});
+            this.sendResults({result: true, message: "Property " + x + "x" + y + " listed for sale."});
         }).catch((e) => {
             console.log(e);
+            this.sendResults({result: false, message: "Unable to put property " + x + "x" + y + " on market."});
         });
     }
 

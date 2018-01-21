@@ -2,7 +2,9 @@ pragma solidity ^0.4.2;
 
 
 /*
-- ethPrice, pxlPrice. 
+- ethPrice, PPCPrice. 
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CHANGE TO PPC WHEN I GET PACK
 */
 
 contract Token {
@@ -72,14 +74,14 @@ contract VirtualRealEstate is StandardToken {
     //propertyRenter to link
     mapping (address => bytes32[2]) ownerHoverText;
     //trade offers
-    mapping (address => TradeOffer) pxlTradeStatus;
+    mapping (address => TradeOffer) ppcTradeStatus;
     
-    uint256 priceEth;
+    uint256 priceETH;
     uint256 PRICE_ETH_MIN_INCREASE = 1000;//10000000000000000000000; //0.0001 ETH
     uint256 PRICE_ETH_MIN_PERCENT = 20; //0.0001 ETH
-    uint256 pricePxl;
-    uint256 PRICE_PXL_MIN_INCREASE = 10;
-    uint256 PRICE_PXL_MIN_PERCENT = 20;
+    uint256 pricePPC;
+    uint256 PRICE_PPC_MIN_INCREASE = 10;
+    uint256 PRICE_PPC_MIN_PERCENT = 20;
     
     uint256 USER_BUY_CUT_PERCENT = 98; //%
     
@@ -93,7 +95,7 @@ contract VirtualRealEstate is StandardToken {
     event SetUserSetLink(address indexed user, bytes32[2] newLink);
     event PropertySetForSale(uint24 indexed property);
     event DelistProperty(uint24 indexed propertyID);
-    event ListTradeOffer(address indexed offerOwner, uint256 eth, uint256 pxl, bool isBuyingPxl);
+    event ListTradeOffer(address indexed offerOwner, uint256 eth, uint256 ppc, bool isBuyingPPC);
     event AcceptTradeOffer(address indexed accepter, address indexed offerOwner);
     event CancelTradeOffer(address indexed offerOwner);
     event SetPropertyPublic(uint24 indexed property);
@@ -101,8 +103,8 @@ contract VirtualRealEstate is StandardToken {
     
     struct TradeOffer {
         uint256 eth;
-        uint256 pxl;
-        bool buyingPxl;
+        uint256 ppc;
+        bool buyingPPC;
     }
     
     struct Property {
@@ -130,8 +132,8 @@ contract VirtualRealEstate is StandardToken {
         owner = msg.sender;
         totalSupply = 0;
         FREE_COLOR_SETTING_UNTIL = now + 3 days;
-        pricePxl = 10;
-        priceEth = 10000;//1000000000000000000; //0.001 ETH
+        pricePPC = 10;
+        priceETH = 10000;//1000000000000000000; //0.001 ETH
     }
     function setHoverText(bytes32[2] text) public {
         ownerHoverText[msg.sender] = text;
@@ -162,10 +164,15 @@ contract VirtualRealEstate is StandardToken {
     
     function getLink(uint24 propertyID) public validPropertyID(propertyID) view returns(bytes32[2]) {
         Property storage property = map[propertyID];
-        //Must have a owner or renter, and that owner/renter must have a short or long hover text
-        require(property.owner != 0);
         
-        return ownerLink[property.owner];
+        //Must have a owner or renter, and that owner/renter must have a short or long hover text
+        if (property.isInPrivateMode) {
+            require(property.owner != 0);
+            return ownerLink[property.owner];
+        } else {
+            require(property.lastUpdater != 0);
+            return ownerLink[property.lastUpdater];
+        }
     }
     
     function getPropertyColors(uint24 propertyID) public validPropertyID(propertyID) view returns(uint256[10]) {
@@ -176,8 +183,8 @@ contract VirtualRealEstate is StandardToken {
         Property storage property = map[propertyID];
         return (property.owner, property.salePrice, property.lastUpdater, property.isInPrivateMode);
     }
-    function getPurchaseETHandPXLPrice() public view returns(uint256, uint256) {
-        return (priceEth, pricePxl);
+    function getPurchaseETHandPPCPrice() public view returns(uint256, uint256) {
+        return (priceETH, pricePPC);
     }
     
     //Change a 10x10 == 70 | 30 | 0 cost
@@ -262,57 +269,57 @@ contract VirtualRealEstate is StandardToken {
             SetPropertyPublic(propertyID);
         }
     }
-    function setBuyETHOffer(uint256 ethToBuy, uint256 offeredPxl) public {
-        //Require we have the pxl to offer
-        require(balances[msg.sender] >= offeredPxl);
-        require(ethToBuy > 0 && offeredPxl > 0);
+    function setBuyETHOffer(uint256 ethToBuy, uint256 offeredPPC) public {
+        //Require we have the ppc to offer
+        require(balances[msg.sender] >= offeredPPC);
+        require(ethToBuy > 0 && offeredPPC > 0);
         
         //Cancel old TradeOffer if present
         cancelTradeOffer();
         
         //Set Offer
-        pxlTradeStatus[msg.sender].eth = ethToBuy;
-        pxlTradeStatus[msg.sender].pxl = offeredPxl;
-        pxlTradeStatus[msg.sender].buyingPxl = false;
+        ppcTradeStatus[msg.sender].eth = ethToBuy;
+        ppcTradeStatus[msg.sender].ppc = offeredPPC;
+        ppcTradeStatus[msg.sender].buyingPPC = false;
         
-        //Lose offered pxl
-        balances[msg.sender] -= offeredPxl;
+        //Lose offered ppc
+        balances[msg.sender] -= offeredPPC;
         
-        ListTradeOffer(msg.sender, ethToBuy, offeredPxl, false);
+        ListTradeOffer(msg.sender, ethToBuy, offeredPPC, false);
     }
-    function setBuyPXLOffer(uint256 pxlToBuy, uint256 offeredEth) public payable {
+    function setBuyPPCOffer(uint256 ppcToBuy, uint256 offeredEth) public payable {
         //Require we have the eth to offer
         require(msg.value >= offeredEth);
-        require(pxlToBuy > 0 && offeredEth > 0);
+        require(ppcToBuy > 0 && offeredEth > 0);
         
         //Cancel old TradeOffer if present
         cancelTradeOffer();
         
         //Set Offer
-        TradeOffer storage tradeOffer = pxlTradeStatus[msg.sender];
-        tradeOffer.pxl = pxlToBuy;
+        TradeOffer storage tradeOffer = ppcTradeStatus[msg.sender];
+        tradeOffer.ppc = ppcToBuy;
         tradeOffer.eth = offeredEth;
-        tradeOffer.buyingPxl = true;
+        tradeOffer.buyingPPC = true;
         
-        ListTradeOffer(msg.sender, offeredEth, pxlToBuy, true);
+        ListTradeOffer(msg.sender, offeredEth, ppcToBuy, true);
     }
     function cancelTradeOffer() public {
-        TradeOffer storage tradeOffer = pxlTradeStatus[msg.sender];
+        TradeOffer storage tradeOffer = ppcTradeStatus[msg.sender];
         //If we have a trade offer
-        if (tradeOffer.eth > 0 && tradeOffer.pxl > 0) {
+        if (tradeOffer.eth > 0 && tradeOffer.ppc > 0) {
             //We already deposited ETH. Return it back
-            if (tradeOffer.buyingPxl) {
+            if (tradeOffer.buyingPPC) {
                 msg.sender.transfer(tradeOffer.eth);
             }
-            //We already deposited PXL. Return it back
+            //We already deposited PPC. Return it back
             else {
-                balances[msg.sender] += tradeOffer.pxl;
+                balances[msg.sender] += tradeOffer.ppc;
             }
             CancelTradeOffer(msg.sender);
         }
     }
     function acceptOfferBuyingETH(address ownerOfTradeOffer) public payable {
-        TradeOffer storage tradeOffer = pxlTradeStatus[ownerOfTradeOffer];
+        TradeOffer storage tradeOffer = ppcTradeStatus[ownerOfTradeOffer];
         //Make sure the accepter has enough to justify accepting
         require(tradeOffer.eth <= msg.value);
         require(ownerOfTradeOffer != 0);
@@ -321,30 +328,30 @@ contract VirtualRealEstate is StandardToken {
         ownerOfTradeOffer.transfer(msg.value);
         
         //Take their money. They already deposited their coins
-        balances[msg.sender] += tradeOffer.pxl;
+        balances[msg.sender] += tradeOffer.ppc;
         
         //Clear trade offer
         tradeOffer.eth = 0;
-        tradeOffer.pxl = 0;
+        tradeOffer.ppc = 0;
         
         AcceptTradeOffer(msg.sender, ownerOfTradeOffer);
     }
-    function acceptOfferBuyingPXL(address ownerOfTradeOffer) public {
-        TradeOffer storage tradeOffer = pxlTradeStatus[ownerOfTradeOffer];
+    function acceptOfferBuyingPPC(address ownerOfTradeOffer) public {
+        TradeOffer storage tradeOffer = ppcTradeStatus[ownerOfTradeOffer];
         //Make sure the accepter has enough to justify accepting
-        require(tradeOffer.pxl <= balances[msg.sender]);
+        require(tradeOffer.ppc <= balances[msg.sender]);
         require(ownerOfTradeOffer != 0);
         
         //Give them our money
-        balances[ownerOfTradeOffer] += tradeOffer.pxl;
-        balances[msg.sender] -= tradeOffer.pxl;
+        balances[ownerOfTradeOffer] += tradeOffer.ppc;
+        balances[msg.sender] -= tradeOffer.ppc;
         
         //Take their money. They already deposited ETH
         msg.sender.transfer(tradeOffer.eth);
         
         //Clear trade offer
         tradeOffer.eth = 0;
-        tradeOffer.pxl = 0;
+        tradeOffer.ppc = 0;
         
         AcceptTradeOffer(msg.sender, ownerOfTradeOffer);
     }
@@ -383,26 +390,25 @@ contract VirtualRealEstate is StandardToken {
         
         return true;
     }
-    function buyPropertyInPXL(uint24 propertyID, uint256 pxlValue) public validPropertyID(propertyID) returns(bool) {
+    function buyPropertyInPPC(uint24 propertyID, uint256 ppcValue) public validPropertyID(propertyID) returns(bool) {
         Property storage property = map[propertyID];
         
-        //If they have no owner, do the PXL price and update it
+        //If they have no owner, do the PPC price and update it
         if (property.owner == 0) {
-            property.salePrice = pricePxl;
+            property.salePrice = pricePPC;
             property.owner = owner;
-            uint256 minPercent = pricePxl * PRICE_PXL_MIN_PERCENT / 100;
-            pricePxl += (minPercent < PRICE_PXL_MIN_INCREASE) ? minPercent : PRICE_PXL_MIN_INCREASE;
+            uint256 minPercent = pricePPC * PRICE_PPC_MIN_PERCENT / 100;
+            pricePPC += (minPercent < PRICE_PPC_MIN_INCREASE) ? minPercent : PRICE_PPC_MIN_INCREASE;
         }
         
-        require(property.salePrice <= pxlValue);
+        require(property.salePrice <= ppcValue);
         require(balances[msg.sender] >= property.salePrice);
         
         uint256 amountTransfered = 0;
         amountTransfered = property.salePrice * USER_BUY_CUT_PERCENT / 100;
         
-        
         balances[property.owner] += amountTransfered;
-        balances[owner] += pxlValue - amountTransfered;
+        balances[owner] += ppcValue - amountTransfered;
         
         property.salePrice = 0;
         property.owner = msg.sender;
@@ -417,12 +423,12 @@ contract VirtualRealEstate is StandardToken {
         Property storage property = map[propertyID];
         
         require(property.owner == 0);
-        require(msg.value >= priceEth);
+        require(msg.value >= priceETH);
         
         ownerEth += msg.value;
     
-        uint256 minPercent = priceEth * PRICE_ETH_MIN_PERCENT / 100;
-        priceEth += (minPercent < PRICE_ETH_MIN_INCREASE) ? minPercent : PRICE_ETH_MIN_INCREASE;
+        uint256 minPercent = priceETH * PRICE_ETH_MIN_PERCENT / 100;
+        priceETH += (minPercent < PRICE_ETH_MIN_INCREASE) ? minPercent : PRICE_ETH_MIN_INCREASE;
         
         property.owner = msg.sender;
         
@@ -475,8 +481,10 @@ contract VirtualRealEstate is StandardToken {
     function changeOwners(address newOwner) public ownerOnly() {
         owner = newOwner;
     }
-
-    //REMOVE BEFORE RELEASE
+    
+    ////////////////////////////////////////////////
+    ///TODO: TESTING ONLY: REMOVE BEFORE RELEASE:///
+    ////////////////////////////////////////////////
     function addCoin(address user, uint256 amount) public ownerOnly() {
         balances[user] += amount;
     }

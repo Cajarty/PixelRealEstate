@@ -44,7 +44,7 @@ contract('VirtualRealEstate', function(accounts) {
       return pixelPropertyInstance.getPropertyData(0, { from: accounts[0] });
     }).then(function(propertyData) {
       assert.equal(propertyData[1], 10000, "Should be listed for sale for 10000 wei" ); //For sale
-      return pixelPropertyInstance.buyPropertyInPXL(0, 10000, {from: accounts[1] });
+      return pixelPropertyInstance.buyPropertyInPPC(0, 10000, {from: accounts[1] });
     }).then(function() {
       return pixelPropertyInstance.getPropertyData(0, { from: accounts[0] });
     }).then(function(propertyData) {
@@ -63,7 +63,7 @@ contract('VirtualRealEstate', function(accounts) {
       return pixelPropertyInstance.getPropertyData(1, { from: accounts[0] });
     }).then(function(propertyData) {
       assert.equal(propertyData[1], 10000, "Should be listed for sale for 10000 wei" ); //For sale
-      return pixelPropertyInstance.buyPropertyInPXL(1, 10000, {from: accounts[1] });
+      return pixelPropertyInstance.buyPropertyInPPC(1, 10000, {from: accounts[1] });
     }).then(function() {
       return pixelPropertyInstance.getPropertyData(1, { from: accounts[0] });
     }).then(function(propertyData) {
@@ -109,7 +109,7 @@ contract('VirtualRealEstate', function(accounts) {
       return pixelPropertyInstance.getPropertyData(3, { from: accounts[0] });
     }).then(function(propertyData) {
       assert.equal(propertyData[1], 10000, "Should be listed for sale for 10000 wei" ); //For sale
-      return pixelPropertyInstance.buyPropertyInPXL(3, 10000, {from: accounts[1] });
+      return pixelPropertyInstance.buyPropertyInPPC(3, 10000, {from: accounts[1] });
     }).then(function() {
       return pixelPropertyInstance.getPropertyData(3, { from: accounts[0] });
     }).then(function(propertyData) {
@@ -168,8 +168,6 @@ contract('VirtualRealEstate', function(accounts) {
     return VirtualRealEstate.deployed().then(function(instance) {
       pixelPropertyInstance = instance;
       return pixelPropertyInstance.setLink([0x1,0x2], { from: accounts[0] });
-    }).then(function() {
-      return pixelPropertyInstance.setColors(0, [1,2,3,4,5,6,7,8,9,10], {  from: accounts[0] })
     }).then(function(setText) {
       return pixelPropertyInstance.getLink(0, { from: accounts[0] });
     }).then(function(link) {
@@ -227,8 +225,6 @@ contract('VirtualRealEstate', function(accounts) {
   it("A property's link is the owners if in private mode", function() {
     return VirtualRealEstate.deployed().then(function(instance) {
       pixelPropertyInstance = instance;
-      return pixelPropertyInstance.setColors(0, [1,2,3,4,5,6,7,8,9,10], {  from: accounts[1] }) //Make the last updater not the owner
-    }).then(function(s) {
       return pixelPropertyInstance.setPropertyMode(0, true, 1, { from: accounts[0] }); //Put it in private mode
     }).then(function(link) {
       return pixelPropertyInstance.setLink([0x7,0x8], { from: accounts[0] });
@@ -258,18 +254,30 @@ contract('VirtualRealEstate', function(accounts) {
   });
 
   //####PROPERTY MODES####
-  //#Owners of properties can change the property mode
+  it("Owners of properties can change the property mode", function() {
+    return VirtualRealEstate.deployed().then(function(instance) {
+      pixelPropertyInstance = instance;
+      return pixelPropertyInstance.setPropertyMode(0, true, 1, { from: accounts[0] }); //Set to private
+    }).then(function(s) {
+      return pixelPropertyInstance.getPropertyData(0, { from: accounts[0] });
+    }).then(function(s) {
+      //Assert that its in private mode
+      return pixelPropertyInstance.setPropertyMode(0, false, 0, { from: accounts[0] }); //Set to public
+    }).then(function(s) {
+      return pixelPropertyInstance.getPropertyData(0, { from: accounts[0] });
+    });
+  });
   //#Non-owners can not change it
   //#Private-Mode makes it private for a short amount of time
   //#SetColor on PrivateMode property that's expired changes it to Free-iuse mode
 
-  //####PXL VS. ETH MARKET####
-  //#Can offer to buy PXL for ETH
-  //#Buy PXL with ETH offering can fail if you dont pay as much as you offer
-  //#Can offer to buy ETH for PXL
-  //#Buy ETH with PXL offering can fail if you dont have the funds to cover your offer
-  //#Can accept "Buy PXL with ETH" offering if you have sufficient PXL
-  //#Can accept "Buy ETH with PXL" offering if you have sufficient ETH
+  //####PPC VS. ETH MARKET####
+  //#Can offer to buy PPC for ETH
+  //#Buy PPC with ETH offering can fail if you dont pay as much as you offer
+  //#Can offer to buy ETH for PPC
+  //#Buy ETH with PPC offering can fail if you dont have the funds to cover your offer
+  //#Can accept "Buy PPC with ETH" offering if you have sufficient PPC
+  //#Can accept "Buy ETH with PPC" offering if you have sufficient ETH
   //#Can cancel offeres you have up
 
   //####OWNER FUNCTIONS####

@@ -44,7 +44,7 @@ class PropertiesOwned extends Component {
                                     <td style={{width: '40%'}}>
                                         {SDM.ownedProperties[x][y].lastColorUpdate == 0 ? 
                                             'Never' 
-                                            : 'sip'
+                                            : <TimeAgo date={SDM.ownedProperties[x][y].lastColorUpdate}/>
                                         }
                                     </td>
                                 </tr>

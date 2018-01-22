@@ -94,7 +94,7 @@ contract VirtualRealEstate is StandardToken {
     event SetUserHoverText(address indexed user, bytes32[2] newHoverText);
     event SetUserSetLink(address indexed user, bytes32[2] newLink);
     event PropertySetForSale(uint24 indexed property);
-    event DelistProperty(uint24 indexed propertyID);
+    event DelistProperty(uint24 indexed property);
     event ListTradeOffer(address indexed offerOwner, uint256 eth, uint256 ppc, bool isBuyingPPC);
     event AcceptTradeOffer(address indexed accepter, address indexed offerOwner);
     event CancelTradeOffer(address indexed offerOwner);
@@ -131,7 +131,7 @@ contract VirtualRealEstate is StandardToken {
     function VirtualRealEstate() public {
         owner = msg.sender;
         totalSupply = 0;
-        FREE_COLOR_SETTING_UNTIL = now + 3 days;
+        FREE_COLOR_SETTING_UNTIL = now;//+ 1 days
         pricePPC = 10;
         priceETH = 10000;//1000000000000000000; //0.001 ETH
     }
@@ -143,12 +143,15 @@ contract VirtualRealEstate is StandardToken {
         ownerLink[msg.sender] = link;
         SetUserSetLink(msg.sender, link);
     }
-    
-    function getForSalePrice(uint24 propertyID) public validPropertyID(propertyID) view returns(uint256) {
+    function getForSalePrices(uint24 propertyID) public validPropertyID(propertyID) view returns(uint256, uint256) {
         Property storage property = map[propertyID];
-        require(property.salePrice != 0);
-        return property.salePrice;
+        if (property.owner == 0) {
+            return (priceETH, pricePPC);
+        } else {
+            return (0, property.salePrice);
+        }
     }
+    
     function getHoverText(uint24 propertyID) public validPropertyID(propertyID) view returns(bytes32[2]) {
         Property storage property = map[propertyID];
         
@@ -183,10 +186,6 @@ contract VirtualRealEstate is StandardToken {
         Property storage property = map[propertyID];
         return (property.owner, property.salePrice, property.lastUpdater, property.isInPrivateMode);
     }
-    function getPurchaseETHandPPCPrice() public view returns(uint256, uint256) {
-        return (priceETH, pricePPC);
-    }
-    
     //Change a 10x10 == 70 | 30 | 0 cost
     function setColors(uint24 propertyID, uint256[10] newColors) public validPropertyID(propertyID) returns(bool) {
         Property storage property = map[propertyID];
@@ -217,7 +216,7 @@ contract VirtualRealEstate is StandardToken {
         //If we're in Public Mode, payouts occur
         
         if (!property.isInPrivateMode && property.lastUpdate != 0) {
-            uint256 hoursSinceLastColorChange = (now - property.lastUpdate) / (1 seconds); //ERRORs on property.lastUpdate = 0
+            uint256 hoursSinceLastColorChange = (now - property.lastUpdate) / (5 seconds); //ERRORs on property.lastUpdate = 0
             uint256 payout = hoursSinceLastColorChange * PROPERTY_GENERATES_PER_HOUR;
     
             if (payout > 0) {
@@ -257,7 +256,7 @@ contract VirtualRealEstate is StandardToken {
             require(numHoursPrivate > 0);
             require(balances[msg.sender] >= numHoursPrivate);
             balances[msg.sender] -= numHoursPrivate;
-            property.becomePublic = now + (1 hours) * numHoursPrivate;
+            property.becomePublic = now + (1 seconds) * numHoursPrivate; //TODO: seconds to hours
         } else {
             property.becomePublic = 0;
         }
@@ -287,6 +286,11 @@ contract VirtualRealEstate is StandardToken {
         
         ListTradeOffer(msg.sender, ethToBuy, offeredPPC, false);
     }
+    
+    function getTradeOffer(address offerOwner) public view returns(uint256, uint256, bool) {
+        TradeOffer storage tradeOffer = ppcTradeStatus[offerOwner];
+        return (tradeOffer.eth, tradeOffer.ppc, tradeOffer.buyingPPC);
+    }
     function setBuyPPCOffer(uint256 ppcToBuy, uint256 offeredEth) public payable {
         //Require we have the eth to offer
         require(msg.value >= offeredEth);
@@ -306,7 +310,7 @@ contract VirtualRealEstate is StandardToken {
     function cancelTradeOffer() public {
         TradeOffer storage tradeOffer = ppcTradeStatus[msg.sender];
         //If we have a trade offer
-        if (tradeOffer.eth > 0 && tradeOffer.ppc > 0) {
+        if (tradeOffer.eth > 0 || tradeOffer.ppc > 0) {
             //We already deposited ETH. Return it back
             if (tradeOffer.buyingPPC) {
                 msg.sender.transfer(tradeOffer.eth);
@@ -316,6 +320,8 @@ contract VirtualRealEstate is StandardToken {
                 balances[msg.sender] += tradeOffer.ppc;
             }
             CancelTradeOffer(msg.sender);
+            tradeOffer.eth = 0;
+            tradeOffer.ppc = 0;
         }
     }
     function acceptOfferBuyingETH(address ownerOfTradeOffer) public payable {
@@ -488,4 +494,7 @@ contract VirtualRealEstate is StandardToken {
     function addCoin(address user, uint256 amount) public ownerOnly() {
         balances[user] += amount;
     }
+    //setPropertyMode ->seconds to hours
+    //setColors -> 5 seconds to 1 hour
+    //FREE_COLOR_SETTING_UNTIL in constructor needs to be changed to have the +1 days
 }

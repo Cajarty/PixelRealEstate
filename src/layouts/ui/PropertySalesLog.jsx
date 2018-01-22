@@ -27,6 +27,10 @@ class PropertySalesLog extends Component {
         });
     }
 
+    componentWillUnmount() {
+        ctr.stopListeningForEvent(EVENTS.PropertyBought, 'PropertySalesLog');
+    }
+
     render() {
         return (
             <div className='tableDataContainer'>

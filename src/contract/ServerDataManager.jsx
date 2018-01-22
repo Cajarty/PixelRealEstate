@@ -49,7 +49,6 @@ export class ServerDataManager {
     Updates the other data depending if it applies.
     */
     organizeProperty(x, y, property) {
-        console.info(ctr.account === property.owner);
 
         if (ctr.account === property.owner) {
             if (this.ownedProperties[x] == null)
@@ -57,7 +56,7 @@ export class ServerDataManager {
             this.ownedProperties[x][y] = property;
         }
 
-        if (property.forSale) {
+        if (property.isForSale) {
             if (this.forSaleProperties[x] == null)
                 this.forSaleProperties[x] = {};
             this.forSaleProperties[x][y] = property;

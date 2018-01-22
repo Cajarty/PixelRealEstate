@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PixelDescriptionBox from '../ui/PixelDescriptionBox.jsx';
-import PixelsOwned from '../ui/PixelsOwned.jsx';
+import PropertiesOwned from '../ui/PropertiesOwned.jsx';
 import Pullout from '../ui/Pullout';
 import PulloutTab from '../ui/PulloutTab';
 import * as Assets from '../../const/assets.jsx';
@@ -28,15 +28,13 @@ class ManagePanel extends Component {
                                 forRent={0}
                             ></PixelDescriptionBox>
                         </PulloutTab>
-                        <PulloutTab icon={Assets.ICON_MONEY} tabName='View Sell Offers'>
-                            <PixelsOwned
-                                ownedProperty={{0: {x: 0, y: 0, price: 1000}}}
-                            ></PixelsOwned>
+                        <PulloutTab icon={Assets.ICON_MONEY} tabName='Owned'>
+                            <PropertiesOwned/>
                         </PulloutTab>
                         <PulloutTab icon={Assets.ICON_MONEY} tabName='View Coin Offers'>
                             
                         </PulloutTab>
-                        <PulloutTab icon={Assets.ICON_MONEY} tabName='Owned'>
+                        <PulloutTab icon={Assets.ICON_MONEY} tabName='View Sell Offers'>
                             
                         </PulloutTab>
                     </Pullout>

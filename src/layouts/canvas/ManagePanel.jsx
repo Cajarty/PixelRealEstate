@@ -22,19 +22,15 @@ class ManagePanel extends Component {
                             <PixelDescriptionBox
                                 x={this.props.clickX}
                                 y={this.props.clickY}
-                                color={'FF0000'}
-                                owner={'myself'}
-                                forSale={0}
-                                forRent={0}
                             ></PixelDescriptionBox>
                         </PulloutTab>
                         <PulloutTab icon={Assets.ICON_MONEY} tabName='Owned'>
                             <PropertiesOwned/>
                         </PulloutTab>
-                        <PulloutTab icon={Assets.ICON_MONEY} tabName='View Coin Offers'>
+                        <PulloutTab icon={Assets.ICON_MONEY} tabName='Property Market'>
                             
                         </PulloutTab>
-                        <PulloutTab icon={Assets.ICON_MONEY} tabName='View Sell Offers'>
+                        <PulloutTab icon={Assets.ICON_MONEY} tabName='Coin Market'>
                             
                         </PulloutTab>
                     </Pullout>

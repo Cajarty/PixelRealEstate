@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Canvas from './Canvas.jsx'
 import ManagePanel from './ManagePanel.jsx'
 import ActionPanel from './ActionPanel.jsx'
-import {Contract, ctr} from '../../contract/contract.jsx';
+import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import PropertySalesLog from '../ui/PropertySalesLog';
 import ErrorBox from '../ErrorBox';
 import ZoomCanvas from './ZoomCanvas';
@@ -25,8 +25,17 @@ class CanvasPage extends Component {
     componentDidMount() {
         this.loadCanvas();
         SDM.requestServerData();
+        ctr.listenForResults(LISTENERS.CoordinateUpdate, 'coordinateUpdate', (data) => {
+            this.setState({
+                clickX: data.x,
+                clickY: data.y
+            });
+        });
     }
-    
+
+    componentWillUnmount() {
+        ctr.stopListeningForResults(LISTENERS);
+    }
 
     loadCanvas() {
         let cancelToken = null;
@@ -43,13 +52,6 @@ class CanvasPage extends Component {
         this.setState({
             hoverX: x, 
             hoverY: y
-        });
-    }
-
-    canvasClick(x, y) {
-        this.setState({
-            clickX: x, 
-            clickY: y
         });
     }
 
@@ -76,7 +78,6 @@ class CanvasPage extends Component {
                             pixelData={this.state.pixelData} 
                             pixelDataUpdateVersion={this.state.pixelDataUpdateVersion} 
                             hover={(x, y) => this.canvasHover(x, y)}
-                            click={(x, y) => this.canvasClick(x, y)}
                         />
                     </div>
                     <div className='right'>

@@ -24,7 +24,7 @@ class PixelDescriptionBox extends Component {
             if (newProps[i] != this.props[i])
                 update[i] = newProps[i];
         })
-        if (update.x != null || update.y != null)
+        if (update.x != null && update.y != null)
             this.loadProperty(newProps.x, newProps.y);
         this.setState(update);
     }
@@ -42,8 +42,8 @@ class PixelDescriptionBox extends Component {
         this.setState({
             ctx, 
             dataCtx,
-            valueX: this.props.valueX,
-            valueY: this.props.valueY,
+            x: this.props.x,
+            y: this.props.y,
         });
     }
 

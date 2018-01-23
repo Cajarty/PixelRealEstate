@@ -14,9 +14,15 @@ th {
     padding-right: 20px;
 }
 
+div.tableData {
+    max-height: calc(90vh - 100px);
+    overflow-y: auto;
+}
+
 table.data {
     table-layout: fixed;
     max-width: 100%;
+    width: 100%;
     tr {}
     th {
         width: 80px;

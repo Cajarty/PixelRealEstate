@@ -15,8 +15,9 @@ export const ERROR_TYPE = {
     error: 'error',
 }
 export const LISTENERS = {
-    Error: 'error',
-    Alert: 'alert',
+    Error: 'Error',
+    Alert: 'Alert',
+    CoordinateUpdate: 'CoordinateUpdate',
 }; 
 
 export const EVENTS = { 
@@ -36,7 +37,6 @@ export const EVENTS = {
 
 export class Contract {
     constructor() {
-        this.listeners = {};
 
         this.accounts = null;
         this.account = null;
@@ -56,6 +56,13 @@ export class Contract {
         Object.keys(EVENTS).map((index) => {
             this.events[index] = {};
         });
+
+        this.listeners = {};
+        Object.keys(LISTENERS).map((index) => {
+            this.listeners[index] = {};
+        });
+
+        console.info(this.listeners);
         
         this.setup();
         this.test();
@@ -82,16 +89,16 @@ export class Contract {
     getAccounts() {
         window.web3.eth.getAccounts((err, accs) => {
             if (err != null) {
-                this.sendResults({errorId: 1, errorType: ERROR_TYPE.Error, message: "There was an error fetching your accounts."}, [LISTENERS.Error]);
+                this.sendResults(LISTENERS.Alert, {errorId: 1, errorType: ERROR_TYPE.Error, message: "There was an error fetching your accounts."});
                 return;
             }
 
             if (accs.length == 0) {
-                this.sendResults({errorId: 0, errorType: ERROR_TYPE.Error, message: "Couldn't get any accounts! Make sure you're logged into Metamask."}, [LISTENERS.Error]);
+                this.sendResults(LISTENERS.Error, {errorId: 0, errorType: ERROR_TYPE.Error, message: "Couldn't get any accounts! Make sure you're logged into Metamask."});
                 return;
             }
 
-            this.sendResults({removeErrors: [0, 1], message: ''}, [LISTENERS.Error]);
+            this.sendResults(LISTENERS.Error, {removeErrors: [0, 1], message: ''});
 
             this.accounts = accs;
             this.account = this.accounts[0];
@@ -131,10 +138,10 @@ export class Contract {
             else
                 return i.buyPropertyInPXL(this.toID(x, y), price, { from: this.account });
         }).then(() => {
-            this.sendResults({result: true, message: "Property " + x + "x" + y + " purchase complete."});
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " purchase complete."});
         }).catch((e) => {
             console.info(e);
-            this.sendResults({result: false, message: "Unable to purchase property " + x + "x" + y + "."});
+            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to purchase property " + x + "x" + y + "."});
         });
     }
 
@@ -142,10 +149,10 @@ export class Contract {
         this.VRE.deployed().then((i) => {
             return i.listForSale(this.toID(x, y), price, {from: this.account });
         }).then(() => {
-            this.sendResults({result: true, message: "Property " + x + "x" + y + " listed for sale."});
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " listed for sale."});
         }).catch((e) => {
             console.log(e);
-            this.sendResults({result: false, message: "Unable to put property " + x + "x" + y + " on market."});
+            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to put property " + x + "x" + y + " on market."});
         });
     }
 
@@ -252,11 +259,11 @@ export class Contract {
         this.VRE.deployed().then((i) => {
             return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), {from: this.account });
         }).then(() => {
-            this.sendResults(true, "Property " + x + "x" + y + " pixels changed.");
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " pixels changed."});
             this.sendEvent(EVENTS.PropertyColorUpdate, {args: {x: x, y: y, colorsRGB: data}});
         }).catch((e) => {
             console.info(e);
-            this.sendResults(false, "Error uploading pixels.");
+            this.sendResults(LISTENERS.Error, {result: false, message: "Error uploading pixels."});
         });
     }
 
@@ -299,23 +306,17 @@ export class Contract {
     Events that are being used:
         Alerts
     */
-    listenForResults(key, callback) {
-        this.listeners[key] = callback;
+    listenForResults(listener, key, callback) {
+        this.listeners[listener][key] = callback;
     }
 
-    stopListeningForResults(key) {
-        delete this.listeners[key];
+    stopListeningForResults(listener, key) {
+        delete this.listeners[listener][key];
     }
 
-    sendResults(result, include = [], exclude = []) {
-        Object.keys(this.listeners).map((i) => {
-            for (let b = 0; b < Math.max(exclude.length, include.length); b++) {
-                if (include.length > b && include[b] !== i)
-                    return;
-                if (exclude.length > b && exclude[b] === i)
-                    return;
-            }
-            this.listeners[i](result);
+    sendResults(listener, result) {
+        Object.keys(this.listeners[listener]).map((i) => {
+            this.listeners[listener][i](result);
         });
     }
 

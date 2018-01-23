@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import * as Const from '../../const/const.jsx';
-import {EVENTS, ctr, Contract} from '../../contract/contract.jsx';
+import {EVENTS, LISTENERS, ctr, Contract} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions.jsx';
 import * as Compress from 'lzwcompress';
 import Zoom from './Zoom';
@@ -46,7 +46,7 @@ class Canvas extends Component {
             let rect = this.canvas.getBoundingClientRect();
             let x = Math.floor((e.clientX - rect.left) * (1000 / rect.width) / 10);
             let y = Math.floor((e.clientY - rect.top) * (1000 / rect.height) / 10); 
-            this.props.click(x, y);
+            ctr.sendResults(LISTENERS.CoordinateUpdate, {x, y});
         };
         ctr.listenForEvent(EVENTS.PropertyColorUpdate, 'canvas', (data) => {
             let xy = {x: 0, y: 0};

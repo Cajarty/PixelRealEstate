@@ -93,7 +93,7 @@ contract VirtualRealEstate is StandardToken {
     event PropertyBought(uint24 indexed property,  address newOwner);
     event SetUserHoverText(address indexed user, bytes32[2] newHoverText);
     event SetUserSetLink(address indexed user, bytes32[2] newLink);
-    event PropertySetForSale(uint24 indexed property);
+    event PropertySetForSale(uint24 indexed property, uint256 forSalePrice);
     event DelistProperty(uint24 indexed property);
     event ListTradeOffer(address indexed offerOwner, uint256 eth, uint256 ppc, bool isBuyingPPC);
     event AcceptTradeOffer(address indexed accepter, address indexed offerOwner);
@@ -453,7 +453,7 @@ contract VirtualRealEstate is StandardToken {
         //You can listForSale an already listed item to update the listing
         property.salePrice = price;
         
-        PropertySetForSale(propertyID);
+        PropertySetForSale(propertyID, property.salePrice);
         
         return true;
     }

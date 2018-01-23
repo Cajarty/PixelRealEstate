@@ -3,13 +3,13 @@ import {Contract, ctr, EVENTS, LISTENERS} from '../../contract/contract.jsx';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 import TimeAgo from 'react-timeago';
 
-class PropertiesOwned extends Component {
+class PropertiesForSale extends Component {
     constructor(props) {
         super(props);
     }
 
     componentDidMount() {
-        ctr.listenForEvent(EVENTS.PropertyBought, 'PropertiesOwned', (data) => {
+        ctr.listenForEvent(EVENTS.ListTradeOffer, 'PropertiesOwned', (data) => {
             this.forceUpdate();
         });
     }
@@ -63,4 +63,4 @@ class PropertiesOwned extends Component {
     }
 }
 
-export default PropertiesOwned
+export default PropertiesForSale

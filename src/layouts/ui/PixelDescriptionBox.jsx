@@ -19,12 +19,13 @@ class PixelDescriptionBox extends Component {
     }
 
     componentWillReceiveProps(newProps) {
-        let update = {};
+        let update = {x: this.state.x, y: this.state.y};
         Object.keys(newProps).map((i) => {
             if (newProps[i] != this.props[i])
                 update[i] = newProps[i];
         })
-        if (update.x != null && update.y != null)
+        //update property view if new area clicked
+        if (newProps.x != null || newProps.y != null)
             this.loadProperty(newProps.x, newProps.y);
         this.setState(update);
     }
@@ -37,7 +38,7 @@ class PixelDescriptionBox extends Component {
         let dataCtx = this.dataCanvas.getContext('2d');
         dataCtx.imageSmoothingEnabled = false;
         dataCtx.webkitImageSmoothingEnabled = false;
-        if (this.props.x != null && this.props.y != -1 && this.props.x != null && this.props.y != -1) 
+        if (this.props.x != null && this.props.x != -1 && this.props.y != null && this.props.y != -1) 
             this.loadProperty(this.props.x, this.props.y);
         this.setState({
             ctx, 

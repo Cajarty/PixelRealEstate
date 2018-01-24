@@ -18,21 +18,30 @@ export const LISTENERS = {
     Error: 'Error',
     Alert: 'Alert',
     CoordinateUpdate: 'CoordinateUpdate',
+    ShowForSale: 'ShowForSale',
 }; 
 
 export const EVENTS = { 
     PropertyColorUpdate: 'PropertyColorUpdate',                     //(uint24 indexed property, uint256[10] colors, address propertyOwnerPayee, address lastUpdaterPayee);
     PropertyColorUpdatePixel: 'PropertyColorUpdatePixel',           //(uint24 indexed property, uint8 row, uint24 rgb);
-    PropertyBought: 'PropertyBought',                               //(uint24 indexed property,  address newOwner);
+
     SetUserHoverText: 'SetUserHoverText',                           //(address indexed user, bytes32[2] newHoverText);
     SetUserSetLink: 'SetUserSetLink',                               //(address indexed user, bytes32[2] newLink);
-    PropertySetForSale: 'PropertySetForSale',                       //(uint24 indexed property);
-    DelistProperty: 'DelistProperty',                               //(uint24 indexed propertyID);
+
+    PropertyBought: 'PropertyBought',                               //(uint24 indexed property,  address newOwner);
+    PropertySetForSale: 'PropertySetForSale',                       //(uint24 indexed property, uint256 forSalePrice);
+    DelistProperty: 'DelistProperty',                               //(uint24 indexed property);
+
     ListTradeOffer: 'ListTradeOffer',                               //(address indexed offerOwner, uint256 eth, uint256 pxl, bool isBuyingPxl);
     AcceptTradeOffer: 'AcceptTradeOffer',                           //(address indexed accepter, address indexed offerOwner);
     CancelTradeOffer: 'CancelTradeOffer',                           //(address indexed offerOwner);
+
     SetPropertyPublic: 'SetPropertyPublic',                         //(uint24 indexed property);
     SetPropertyPrivate: 'SetPropertyPrivate',                       //(uint24 indexed property, uint32 numHoursPrivate);
+
+    //token events    
+    Transfer: 'Transfer',                                           //(address indexed _from, address indexed _to, uint256 _value);
+    Approval: 'Approval',                                           //(address indexed _owner, address indexed _spender, uint256 _value);
 };
 
 export class Contract {
@@ -129,6 +138,17 @@ export class Contract {
         obj.x = id % Const.PROPERTIES_WIDTH;
         obj.y = Math.floor(id / 100);
         return obj;
+    }
+
+    getBalance(callback) {
+        this.VRE.deployed().then((i) => {
+            i.balanceOf(this.account, { from: this.account }).then((r) => {
+                callback(Func.BigNumberToNumber(r));
+            });
+        }).catch((e) => {
+            console.info(e);
+            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to retrieve PPC balance."});
+        });
     }
 
     buyProperty(x, y, price, useEth = true) {

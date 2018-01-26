@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {Contract, ctr, EVENTS, LISTENERS} from '../../contract/contract.jsx';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
-import TimeAgo from 'react-timeago';
+import Timestamp from 'react-timestamp';
 
 class PropertiesOwned extends Component {
     constructor(props) {
@@ -47,9 +47,9 @@ class PropertiesOwned extends Component {
                                         <td style={{width: '20%'}}>{SDM.ownedProperties[x][y].isForSale ? 'Yes' : 'No'}</td>
                                         <td style={{width: '20%'}}>{SDM.ownedProperties[x][y].isInPrivate ? 'Yes' : 'No'}</td>
                                         <td style={{width: '40%'}}>
-                                            {SDM.ownedProperties[x][y].lastColorUpdate == null || SDM.ownedProperties[x][y].lastColorUpdate == 0 ? 
+                                            {SDM.ownedProperties[x][y].lastUpdate == null || SDM.ownedProperties[x][y].lastUpdate == 0 ? 
                                                 'Never' 
-                                                : <TimeAgo date={SDM.ownedProperties[x][y].lastColorUpdate}/>
+                                                : <Timestamp time={SDM.ownedProperties[x][y].lastUpdate}/>
                                             }
                                         </td>
                                     </tr>

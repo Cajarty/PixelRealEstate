@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {Contract, ctr} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions.jsx';
+import Timestamp from 'react-timestamp';
 
 class PixelDescriptionBox extends Component {
     constructor(props) {
@@ -24,9 +25,10 @@ class PixelDescriptionBox extends Component {
             if (newProps[i] != this.props[i])
                 update[i] = newProps[i];
         })
+        
         //update property view if new area clicked
         if (newProps.x != null || newProps.y != null)
-            this.loadProperty(newProps.x, newProps.y);
+            this.loadProperty(update.x, update.y);
         this.setState(update);
     }
 
@@ -75,7 +77,7 @@ class PixelDescriptionBox extends Component {
                 owner: data[0],
                 isForSale: price != 0,
                 salePrice: price,
-                lastColorUpdate: 0, //deal with this: with timestamp for since last time ::: data[2]
+                lastUpdate: data[2], //deal with this: with timestamp for since last time ::: data[2]
                 isInPrivate: data[3],
             })
         });
@@ -117,7 +119,7 @@ class PixelDescriptionBox extends Component {
                         ) : null}
                         <tr>
                             <th>Last Color Change</th>
-                            <td>{this.state.lastColorUpdate}</td>
+                            <td>{this.state.lastUpdate == 0 ? 'Never' : <Timestamp time={this.state.lastUpdate}/>}</td>
                         </tr>
                         <tr>
                             <th>Is Private</th>

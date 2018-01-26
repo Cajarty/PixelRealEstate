@@ -32,7 +32,7 @@ class BuyPixelForm extends Component {
         let obj = {};
         obj[key] = value;
         this.setState(obj);
-        ctr.getForSalePrice(this.state.x, this.state.y); //TODO get this to work and store and set the prices.
+        console.info(ctr.getForSalePrice(this.state.x, this.state.y)); //TODO get this to work and store and set the prices.
     }
 
     render() {

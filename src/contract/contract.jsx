@@ -19,10 +19,11 @@ export const LISTENERS = {
     Alert: 'Alert',
     CoordinateUpdate: 'CoordinateUpdate',
     ShowForSale: 'ShowForSale',
+    ServerDataManagerInit: 'ServerDataManagerInit',
 }; 
 
 export const EVENTS = { 
-    PropertyColorUpdate: 'PropertyColorUpdate',                     //(uint24 indexed property, uint256[10] colors, address propertyOwnerPayee, address lastUpdaterPayee);
+    PropertyColorUpdate: 'PropertyColorUpdate',                     //(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address lastUpdaterPayee);
     PropertyColorUpdatePixel: 'PropertyColorUpdatePixel',           //(uint24 indexed property, uint8 row, uint24 rgb);
 
     SetUserHoverText: 'SetUserHoverText',                           //(address indexed user, bytes32[2] newHoverText);
@@ -70,8 +71,6 @@ export class Contract {
         Object.keys(LISTENERS).map((index) => {
             this.listeners[index] = {};
         });
-
-        console.info(this.listeners);
         
         this.setup();
         this.test();
@@ -91,6 +90,7 @@ export class Contract {
         this.VRE.setProvider(window.web3.currentProvider);
 
         this.getAccounts();
+        this.setupEvents();
         
         this.getAccountsInterval = setInterval(() => this.getAccounts(), 1000);
     }
@@ -206,7 +206,7 @@ export class Contract {
 
     getForSalePrice(x, y) {
         this.VRE.deployed().then((i) => {
-            return i.getForSalePrice.call(this.toID(x, y)).then((r) => {
+            return i.getForSalePrices.call(this.toID(x, y)).then((r) => {
                 return r;
             });
         }).catch((e) => {
@@ -280,7 +280,7 @@ export class Contract {
             return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), {from: this.account });
         }).then(() => {
             this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " pixels changed."});
-            this.sendEvent(EVENTS.PropertyColorUpdate, {args: {x: x, y: y, colorsRGB: data}});
+            this.sendEvent(EVENTS.PropertyColorUpdate, {args: {x: x, y: y, colorsRGB: data, lastUpdate: new Date().getTime()}});
         }).catch((e) => {
             console.info(e);
             this.sendResults(LISTENERS.Error, {result: false, message: "Error uploading pixels."});

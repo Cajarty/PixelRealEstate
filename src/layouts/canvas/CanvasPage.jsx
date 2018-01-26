@@ -26,8 +26,7 @@ class CanvasPage extends Component {
     }
 
     componentDidMount() {
-        this.loadCanvas();
-        SDM.requestServerData();
+        SDM.init();
         ctr.listenForResults(LISTENERS.CoordinateUpdate, 'coordinateUpdate', (data) => {
             this.setState({
                 clickX: data.x,
@@ -38,18 +37,20 @@ class CanvasPage extends Component {
             this.setState({PPCOwned: balance, loadingPPC: false});
         });
         ctr.listenForEvent(EVENTS.Transfer, 'CanvasPagePPCListener', (data) => {
-            this.setState({loadingPPC: true});
-            if (data.args._from === ctr.account || data.args._to === ctr.account)
+            if (data.args._from === ctr.account || data.args._to === ctr.account) {
+                this.setState({loadingPPC: true});
                 ctr.getBalance((balance) => {
                     this.setState({PPCOwned: balance, loadingPPC: false});
                 });
+            }
         });
         ctr.listenForEvent(EVENTS.PropertyColorUpdate, 'CanvasPagePPCListener', (data) => {
-            this.setState({loadingPPC: true});
-            if (data.args.lastUpdaterPayee != null && data.args.lastUpdaterPayee === ctr.account)
+            if (data.args.lastUpdaterPayee != null && data.args.lastUpdaterPayee === ctr.account) {
+                this.setState({loadingPPC: true});
                 ctr.getBalance((balance) => {
                     this.setState({PPCOwned: balance, loadingPPC: false});
                 });
+            }
         });
     }
 
@@ -57,17 +58,6 @@ class CanvasPage extends Component {
         ctr.stopListeningForResults(LISTENERS.CoordinateUpdate, 'coordinateUpdate');
         ctr.stopListeningForEvent(EVENTS.Transfer, 'CanvasPagePPCListener');
         ctr.stopListeningForEvent(EVENTS.PropertyColorUpdate, 'CanvasPagePPCListener');
-    }
-
-    loadCanvas() {
-        let cancelToken = null;
-        Axios.getInstance().get('/getPixelData', cancelToken).then((result) => {
-            this.setState({
-                pixelData: result.data,
-                pixelDataUpdateVersion: this.state.pixelDataUpdateVersion + 1
-            });
-        });
-        this.setState({cancelToken: cancelToken});
     }
 
     canvasHover(x, y) {
@@ -93,24 +83,20 @@ class CanvasPage extends Component {
                             <ZoomCanvas 
                                 x={this.state.hoverX} 
                                 y={this.state.hoverY}
-                                pixelData={this.state.pixelData} 
-                                pixelDataUpdateVersion={this.state.pixelDataUpdateVersion} 
                             />
                         </div>
                     </div>
                     <div className='center'>
                         <Canvas 
-                            pixelData={this.state.pixelData} 
-                            pixelDataUpdateVersion={this.state.pixelDataUpdateVersion} 
                             hover={(x, y) => this.canvasHover(x, y)}
                         />
                     </div>
                     <div className='right'>
-                    </div>
                         <ActionPanel
                             clickX={this.state.clickX}
                             clickY={this.state.clickY}
                         />
+                    </div>
                 </div>
                 <div className='middle-top'>
                     <ErrorBox/>

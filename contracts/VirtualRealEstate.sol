@@ -88,7 +88,7 @@ contract VirtualRealEstate is StandardToken {
     uint256 PROPERTY_GENERATES_PER_HOUR = 2;
     uint256 FREE_COLOR_SETTING_UNTIL;
     
-    event PropertyColorUpdate(uint24 indexed property, uint256[10] colors, address propertyOwnerPayee, address lastUpdaterPayee);
+    event PropertyColorUpdate(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address lastUpdaterPayee);
     event PropertyColorUpdatePixel(uint24 indexed property, uint8 row, uint24 rgb);
     event PropertyBought(uint24 indexed property,  address newOwner);
     event SetUserHoverText(address indexed user, bytes32[2] newHoverText);
@@ -131,7 +131,7 @@ contract VirtualRealEstate is StandardToken {
     function VirtualRealEstate() public {
         owner = msg.sender;
         totalSupply = 0;
-        FREE_COLOR_SETTING_UNTIL = now;//+ 1 days
+        FREE_COLOR_SETTING_UNTIL = now + 1 days;
         pricePPC = 10;
         priceETH = 10000;//1000000000000000000; //0.001 ETH
     }
@@ -182,9 +182,9 @@ contract VirtualRealEstate is StandardToken {
         return map[propertyID].colors;
     }
     
-    function getPropertyData(uint24 propertyID) public validPropertyID(propertyID) view returns(address, uint256, address, bool) {
+    function getPropertyData(uint24 propertyID) public validPropertyID(propertyID) view returns(address, uint256, uint256, bool) {
         Property storage property = map[propertyID];
-        return (property.owner, property.salePrice, property.lastUpdater, property.isInPrivateMode);
+        return (property.owner, property.salePrice, property.lastUpdate, property.isInPrivateMode);
     }
     //Change a 10x10 == 70 | 30 | 0 cost
     function setColors(uint24 propertyID, uint256[10] newColors) public validPropertyID(propertyID) returns(bool) {
@@ -244,8 +244,9 @@ contract VirtualRealEstate is StandardToken {
         property.colors = newColors;
         property.lastUpdater = msg.sender;
         property.lastUpdate = now;
+        uint256 timeUpdate = now;
         
-        PropertyColorUpdate(propertyID, newColors, propertyOwnerPayee, lastUpdaterPayee);
+        PropertyColorUpdate(propertyID, newColors, timeUpdate, lastUpdaterPayee);
         
         return true;
     }

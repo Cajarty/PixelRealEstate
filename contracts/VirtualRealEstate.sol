@@ -2,9 +2,10 @@ pragma solidity ^0.4.2;
 
 
 /*
-- ethPrice, PPCPrice. 
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CHANGE TO PPC WHEN I GET PACK
+- Partial sales filling unit test
+- Fractional purchases unit test
+- timestamp for events that represent history
+- Stress Test Functionality (7pm Tonight, all above must be done by then)
 */
 
 contract Token {
@@ -102,8 +103,8 @@ contract VirtualRealEstate is StandardToken {
     event SetPropertyPrivate(uint24 indexed property, uint32 numHoursPrivate);
     
     struct TradeOffer {
-        uint256 eth;
-        uint256 ppc;
+        uint256 ethPer;
+        uint256 ppcAmount;
         bool buyingPPC;
     }
     
@@ -182,9 +183,9 @@ contract VirtualRealEstate is StandardToken {
         return map[propertyID].colors;
     }
     
-    function getPropertyData(uint24 propertyID) public validPropertyID(propertyID) view returns(address, uint256, address, bool) {
+    function getPropertyData(uint24 propertyID) public validPropertyID(propertyID) view returns(address, uint256, uint256, bool) {
         Property storage property = map[propertyID];
-        return (property.owner, property.salePrice, property.lastUpdater, property.isInPrivateMode);
+        return (property.owner, property.salePrice, property.lastUpdate, property.isInPrivateMode);
     }
     //Change a 10x10 == 70 | 30 | 0 cost
     function setColors(uint24 propertyID, uint256[10] newColors) public validPropertyID(propertyID) returns(bool) {
@@ -268,96 +269,128 @@ contract VirtualRealEstate is StandardToken {
             SetPropertyPublic(propertyID);
         }
     }
-    function setBuyETHOffer(uint256 ethToBuy, uint256 offeredPPC) public {
+    function setBuyETHOffer(uint256 ethPer, uint256 offeredPPC) public {
         //Require we have the ppc to offer
         require(balances[msg.sender] >= offeredPPC);
-        require(ethToBuy > 0 && offeredPPC > 0);
+        require(ethPer > 0 && offeredPPC > 0);
         
         //Cancel old TradeOffer if present
         cancelTradeOffer();
         
         //Set Offer
-        ppcTradeStatus[msg.sender].eth = ethToBuy;
-        ppcTradeStatus[msg.sender].ppc = offeredPPC;
+        ppcTradeStatus[msg.sender].ethPer = ethPer;
+        ppcTradeStatus[msg.sender].ppcAmount = offeredPPC;
         ppcTradeStatus[msg.sender].buyingPPC = false;
         
         //Lose offered ppc
         balances[msg.sender] -= offeredPPC;
         
-        ListTradeOffer(msg.sender, ethToBuy, offeredPPC, false);
+        ListTradeOffer(msg.sender, ethPer, offeredPPC, false);
     }
     
     function getTradeOffer(address offerOwner) public view returns(uint256, uint256, bool) {
         TradeOffer storage tradeOffer = ppcTradeStatus[offerOwner];
-        return (tradeOffer.eth, tradeOffer.ppc, tradeOffer.buyingPPC);
+        return (tradeOffer.ethPer, tradeOffer.ppcAmount, tradeOffer.buyingPPC);
     }
-    function setBuyPPCOffer(uint256 ppcToBuy, uint256 offeredEth) public payable {
+    function setBuyPPCOffer(uint256 ppcToBuy, uint256 ethPer) public payable {
         //Require we have the eth to offer
-        require(msg.value >= offeredEth);
-        require(ppcToBuy > 0 && offeredEth > 0);
+        require(msg.value >= ethPer);
+        require(ppcToBuy > 0 && ethPer > 0);
         
         //Cancel old TradeOffer if present
         cancelTradeOffer();
         
         //Set Offer
         TradeOffer storage tradeOffer = ppcTradeStatus[msg.sender];
-        tradeOffer.ppc = ppcToBuy;
-        tradeOffer.eth = offeredEth;
+        tradeOffer.ppcAmount = ppcToBuy;
+        tradeOffer.ethPer = ethPer;
         tradeOffer.buyingPPC = true;
         
-        ListTradeOffer(msg.sender, offeredEth, ppcToBuy, true);
+        ListTradeOffer(msg.sender, ethPer, ppcToBuy, true);
     }
     function cancelTradeOffer() public {
         TradeOffer storage tradeOffer = ppcTradeStatus[msg.sender];
         //If we have a trade offer
-        if (tradeOffer.eth > 0 || tradeOffer.ppc > 0) {
+        if (tradeOffer.ethPer > 0 || tradeOffer.ppcAmount > 0) {
             //We already deposited ETH. Return it back
             if (tradeOffer.buyingPPC) {
-                msg.sender.transfer(tradeOffer.eth);
+                msg.sender.transfer(tradeOffer.ethPer * tradeOffer.ppcAmount);
             }
             //We already deposited PPC. Return it back
             else {
-                balances[msg.sender] += tradeOffer.ppc;
+                balances[msg.sender] += tradeOffer.ppcAmount;
             }
             CancelTradeOffer(msg.sender);
-            tradeOffer.eth = 0;
-            tradeOffer.ppc = 0;
+            tradeOffer.ethPer = 0;
+            tradeOffer.ppcAmount = 0;
         }
     }
     function acceptOfferBuyingETH(address ownerOfTradeOffer) public payable {
         TradeOffer storage tradeOffer = ppcTradeStatus[ownerOfTradeOffer];
         //Make sure the accepter has enough to justify accepting
-        require(tradeOffer.eth <= msg.value);
+        //require(tradeOffer.eth <= msg.value); ## Instead of having enough, we can partial-buy
         require(ownerOfTradeOffer != 0);
+        require(msg.value > 0);
+        require(tradeOffer.ethPer != 0);
+        require(tradeOffer.ppcAmount != 0);
+        require(!tradeOffer.buyingPPC);
         
-        //Give them our money. We are deposited it by this being "payable"
-        ownerOfTradeOffer.transfer(msg.value);
+        uint256 maxEthprice = tradeOffer.ethPer * tradeOffer.ppcAmount;
+        
+        //require(msg.value == maxEthprice); ## Instead of having the exact amount to fulfill all, partial fill
+        
         
         //Take their money. They already deposited their coins
-        balances[msg.sender] += tradeOffer.ppc;
+        uint256 payedValue = msg.value > maxEthprice ? maxEthprice : msg.value;
         
-        //Clear trade offer
-        tradeOffer.eth = 0;
-        tradeOffer.ppc = 0;
+        //Give them our money. We are deposited it by this being "payable"
+        ownerOfTradeOffer.transfer(payedValue);
+        
+        //10 * (100 / 200) = 10 * 0.5 = 5
+        //10 * 100 / 200 = 1000 / 200 = 5
+        
+        balances[msg.sender] += payedValue / tradeOffer.ethPer;
+        
+        //Clear or split trade offers
+        if (payedValue == maxEthprice) {
+            tradeOffer.ethPer = 0;
+            tradeOffer.ppcAmount = 0;
+        } else {
+            tradeOffer.ppcAmount -= payedValue / tradeOffer.ethPer;
+        }
         
         AcceptTradeOffer(msg.sender, ownerOfTradeOffer);
     }
-    function acceptOfferBuyingPPC(address ownerOfTradeOffer) public {
+    
+    function acceptOfferBuyingPPC(address ownerOfTradeOffer, uint256 ppcValue) public {
         TradeOffer storage tradeOffer = ppcTradeStatus[ownerOfTradeOffer];
         //Make sure the accepter has enough to justify accepting
-        require(tradeOffer.ppc <= balances[msg.sender]);
+        //require(tradeOffer.ppc <= balances[msg.sender]);  ## Instead of having enough, we can partial-buy
         require(ownerOfTradeOffer != 0);
+        require(tradeOffer.ethPer != 0);
+        require(tradeOffer.ppcAmount != 0);
+        require(ppcValue != 0);
+        require(tradeOffer.buyingPPC);
+        
+        //Take their money. They already deposited their coins
+        uint256 payedValue = ppcValue > tradeOffer.ppcAmount ? tradeOffer.ppcAmount : ppcValue;
+        
+        require(balances[msg.sender] >= payedValue);
         
         //Give them our money
-        balances[ownerOfTradeOffer] += tradeOffer.ppc;
-        balances[msg.sender] -= tradeOffer.ppc;
+        balances[ownerOfTradeOffer] += payedValue;
+        balances[msg.sender] -= payedValue;
         
         //Take their money. They already deposited ETH
-        msg.sender.transfer(tradeOffer.eth);
+        msg.sender.transfer(tradeOffer.ethPer * ppcValue);
         
-        //Clear trade offer
-        tradeOffer.eth = 0;
-        tradeOffer.ppc = 0;
+        //Clear or split trade offers
+        if (payedValue == tradeOffer.ppcAmount) {
+            tradeOffer.ethPer = 0;
+            tradeOffer.ppcAmount = 0;
+        } else {
+            tradeOffer.ppcAmount -= payedValue;
+        }
         
         AcceptTradeOffer(msg.sender, ownerOfTradeOffer);
     }
@@ -393,6 +426,35 @@ contract VirtualRealEstate is StandardToken {
         require(newOwner != 0);
         
         property.owner = newOwner;
+        
+        return true;
+    }
+    function buyProperty(uint24 propertyID, uint256 ppcValue) public validPropertyID(propertyID) payable returns(bool) {
+        Property storage property = map[propertyID];
+        
+        //Must be the first purchase, otherwise do it with ppc
+        require(property.owner == 0);
+        //Required to avoid underflowing (pricePPC - ppcValue)
+        require(ppcValue <= pricePPC);
+        require(balances[msg.sender] >= ppcValue);
+        require(ppcValue != 0);
+        
+        uint256 ppcLeft = pricePPC - ppcValue;
+        uint256 ethleft = priceETH / ppcValue * ppcLeft;
+        
+        require(msg.value >= ethleft);
+    
+        balances[owner] += ppcValue;
+        uint256 minPercent = pricePPC * PRICE_PPC_MIN_PERCENT / 100;
+        pricePPC += ((minPercent < PRICE_PPC_MIN_INCREASE) ? minPercent : PRICE_PPC_MIN_INCREASE) * ppcValue / pricePPC;
+
+        ownerEth += msg.value;
+        minPercent = priceETH * PRICE_ETH_MIN_PERCENT / 100;
+        priceETH += ((minPercent < PRICE_ETH_MIN_INCREASE) ? minPercent : PRICE_ETH_MIN_INCREASE) * ppcLeft / ppcValue;
+        
+        property.owner = msg.sender;
+        
+        PropertyBought(propertyID, property.owner);
         
         return true;
     }

@@ -15,28 +15,38 @@ export const ERROR_TYPE = {
     error: 'error',
 }
 export const LISTENERS = {
-    Error: 'error',
-    Alert: 'alert',
+    Error: 'Error',
+    Alert: 'Alert',
+    CoordinateUpdate: 'CoordinateUpdate',
+    ShowForSale: 'ShowForSale',
+    ServerDataManagerInit: 'ServerDataManagerInit',
 }; 
 
 export const EVENTS = { 
-    PropertyColorUpdate: 'PropertyColorUpdate',                     //(uint24 indexed property, uint256[10] colors, address propertyOwnerPayee, address lastUpdaterPayee);
+    PropertyColorUpdate: 'PropertyColorUpdate',                     //(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address lastUpdaterPayee);
     PropertyColorUpdatePixel: 'PropertyColorUpdatePixel',           //(uint24 indexed property, uint8 row, uint24 rgb);
-    PropertyBought: 'PropertyBought',                               //(uint24 indexed property,  address newOwner);
+
     SetUserHoverText: 'SetUserHoverText',                           //(address indexed user, bytes32[2] newHoverText);
     SetUserSetLink: 'SetUserSetLink',                               //(address indexed user, bytes32[2] newLink);
-    PropertySetForSale: 'PropertySetForSale',                       //(uint24 indexed property);
-    DelistProperty: 'DelistProperty',                               //(uint24 indexed propertyID);
+
+    PropertyBought: 'PropertyBought',                               //(uint24 indexed property,  address newOwner);
+    PropertySetForSale: 'PropertySetForSale',                       //(uint24 indexed property, uint256 forSalePrice);
+    DelistProperty: 'DelistProperty',                               //(uint24 indexed property);
+
     ListTradeOffer: 'ListTradeOffer',                               //(address indexed offerOwner, uint256 eth, uint256 pxl, bool isBuyingPxl);
     AcceptTradeOffer: 'AcceptTradeOffer',                           //(address indexed accepter, address indexed offerOwner);
     CancelTradeOffer: 'CancelTradeOffer',                           //(address indexed offerOwner);
+
     SetPropertyPublic: 'SetPropertyPublic',                         //(uint24 indexed property);
     SetPropertyPrivate: 'SetPropertyPrivate',                       //(uint24 indexed property, uint32 numHoursPrivate);
+
+    //token events    
+    Transfer: 'Transfer',                                           //(address indexed _from, address indexed _to, uint256 _value);
+    Approval: 'Approval',                                           //(address indexed _owner, address indexed _spender, uint256 _value);
 };
 
 export class Contract {
     constructor() {
-        this.listeners = {};
 
         this.accounts = null;
         this.account = null;
@@ -55,6 +65,11 @@ export class Contract {
         }
         Object.keys(EVENTS).map((index) => {
             this.events[index] = {};
+        });
+
+        this.listeners = {};
+        Object.keys(LISTENERS).map((index) => {
+            this.listeners[index] = {};
         });
         
         this.setup();
@@ -75,6 +90,7 @@ export class Contract {
         this.VRE.setProvider(window.web3.currentProvider);
 
         this.getAccounts();
+        this.setupEvents();
         
         this.getAccountsInterval = setInterval(() => this.getAccounts(), 1000);
     }
@@ -82,16 +98,16 @@ export class Contract {
     getAccounts() {
         window.web3.eth.getAccounts((err, accs) => {
             if (err != null) {
-                this.sendResults({errorId: 1, errorType: ERROR_TYPE.Error, message: "There was an error fetching your accounts."}, [LISTENERS.Error]);
+                this.sendResults(LISTENERS.Alert, {errorId: 1, errorType: ERROR_TYPE.Error, message: "There was an error fetching your accounts."});
                 return;
             }
 
             if (accs.length == 0) {
-                this.sendResults({errorId: 0, errorType: ERROR_TYPE.Error, message: "Couldn't get any accounts! Make sure you're logged into Metamask."}, [LISTENERS.Error]);
+                this.sendResults(LISTENERS.Error, {errorId: 0, errorType: ERROR_TYPE.Error, message: "Couldn't get any accounts! Make sure you're logged into Metamask."});
                 return;
             }
 
-            this.sendResults({removeErrors: [0, 1], message: ''}, [LISTENERS.Error]);
+            this.sendResults(LISTENERS.Error, {removeErrors: [0, 1], message: ''});
 
             this.accounts = accs;
             this.account = this.accounts[0];
@@ -124,6 +140,17 @@ export class Contract {
         return obj;
     }
 
+    getBalance(callback) {
+        this.VRE.deployed().then((i) => {
+            i.balanceOf(this.account, { from: this.account }).then((r) => {
+                callback(Func.BigNumberToNumber(r));
+            });
+        }).catch((e) => {
+            console.info(e);
+            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to retrieve PPC balance."});
+        });
+    }
+
     buyProperty(x, y, price, useEth = true) {
         this.VRE.deployed().then((i) => {
             if (useEth)
@@ -131,10 +158,10 @@ export class Contract {
             else
                 return i.buyPropertyInPXL(this.toID(x, y), price, { from: this.account });
         }).then(() => {
-            this.sendResults({result: true, message: "Property " + x + "x" + y + " purchase complete."});
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " purchase complete."});
         }).catch((e) => {
             console.info(e);
-            this.sendResults({result: false, message: "Unable to purchase property " + x + "x" + y + "."});
+            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to purchase property " + x + "x" + y + "."});
         });
     }
 
@@ -142,10 +169,10 @@ export class Contract {
         this.VRE.deployed().then((i) => {
             return i.listForSale(this.toID(x, y), price, {from: this.account });
         }).then(() => {
-            this.sendResults({result: true, message: "Property " + x + "x" + y + " listed for sale."});
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " listed for sale."});
         }).catch((e) => {
             console.log(e);
-            this.sendResults({result: false, message: "Unable to put property " + x + "x" + y + " on market."});
+            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to put property " + x + "x" + y + " on market."});
         });
     }
 
@@ -179,7 +206,7 @@ export class Contract {
 
     getForSalePrice(x, y) {
         this.VRE.deployed().then((i) => {
-            return i.getForSalePrice.call(this.toID(x, y)).then((r) => {
+            return i.getForSalePrices.call(this.toID(x, y)).then((r) => {
                 return r;
             });
         }).catch((e) => {
@@ -252,11 +279,11 @@ export class Contract {
         this.VRE.deployed().then((i) => {
             return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), {from: this.account });
         }).then(() => {
-            this.sendResults(true, "Property " + x + "x" + y + " pixels changed.");
-            this.sendEvent(EVENTS.PropertyColorUpdate, {args: {x: x, y: y, colorsRGB: data}});
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " pixels changed."});
+            this.sendEvent(EVENTS.PropertyColorUpdate, {args: {x: x, y: y, colorsRGB: data, lastUpdate: new Date().getTime()}});
         }).catch((e) => {
             console.info(e);
-            this.sendResults(false, "Error uploading pixels.");
+            this.sendResults(LISTENERS.Error, {result: false, message: "Error uploading pixels."});
         });
     }
 
@@ -299,23 +326,17 @@ export class Contract {
     Events that are being used:
         Alerts
     */
-    listenForResults(key, callback) {
-        this.listeners[key] = callback;
+    listenForResults(listener, key, callback) {
+        this.listeners[listener][key] = callback;
     }
 
-    stopListeningForResults(key) {
-        delete this.listeners[key];
+    stopListeningForResults(listener, key) {
+        delete this.listeners[listener][key];
     }
 
-    sendResults(result, include = [], exclude = []) {
-        Object.keys(this.listeners).map((i) => {
-            for (let b = 0; b < Math.max(exclude.length, include.length); b++) {
-                if (include.length > b && include[b] !== i)
-                    return;
-                if (exclude.length > b && exclude[b] === i)
-                    return;
-            }
-            this.listeners[i](result);
+    sendResults(listener, result) {
+        Object.keys(this.listeners[listener]).map((i) => {
+            this.listeners[listener][i](result);
         });
     }
 

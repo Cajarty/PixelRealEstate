@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import * as Const from '../../const/const.jsx';
-import {EVENTS, ctr, Contract} from '../../contract/contract.jsx';
+import {EVENTS, ctr, Contract, LISTENERS} from '../../contract/contract.jsx';
+import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 import * as Func from '../../functions/functions.jsx';
 import Axios from '../../network/Axios.jsx';
 import * as Compress from 'lzwcompress';
@@ -19,15 +20,12 @@ class ZoomCanvas extends Component {
             hoverX: 0,
             hoverY: 0,
             hideCanvas: true,
+            queuedUpdates: [],
         }
         this.setCanvasProperty = this.setCanvasProperty.bind(this);
     }
 
     componentWillReceiveProps(newProps) {
-        if (newProps.pixelDataUpdateVersion > this.props.pixelDataUpdateVersion && newProps.pixelData != null) {
-            this.setCanvas(newProps.pixelData);
-            ctr.setupEvents();
-        }
         this.drawWindow(newProps.x, newProps.y);
     }
 
@@ -65,18 +63,36 @@ class ZoomCanvas extends Component {
         //ctx.scale(10, 10);
         this.setState({ ctx, dataCtx });
 
+        ctr.listenForResults(LISTENERS.ServerDataManagerInit, 'canvasZoom', (results) => {
+            if (results.imageLoaded) {
+                this.setCanvas(SDM.pixelData);
+                for (let i in this.state.queuedUpdates) {
+                    this.setCanvasProperty(this.state.queuedUpdates[i].x, this.state.queuedUpdates[i].y, this.state.queuedUpdates[i].colors);
+                }
+            }
+        });
+
         ctr.listenForEvent(EVENTS.PropertyColorUpdate, 'canvasZoom', (data) => {
-            let xy = {x: 0, y: 0};
+            let xy = {x: 0, y: 0, colors: []};
             if (data.args.x == null || data.args.y == null)
                 xy = ctr.fromID(Func.BigNumberToNumber(data.args.property));
             else {
                 xy.x = data.args.x;
                 xy.y = data.args.y;
             }
+
             if (data.args.colorsRGB == null)
-                this.setCanvasProperty(xy.x, xy.y, Func.ContractDataToRGBAArray(data.args.colors));
+                xy.colors = Func.ContractDataToRGBAArray(data.args.colors);
             else
-                this.setCanvasProperty(xy.x, xy.y, data.args.colorsRGB);
+                xy.colors = data.args.colorsRGB;
+
+            if (this.state.canvasLoaded) 
+                this.setCanvasProperty(xy.x, xy.y, Func.ContractDataToRGBAArray(data.args.colors));
+            else {
+                let update = this.state.queuedUpdates;
+                update.push(xy);
+                this.setState({queuedUpdates: update});
+            }
         });
     }
 

@@ -4,6 +4,7 @@ import PropertiesOwned from '../ui/PropertiesOwned.jsx';
 import Pullout from '../ui/Pullout';
 import PulloutTab from '../ui/PulloutTab';
 import * as Assets from '../../const/assets.jsx';
+import PropertiesForSale from '../ui/PropertiesForSale';
 // import PixelsRented from '../ui/PixelsRented.jsx';
 // import PixelsForSale from '../ui/PixelsForSale.jsx';
 // import PixelsForRent from '../ui/PixelsForRent.jsx';
@@ -22,19 +23,15 @@ class ManagePanel extends Component {
                             <PixelDescriptionBox
                                 x={this.props.clickX}
                                 y={this.props.clickY}
-                                color={'FF0000'}
-                                owner={'myself'}
-                                forSale={0}
-                                forRent={0}
                             ></PixelDescriptionBox>
                         </PulloutTab>
                         <PulloutTab icon={Assets.ICON_MONEY} tabName='Owned'>
                             <PropertiesOwned/>
                         </PulloutTab>
-                        <PulloutTab icon={Assets.ICON_MONEY} tabName='View Coin Offers'>
-                            
+                        <PulloutTab icon={Assets.ICON_MONEY} tabName='Property Market'>
+                            <PropertiesForSale/>
                         </PulloutTab>
-                        <PulloutTab icon={Assets.ICON_MONEY} tabName='View Sell Offers'>
+                        <PulloutTab icon={Assets.ICON_MONEY} tabName='Coin Market'>
                             
                         </PulloutTab>
                     </Pullout>

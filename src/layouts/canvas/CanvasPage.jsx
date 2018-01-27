@@ -2,12 +2,13 @@ import React, { Component } from 'react'
 import Canvas from './Canvas.jsx'
 import ManagePanel from './ManagePanel.jsx'
 import ActionPanel from './ActionPanel.jsx'
-import {Contract, ctr} from '../../contract/contract.jsx';
+import {Contract, ctr, LISTENERS, EVENTS} from '../../contract/contract.jsx';
 import PropertySalesLog from '../ui/PropertySalesLog';
 import ErrorBox from '../ErrorBox';
 import ZoomCanvas from './ZoomCanvas';
 import Axios from '../../network/Axios.jsx';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
+import TimeAgo from 'react-timeago';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -19,24 +20,44 @@ class CanvasPage extends Component {
             clickY: '',
             pixelDataUpdateVersion: 0,
             pixelData: null,
+            loadingPPC: true,
+            PPCOwned: 0,
         }
     }
 
     componentDidMount() {
-        this.loadCanvas();
-        SDM.requestServerData();
-    }
-    
-
-    loadCanvas() {
-        let cancelToken = null;
-        Axios.getInstance().get('/getPixelData', cancelToken).then((result) => {
+        SDM.init();
+        ctr.listenForResults(LISTENERS.CoordinateUpdate, 'coordinateUpdate', (data) => {
             this.setState({
-                pixelData: result.data,
-                pixelDataUpdateVersion: this.state.pixelDataUpdateVersion + 1
+                clickX: data.x,
+                clickY: data.y
             });
         });
-        this.setState({cancelToken: cancelToken});
+        ctr.getBalance((balance) => {
+            this.setState({PPCOwned: balance, loadingPPC: false});
+        });
+        ctr.listenForEvent(EVENTS.Transfer, 'CanvasPagePPCListener', (data) => {
+            if (data.args._from === ctr.account || data.args._to === ctr.account) {
+                this.setState({loadingPPC: true});
+                ctr.getBalance((balance) => {
+                    this.setState({PPCOwned: balance, loadingPPC: false});
+                });
+            }
+        });
+        ctr.listenForEvent(EVENTS.PropertyColorUpdate, 'CanvasPagePPCListener', (data) => {
+            if (data.args.lastUpdaterPayee != null && data.args.lastUpdaterPayee === ctr.account) {
+                this.setState({loadingPPC: true});
+                ctr.getBalance((balance) => {
+                    this.setState({PPCOwned: balance, loadingPPC: false});
+                });
+            }
+        });
+    }
+
+    componentWillUnmount() {
+        ctr.stopListeningForResults(LISTENERS.CoordinateUpdate, 'coordinateUpdate');
+        ctr.stopListeningForEvent(EVENTS.Transfer, 'CanvasPagePPCListener');
+        ctr.stopListeningForEvent(EVENTS.PropertyColorUpdate, 'CanvasPagePPCListener');
     }
 
     canvasHover(x, y) {
@@ -46,16 +67,12 @@ class CanvasPage extends Component {
         });
     }
 
-    canvasClick(x, y) {
-        this.setState({
-            clickX: x, 
-            clickY: y
-        });
-    }
-
     render() {
         return (
             <div>
+                <div className='banner'>
+                    PPC Owned: {this.state.PPCOwned}{this.state.loadingPPC ? ' LOADING' : ''}
+                </div>
                 <div className='top'>
                         <ManagePanel
                             clickX={this.state.clickX}
@@ -66,25 +83,20 @@ class CanvasPage extends Component {
                             <ZoomCanvas 
                                 x={this.state.hoverX} 
                                 y={this.state.hoverY}
-                                pixelData={this.state.pixelData} 
-                                pixelDataUpdateVersion={this.state.pixelDataUpdateVersion} 
                             />
                         </div>
                     </div>
                     <div className='center'>
                         <Canvas 
-                            pixelData={this.state.pixelData} 
-                            pixelDataUpdateVersion={this.state.pixelDataUpdateVersion} 
                             hover={(x, y) => this.canvasHover(x, y)}
-                            click={(x, y) => this.canvasClick(x, y)}
                         />
                     </div>
                     <div className='right'>
-                    </div>
                         <ActionPanel
                             clickX={this.state.clickX}
                             clickY={this.state.clickY}
                         />
+                    </div>
                 </div>
                 <div className='middle-top'>
                     <ErrorBox/>

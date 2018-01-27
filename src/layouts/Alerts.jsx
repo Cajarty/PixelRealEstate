@@ -11,7 +11,7 @@ class Alerts extends Component {
     }
 
     componentDidMount() {
-        ctr.listenForResults(LISTENERS.Alert, this.receiveMessage);
+        ctr.listenForResults(LISTENERS.Alert, 'alerts', this.receiveMessage);
     }
 
     componentWillUnmount() {

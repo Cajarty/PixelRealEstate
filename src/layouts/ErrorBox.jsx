@@ -13,7 +13,7 @@ class ErrorBox extends Component {
     }
 
     componentDidMount() {
-        ctr.listenForResults(LISTENERS.Error, this.receiveMessage);
+        ctr.listenForResults(LISTENERS.Error,  'error', this.receiveMessage);
     }
 
     componentWillUnmount() {

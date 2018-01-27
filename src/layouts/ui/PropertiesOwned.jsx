@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import {Contract, ctr, EVENTS} from '../../contract/contract.jsx';
+import {Contract, ctr, EVENTS, LISTENERS} from '../../contract/contract.jsx';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
-import TimeAgo from 'react-timeago';
+import Timestamp from 'react-timestamp';
 
 class PropertiesOwned extends Component {
     constructor(props) {
@@ -10,12 +10,16 @@ class PropertiesOwned extends Component {
 
     componentDidMount() {
         ctr.listenForEvent(EVENTS.PropertyBought, 'PropertiesOwned', (data) => {
-            console.info(data);
+            this.forceUpdate();
         });
     }
 
     componentWillUnmount() {
         ctr.stopListeningForEvent(EVENTS.PropertyBought, 'PropertiesOwned');
+    }
+
+    propertySelected(x, y) {
+        ctr.sendResults(LISTENERS.CoordinateUpdate, {x, y});
     }
 
     render() {
@@ -32,26 +36,28 @@ class PropertiesOwned extends Component {
                         </tr>
                     </thead>
                 </table>
-                <table id='data'>
-                    <tbody>
-                        {Object.keys(SDM.ownedProperties).map((x) =>
-                            {return Object.keys(SDM.ownedProperties[x]).map((y) => 
-                                <tr key={x * 100 + y}>
-                                    <td style={{width: '10%'}}>{x}</td>
-                                    <td style={{width: '10%'}}>{y}</td>
-                                    <td style={{width: '20%'}}>{SDM.ownedProperties[x][y].isForSale ? 'Yes' : 'No'}</td>
-                                    <td style={{width: '20%'}}>{SDM.ownedProperties[x][y].isInPrivate ? 'Yes' : 'No'}</td>
-                                    <td style={{width: '40%'}}>
-                                        {SDM.ownedProperties[x][y].lastColorUpdate == 0 ? 
-                                            'Never' 
-                                            : <TimeAgo date={SDM.ownedProperties[x][y].lastColorUpdate}/>
-                                        }
-                                    </td>
-                                </tr>
+                <div className='tableData'>
+                    <table className='data'>
+                        <tbody>
+                            {Object.keys(SDM.ownedProperties).map((x) =>
+                                {return Object.keys(SDM.ownedProperties[x]).map((y) => 
+                                    <tr key={x * 100 + y} onClick={() => this.propertySelected(x, y)}>
+                                        <td style={{width: '10%'}}>{x}</td>
+                                        <td style={{width: '10%'}}>{y}</td>
+                                        <td style={{width: '20%'}}>{SDM.ownedProperties[x][y].isForSale ? 'Yes' : 'No'}</td>
+                                        <td style={{width: '20%'}}>{SDM.ownedProperties[x][y].isInPrivate ? 'Yes' : 'No'}</td>
+                                        <td style={{width: '40%'}}>
+                                            {SDM.ownedProperties[x][y].lastUpdate == null || SDM.ownedProperties[x][y].lastUpdate == 0 ? 
+                                                'Never' 
+                                                : <Timestamp time={SDM.ownedProperties[x][y].lastUpdate}/>
+                                            }
+                                        </td>
+                                    </tr>
+                                )}
                             )}
-                        )}
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         );
     }

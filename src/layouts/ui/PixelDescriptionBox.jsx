@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {Contract, ctr} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions.jsx';
+import Timestamp from 'react-timestamp';
 
 class PixelDescriptionBox extends Component {
     constructor(props) {
@@ -19,13 +20,15 @@ class PixelDescriptionBox extends Component {
     }
 
     componentWillReceiveProps(newProps) {
-        let update = {};
+        let update = {x: this.state.x, y: this.state.y};
         Object.keys(newProps).map((i) => {
             if (newProps[i] != this.props[i])
                 update[i] = newProps[i];
         })
-        if (update.x != null || update.y != null)
-            this.loadProperty(newProps.x, newProps.y);
+        
+        //update property view if new area clicked
+        if (newProps.x != null || newProps.y != null)
+            this.loadProperty(update.x, update.y);
         this.setState(update);
     }
 
@@ -37,13 +40,13 @@ class PixelDescriptionBox extends Component {
         let dataCtx = this.dataCanvas.getContext('2d');
         dataCtx.imageSmoothingEnabled = false;
         dataCtx.webkitImageSmoothingEnabled = false;
-        if (this.props.x != null && this.props.y != -1 && this.props.x != null && this.props.y != -1) 
+        if (this.props.x != null && this.props.x != -1 && this.props.y != null && this.props.y != -1) 
             this.loadProperty(this.props.x, this.props.y);
         this.setState({
             ctx, 
             dataCtx,
-            valueX: this.props.valueX,
-            valueY: this.props.valueY,
+            x: this.props.x,
+            y: this.props.y,
         });
     }
 
@@ -74,7 +77,7 @@ class PixelDescriptionBox extends Component {
                 owner: data[0],
                 isForSale: price != 0,
                 salePrice: price,
-                lastColorUpdate: 0, //deal with this: with timestamp for since last time ::: data[2]
+                lastUpdate: data[2], //deal with this: with timestamp for since last time ::: data[2]
                 isInPrivate: data[3],
             })
         });
@@ -116,7 +119,7 @@ class PixelDescriptionBox extends Component {
                         ) : null}
                         <tr>
                             <th>Last Color Change</th>
-                            <td>{this.state.lastColorUpdate}</td>
+                            <td>{this.state.lastUpdate == 0 ? 'Never' : <Timestamp time={this.state.lastUpdate}/>}</td>
                         </tr>
                         <tr>
                             <th>Is Private</th>

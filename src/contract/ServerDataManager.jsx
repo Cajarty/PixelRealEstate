@@ -1,33 +1,139 @@
-import {ctr, Contract} from './contract.jsx';
+import {ctr, Contract, EVENTS, LISTENERS} from './contract.jsx';
 import Axios from '../network/Axios.jsx';
+import * as Func from '../functions/functions.jsx';
 
 export class ServerDataManager {
     constructor() {
+        //pixel data
+        this.pixelData = [];
+
         //stored data
         this.allProperties = {};
         this.forSaleProperties = {};
         this.ownedProperties = {};
 
         //for network requests
-        this.cancelToken = null;
+        this.cancelDataRequestToken = null;
+        this.cancelImageRequestToken = null;
+    }
+
+    destructor() {
+
+        ctr.stopListeningForEvent(EVENTS.PropertyColorUpdate, 'SDM-PropertyColorUpdate');
+        ctr.stopListeningForEvent(EVENTS.PropertyColorUpdatePixel, 'SDM-PropertyColorUpdatePixel');
+        ctr.stopListeningForEvent(EVENTS.PropertyBought, 'SDM-PropertyBought');
+        ctr.stopListeningForEvent(EVENTS.SetUserHoverText, 'SDM-SetUserHoverText');
+        ctr.stopListeningForEvent(EVENTS.SetUserSetLink, 'SDM-SetUserSetLink');
+        ctr.stopListeningForEvent(EVENTS.PropertySetForSale, 'SDM-PropertySetForSale');
+        ctr.stopListeningForEvent(EVENTS.DelistProperty, 'SDM-DelistProperty');
+        ctr.stopListeningForEvent(EVENTS.ListTradeOffer, 'SDM-ListTradeOffer');
+        ctr.stopListeningForEvent(EVENTS.AcceptTradeOffer, 'SDM-AcceptTradeOffer');
+        ctr.stopListeningForEvent(EVENTS.CancelTradeOffer, 'SDM-CancelTradeOffer');
+        ctr.stopListeningForEvent(EVENTS.SetPropertyPublic, 'SDM-SetPropertyPublic');
+        ctr.stopListeningForEvent(EVENTS.SetPropertyPrivate, 'SDM-SetPropertyPrivate');
+    }
+
+    setupEvents() {
+        ctr.listenForEvent(EVENTS.PropertyColorUpdate, 'SDM-PropertyColorUpdate', (data) => {
+            console.info(data);
+            let xy = {x: 0, y: 0};
+            if (data.args.x == null || data.args.y == null)
+                xy = ctr.fromID(Func.BigNumberToNumber(data.args.property));
+            else {
+                xy.x = data.args.x;
+                xy.y = data.args.y;
+            }
+            if (data.args.colorsRGB == null)
+                this.insertPropertyImage(xy.x, xy.y, Func.ContractDataToRGBAArray(data.args.colors));
+            else
+                this.insertPropertyImage(xy.x, xy.y, data.args.colorsRGB);
+        });
+
+        ctr.listenForEvent(EVENTS.PropertyColorUpdatePixel, 'SDM-PropertyColorUpdatePixel', (data) => {
+            this.insertProperty(data.args);
+            this.organizeProperty(data.args);
+        });
+        ctr.listenForEvent(EVENTS.PropertyBought, 'SDM-PropertyBought', (data) => {
+            let pos = ctr.fromID(Func.BigNumberToNumber(data.args.property));
+            this.updateProperty(pos.x, pos.y, {owner: data.args.newOwner});
+            this.organizeProperty(pos.x, pos.y);
+        });
+        ctr.listenForEvent(EVENTS.SetUserHoverText, 'SDM-SetUserHoverText', (data) => {
+        });
+        ctr.listenForEvent(EVENTS.SetUserSetLink, 'SDM-SetUserSetLink', (data) => {
+        });
+        ctr.listenForEvent(EVENTS.PropertySetForSale, 'SDM-PropertySetForSale', (data) => {
+            let pos = ctr.fromID(Func.BigNumberToNumber(data.args.property));
+            this.updateProperty(pos.x, pos.y, {isForSale: true});
+            this.organizeProperty(pos.x, pos.y);
+        });
+        ctr.listenForEvent(EVENTS.DelistProperty, 'SDM-DelistProperty', (data) => {
+            this.insertProperty(data.args);
+            this.organizeProperty(data.args);
+        });
+        ctr.listenForEvent(EVENTS.ListTradeOffer, 'SDM-ListTradeOffer', (data) => {
+            this.insertProperty(data.args);
+            this.organizeProperty(data.args);
+        });
+        ctr.listenForEvent(EVENTS.AcceptTradeOffer, 'SDM-AcceptTradeOffer', (data) => {
+            this.insertProperty(data.args);
+            this.organizeProperty(data.args);
+        });
+        ctr.listenForEvent(EVENTS.CancelTradeOffer, 'SDM-CancelTradeOffer', (data) => {
+            this.insertProperty(data.args);
+            this.organizeProperty(data.args);
+        });
+        ctr.listenForEvent(EVENTS.SetPropertyPublic, 'SDM-SetPropertyPublic', (data) => {
+            this.insertProperty(data.args);
+            this.organizeProperty(data.args);
+        });
+        ctr.listenForEvent(EVENTS.SetPropertyPrivate, 'SDM-SetPropertyPrivate', (data) => {
+            this.insertProperty(data.args);
+            this.organizeProperty(data.args);
+        });
+    }
+
+    init() {
+        this.requestServerImage((imageResult) => {
+            this.requestServerData((dataResult) => {
+                this.setupEvents();
+                ctr.sendResults(LISTENERS.ServerDataManagerInit, {imageLoaded: imageResult, dataLoaded: dataResult});
+            });
+        });
     }
 
     /*
     Returns true/false on success/fail of the load.
     */
-    requestServerData() {
-        let cancelToken = null;
-        Axios.getInstance().get('/getPropertyData', cancelToken).then((result) => {
+    requestServerData(resultCallback) {
+        Axios.getInstance().get('/getPropertyData', this.cancelDataRequestToken).then((result) => {
             if (result.status == 200 && typeof result.data === 'object') {
                 this.allProperties = result.data;
                 this.organizeAllProperties();
-                console.info(this);
-                return true;
+                resultCallback(true);
             } else {
-                return false;
+                resultCallback(false);
             }
         });
-        this.cancelToken = cancelToken;
+    }
+
+    requestServerImage(resultCallback) {
+        Axios.getInstance().get('/getPixelData', this.cancelImageRequestToken).then((result) => {
+            if (result.status == 200) {
+                this.pixelData = result.data;
+                resultCallback(true);
+            } else {
+                resultCallback(false);
+            }
+        });
+    }
+
+    insertPropertyImage(xx, yy, RGBArray) {
+        let counter = 0;
+        for (let y = yy * 10; y < (yy + 1) * 10; y++)
+            for (let x = xx * 10; x < (xx + 1) * 10; x++)
+                for (let i = 0; i < 4; i++)
+                    this.pixelData[y * 4000 + x * 4 + i] = RGBArray[counter++];
     }
 
     /*
@@ -40,7 +146,7 @@ export class ServerDataManager {
             if (this.allProperties[x] != null)
                 for (let y = 0; y < 100; y++) {
                     if (this.allProperties[x][y] != null)
-                        this.organizeProperty(x, y, this.allProperties[x][y]);
+                        this.organizeProperty(x, y);
                 }
         }
     }
@@ -48,28 +154,49 @@ export class ServerDataManager {
     /*
     Updates the other data depending if it applies.
     */
-    organizeProperty(x, y, property) {
+    organizeProperty(x, y) {
+        if (this.allProperties[x][y] == null)
+            return;
 
-        if (ctr.account === property.owner) {
+
+        if (ctr.account === this.allProperties[x][y].owner) {
             if (this.ownedProperties[x] == null)
                 this.ownedProperties[x] = {};
-            this.ownedProperties[x][y] = property;
+            this.ownedProperties[x][y] = this.allProperties[x][y];
+        } else {
+            if (this.ownedProperties[x] != null && this.ownedProperties[x][y] != null) {
+                delete this.ownedProperties[x][y];
+            }
         }
 
-        if (property.isForSale) {
+        if (this.allProperties[x][y].isForSale) {
             if (this.forSaleProperties[x] == null)
                 this.forSaleProperties[x] = {};
-            this.forSaleProperties[x][y] = property;
+            this.forSaleProperties[x][y] = this.allProperties[x][y];
+        } else {
+            if (this.forSaleProperties[x] != null && this.forSaleProperties[x][y] != null) {
+                delete this.forSaleProperties[x][y];
+            }
         }
+    }
+
+    /*
+    Updates a property at a location with the new passed in data.
+    */
+    updateProperty(x, y, update) {
+        if (this.allProperties[x] == null) {
+            this.allProperties[x] = {};
+        }
+        this.allProperties[x][y] = Object.assign({}, this.allProperties[x][y] || {}, update);
     }
 
     /*
     Puts a new property or update on the main list into it.
     */
-    insertProperty(property) {
-        if (this.allProperties[property.x] == null)
-            this.allProperties[property.x] = {};
-        this.allProperties[property.x][property.y] = property;
+    insertProperty(x, y, property) {
+        if (this.allProperties[x] == null)
+            this.allProperties[x] = {};
+        this.allProperties[x][y] = property;
     }
 }
 

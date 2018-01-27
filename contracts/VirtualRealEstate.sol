@@ -89,7 +89,7 @@ contract VirtualRealEstate is StandardToken {
     uint256 PROPERTY_GENERATES_PER_HOUR = 2;
     uint256 FREE_COLOR_SETTING_UNTIL;
     
-    event PropertyColorUpdate(uint24 indexed property, uint256[10] colors, address propertyOwnerPayee, address lastUpdaterPayee);
+    event PropertyColorUpdate(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address lastUpdaterPayee);
     event PropertyColorUpdatePixel(uint24 indexed property, uint8 row, uint24 rgb);
     event PropertyBought(uint24 indexed property,  address newOwner);
     event SetUserHoverText(address indexed user, bytes32[2] newHoverText);
@@ -132,7 +132,7 @@ contract VirtualRealEstate is StandardToken {
     function VirtualRealEstate() public {
         owner = msg.sender;
         totalSupply = 0;
-        FREE_COLOR_SETTING_UNTIL = now;//+ 1 days
+        FREE_COLOR_SETTING_UNTIL = now + 1 days;
         pricePPC = 10;
         priceETH = 10000;//1000000000000000000; //0.001 ETH
     }
@@ -225,8 +225,9 @@ contract VirtualRealEstate is StandardToken {
         property.colors = newColors;
         property.lastUpdater = msg.sender;
         property.lastUpdate = now;
+        uint256 timeUpdate = now;
         
-        PropertyColorUpdate(propertyID, newColors, propertyOwnerPayee, lastUpdaterPayee);
+        PropertyColorUpdate(propertyID, newColors, timeUpdate, lastUpdaterPayee);
         
         return true;
     }

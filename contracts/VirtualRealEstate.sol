@@ -152,31 +152,11 @@ contract VirtualRealEstate is StandardToken {
             return (0, property.salePrice);
         }
     }
-    
-    function getHoverText(uint24 propertyID) public validPropertyID(propertyID) view returns(bytes32[2]) {
-        Property storage property = map[propertyID];
-        
-        //Must have a owner or renter, and that owner/renter must have a short or long hover text
-        if (property.isInPrivateMode) {
-            require(property.owner != 0);
-            return ownerHoverText[property.owner];
-        } else {
-            require(property.lastUpdater != 0);
-            return ownerHoverText[property.lastUpdater];
-        }
+    function getHoverText(address user) public view returns(bytes32[2]) {
+        return ownerHoverText[user];
     }
-    
-    function getLink(uint24 propertyID) public validPropertyID(propertyID) view returns(bytes32[2]) {
-        Property storage property = map[propertyID];
-        
-        //Must have a owner or renter, and that owner/renter must have a short or long hover text
-        if (property.isInPrivateMode) {
-            require(property.owner != 0);
-            return ownerLink[property.owner];
-        } else {
-            require(property.lastUpdater != 0);
-            return ownerLink[property.lastUpdater];
-        }
+    function getLink(address user) public view returns(bytes32[2]) {
+        return ownerLink[user];
     }
     
     function getPropertyColors(uint24 propertyID) public validPropertyID(propertyID) view returns(uint256[10]) {
@@ -440,9 +420,9 @@ contract VirtualRealEstate is StandardToken {
         require(ppcValue != 0);
         
         uint256 ppcLeft = pricePPC - ppcValue;
-        uint256 ethleft = priceETH / ppcValue * ppcLeft;
+        uint256 ethLeft = priceETH / pricePPC * ppcLeft;
         
-        require(msg.value >= ethleft);
+        require(msg.value >= ethLeft);
     
         balances[owner] += ppcValue;
         uint256 minPercent = pricePPC * PRICE_PPC_MIN_PERCENT / 100;

@@ -33,7 +33,6 @@ contract('VirtualRealEstate', function(accounts) {
     });
   });
   //??#Can't purchase someone elses owned one
-  //#All 10000 can be purchased
   it("After a sale, ownership changes", function() {
     return VirtualRealEstate.deployed().then(function(instance) {
       pixelPropertyInstance = instance;
@@ -52,7 +51,6 @@ contract('VirtualRealEstate', function(accounts) {
     });
   });
   //?#Money from initial property sale goes to contract owner
-  
   it("After a sale occurs, money goes to the old owner of a property", function() {
     return VirtualRealEstate.deployed().then(function(instance) {
       pixelPropertyInstance = instance;
@@ -129,8 +127,25 @@ contract('VirtualRealEstate', function(accounts) {
       assert.equal(propertyData[0], accounts[0], "Should be owned by account 0" );
     });
   });
+  it("User5 can buy a property with some PPC and some ETH", function() {
+    return VirtualRealEstate.deployed().then(function(instance) {
+      pixelPropertyInstance = instance;
+      return pixelPropertyInstance.getForSalePrices(75, {from: accounts[5]});
+    }).then(function(prices) {
+      assert.equal(prices[0] > 0, true, "ETH price should be set for default property purchase");
+      assert.equal(prices[1] > 0, true, "PPC price should be set for default property purchase");
+      console.log(prices);
+      initialPricesForPPCETHBuy = prices;
+      return pixelPropertyInstance.addCoin(accounts[5], prices[1] / 2, {from: accounts[5]});
+    }).then(function() {
+      return pixelPropertyInstance.buyProperty(75, initialPricesForPPCETHBuy[1] / 2, { from: accounts[5], value: initialPricesForPPCETHBuy[0]})
+    }).then(function() {
 
-
+    });
+  });
+  it("Purchasing with ETH increases ETH price, PPC increases PPC, and partial buy (30% PPC 70% ETH) raises price appropriately (30% for PPC, 70% for ETH)", function() {
+    
+  });
   
   //####SETTING COLOR & COIN DISTRIBUTION####
   //#Changing the colour pays out 2 coins per hour to the last person who changed the colour for unpurchased properties
@@ -232,7 +247,7 @@ contract('VirtualRealEstate', function(accounts) {
     }).then(function() {
       return pixelPropertyInstance.setColors(0, [1,2,3,4,5,6,7,8,9,10], {  from: accounts[0] })
     }).then(function(setText) {
-      return pixelPropertyInstance.getHoverText(0, { from: accounts[0] });
+      return pixelPropertyInstance.getHoverText(accounts[0], { from: accounts[0] });
     }).then(function(hoverText) {
       assert.equal(hoverText[0], 0x5000000000000000000000000000000000000000000000000000000000000000, "Should say 0x500.. since user updated it to 0x5");
       assert.equal(hoverText[1], 0x6000000000000000000000000000000000000000000000000000000000000000, "Should say 0x600.. since user updated it to 0x6");
@@ -243,7 +258,7 @@ contract('VirtualRealEstate', function(accounts) {
       pixelPropertyInstance = instance;
       return pixelPropertyInstance.setLink([0x1,0x2], { from: accounts[0] });
     }).then(function(setText) {
-      return pixelPropertyInstance.getLink(0, { from: accounts[0] });
+      return pixelPropertyInstance.getLink(accounts[0], { from: accounts[0] });
     }).then(function(link) {
       assert.equal(link[0], 0x1000000000000000000000000000000000000000000000000000000000000000, "Should say 0x100.. since user updated it to 0x1");
       assert.equal(link[1], 0x2000000000000000000000000000000000000000000000000000000000000000, "Should say 0x200.. since user updated it to 0x2");
@@ -252,13 +267,13 @@ contract('VirtualRealEstate', function(accounts) {
   it("A user can change their hover text", function() {
     return VirtualRealEstate.deployed().then(function(instance) {
       pixelPropertyInstance = instance;
-      return pixelPropertyInstance.getHoverText(0, { from: accounts[0] });
+      return pixelPropertyInstance.getHoverText(accounts[0], { from: accounts[0] });
     }).then(function(hoverText) {
       assert.equal(hoverText[0], 0x5000000000000000000000000000000000000000000000000000000000000000, "Should say 0x500 from last test");
       assert.equal(hoverText[1], 0x6000000000000000000000000000000000000000000000000000000000000000, "Should say 0x600 from last test");
       return pixelPropertyInstance.setHoverText([0x7,0x8], { from: accounts[0] });
     }).then(function(setText) {
-      return pixelPropertyInstance.getHoverText(0, { from: accounts[0] });
+      return pixelPropertyInstance.getHoverText(accounts[0], { from: accounts[0] });
     }).then(function(hoverText) {
       assert.equal(hoverText[0], 0x7000000000000000000000000000000000000000000000000000000000000000, "Should say 0x700.. since user updated it to 0x7");
       assert.equal(hoverText[1], 0x8000000000000000000000000000000000000000000000000000000000000000, "Should say 0x800.. since user updated it to 0x8");
@@ -267,63 +282,16 @@ contract('VirtualRealEstate', function(accounts) {
   it("A user can change their link text", function() {
     return VirtualRealEstate.deployed().then(function(instance) {
       pixelPropertyInstance = instance;
-      return pixelPropertyInstance.getLink(0, { from: accounts[0] });
+      return pixelPropertyInstance.getLink(accounts[0], { from: accounts[0] });
     }).then(function(link) {
       assert.equal(link[0], 0x1000000000000000000000000000000000000000000000000000000000000000, "Should say 0x100 from last test");
       assert.equal(link[1], 0x2000000000000000000000000000000000000000000000000000000000000000, "Should say 0x200 from last test");
       return pixelPropertyInstance.setLink([0x2,0x3], { from: accounts[0] });
     }).then(function(setLink) {
-      return pixelPropertyInstance.getLink(0, { from: accounts[0] });
+      return pixelPropertyInstance.getLink(accounts[0], { from: accounts[0] });
     }).then(function(link) {
       assert.equal(link[0], 0x2000000000000000000000000000000000000000000000000000000000000000, "Should say 0x200.. since user updated it to 0x2");
       assert.equal(link[1], 0x3000000000000000000000000000000000000000000000000000000000000000, "Should say 0x300.. since user updated it to 0x3");
-    });
-  });
-  it("A property's hover text is the owners if in private mode", function() {
-    return VirtualRealEstate.deployed().then(function(instance) {
-      pixelPropertyInstance = instance;
-      return pixelPropertyInstance.addCoin(accounts[1], 10000);
-    }).then(function(s) {
-      return pixelPropertyInstance.setColors(0, [1,2,3,4,5,6,7,8,9,10], {  from: accounts[1] }) //Make the last updater not the owner
-    }).then(function(s) {
-      return pixelPropertyInstance.setPropertyMode(0, true, 1, { from: accounts[0] }); //Put it in private mode
-    }).then(function(hoverText) {
-      return pixelPropertyInstance.setHoverText([0x7,0x8], { from: accounts[0] });
-    }).then(function(setText) {
-      return pixelPropertyInstance.getHoverText(0, { from: accounts[0] });
-    }).then(function(hoverText) {
-      assert.equal(hoverText[0], 0x7000000000000000000000000000000000000000000000000000000000000000, "Should say 0x700.. since user updated it to 0x7");
-      assert.equal(hoverText[1], 0x8000000000000000000000000000000000000000000000000000000000000000, "Should say 0x800.. since user updated it to 0x8");
-    });
-  });
-  it("A property's link is the owners if in private mode", function() {
-    return VirtualRealEstate.deployed().then(function(instance) {
-      pixelPropertyInstance = instance;
-      return pixelPropertyInstance.setPropertyMode(0, true, 1, { from: accounts[0] }); //Put it in private mode
-    }).then(function(link) {
-      return pixelPropertyInstance.setLink([0x7,0x8], { from: accounts[0] });
-    }).then(function(link) {
-      return pixelPropertyInstance.getLink(0, { from: accounts[0] });
-    }).then(function(link) {
-      assert.equal(link[0], 0x7000000000000000000000000000000000000000000000000000000000000000, "Should say 0x700.. since user updated it to 0x7");
-      assert.equal(link[1], 0x8000000000000000000000000000000000000000000000000000000000000000, "Should say 0x800.. since user updated it to 0x8");
-    });
-  });
-  it("A property's hover text is the last-updater if in free use mode", function() {
-    return VirtualRealEstate.deployed().then(function(instance) {
-      pixelPropertyInstance = instance;
-      return pixelPropertyInstance.addCoin(accounts[1], 10000);
-    }).then(function(s) {
-      return pixelPropertyInstance.setPropertyMode(0, false, 0, { from: accounts[0] }); //Put it in private mode
-    }).then(function(s) {
-      return pixelPropertyInstance.setColors(0, [1,2,3,4,5,6,7,8,9,10], {  from: accounts[1] }) //Make the last updater not the owner
-    }).then(function(hoverText) {
-      return pixelPropertyInstance.setHoverText([0x9,0x2], { from: accounts[1] });
-    }).then(function(setText) {
-      return pixelPropertyInstance.getHoverText(0, { from: accounts[0] });
-    }).then(function(hoverText) {
-      assert.equal(hoverText[0], 0x9000000000000000000000000000000000000000000000000000000000000000, "Should say 0x900.. since user updated it to 0x9");
-      assert.equal(hoverText[1], 0x2000000000000000000000000000000000000000000000000000000000000000, "Should say 0x200.. since user updated it to 0x2");
     });
   });
 

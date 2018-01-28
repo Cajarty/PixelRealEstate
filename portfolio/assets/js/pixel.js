@@ -1,164 +1,208 @@
 $(function() {
 
     var p = [
-        [1,1,1,1,1,0],
-        [1,1,0,0,1,1],
-        [1,1,0,0,1,1],
-        [1,1,1,1,1,0],
-        [1,1,0,0,0,0],
-        [1,1,0,0,0,0],
-        [1,1,0,0,0,0]
+        [0,0,0,0,0,0,0,0],
+        [0,1,1,1,1,1,0,0],
+        [0,1,1,0,0,1,1,0],
+        [0,1,1,0,0,1,1,0],
+        [0,1,1,1,1,1,0,0],
+        [0,1,1,0,0,0,0,0],
+        [0,1,1,0,0,0,0,0],
+        [0,1,1,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
     ];
     var i = [
-        [1,1,1,1],
-        [0,1,1,0],
-        [0,1,1,0],
-        [0,1,1,0],
-        [0,1,1,0],
-        [0,1,1,0],
-        [1,1,1,1]
+        [0,0,0,0,0,0],
+        [0,1,1,1,1,0],
+        [0,0,1,1,0,0],
+        [0,0,1,1,0,0],
+        [0,0,1,1,0,0],
+        [0,0,1,1,0,0],
+        [0,0,1,1,0,0],
+        [0,1,1,1,1,0],
+        [0,0,0,0,0,0],
     ];
     var x = [
-        [1,1,0,0,0,1],
-        [1,1,0,0,0,1],
-        [0,1,1,0,1,0],
-        [0,0,1,1,0,0],
-        [0,1,0,1,1,0],
-        [1,0,0,0,1,1],
-        [1,0,0,0,1,1],
+        [0,0,0,0,0,0,0,0],
+        [0,1,1,0,0,0,1,0],
+        [0,1,1,0,0,0,1,0],
+        [0,0,1,1,0,1,0,0],
+        [0,0,0,1,1,0,0,0],
+        [0,0,1,0,1,1,0,0],
+        [0,1,0,0,0,1,1,0],
+        [0,1,0,0,0,1,1,0],
+        [0,0,0,0,0,0,0,0],
     ];
     var e = [
-        [1,1,1,1,1,1],
-        [1,1,0,0,0,0],
-        [1,1,0,0,0,0],
-        [1,1,1,1,1,0],
-        [1,1,0,0,0,0],
-        [1,1,0,0,0,0],
-        [1,1,1,1,1,1],
+        [0,0,0,0,0,0,0,0],
+        [0,1,1,1,1,1,1,0],
+        [0,1,1,0,0,0,0,0],
+        [0,1,1,0,0,0,0,0],
+        [0,1,1,1,1,1,0,0],
+        [0,1,1,0,0,0,0,0],
+        [0,1,1,0,0,0,0,0],
+        [0,1,1,1,1,1,1,0],
+        [0,0,0,0,0,0,0,0],
     ];
     var l = [
-        [1,1,0,0,0,0],
-        [1,1,0,0,0,0],
-        [1,1,0,0,0,0],
-        [1,1,0,0,0,0],
-        [1,1,0,0,0,0],
-        [1,1,0,0,0,0],
-        [1,1,1,1,1,1],
+        [0,0,0,0,0,0,0,0],
+        [0,1,1,0,0,0,0,0],
+        [0,1,1,0,0,0,0,0],
+        [0,1,1,0,0,0,0,0],
+        [0,1,1,0,0,0,0,0],
+        [0,1,1,0,0,0,0,0],
+        [0,1,1,0,0,0,0,0],
+        [0,1,1,1,1,1,1,0],
+        [0,0,0,0,0,0,0,0],
     ];
 
     var r = [
-        [1,1,1,1,1,0],
-        [1,1,0,0,1,1],
-        [1,1,0,0,1,1],
-        [1,1,1,1,1,0],
-        [1,1,0,0,1,1],
-        [1,1,0,0,1,1],
-        [1,1,0,0,1,1]
+        [0,0,0,0,0,0,0,0],
+        [0,1,1,1,1,1,0,0],
+        [0,1,1,0,0,1,1,0],
+        [0,1,1,0,0,1,1,0],
+        [0,1,1,1,1,1,0,0],
+        [0,1,1,0,0,1,1,0],
+        [0,1,1,0,0,1,1,0],
+        [0,1,1,0,0,1,1,0],
+        [0,0,0,0,0,0,0,0],
     ];
 
     var o = [
-        [0,1,1,1,1,0],
-        [1,1,0,0,1,1],
-        [1,1,0,0,1,1],
-        [1,1,0,0,1,1],
-        [1,1,0,0,1,1],
-        [1,1,0,0,1,1],
-        [0,1,1,1,1,0]
+        [0,0,0,0,0,0,0,0],
+        [0,0,1,1,1,1,0,0],
+        [0,1,1,0,0,1,1,0],
+        [0,1,1,0,0,1,1,0],
+        [0,1,1,0,0,1,1,0],
+        [0,1,1,0,0,1,1,0],
+        [0,1,1,0,0,1,1,0],
+        [0,0,1,1,1,1,0,0],
+        [0,0,0,0,0,0,0,0],
     ];
 
     var t = [
-        [1,1,1,1,1,1],
-        [0,0,1,1,0,0],
-        [0,0,1,1,0,0],
-        [0,0,1,1,0,0],
-        [0,0,1,1,0,0],
-        [0,0,1,1,0,0],
-        [0,0,1,1,0,0]
+        [0,0,0,0,0,0,0,0],
+        [0,1,1,1,1,1,1,0],
+        [0,0,0,1,1,0,0,0],
+        [0,0,0,1,1,0,0,0],
+        [0,0,0,1,1,0,0,0],
+        [0,0,0,1,1,0,0,0],
+        [0,0,0,1,1,0,0,0],
+        [0,0,0,1,1,0,0,0],
+        [0,0,0,0,0,0,0,0],
     ];
 
     var y =[
-        [1,1,0,0,0,1],
-        [1,1,0,0,0,1],
-        [0,1,1,0,1,0],
-        [0,0,1,1,0,0],
-        [0,0,1,1,0,0],
-        [0,0,1,1,0,0],
-        [0,0,1,1,0,0]
+        [0,0,0,0,0,0,0,0],
+        [0,1,1,0,0,0,1,0],
+        [0,1,1,0,0,0,1,0],
+        [0,0,1,1,0,1,0,0],
+        [0,0,0,1,1,0,0,0],
+        [0,0,0,1,1,0,0,0],
+        [0,0,0,1,1,0,0,0],
+        [0,0,0,1,1,0,0,0],
+        [0,0,0,0,0,0,0,0],
     ];
 
-    // random colors for animation
-    var colors = ['#f08080', '#eaf651', '#ab6d78', '#ffe5fa', '#ffac99', '#f7bedd', '#d8bef7', '#ddf7be'];
-
-    var word = [p,i,x,e,l,p,r,o,p,e,r,t,y];
-    var gap = 3;
-    var size = 15;
-    var square = '';
-    var x = 0;
-    var y = 0;
-    var svgWidth = 6 * size + (5 * gap) + gap;
+    var divs    = ['#div-pixel','#div-property'];
+    var words   = [[p,i,x,e,l],[p,r,o,p,e,r,t,y]];
+    var gap     = 0;
+    var size    = 12;
+    var size2   = size + 10;
+    var square  = '';
+    var x       = 0;
+    var y       = 0;
+    var svgWidth  = 6 * size + (5 * gap) + gap;
     var svgHeight = 7 * size + (6 * gap) + gap;
 
-    // make svg canvas per word
-    // loop through each letter in word and place rect element where 1
-    for (var i = 0; i < word.length; i++) {
-
-        var svgWidth = word[i][0].length * size + ((word[i][0].length - 1) * gap) + gap;
-        var svgHeight = word[i].length * size + ((word[i].length - 1) * gap) + gap;
-
-        var elementSvg = '<svg xmlns="http://www.w3.org/2000/svg" data-color="' + colors[i] + '" class="svg-letter" id="letter-' 
-            + i + '" width="' + svgWidth + '" height="' + svgHeight + '" style="border:0px solid black; margin:5px;">'
-        $('#div-pixels').append(elementSvg);
-        for (var j = 0; j < word[i].length; j++) {
-            for (var k = 0; k < word[i][j].length; k++) {
-
-                if (word[i][j][k] == 0) {
-                    continue; 
+    // generate shadow pixels first b/c of how svg rects stack
+    for (var w = 0; w < words.length; w++) {
+        for (var i = 0; i < words[w].length; i++) {
+            var svgWidth    = words[w][i][0].length * size + ((words[w][i][0].length - 1)   * gap) + gap;
+            var svgHeight   = words[w][i].length    * size + ((words[w][i].length - 1)      * gap) + gap;
+            var elementSvg  = '<svg xmlns="http://www.w3.org/2000/svg" class="svg-letter" id="letter-' + (w + '' + i) 
+                                + '" width="' + svgWidth + '" height="' + svgHeight + '" style="margin:5px;">'
+            $(divs[w]).append(elementSvg);
+            for (var j = 0; j < words[w][i].length; j++) {
+                for (var k = 0; k < words[w][i][j].length; k++) {
+                    if (words[w][i][j][k] == 0) {
+                        continue;
+                    }
+                    x = k * (size + gap) + (gap / 2);
+                    y = j * (size + gap) + (gap / 2);
+                    x += 3;
+                    y += 3;
+                    square = '<rect data-x="' + x + '" data-y="' + y + '"class="pixels shadow shadow-' + (w + '' + i) 
+                            + '" fill="black" x="' + x + '" y="' + (-100) 
+                            + '" width="' + size2 + '" height="' + size2 + '" style="stroke:black; stroke-width:1"/>';
+                    $('#letter-' + (w + '' + i)).append(square);                            
                 }
-
-                x = k * (size + gap) + (gap / 2);
-                y = j * (size + gap) + (gap / 2);
-                square = '<rect data-x="' + x + '" data-y="' + y + '"class="pixels rect-' + i 
+            }
+        }
+    }
+    // generate white pixels
+    for (var w = 0; w < words.length; w++) {
+        for (var i = 0; i < words[w].length; i++) {
+            var svgWidth    = words[w][i][0].length * size + ((words[w][i][0].length - 1)   * gap) + gap;
+            var svgHeight   = words[w][i].length    * size + ((words[w][i].length - 1)      * gap) + gap;
+            for (var j = 0; j < words[w][i].length; j++) {
+                for (var k = 0; k < words[w][i][j].length; k++) {
+                    if (words[w][i][j][k] == 0) {
+                        continue;
+                    }
+                    x = k * (size + gap) + (gap / 2);
+                    y = j * (size + gap) + (gap / 2);
+                    square = '<rect data-x="' + x + '" data-y="' + y + '"class="pixels rect-' + (w + '' + i) 
                             + '" fill="white" x="' + x + '" y="' + (-100) 
-                            + '" width="' + size + '" height="' + size + '" style="stroke:black; stroke-width:1"/>';
-
-                $('#letter-' + i).append(square);
+                            + '" width="' + size + '" height="' + size + '" style="z-index: 100; stroke:white; stroke-width:1"/>';
+                    $('#letter-' + (w + '' + i)).append(square);
+                }
             }
         }
     }
 
     // have to refresh the div when placing svg with jquery
-    // $("#div-pixels").html($("#div-pixels").html());
     $("#header").html($("#header").html());
 
+    function explode(element, elementSize) {
+        element.clearQueue();
+        var x = Math.floor(Math.random() * (svgWidth - elementSize)) + 1;
+        var y = Math.floor(Math.random() * (svgHeight - elementSize)) + 1;
+        var rand = Math.floor(Math.random() * 3) + 2;
+        element.animate({
+            svgX: x,
+            svgY: y,
+            svgWidth: elementSize / rand,
+            svgHeight: elementSize / rand
+        }, {duration: 250});
+    }
+
+    function implode(element, elementSize) {
+        element.animate({
+                svgX: element.data('x'),
+                svgY: element.data('y'),
+                svgWidth: elementSize,
+                svgHeight: elementSize
+        }, {duration: 250});
+    }
+
     $('.svg-letter').mouseenter(function() {
-        var index = this.id;
-        index = index.replace('letter-', '');
-        var color = colors[Math.floor(Math.random() * colors.length)];
-        $(this).children().css({fill: color, transition: '0.5s'});  // random color for animation
+        var index = this.id.replace('letter-', '');
         $('.rect-' + index).each(function(i, obj) {
-            var x = Math.floor(Math.random() * (svgWidth - size)) + 1;    // -size so it doesnt go outside of svg
-            var y = Math.floor(Math.random() * (svgHeight - size)) + 1;
-            var rand = Math.floor(Math.random() * 3) + 2;
-            $(this).animate({
-                svgX: x,
-                svgY: y,
-                svgWidth: size / rand,
-                svgHeight: size / rand,
-            }, {duration: 250});
+            explode($(this), size);
+        });
+        $('.shadow-' + index).each(function(i, obj) {
+            explode($(this), size2);
         });
     })
 
     $('.svg-letter').mouseleave(function() {
-        var index = this.id;
-        index = index.replace('letter-', '');
-        $(this).children().css('fill', 'white');
+        var index = this.id.replace('letter-', '');
         $('.rect-' + index).each(function(i, obj) {
-            $(this).animate({
-                svgX: $(this).data('x'),
-                svgY: $(this).data('y'),
-                svgWidth: size,
-                svgHeight: size
-            }, {duration: 250});
+            implode($(this), size);
+        });
+        $('.shadow-' + index).each(function(i, obj) {
+            implode($(this), size2);
         });
     })
 
@@ -173,7 +217,7 @@ $(function() {
             }, {duration: duration});
         });
     }
-
-    setTimeout(blockIntro, 1000);
+    
+    setTimeout(blockIntro, 1500);
     
 });

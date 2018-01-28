@@ -1,17 +1,19 @@
 <!DOCTYPE HTML>
 <html>
-<head>
-    <title>PixelProperty</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
-    <link rel="stylesheet" href="assets/css/main.css" />
-    <!-- <link rel="stylesheet" href="assets/css/overrides.css" /> -->
-    <!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
-    <!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
-</head>
-<!-- Overrides/temp css -->
-<style>
+    <head>
+        <title>PixelProperty</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+        <link rel="stylesheet" href="assets/css/main.css" />
+        <!-- <link rel="stylesheet" href="assets/css/overrides.css" /> -->
+        <!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+        <!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
+    </head>
+
+    <!-- temp override -->
+    <style>
+
     @font-face {
         font-family: 'Unibody8Pro-Bold';
         src: url('assets/fonts/Unibody8Pro-Bold.otf') format('opentype');
@@ -22,17 +24,9 @@
         src: url('assets/fonts/Roboto-Regular.ttf');
     }
 
-    .pixel-span {
-        font-family: 'Unibody8Pro-Bold';
-        font-size: 2.5em;
-        /*-webkit-text-stroke: .5px black; */
-        /*text-stroke: .5px black;*/
-        color:white;
-    }
-
     .roboto-span {
         font-family: 'Roboto-Regular';
-        font-size: 1em;
+        font-size: 4em;
         padding-bottom:20px;
         /*-webkit-text-stroke: 1px black; */
         /*text-stroke: 1px black;*/
@@ -41,7 +35,9 @@
 
     #header-title {
         margin-top: 100px !important;
+        margin-bottom: 50px !important;
     }
+
     #header-slogan {
         margin-top: 200px !important;
         margin-bottom: 200px !important;
@@ -50,54 +46,160 @@
     }
 
     #header {
-        min-height: 900px !important;;
-    }
-
-    #header {
         height: 100vh !important ;
-        background-color: black;
+        background-color: none;
+        position:relative;
     }
-</style>
 
-<body>
+    #inner {
+        background-color: transparent;
+    }
 
+    #bg-image {
+        background-image: url("images/pixelbg3.png");
+        background-size: 75% 75%;
+        width: 100vw;
+        height: 100vh;
+        position: absolute;
+        top: 0;
 
-    <!-- Header -->
-    <section id="header">
-        <div class="inner">
-            <h1 id="header-title">
-                <div id="div-pixels"></div>    
-            </h1>
-            <h1 id="header-slogan"><span class="roboto-span">Coming Soon</span></h1>
+        -webkit-filter: blur(10px);
+        -moz-filter: blur(10px);
+        -o-filter: blur(10px);
+        -ms-filter: blur(10px);
+        filter: blur(10px);
+    }
 
-            <ul class="icons">
-                <li><a href="https://twitter.com/pixelpropertyio" class="icon alt fa-twitter"><span class="label">Twitter</span></a></li>
-            </ul>
-        </div>
-    </section>
-                        
-                    
+    #inner,
+    #header {
+        padding: 0;
+    }
 
-             <!-- Footer -->
-                 <!-- <section id="footer"> -->
-                    <!-- <ul class="icons"> -->
-                            <!-- <li><a href="#" class="icon alt fa-twitter"><span class="label">Twitter</span></a></li> -->
-                            <!-- <li><a href="#" class="icon alt fa-facebook"><span class="label">Facebook</span></a></li> -->
-                            <!-- <li><a href="#" class="icon alt fa-instagram"><span class="label">Instagram</span></a></li> -->
-                            <!-- <li><a href="#" class="icon alt fa-github"><span class="label">GitHub</span></a></li> -->
-                            <!-- <li><a href="#" class="icon alt fa-envelope"><span class="label">Email</span></a></li> -->
-                    <!-- </ul> -->
-                 <!-- </section> -->
+    .clearBoth { clear:both; }
 
-        <!-- Scripts -->
-        <script src="assets/js/jquery.min.js"></script>
-        <script src="assets/js/jquery.scrolly.min.js"></script>
-        <script src="assets/js/skel.min.js"></script>
-        <script src="assets/js/util.js"></script>
-        <!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
-        <script src="assets/js/jquery.svg.min.js"></script>
-        <script src="assets/js/jquery.svganim.min.js"></script>
-        <script src="assets/js/main.js"></script>
-        <script src="assets/js/pixel.js"></script>
+    #scrolling-canvas-link {
+        top: 90vh;
+        left: 85vw;
+        z-index: 100;
+        position: absolute;
+        background: white;
+        border: 2px solid black;
+    }
+
+    </style>
+
+    <body>
+    
+        <!-- scrolling link to full canvas -->
+        <!-- <div id="scrolling-canvas-link">Checkout the full Canvas</div> -->
+
+       <!-- Header -->
+        <section id="header">
+            <div class="inner">
+                <h1 id="header-title">
+                    <span class="inline" id="div-pixel"></span><span class="inline" id="div-property"></span>       
+                </h1>
+                <img id="scrolling-canvas2" src="images/coming-soon.png" style="border: 5px solid black; opacity:.8;">
+            </div>
+            <div id="bg-image"></div>
+        </section>
+
+       <!-- Landing -->
+        <section id="one" class="main style1 special">
+            <div class="container">
+                <!-- <div style="width: 50%; text-align: center;"> -->
+                <header class="major">
+                    <h2>What is PixelProperty?</h2>
+                </header>
+                <p>
+                    PixelProperty is a constantly evolving canvas of a tradable digital property where the owners of property may upload any image they like, or rent their property to other users.
+                </p>
+            </div>
+         </section>
+
+        <section id="two" class="main style2 special">
+            <div class="container">
+                <header class="major">
+                    <h2>What is Digital Property?</h2>
+                </header>
+                <p>
+                    Digital properties in PixelProperty are tradable blockchain tokens powered by Ethereum. Each property is a separate individual token, which can have its appearance altered to its owners desire. Where Bitcoin and Ethereum are cryptocurrencies, these are cryptocollectables. Cryptocollectables can be bought, sold, or traded like any collectable item.
+                </p>
+            </div>
+        </section>
+
+       <!--  <section id="three" class="main style1 special">
+            <div class="container">
+                <header class="major">
+                    <h2>Interested in jumping in?</h2>
+                </header>
+                <p>
+                    Viewing the digital canvas does not require any extra setup. You can checkout the canvas on our [Canvas] page.
+                </p>
+                <p>
+                    When you want to interact with the canvas through our website, you must have an Ethereum account, as well as have [MetaMask] installed. You can view the [Setting Up] page for simple instructions on installing MetaMask.
+                </p>
+            </div>
+         </section> -->
+
+         <section id="four" class="main style1 special">
+            <div class="container">
+                <header class="major">
+                    <h2>White Paper & Technical Road Map</h2>
+                </header>
+                <h5>COMING SOON</h5><br/>
+                <input disabled="disabled" style="margin-right: 20px;" type="button" value="Download Full Whitepaper" onclick="window.location = '.doc';">
+                <input disabled="disabled" style="margin-left: 20px;" type="button" value="Download Full Road Map" onclick="window.location = '.doc';">
+            </div>
+         </section>
+
+       <!-- Footer -->
+         <section id="footer">
+          <ul class="icons">
+              <li><a href="https://twitter.com/pixelpropertyio" class="icon alt fa-twitter"><span class="label">Twitter</span></a></li>
+              <!-- <li><a href="#" class="icon alt fa-facebook"><span class="label">Facebook</span></a></li> -->
+              <!-- <li><a href="#" class="icon alt fa-reddit"><span class="label">Reddit</span></a></li> -->
+              <!-- <li><a href="#" class="icon alt fa-instagram"><span class="label">Instagram</span></a></li> -->
+              <!-- <li><a href="#" class="icon alt fa-github"><span class="label">GitHub</span></a></li> -->
+              <!-- <li><a href="#" class="icon alt fa-envelope"><span class="label">Email</span></a></li> -->
+          </ul>
+         </section>
+
+       <!-- Scripts -->
+         <script src="assets/js/jquery.min.js"></script>
+         <script src="assets/js/jquery.scrolly.min.js"></script>
+         <script src="assets/js/skel.min.js"></script>
+         <script src="assets/js/util.js"></script>
+         <!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+         <script src="assets/js/ScrollMagic.min.js"></script>
+         <script src="assets/js/jquery.svg.min.js"></script>
+         <script src="assets/js/jquery.svganim.min.js"></script>
+         <script src="assets/js/debug.addIndicators.min.js"></script>
+         <script src="assets/js/main.js"></script>
+         <script src="assets/js/pixel.js"></script>
+
+        <script type="text/javascript">
+            // $(function() {
+                // var controller = new ScrollMagic.Controller();
+                // var controller = new ScrollMagic.Controller({
+                //     globalSceneOptions: {
+                //         triggerHook: 'onLeave'
+                //     }
+                // });
+                // // var slides = document.querySelectorAll('section');
+                // var slides = $('section');
+                // for (var i = 0; i < slides.length; i++) {
+                //     new ScrollMagic.Scene({
+                //         triggerElement: slides[i]
+                //     })
+                //     .setPin(slides[i])
+                //     .addIndicators()
+                //     .addTo(controller);
+                // }
+                // var scene = new ScrollMagic.Scene({triggerElement: "#scrolling-trigger-1", duration: 0})
+                                                // .setPin('#scrolling-canvas-link')
+                                                // .addTo(controller);
+            // });
+        </script>
     </body>
 </html>

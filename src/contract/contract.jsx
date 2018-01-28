@@ -167,7 +167,7 @@ export class Contract {
 
     sellProperty(x, y, price) {
         this.VRE.deployed().then((i) => {
-            return i.listForSale(this.toID(x, y), price, {from: this.account });
+            return i.listForSale(this.toID(parseInt(x), parseInt(y)), price, {from: this.account });
         }).then(() => {
             this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " listed for sale."});
         }).catch((e) => {
@@ -177,28 +177,28 @@ export class Contract {
     }
 
     //array of 2 32 bytes of string
-    setHoverText(x, y, text) {
+    setHoverText(text) {
         let strs = [];
-        strs.push(text.slice(0, 32));
-        strs.push(text.slice(33, 64));
+        strs.push(Func.StringToHex(text.slice(0, 32)));
+        strs.push(Func.StringToHex(text.slice(33, 64)));
         this.VRE.deployed().then((i) => {
-            return i.setHoverText(this.toID(x, y), strs, {from: this.account });
+            return i.setHoverText(strs, {from: this.account });
         }).then(function() {
-            console.info("Pixel " + x + "x" + y + " update complete.");
+            console.info("Hover text set!");
         }).catch((e) => {
             console.log(e);
         });
     }
 
     //array of 2 32 bytes
-    setLink(x, y, text) {
+    setLink(text) {
         let strs = [];
         strs.push(text.slice(0, 32));
         strs.push(text.slice(33, 64));
         this.VRE.deployed().then((i) => {
-            return i.setLink(this.toID(x, y), strs, {from: this.account });
+            return i.setLink(strs, {from: this.account });
         }).then(function() {
-            console.info("Pixel " + x + "x" + y + " update complete.");
+            console.info("Property links updated!");
         }).catch((e) => {
             console.log(e);
         });
@@ -224,20 +224,20 @@ export class Contract {
         });
     }
 
-    getHoverText(x, y) {
+    getHoverText(address, callback) {
         this.VRE.deployed().then((i) => {
-            return i.getHoverText.call(this.toID(x, y)).then((r) => {
-                return r;
+            return i.getHoverText.call(address).then((r) => {
+                return callback(r);
             });
         }).catch((e) => {
             console.log(e);
         });
     }
 
-    getLink(x, y) {
+    getLink(address, callback) {
         this.VRE.deployed().then((i) => {
-            return i.getLink.call(this.toID(x, y)).then((r) => {
-                return r;
+            return i.getLink.call(address).then((r) => {
+                return callback(r);
             });
         }).catch((e) => {
             console.log(e);

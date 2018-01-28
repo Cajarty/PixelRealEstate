@@ -8,6 +8,21 @@
     }
 }
 
+table {
+    border-collapse: separate;
+    border-spacing: 0px 10px;
+}
+
+tr {
+    border: solid black 1px;
+    background-color: $color4;
+}
+
+tr:first-child,
+tr:last-child {
+    margin-top: -10px;
+}
+
 th {
     font-weight: 200;
     text-align: left;

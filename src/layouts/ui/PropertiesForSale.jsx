@@ -22,6 +22,7 @@ class PropertiesForSale extends Component {
     }
 
     propertySelected(x, y) {
+        console.info(SDM.forSaleProperties[x][y]);
         ctr.sendResults(LISTENERS.CoordinateUpdate, {x, y});
     }
 
@@ -42,7 +43,7 @@ class PropertiesForSale extends Component {
                     ></input>
                     <span className="slider"></span>
                 </label>
-                <table className='header'>
+                <table cellSpacing={0} cellPadding={0} className='header'>
                     <thead>
                         <tr>
                             <td style={{width: '15%'}}>{'X'}</td>
@@ -53,15 +54,15 @@ class PropertiesForSale extends Component {
                     </thead>
                 </table>
                 <div className='tableData'>
-                    <table className='data'>
+                    <table cellSpacing={0} cellPadding={0} className='data'>
                         <tbody>
-                            {Object.keys(SDM.ownedProperties).map((x) =>
-                                {return Object.keys(SDM.ownedProperties[x]).map((y) => 
+                            {Object.keys(SDM.forSaleProperties).map((x) =>
+                                {return Object.keys(SDM.forSaleProperties[x]).map((y) => 
                                     <tr key={x * 100 + y} onClick={() => this.propertySelected(x, y)}>
                                         <td style={{width: '15%'}}>{x}</td>
                                         <td style={{width: '15%'}}>{y}</td>
-                                        <td style={{width: '35%'}}>{SDM.ownedProperties[x][y].salePriceETH == 0 ? 'N/A' : SDM.ownedProperties[x][y].salePriceETH}</td>
-                                        <td style={{width: '35%'}}>{SDM.ownedProperties[x][y].salePricePXL == 0 ? 'N/A' : SDM.ownedProperties[x][y].salePricePXL}</td>
+                                        <td style={{width: '35%'}}>{SDM.forSaleProperties[x][y].salePriceETH == 0 ? 'N/A' : SDM.forSaleProperties[x][y].salePriceETH}</td>
+                                        <td style={{width: '35%'}}>{SDM.forSaleProperties[x][y].salePricePXL == 0 ? 'N/A' : SDM.forSaleProperties[x][y].salePricePXL}</td>
                                     </tr>
                                 )}
                             )}

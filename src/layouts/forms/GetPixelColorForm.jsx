@@ -74,7 +74,7 @@ class GetPixelColorForm extends Component {
 
     render() {
         return (
-            <table className='form'>
+            <table cellSpacing={0} cellPadding={0} className='form'>
                 <tbody>
                     <tr>
                         <td colSpan={2}>

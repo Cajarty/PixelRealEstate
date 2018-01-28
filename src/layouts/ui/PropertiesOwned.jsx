@@ -12,6 +12,7 @@ class PropertiesOwned extends Component {
         ctr.listenForEvent(EVENTS.PropertyBought, 'PropertiesOwned', (data) => {
             this.forceUpdate();
         });
+        console.info("ordered", SDM.orderPropertyList(SDM.ownedProperties, (a, b) => {return a.y > b.y;}));
     }
 
     componentWillUnmount() {
@@ -25,7 +26,7 @@ class PropertiesOwned extends Component {
     render() {
         return (
             <div>
-                 <table className='header'>
+                 <table cellSpacing={0} cellPadding={0} className='header'>
                     <thead>
                         <tr>
                             <td style={{width: '10%'}}>{'X'}</td>
@@ -37,7 +38,7 @@ class PropertiesOwned extends Component {
                     </thead>
                 </table>
                 <div className='tableData'>
-                    <table className='data'>
+                    <table cellSpacing={0} cellPadding={0} className='data'>
                         <tbody>
                             {Object.keys(SDM.ownedProperties).map((x) =>
                                 {return Object.keys(SDM.ownedProperties[x]).map((y) => 
@@ -49,7 +50,7 @@ class PropertiesOwned extends Component {
                                         <td style={{width: '40%'}}>
                                             {SDM.ownedProperties[x][y].lastUpdate == null || SDM.ownedProperties[x][y].lastUpdate == 0 ? 
                                                 'Never' 
-                                                : <Timestamp time={SDM.ownedProperties[x][y].lastUpdate}/>
+                                                : <Timestamp time={SDM.ownedProperties[x][y].lastUpdate} autoUpdate precision={2}/>
                                             }
                                         </td>
                                     </tr>

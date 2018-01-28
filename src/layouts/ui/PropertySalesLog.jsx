@@ -20,7 +20,8 @@ class PropertySalesLog extends Component {
                 x: id.x,
                 y: id.y,
                 price: 0,
-                newOwner: data.args.newOwner
+                newOwner: data.args.newOwner,
+                transaction: data.transactionHash,
             };
             old.unshift(newData);
             this.setState({ salesLog: old });
@@ -37,7 +38,7 @@ class PropertySalesLog extends Component {
                 <div className='title'>
                     Sales History
                 </div>
-                <table className='header'>
+                <table cellSpacing={0} cellPadding={0} className='header'>
                     <thead>
                         <tr>
                             <td style={{width: '8%'}}>{'X'}</td>
@@ -49,7 +50,7 @@ class PropertySalesLog extends Component {
                     </thead>
                 </table>
                 <div className='dataContainer'>
-                    <table className='data'>
+                    <table cellSpacing={0} cellPadding={0} className='data'>
                         <tbody>
                             {this.state.salesLog.map((log) => (
                                 <tr key={Math.random() + log.x + log.y}>
@@ -57,7 +58,7 @@ class PropertySalesLog extends Component {
                                     <td style={{width: '8%'}}>{log.y}</td>
                                     <td style={{width: '8%'}}>{log.price}</td>
                                     <td style={{width: '56%'}}>{log.newOwner}</td>
-                                    <td style={{width: '20%'}}>see more...</td>
+                                    <td style={{width: '20%'}}><a target='_blank' href={'https://etherscan.io/tx/' + log.transaction} >see more...</a></td>
                                 </tr>
                             ))}
                         </tbody>

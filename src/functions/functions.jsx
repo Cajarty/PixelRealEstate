@@ -4,6 +4,23 @@ var Base64 = _Base64.Base64;
 var bigInt = require("big-integer");
 var BigNumber = require('bignumber.js');
 
+export const HexToString = (hexx) => {
+    let hex = hexx.toString();//force conversion
+    let str = '';
+    for (let i = 0; i < hex.length; i += 2)
+        str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    return str;
+}
+
+export const StringToHex = (str) => {
+    let arr = [];
+    for (let i = 0, l = str.length; i < l; i ++) {
+        let hex = Number(str.charCodeAt(i)).toString(16);
+        arr.push(hex);
+    }
+    return arr.join('');
+}
+
 export const BigNumberToNumber = (big) => {
     return big.toNumber();
 }

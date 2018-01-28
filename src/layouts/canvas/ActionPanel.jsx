@@ -6,6 +6,8 @@ import Pullout from '../ui/Pullout';
 import PulloutTab from '../ui/PulloutTab';
 import GetPixelColorForm from '../forms/GetPixelColorForm';
 import * as Assets from '../../const/assets.jsx';
+import SetHoverText from '../forms/SetHoverText';
+import SetLink from '../forms/SetLink';
 
 class ActionPanel extends Component {
     constructor(props) {
@@ -38,10 +40,8 @@ class ActionPanel extends Component {
                         />
                     </PulloutTab>
                     <PulloutTab icon={Assets.ICON_MONEY} tabName='Set Property Info'>
-                        <GetPixelColorForm
-                            valueX={this.props.clickX}
-                            valueY={this.props.clickY}
-                        />
+                        <SetHoverText/>
+                        <SetLink/>
                     </PulloutTab>
                     <PulloutTab icon={Assets.ICON_MONEY} tabName='Exchange Currency'>
                         <GetPixelColorForm

@@ -21,6 +21,7 @@ class ZoomCanvas extends Component {
             hoverY: 0,
             hideCanvas: true,
             queuedUpdates: [],
+            canvasLoaded: false,
         }
         this.setCanvasProperty = this.setCanvasProperty.bind(this);
     }
@@ -66,6 +67,7 @@ class ZoomCanvas extends Component {
         ctr.listenForResults(LISTENERS.ServerDataManagerInit, 'canvasZoom', (results) => {
             if (results.imageLoaded) {
                 this.setCanvas(SDM.pixelData);
+                this.setState({canvasLoaded: true});
                 for (let i in this.state.queuedUpdates) {
                     this.setCanvasProperty(this.state.queuedUpdates[i].x, this.state.queuedUpdates[i].y, this.state.queuedUpdates[i].colors);
                 }
@@ -87,7 +89,7 @@ class ZoomCanvas extends Component {
                 xy.colors = data.args.colorsRGB;
 
             if (this.state.canvasLoaded) 
-                this.setCanvasProperty(xy.x, xy.y, Func.ContractDataToRGBAArray(data.args.colors));
+                this.setCanvasProperty(xy.x, xy.y, xy.colors);
             else {
                 let update = this.state.queuedUpdates;
                 update.push(xy);

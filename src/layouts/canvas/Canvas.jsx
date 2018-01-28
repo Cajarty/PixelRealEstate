@@ -16,6 +16,7 @@ class Canvas extends Component {
             loadValue: 0,
             cancelToken: null,
             loaded: false,
+            canvasLoaded: false,
             queuedUpdates: [],
         }
         this.setCanvasProperty = this.setCanvasProperty.bind(this);
@@ -47,6 +48,7 @@ class Canvas extends Component {
 
         ctr.listenForResults(LISTENERS.ServerDataManagerInit, 'canvas', (results) => {
             if (results.imageLoaded) {
+                this.setState({canvasLoaded: true});
                 this.setCanvas(SDM.pixelData);
                 for (let i in this.state.queuedUpdates) {
                     this.setCanvasProperty(this.state.queuedUpdates[i].x, this.state.queuedUpdates[i].y, this.state.queuedUpdates[i].colors);
@@ -68,9 +70,9 @@ class Canvas extends Component {
             else
                 xy.colors = data.args.colorsRGB;
 
-            if (this.state.canvasLoaded) 
-                this.setCanvasProperty(xy.x, xy.y, Func.ContractDataToRGBAArray(data.args.colors));
-            else {
+            if (this.state.canvasLoaded) {
+                this.setCanvasProperty(xy.x, xy.y, xy.colors);
+            } else {
                 let update = this.state.queuedUpdates;
                 update.push(xy);
                 this.setState({queuedUpdates: update});

@@ -18,7 +18,6 @@ export class ServerDataManager {
     }
 
     destructor() {
-
         ctr.stopListeningForEvent(EVENTS.PropertyColorUpdate, 'SDM-PropertyColorUpdate');
         ctr.stopListeningForEvent(EVENTS.PropertyColorUpdatePixel, 'SDM-PropertyColorUpdatePixel');
         ctr.stopListeningForEvent(EVENTS.PropertyBought, 'SDM-PropertyBought');
@@ -134,6 +133,7 @@ export class ServerDataManager {
             for (let x = xx * 10; x < (xx + 1) * 10; x++)
                 for (let i = 0; i < 4; i++)
                     this.pixelData[y * 4000 + x * 4 + i] = RGBArray[counter++];
+        
     }
 
     /*
@@ -198,6 +198,22 @@ export class ServerDataManager {
             this.allProperties[x] = {};
         this.allProperties[x][y] = property;
     }
+
+    orderPropertyList(objList, compFunc) {
+        let list = [];
+        Object.keys(objList).map(x => {
+            Object.keys(objList[x]).map(y => {
+                let i = 0;
+                for (; i < list.length; i++) {
+                    if (compFunc(objList[x][y], list[i]))
+                        break;
+                }
+                list.splice(i, 0, objList[x][y]);
+            });
+        });
+        return list;
+    }
+
 }
 
 export const SDM = new ServerDataManager();

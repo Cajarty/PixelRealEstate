@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Contract, ctr} from '../../contract/contract.jsx';
+import {Contract, ctr, EVENTS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions.jsx';
 import Timestamp from 'react-timestamp';
 
@@ -14,7 +14,7 @@ class PixelDescriptionBox extends Component {
             owner: "",
             isForSale: false,
             salePrice: 0,
-            lastColorUpdate: 0,
+            lastUpdate: 0,
             isInPrivate: false,
         }
     }
@@ -25,10 +25,11 @@ class PixelDescriptionBox extends Component {
             if (newProps[i] != this.props[i])
                 update[i] = newProps[i];
         })
-        
+
         //update property view if new area clicked
-        if (newProps.x != null || newProps.y != null)
+        if (update.x !== this.state.x || update.y !== this.state.y) {
             this.loadProperty(update.x, update.y);
+        }
         this.setState(update);
     }
 
@@ -40,13 +41,30 @@ class PixelDescriptionBox extends Component {
         let dataCtx = this.dataCanvas.getContext('2d');
         dataCtx.imageSmoothingEnabled = false;
         dataCtx.webkitImageSmoothingEnabled = false;
-        if (this.props.x != null && this.props.x != -1 && this.props.y != null && this.props.y != -1) 
-            this.loadProperty(this.props.x, this.props.y);
         this.setState({
             ctx, 
             dataCtx,
-            x: this.props.x,
-            y: this.props.y,
+            x: this.props.x == null ? '' : this.props.x,
+            y: this.props.y == null ? '' : this.props.y,
+        });
+
+        ctr.listenForEvent(EVENTS.PropertyColorUpdate, 'PixelDescriptionBox', (data) => {
+            let xy = {x: 0, y: 0, colors: []};
+            if (data.args.x == null || data.args.y == null)
+                xy = ctr.fromID(Func.BigNumberToNumber(data.args.property));
+            else {
+                xy.x = data.args.x;
+                xy.y = data.args.y;
+            }
+
+            if (data.args.colorsRGB == null)
+                xy.colors = Func.ContractDataToRGBAArray(data.args.colors);
+            else
+                xy.colors = data.args.colorsRGB;
+
+            if (xy.x === this.state.x && xy.y === this.state.y) {
+                this.setCanvas(xy.colors);
+            }
         });
     }
 
@@ -71,7 +89,6 @@ class PixelDescriptionBox extends Component {
 
     loadProperty(x, y) {
         ctr.getPropertyData(x, y, (data) => {
-            //console.info(data)
             let price = Func.BigNumberToNumber(data[1]);
             this.setState({
                 owner: data[0],
@@ -93,7 +110,7 @@ class PixelDescriptionBox extends Component {
                     <canvas id='colorPreviewCanvas' width={100} height={100} ref={(canvas) => { this.canvas = canvas; }} ></canvas>
                     <canvas className='hidden' width={10} height={10} ref={(dataCanvas) => { this.dataCanvas = dataCanvas; }} ></canvas>
                 </div>
-                <table className='data'>
+                <table cellSpacing={0} cellPadding={0} className='data'>
                     <tbody>
                         <tr>
                             <th>X</th>
@@ -119,11 +136,19 @@ class PixelDescriptionBox extends Component {
                         ) : null}
                         <tr>
                             <th>Last Color Change</th>
-                            <td>{this.state.lastUpdate == 0 ? 'Never' : <Timestamp time={this.state.lastUpdate}/>}</td>
+                            <td>{this.state.lastUpdate == 0 ? 'Never' : <Timestamp time={this.state.lastUpdate} precision={2} autoUpdate/>}</td>
                         </tr>
                         <tr>
                             <th>Is Private</th>
                             <td>{this.state.isInPrivate ? 'Yes' : 'No'}</td>
+                        </tr>
+                        <tr>
+                            <th>Comment</th>
+                            <td>IMPLEMENT</td>
+                        </tr>
+                        <tr>
+                            <th>Link</th>
+                            <td>IMPLEMENT</td>
                         </tr>
                     </tbody>
                 </table>

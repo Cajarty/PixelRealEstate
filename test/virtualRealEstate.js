@@ -1,4 +1,6 @@
 var VirtualRealEstate = artifacts.require("./VirtualRealEstate.sol");
+ 
+var utf8 = require("utf8");
 
 /**
  * Should be called to get hex representation (prefixed by 0x) of utf8 string
@@ -38,8 +40,8 @@ var utf8ToHex = function(str) {
  * @returns {String} ascii string representation of hex value
  */
 var hexToUtf8 = function(hex) {
-    if (!isHexStrict(hex))
-        throw new Error('The parameter "'+ hex +'" must be a valid HEX string.');
+    //if (!isHexStrict(hex))
+    //    throw new Error('The parameter "'+ hex +'" must be a valid HEX string.');
 
     var str = "";
     var code = 0;
@@ -62,14 +64,6 @@ var hexToUtf8 = function(hex) {
 
     return utf8.decode(str);
 };
-
-function encode_utf8(s) {
-  return unescape(encodeURIComponent(s));
-}
-
-function decode_utf8(s) {
-  return decodeURIComponent(escape(s));
-}
 
 contract('VirtualRealEstate', function(accounts) {
   //####PURCHASE, SELLING & TRANSFERING####
@@ -113,7 +107,7 @@ contract('VirtualRealEstate', function(accounts) {
     }).then(function(result) {
       return pixelPropertyInstance.getPropertyData(0, { from: accounts[0] });
     }).then(function(propertyData) {
-      assert.equal(propertyData[1], 10000, "Should be listed for sale for 10000 wei" ); //For sale
+      assert.equal(propertyData[2], 10000, "Should be listed for sale for 10000 wei" ); //For sale
       return pixelPropertyInstance.buyPropertyInPPC(0, 10000, {from: accounts[1] });
     }).then(function() {
       return pixelPropertyInstance.getPropertyData(0, { from: accounts[0] });
@@ -131,7 +125,7 @@ contract('VirtualRealEstate', function(accounts) {
     }).then(function(result) {
       return pixelPropertyInstance.getPropertyData(1, { from: accounts[0] });
     }).then(function(propertyData) {
-      assert.equal(propertyData[1], 10000, "Should be listed for sale for 10000 wei" ); //For sale
+      assert.equal(propertyData[2], 10000, "Should be listed for sale for 10000 wei" ); //For sale
       return pixelPropertyInstance.buyPropertyInPPC(1, 10000, {from: accounts[1] });
     }).then(function() {
       return pixelPropertyInstance.getPropertyData(1, { from: accounts[0] });
@@ -151,7 +145,7 @@ contract('VirtualRealEstate', function(accounts) {
       return pixelPropertyInstance.getPropertyData(2, { from: accounts[0] });
     }).then(function(propertyData) {
       assert.equal(propertyData[0], accounts[0], "Should be owned by account0 (to delist)")
-      assert.equal(propertyData[1], 10000, "Should be listed for sale for 10000 wei" ); //For sale
+      assert.equal(propertyData[2], 10000, "Should be listed for sale for 10000 wei" ); //For sale
       return pixelPropertyInstance.delist(2, { from: accounts[0] });
     }).then(function() {
       return pixelPropertyInstance.getPropertyData(2, { from: accounts[0] });
@@ -167,17 +161,17 @@ contract('VirtualRealEstate', function(accounts) {
       return pixelPropertyInstance.getPropertyData(3, { from: accounts[0] });
     }).then(function(propertyData) {
       assert.equal(propertyData[0], accounts[0], "Should be owned by account0 (to delist)")
-      assert.equal(propertyData[1], 10000, "Should be listed for sale for 10000 wei" ); //For sale
+      assert.equal(propertyData[2], 10000, "Should be listed for sale for 10000 wei" ); //For sale
       return pixelPropertyInstance.delist(3, { from: accounts[0] });
     }).then(function() {
       return pixelPropertyInstance.getPropertyData(3, { from: accounts[0] });
     }).then(function(propertyData) {
-      assert.equal(propertyData[1], 0, "Should be delisted and back to 0 wei" ); //For sale
+      assert.equal(propertyData[2], 0, "Should be delisted and back to 0 wei" ); //For sale
       return pixelPropertyInstance.listForSale(3, 10000, { from: accounts[0] }); 
     }).then(function(result) {
       return pixelPropertyInstance.getPropertyData(3, { from: accounts[0] });
     }).then(function(propertyData) {
-      assert.equal(propertyData[1], 10000, "Should be listed for sale for 10000 wei" ); //For sale
+      assert.equal(propertyData[2], 10000, "Should be listed for sale for 10000 wei" ); //For sale
       return pixelPropertyInstance.buyPropertyInPPC(3, 10000, {from: accounts[1] });
     }).then(function() {
       return pixelPropertyInstance.getPropertyData(3, { from: accounts[0] });
@@ -201,17 +195,21 @@ contract('VirtualRealEstate', function(accounts) {
   it("User5 can buy a property with some PPC and some ETH", function() {
     return VirtualRealEstate.deployed().then(function(instance) {
       pixelPropertyInstance = instance;
+      return pixelPropertyInstance.balanceOf(accounts[5]);
+    }).then(function(balance) {
+      user5InitialBalance = balance;
       return pixelPropertyInstance.getForSalePrices(75, {from: accounts[5]});
     }).then(function(prices) {
       assert.equal(prices[0] > 0, true, "ETH price should be set for default property purchase");
       assert.equal(prices[1] > 0, true, "PPC price should be set for default property purchase");
-      console.log(prices);
       initialPricesForPPCETHBuy = prices;
-      return pixelPropertyInstance.addCoin(accounts[5], prices[1] / 2, {from: accounts[5]});
+      return pixelPropertyInstance.addCoin(accounts[5], prices[1] / 2);
     }).then(function() {
       return pixelPropertyInstance.buyProperty(75, initialPricesForPPCETHBuy[1] / 2, { from: accounts[5], value: initialPricesForPPCETHBuy[0]})
     }).then(function() {
-
+      return pixelPropertyInstance.balanceOf(accounts[5]);
+    }).then(function(balance) {
+      assert.equal(balance - user5InitialBalance, 0, "Should have spent the same amount earned");
     });
   });
   it("Purchasing with ETH increases ETH price, PPC increases PPC, and partial buy (30% PPC 70% ETH) raises price appropriately (30% for PPC, 70% for ETH)", function() {
@@ -288,6 +286,7 @@ contract('VirtualRealEstate', function(accounts) {
       assert.equal(coloursReturned[0], 5, "Should return 5 from the array of 5's" );
       return pixelPropertyInstance.balanceOf(accounts[5], { from: accounts[0] });
     }).then(function(balance) {
+      console.log(balance);
       assert.equal(balance, 2, "Should have earned two coins from setting it and having it set for 1 second");
     });
   });
@@ -324,6 +323,7 @@ contract('VirtualRealEstate', function(accounts) {
       assert.equal(hoverText[1], 0x6000000000000000000000000000000000000000000000000000000000000000, "Should say 0x600.. since user updated it to 0x6");
     });
   });
+
   it("A user can set their link", function() {
     return VirtualRealEstate.deployed().then(function(instance) {
       pixelPropertyInstance = instance;
@@ -365,20 +365,29 @@ contract('VirtualRealEstate', function(accounts) {
       assert.equal(link[1], 0x3000000000000000000000000000000000000000000000000000000000000000, "Should say 0x300.. since user updated it to 0x3");
     });
   });
-  it("A user can change their hover text with strings", function() {
+  it("A user can change their hover text with strings (Version2 1)", function() {
     return VirtualRealEstate.deployed().then(function(instance) {
       pixelPropertyInstance = instance;
-      hexToText = utf8ToHex(encode_utf8("12345678901234567890123456789012"));
-      return pixelPropertyInstance.getHoverText(accounts[0], { from: accounts[0] });
-    }).then(function(hoverText) {
-      assert.equal(hoverText[0], hexToText, "Should say 0x500 from last test");
-      assert.equal(hoverText[1], hexToText, "Should say 0x600 from last test");
-      return pixelPropertyInstance.setHoverText([0x7,0x8], { from: accounts[0] });
+      hexToText = utf8ToHex("12345678901234567890123456789012");
+      return pixelPropertyInstance.setHoverText([hexToText,hexToText], { from: accounts[0] });
     }).then(function(setText) {
       return pixelPropertyInstance.getHoverText(accounts[0], { from: accounts[0] });
     }).then(function(hoverText) {
-      assert.equal(hoverText[0], "12345678901234567890123456789012", "Should say 0x700.. since user updated it to 0x7");
-      assert.equal(hoverText[1], "12345678901234567890123456789012", "Should say 0x800.. since user updated it to 0x8");
+      assert.equal(hexToUtf8(hoverText[0]), "12345678901234567890123456789012", "Should say 0x700.. since user updated it to 0x7");
+      assert.equal(hexToUtf8(hoverText[1]), "12345678901234567890123456789012", "Should say 0x800.. since user updated it to 0x8");
+    });
+  });
+
+  it("A user can change their hover text with strings (Version 2)", function() {
+    return VirtualRealEstate.deployed().then(function(instance) {
+      pixelPropertyInstance = instance;
+      hexToText = utf8ToHex("This string is short");
+      return pixelPropertyInstance.setHoverText([hexToText,hexToText], { from: accounts[0] });
+    }).then(function(setText) {
+      return pixelPropertyInstance.getHoverText(accounts[0], { from: accounts[0] });
+    }).then(function(hoverText) {
+      assert.equal(hexToUtf8(hoverText[0]), "This string is short", "Should say 0x700.. since user updated it to 0x7");
+      assert.equal(hexToUtf8(hoverText[1]), "This string is short", "Should say 0x800.. since user updated it to 0x8");
     });
   });
 
@@ -390,12 +399,12 @@ contract('VirtualRealEstate', function(accounts) {
     }).then(function(s) {
       return pixelPropertyInstance.getPropertyData(0, { from: accounts[0] });
     }).then(function(propertyData) {
-      assert.equal(propertyData[3], true, "Should be in private mode");
+      assert.equal(propertyData[4], true, "Should be in private mode");
       return pixelPropertyInstance.setPropertyMode(0, false, 0, { from: accounts[0] }); //Set to public
     }).then(function(s) {
       return pixelPropertyInstance.getPropertyData(0, { from: accounts[0] });
     }).then(function(propertyData) {
-      assert.equal(propertyData[3], false, "Should be in public mode");
+      assert.equal(propertyData[4], false, "Should be in public mode");
     });
   });
   //?#Private-Mode makes it private for a short amount of time
@@ -406,7 +415,7 @@ contract('VirtualRealEstate', function(accounts) {
     }).then(function(s) {
       return pixelPropertyInstance.getPropertyData(0, { from: accounts[0] });
     }).then(function(propertyData) {
-      assert.equal(propertyData[3], true, "Should be in private mode");
+      assert.equal(propertyData[4], true, "Should be in private mode");
       return new Promise((resolve, reject) => {
         let wait = setTimeout(() => {
           resolve("Delay Finished");
@@ -468,6 +477,7 @@ contract('VirtualRealEstate', function(accounts) {
       assert.equal(tradeOffer[1], 0, "Should be zero'd as trade completed");
     });
   });
+  
   it("Can cancel ETH offers you have up", function() {
     return VirtualRealEstate.deployed().then(function(instance) {
       pixelPropertyInstance = instance;
@@ -647,5 +657,4 @@ contract('VirtualRealEstate', function(accounts) {
   //#Can't change owners to the void
   //#Can change the default price if we're an owner
   //#Non-owners can't call ANY of the listed above functions
-
 });

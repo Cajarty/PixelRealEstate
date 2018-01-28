@@ -1,13 +1,5 @@
 pragma solidity ^0.4.2;
 
-
-/*
-- Partial sales filling unit test
-- Fractional purchases unit test
-- timestamp for events that represent history
-- Stress Test Functionality (7pm Tonight, all above must be done by then)
-*/
-
 contract Token {
     uint256 public totalSupply;
     function balanceOf(address _owner) public constant returns (uint256 balance);
@@ -168,7 +160,7 @@ contract VirtualRealEstate is StandardToken {
         if (property.owner == 0) {
             return (property.owner, priceETH, pricePPC, property.lastUpdate, property.isInPrivateMode);
         } else {
-            return (property.owner, 0, property.salePrice property.lastUpdate, property.isInPrivateMode);
+            return (property.owner, 0, property.salePrice, property.lastUpdate, property.isInPrivateMode);
         }
     }
     //Change a 10x10 == 70 | 30 | 0 cost
@@ -430,6 +422,8 @@ contract VirtualRealEstate is StandardToken {
         require(msg.value >= ethLeft);
     
         balances[owner] += ppcValue;
+        balances[msg.sender] -= ppcValue;
+
         uint256 minPercent = pricePPC * PRICE_PPC_MIN_PERCENT / 100;
         pricePPC += ((minPercent < PRICE_PPC_MIN_INCREASE) ? minPercent : PRICE_PPC_MIN_INCREASE) * ppcValue / pricePPC;
 

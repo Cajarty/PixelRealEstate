@@ -1,0 +1,10 @@
+.panel {
+    background-color: $color2;
+    color: $color5;
+    padding: 4px;
+    margin: 4px;
+    box-shadow: black 1px 1px 1px 1px;
+    div {
+        display: inline-block;
+    }
+}

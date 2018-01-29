@@ -214,6 +214,46 @@ export class ServerDataManager {
         return list;
     }
 
+    partialOrderPropertyListByIndex(sortedArray, objArr, startIndex, endIndex, compFunc) {
+        let list = sortedArray;
+        for (let xy = startIndex; xy < endIndex && xy < objArr.length; xy++) {
+            let i = 0;
+            for (; i < list.length; i++) {
+                if (compFunc(objArr[xy], list[i]))
+                    break;
+            }
+            list.splice(i, 0, objArr[xy]);
+        };
+        return list;
+    }
+
+    orderPropertyListAsync(objList, compFunc) {
+        let index = 0;
+        let block = 40;
+        let sortedArray = [];
+
+        let objArr = [];
+
+        Object.keys(objList).map(x => {
+            Object.keys(objList[x]).map(y => {
+                objArr.push(objList[x][y]);
+            });
+        });
+
+        let repromise = (res, rej) => {
+            setTimeout(() => {
+                console.info('a call');
+                sortedArray = this.partialOrderPropertyListByIndex(sortedArray, objArr, index, index + block, compFunc);
+                index += block;
+                if (index < objArr.length)
+                    res({promise: new Promise(repromise), data: sortedArray});
+                else 
+                    res({promise: null, data: sortedArray});
+            }, 100);
+        }
+
+        return new Promise(repromise);
+    }
 }
 
 export const SDM = new ServerDataManager();

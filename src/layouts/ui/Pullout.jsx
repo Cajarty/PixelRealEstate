@@ -46,7 +46,7 @@ class Pullout extends Component {
                     );
                 })}
                 </div>
-                <div className={this.props.side + ' panel'}>
+                <div className={this.props.side + ' sidebar'}>
                         {this.props.children[this.state.tabOpen < 0 ? 0 : this.state.tabOpen].props.children}
                 </div>
             </div>

@@ -63,6 +63,7 @@ export class Contract {
         this.events = {
             event: null,
         }
+        
         Object.keys(EVENTS).map((index) => {
             this.events[index] = {};
         });

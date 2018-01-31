@@ -1,45 +1,39 @@
 import React, { Component } from 'react'
-//import test from '../../assets/icons/test.png'; is coorecrt
+import {Panel, PanelItem} from './Panel';
 
 class PanelContainer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            dataView: []
         }
+    }
+
+    componentDidMount() {
+        let start = this.props.viewStart | 0;
+        let end = this.props.viewEnd | this.props.data.length;
+        this.setState({dataView: this.props.data.slice(start, end)});
+    }
+
+    componentWillReceiveProps(newProps) {
+        let start = newProps.viewStart || this.props.viewStart || 0;
+        let end = newProps.viewEnd || this.props.viewEnd || this.props.data.length;
+        this.setState({dataView: newProps.data.slice(start, end)});
     }
 
     render() {
         return (
             <div>
-                {this.props.data.map((child, i) => (
-                    <Panel 
-                        key={i}
-                        data={child}
-                    />
+                {this.state.dataView.map((child, i) => (
+                    <Panel key={i}>
+                        <PanelItem width='10%' data='X:'/>
+                        <PanelItem width='40%' data={child.x}/>
+                        <PanelItem width='10%' data='Y:'/>
+                        <PanelItem width='40%' data={child.y}/>
+                    </Panel>
                 ))}
             </div>
         );
     }
 }
-
-class Panel extends Component {
-    render() {
-        return (
-            <div className='panel'>
-                <PanelItem width='25%' data='X:'/>
-                <PanelItem width='25%' data={this.props.data.x}/>
-                <PanelItem width='25%' data='Y:'/>
-                <PanelItem width='25%' data={this.props.data.y}/>
-            </div>
-        );
-    }
-}
-
-class PanelItem extends Component {
-    render() {
-        return (<div className='panelItem' style={{width: this.props.width}}>{this.props.data}</div>);
-    }
-}
-
 export default PanelContainer

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import {Contract, ctr} from '../../contract/contract.jsx';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
-import PanelContainer from '../ui/PanelContainer';
+import PanelContainerOwned from '../ui/PanelContainerOwned';
 
 const compares = {
     xDesc: 0
@@ -25,7 +25,6 @@ class PlaceMarketTrade extends Component {
 
         let relisten = (results) => {
             this.setState({orderedItems: results.data});
-            console.info(results);
             if (results.promise && !this.cancelSort)
                 results.promise.then(relisten);
         }
@@ -46,8 +45,10 @@ class PlaceMarketTrade extends Component {
     render() {
         return (
             <div>
-                <PanelContainer
+                <PanelContainerOwned
                     data={this.state.orderedItems}
+                    viewStart={0}
+                    viewEnd={1}
                 />
             </div>
         );

@@ -88,9 +88,10 @@ contract VirtualRealEstate is StandardToken {
     event SetUserSetLink(address indexed user, bytes32[2] newLink);
     event PropertySetForSale(uint24 indexed property, uint256 forSalePrice);
     event DelistProperty(uint24 indexed property);
+
     event ListTradeOffer(address indexed offerOwner, uint256 eth, uint256 ppc, bool isBuyingPPC);
-    event AcceptTradeOffer(address indexed accepter, address indexed offerOwner, uint256 timestamp); //Added timestamp
-    event CancelTradeOffer(address indexed offerOwner);
+    //TODO: PPCBought
+    event UpdateTradeOffer(address indexed accepter, address indexed offerOwner, uint256 ppcBought, uint256 timestamp); //Added timestamp
     event SetPropertyPublic(uint24 indexed property);
     event SetPropertyPrivate(uint24 indexed property, uint32 numHoursPrivate);
     
@@ -297,7 +298,8 @@ contract VirtualRealEstate is StandardToken {
             else {
                 balances[msg.sender] += tradeOffer.ppcAmount;
             }
-            CancelTradeOffer(msg.sender);
+        
+            UpdateTradeOffer(0, msg.sender, 0, now);
             tradeOffer.ethPer = 0;
             tradeOffer.ppcAmount = 0;
         }
@@ -327,16 +329,18 @@ contract VirtualRealEstate is StandardToken {
         //10 * 100 / 200 = 1000 / 200 = 5
         
         balances[msg.sender] += payedValue / tradeOffer.ethPer;
+        uint256 tradedPPC = payedValue / tradeOffer.ethPer;
         
         //Clear or split trade offers
         if (payedValue == maxEthprice) {
             tradeOffer.ethPer = 0;
+            tradedPPC = tradeOffer.ppcAmount;
             tradeOffer.ppcAmount = 0;
         } else {
-            tradeOffer.ppcAmount -= payedValue / tradeOffer.ethPer;
+            tradeOffer.ppcAmount -= tradedPPC;
         }
         
-        AcceptTradeOffer(msg.sender, ownerOfTradeOffer, now);
+        UpdateTradeOffer(msg.sender, ownerOfTradeOffer, tradedPPC, now);
     }
     
     function acceptOfferBuyingPPC(address ownerOfTradeOffer, uint256 ppcValue) public {
@@ -369,7 +373,7 @@ contract VirtualRealEstate is StandardToken {
             tradeOffer.ppcAmount -= payedValue;
         }
         
-        AcceptTradeOffer(msg.sender, ownerOfTradeOffer, now);
+        UpdateTradeOffer(msg.sender, ownerOfTradeOffer, payedValue, now);
     }
     
     //Change pixel or 10x1 costs 7 | 3 | 0

@@ -395,6 +395,7 @@ contract VirtualRealEstate is StandardToken {
         
         property.colors[row] = newColorData;
         property.lastUpdater = msg.sender;
+
         PropertyColorUpdatePixel(propertyID, row, newColorData);
         
         return true;
@@ -407,6 +408,8 @@ contract VirtualRealEstate is StandardToken {
         require(newOwner != 0);
         
         property.owner = newOwner;
+
+        PropertyBought(propertyID, newOwner, 0, 0, now);
         
         return true;
     }

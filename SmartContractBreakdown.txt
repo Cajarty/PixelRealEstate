@@ -1,0 +1,61 @@
+contract VirtualRealEstate:
+    events:
+        event PropertyColorUpdate(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address lastUpdaterPayee);
+        event PropertyColorUpdatePixel(uint24 indexed property, uint8 row, uint24 rgb);
+        event PropertyBought(uint24 indexed property,  address newOwner, uint256 ethAmount, uint256 ppcAmount, uint256 timestamp); //Added ethAmount, ppcAmount and timestamp
+        event SetUserHoverText(address indexed user, bytes32[2] newHoverText);
+        event SetUserSetLink(address indexed user, bytes32[2] newLink);
+        event PropertySetForSale(uint24 indexed property, uint256 forSalePrice);
+        event DelistProperty(uint24 indexed property);
+        event ListTradeOffer(address indexed offerOwner, uint256 eth, uint256 ppc, bool isBuyingPPC);
+        event UpdateTradeOffer(address indexed accepter, address indexed offerOwner, uint256 ppcBought, uint256 timestamp); //Added timestamp
+        event SetPropertyPublic(uint24 indexed property);
+        event SetPropertyPrivate(uint24 indexed property, uint32 numHoursPrivate);
+
+    views:
+        getForSalePrices(uint24 propertyID) view returns(uint256, uint256) 
+        getHoverText(address user) view returns(bytes32[2])
+        getLink(address user) view returns(bytues32[2])
+        getPropertyColors(uint24 propertyID)view returns(uint256[10])
+        getPropertyData(uint24 propertyID) view returns(address, uint256, uint256, uint256, bool)
+        getTradeOffer(address offerOwner) view returns(uint256, uint256, bool)
+
+    functions:
+        setHoverText(bytes32[2] text)
+            - SetUserHoverText(msg.sender, text)
+        setLink(bytes32[2] link)
+            - SetUserSetLink(msg.sender, link)
+        setColors(uint24 propertyID, uint256[10] newColors)
+            - PropertyColorUpdate(propertyID, newColors, timeUpdate, lastUpdaterPayee)
+        setPropertyMode(uint24 propertyID, bool isInPrivateMode, uint32 numHoursPrivate)
+            - SetPropertyPrivate(propertyID, numHoursPrivate)
+            - SetPropertyPublic(propertyID)
+        setBuyETHOffer(uint256 ethPer, uint256 offeredPPC)
+            - ListTradeOffer(msg.sender, ethPer, offeredPPC, false)
+        setBuyPPCOffer(uint256 ppcToBuy, uint256 ethPer)
+            - ListTradeOffer(msg.sender, ethPer, ppcToBuy, true)
+        cancelTradeOffer()
+            - UpdateTradeOffer(0, msg.sender, 0, now);
+        acceptOfferBuyingETH(address ownerOfTradeOffer)
+            - UpdateTradeOffer(msg.sender, ownerOfTradeOffer, tradedPPC, now)
+        acceptOfferBuyingPPC(address ownerOfTradeOffer, uint256 ppcValue)
+            - UpdateTradeOffer(msg.sender, ownerOfTradeOffer, payedValue, now)
+        setRowColors(uint24 propertyID, uint8 row, uint24 newColorData)
+            - PropertyColorUpdatePixel(propertyID, row, newColorData)
+        transferProperty(uint24 propertyID, address newOwner)
+            - PropertyBought(propertyID, newOwner, 0, 0, now)
+        buyProperty(uint24 propertyID, uint256 ppcValue)
+            - PropertyBought(propertyID, property.owner, msg.value, ppcValue, now)
+        buyPropertyInPPC(uint24 propertyID, uint256 ppcValue)
+            - PropertyBought(propertyID, property.owner, 0, property.salePrice, now)
+        buyPropertyInETH(uint24 propertyID)
+            - PropertyBought(propertyID, property.owner, msg.value, 0, now)
+        listForSale(uint24 propertyID, uint128 price )
+            - PropertySetForSale(propertyID, property.salePrice)
+        delist(uint24 propertyID)
+            - DelistProperty(propertyID)
+
+    ownerFunctions:
+        withdraw(uint256 amount)
+        withdrawAll()
+        changeOwners(address newOwner)

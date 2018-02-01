@@ -1,11 +1,7 @@
 import React, { Component } from 'react'
 import {Contract, ctr} from '../../contract/contract.jsx';
-import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
+import {SDM, ServerDataManager, Compares} from '../../contract/ServerDataManager.jsx';
 import PanelContainerOwned from '../ui/PanelContainerOwned';
-
-const compares = {
-    xDesc: 0
-};
 
 class PlaceMarketTrade extends Component {
     constructor(props) {
@@ -21,7 +17,7 @@ class PlaceMarketTrade extends Component {
 
     componentDidMount() {
         //get my current market trade and populate fields
-        let promise = SDM.orderPropertyListAsync(SDM.ownedProperties, (a,b) => {return a.x < b.x;});
+        let promise = SDM.orderPropertyListAsync(SDM.ownedProperties, Compares.xDesc.func);
 
         let relisten = (results) => {
             this.setState({orderedItems: results.data});

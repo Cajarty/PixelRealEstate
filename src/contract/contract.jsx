@@ -51,10 +51,6 @@ export class Contract {
         this.accounts = null;
         this.account = null;
         this.VRE = contract(VirtualRealEstate);
-        this.pixelsOwned = {};
-        this.pixelsRented = {};
-        this.pixelsForSale = {};
-        this.pixelsForRent = {};
 
         this.propertyTradeLog = [];
 

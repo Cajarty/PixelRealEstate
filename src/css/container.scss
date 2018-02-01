@@ -1,0 +1,24 @@
+.uiBase {
+    height: 100%;
+    .header {
+        height: 100px;
+        font: $color2;
+        text-align: center;
+    }
+    .containerParent {
+        height: calc(100% - 150px);
+        overflow-y: auto;
+    }
+    .footer {
+        height: 50px;
+        display: inline-block;
+        width: 100%;
+        .bottomNav {
+            display: inline-block;
+            height: 40px;
+            width: calc(33% - 10px);
+            margin: 5px;
+            text-align: center;
+        }
+    }
+}

@@ -2,6 +2,25 @@ import {ctr, Contract, EVENTS, LISTENERS} from './contract.jsx';
 import Axios from '../network/Axios.jsx';
 import * as Func from '../functions/functions.jsx';
 
+export const Compares = {
+    xAsc: { 
+        name: 'X - Ascending',
+        func: (a,b) => {return a.x < b.x;}
+    }, 
+    xDesc: {
+        name: 'X - Descending',
+        func: (a,b) => {return a.x > b.x;}
+    },
+    yAsc: {
+        name: 'Y - Ascending', 
+        func: (a,b) => {return a.y < b.y;}
+    },
+    yDesc: {
+        name: 'Y - Descending',
+        func: (a,b) => {return a.y > b.y;}
+    }
+};
+
 export class ServerDataManager {
     constructor() {
         //pixel data
@@ -253,6 +272,16 @@ export class ServerDataManager {
         }
 
         return new Promise(repromise);
+    }
+
+    getPropertyImage(xx, yy) {
+        let data = [];
+        for (let y = yy * 10; y < (yy + 1) * 10; y++)
+            for (let x = xx * 10; x < (xx + 1) * 10; x++)
+                for (let i = 0; i < 4; i++) {
+                    data.push(this.pixelData[y][x * 4 + i]);
+                }
+        return data;
     }
 }
 

@@ -16,14 +16,14 @@ class PanelContainer extends Component {
     }
 
     componentWillReceiveProps(newProps) {
-        let start = newProps.viewStart || this.props.viewStart || 0;
-        let end = newProps.viewEnd || this.props.viewEnd || this.props.data.length;
+        let start = newProps.viewStart == null ? 0 : newProps.viewStart;
+        let end = newProps.viewEnd == null ? this.props.data.length : newProps.viewEnd;
         this.setState({dataView: newProps.data.slice(start, end)});
     }
 
     render() {
         return (
-            <div>
+            <div className='panelContainer'>
                 {this.state.dataView.map((child, i) => (
                     <Panel key={i}>
                         <PanelItem width='10%' data='X:'/>

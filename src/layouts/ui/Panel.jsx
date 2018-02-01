@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
+import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 
 export class Panel extends Component {
     render() {
         return (
-            <div className='panel'>
+            <div onClick={() => this.props.onClick()} className='panel'>
                 {this.props.children}
             </div>
         );
@@ -16,10 +17,11 @@ export class PanelItem extends Component {
     }
 }
 
-export class PanelCanvas extends Component {
+export class PanelPropertyCanvas extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            ctx: null,
             scale: 1,
         };
     }
@@ -28,29 +30,28 @@ export class PanelCanvas extends Component {
         let ctx = this.canvas.getContext("2d");
         ctx.imageSmoothingEnabled = false;
         ctx.webkitImageSmoothingEnabled = false;
-        ctx.scale(this.props.width, this.props.width);
         this.setState({ ctx });
-        this.setCanvas(this.props.imageData);
+        this.setCanvas(SDM.getPropertyImage(this.props.x, this.props.y));
     }
 
     componentWillReceiveProps(newProps) {
-        if (newProps.imageData !== this.props.imageData)
-            this.setCanvas(newProps.imageData);
-        if (newProps.width != this.props.width) {
-            this.ctx.scale(1/this.state.scale, 1/this.state.scale);
-            this.ctx.scale(newProps.width, newProps.width);
-            this.setState({scale: newProps.width});
-        }
+        this.setCanvas(SDM.getPropertyImage(this.props.x, this.props.y));
     }
 
     setCanvas(rgbArr) {
-        let ctxID = this.state.ctx.createImageData(10, 10);
-        for (let i = 0; i < Object.keys(rgbArr).length; i++) {
-            for (let j = 0; j < rgbArr[i].length; j++) {
-                ctxID.data[i * rgbArr[i].length + j] = rgbArr[i][j];
-            }
+        let ctx = this.state.ctx;
+        if (ctx == null) {
+            ctx = this.canvas.getContext("2d");
         }
-        this.state.ctx.putImageData(ctxID, 0, 0);
+
+        let ctxID = ctx.createImageData(10, 10);
+        for (let i = 0; i < 400; i++) {
+            ctxID.data[i] = rgbArr[i];
+        }
+        ctx.putImageData(ctxID, 0, 0)
+        ctx.scale(this.props.width / 10, this.props.width / 10);
+        this.setState({ ctx, scale: this.props.width });
+        ctx.drawImage(this.canvas, 0, 0);
     }
 
     render() {

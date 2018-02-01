@@ -70,6 +70,7 @@ contract('VirtualRealEstate', function(accounts) {
   it("User0 can purchase a property at default price in ETH", function() {
     return VirtualRealEstate.deployed().then(function(instance) {
       pixelPropertyInstance = instance;
+      
       return pixelPropertyInstance.buyPropertyInETH(0, { from: accounts[0], value: 10000 }); 
     }).then(function(result) {
       return pixelPropertyInstance.getPropertyData(0, { from: accounts[0] });

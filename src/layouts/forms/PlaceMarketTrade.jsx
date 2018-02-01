@@ -16,20 +16,14 @@ class PlaceMarketTrade extends Component {
     }
 
     componentDidMount() {
-        //get my current market trade and populate fields
-        let promise = SDM.orderPropertyListAsync(SDM.ownedProperties, Compares.xDesc.func);
 
-        let relisten = (results) => {
-            this.setState({orderedItems: results.data});
-            if (results.promise && !this.cancelSort)
-                results.promise.then(relisten);
-        }
-
-        promise.then(relisten);
     }
 
     componentWillUnmount() {
-        this.cancelSort = true;
+    }
+
+    placeTrade() {
+
     }
 
     handleInput(key, value) {
@@ -40,13 +34,42 @@ class PlaceMarketTrade extends Component {
 
     render() {
         return (
-            <div>
-                <PanelContainerOwned
-                    data={this.state.orderedItems}
-                    viewStart={0}
-                    viewEnd={1}
-                />
-            </div>
+            <table cellSpacing={0} cellPadding={0} className='form'>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div className='title'>
+                                Place Trade:
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label className="switch">
+                                <input type="checkbox" checked={this.state.tradingPPCToETH} onChange={(e) => this.handleInput('tradingPPCToETH', e.target.checked)}></input>
+                                <span className="slider"></span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div className='inputTitle'>PPC Amount</div>
+                            <input id='PPC' type='number' onChange={(e) => this.handleInput('PPC', parseInt(e.target.value))} value={this.state.PPC}></input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div className='inputTitle'>ETH Each</div>
+                            <input id='ETH' type='number' onChange={(e) => this.handleInput('ETH', parseInt(e.target.value))} value={this.state.ETH}></input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type='button' value='Buy Pixel' onClick={() => this.placeTrade()}></input>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         );
     }
 }

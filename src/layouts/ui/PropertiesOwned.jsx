@@ -4,7 +4,7 @@ import {SDM, ServerDataManager, Compares} from '../../contract/ServerDataManager
 import PanelContainerOwned from './PanelContainerOwned';
 import * as Assets from '../../const/assets.jsx';
 
-const PAGE_SIZE = 4;
+const PAGE_SIZE = 10;
 
 class PropertiesOwned extends Component {
     constructor(props) {
@@ -33,7 +33,7 @@ class PropertiesOwned extends Component {
         let relisten = (results) => {
             this.setState({
                 orderedItems: results.data, 
-                pages: Math.floor(results.data.length / PAGE_SIZE)});
+                pages: Math.floor((results.data.length - 1) / PAGE_SIZE)});
             if (results.promise && !this.cancelSort)
                 results.promise.then(relisten);
         }
@@ -58,11 +58,10 @@ class PropertiesOwned extends Component {
 
     changePage(pageChange) {
         let page = this.state.page + pageChange;
-        if (page <= 0)
+        if (page < 0)
             page = 0;
         if (page > this.state.pages)
             page = this.state.pages;
-            console.info(page);
         this.setState({page});        
     }
 
@@ -70,7 +69,7 @@ class PropertiesOwned extends Component {
         return (
             <div className='uiBase'>
                 <div className='header'>
-                    Some important info right here
+                    Your Owned Properties
                 </div>
                 <div className='containerParent'>
                     <PanelContainerOwned
@@ -85,7 +84,7 @@ class PropertiesOwned extends Component {
                         <img className='icon' src={Assets.ICON_LEFT_ARROW}></img>
                     </div>
                     <div className='bottomNav'>
-                        {(this.state.page + 1) + ' / ' + (this.state.pages + 1)}
+                        {(this.state.page + 1) + ' / ' + Math.max(this.state.pages + 1, 1)}
                     </div>
                     <div className='bottomNav' onClick={() => this.changePage(1)}>
                         <img className='icon' src={Assets.ICON_RIGHT_ARROW}></img>
@@ -93,47 +92,7 @@ class PropertiesOwned extends Component {
                 </div>
             </div>
         );
-}
-
-    // render() {
-    //     return (
-    //         <div>
-    //              <table cellSpacing={0} cellPadding={0} className='header'>
-    //                 <thead>
-    //                     <tr>
-    //                         <td style={{width: '10%'}}>{'X'}</td>
-    //                         <td style={{width: '10%'}}>{'Y'}</td>
-    //                         <td style={{width: '20%'}}>{'For Sale'}</td>
-    //                         <td style={{width: '20%'}}>{'Private'}</td>
-    //                         <td style={{width: '40%'}}>{'Last Change'}</td>
-    //                     </tr>
-    //                 </thead>
-    //             </table>
-    //             <div className='tableData'>
-    //                 <table cellSpacing={0} cellPadding={0} className='data'>
-    //                     <tbody>
-    //                         {Object.keys(SDM.ownedProperties).map((x) =>
-    //                             {return Object.keys(SDM.ownedProperties[x]).map((y) => 
-    //                                 <tr key={x * 100 + y} onClick={() => this.propertySelected(x, y)}>
-    //                                     <td style={{width: '10%'}}>{x}</td>
-    //                                     <td style={{width: '10%'}}>{y}</td>
-    //                                     <td style={{width: '20%'}}>{SDM.ownedProperties[x][y].isForSale ? 'Yes' : 'No'}</td>
-    //                                     <td style={{width: '20%'}}>{SDM.ownedProperties[x][y].isInPrivate ? 'Yes' : 'No'}</td>
-    //                                     <td style={{width: '40%'}}>
-    //                                         {SDM.ownedProperties[x][y].lastUpdate == null || SDM.ownedProperties[x][y].lastUpdate == 0 ? 
-    //                                             'Never' 
-    //                                             : <Timestamp time={SDM.ownedProperties[x][y].lastUpdate} autoUpdate precision={2}/>
-    //                                         }
-    //                                     </td>
-    //                                 </tr>
-    //                             )}
-    //                         )}
-    //                     </tbody>
-    //                 </table>
-    //             </div>
-    //         </div>
-    //     );
-    // }
+    }
 }
 
 export default PropertiesOwned

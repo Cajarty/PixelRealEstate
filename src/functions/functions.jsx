@@ -3,23 +3,54 @@ import _Base64 from 'js-base64';
 var Base64 = _Base64.Base64;
 var bigInt = require("big-integer");
 var BigNumber = require('bignumber.js');
+var utf8 = require("utf8");
 
-export const HexToString = (hexx) => {
-    let hex = hexx.toString();//force conversion
-    let str = '';
-    for (let i = 0; i < hex.length; i += 2)
-        str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
-    return str;
-}
+export const StringToHex = function(str) {
+    str = utf8.encode(str);
+    var hex = "";
 
-export const StringToHex = (str) => {
-    let arr = [];
-    for (let i = 0, l = str.length; i < l; i ++) {
-        let hex = Number(str.charCodeAt(i)).toString(16);
-        arr.push(hex);
+    // remove \u0000 padding from either side
+    str = str.replace(/^(?:\u0000)*/,'');
+    str = str.split("").reverse().join("");
+    str = str.replace(/^(?:\u0000)*/,'');
+    str = str.split("").reverse().join("");
+
+    for(var i = 0; i < str.length; i++) {
+        var code = str.charCodeAt(i);
+        // if (code !== 0) {
+        var n = code.toString(16);
+        hex += n.length < 2 ? '0' + n : n;
+        // }
     }
-    return arr.join('');
-}
+
+    return "0x" + hex;
+};
+
+export const HexToString = function(hex) {
+    //if (!isHexStrict(hex))
+    //    throw new Error('The parameter "'+ hex +'" must be a valid HEX string.');
+
+    var str = "";
+    var code = 0;
+    hex = hex.replace(/^0x/i,'');
+
+    // remove 00 padding from either side
+    hex = hex.replace(/^(?:00)*/,'');
+    hex = hex.split("").reverse().join("");
+    hex = hex.replace(/^(?:00)*/,'');
+    hex = hex.split("").reverse().join("");
+
+    var l = hex.length;
+
+    for (var i=0; i < l; i+=2) {
+        code = parseInt(hex.substr(i, 2), 16);
+        // if (code !== 0) {
+        str += String.fromCharCode(code);
+        // }
+    }
+
+    return utf8.decode(str);
+};
 
 export const BigNumberToNumber = (big) => {
     return big.toNumber();

@@ -175,11 +175,10 @@ export class Contract {
 
     //array of 2 32 bytes of string
     setHoverText(text) {
-        let strs = [];
-        strs.push(Func.StringToHex(text.slice(0, 32)));
-        strs.push(Func.StringToHex(text.slice(33, 64)));
+        let str1 = Func.StringToHex(text.slice(0, 32)).padEnd(66, '0');
+        let str2 = Func.StringToHex(text.slice(32, 64)).padEnd(66, '0');
         this.VRE.deployed().then((i) => {
-            return i.setHoverText(strs, {from: this.account });
+            return i.setHoverText([str1, str2], {from: this.account });
         }).then(function() {
             console.info("Hover text set!");
         }).catch((e) => {
@@ -189,11 +188,10 @@ export class Contract {
 
     //array of 2 32 bytes
     setLink(text) {
-        let strs = [];
-        strs.push(text.slice(0, 32));
-        strs.push(text.slice(33, 64));
+        let str1 = Func.StringToHex(text.slice(0, 32)).padEnd(66, '0');
+        let str2 = Func.StringToHex(text.slice(32, 64)).padEnd(66, '0');
         this.VRE.deployed().then((i) => {
-            return i.setLink(strs, {from: this.account });
+            return i.setLink([str1, str2], {from: this.account });
         }).then(function() {
             console.info("Property links updated!");
         }).catch((e) => {

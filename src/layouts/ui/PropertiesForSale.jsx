@@ -1,29 +1,58 @@
 import React, { Component } from 'react';
 import {Contract, ctr, EVENTS, LISTENERS} from '../../contract/contract.jsx';
-import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
+import {SDM, ServerDataManager, Compares} from '../../contract/ServerDataManager.jsx';
 import TimeAgo from 'react-timeago';
+import PanelContainerOwned from './PanelContainerOwned';
+import * as Assets from '../../const/assets.jsx';
+
+const PAGE_SIZE = 10;
 
 class PropertiesForSale extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showPopertiesForSale: false,
-        }
+            orderedItems: [],
+            compare: Compares.xDesc,
+            page: 0, //on page #
+            pages: 0, //total pages
+        };
+        this.cancelSort = false;
     }
 
     componentDidMount() {
         ctr.listenForEvent(EVENTS.PropertySetForSale, 'PropertiesForSale', (data) => {
+            this.reorderItems();
             this.forceUpdate();
         });
+        this.reorderItems();
+    }
+
+    reorderItems() {
+        console.info(SDM.forSaleProperties)
+        //get my current market trade and populate fields
+        let promise = SDM.orderPropertyListAsync(SDM.forSaleProperties, this.state.compare.func);
+
+        let relisten = (results) => {
+            this.setState({
+                orderedItems: results.data, 
+                pages: Math.floor((results.data.length - 1) / PAGE_SIZE)});
+            if (results.promise && !this.cancelSort)
+                results.promise.then(relisten);
+        }
+
+        promise.then(relisten);
     }
 
     componentWillUnmount() {
+        this.cancelSort = true;
         ctr.stopListeningForEvent(EVENTS.PropertySetForSale, 'PropertiesForSale');
     }
 
-    propertySelected(x, y) {
-        console.info(SDM.forSaleProperties[x][y]);
-        ctr.sendResults(LISTENERS.CoordinateUpdate, {x, y});
+    handleInput(key, value) {
+        let obj = {};
+        obj[key] = value;
+        this.setState(obj);
     }
 
     toggleCanvasProperties(value) {
@@ -31,11 +60,26 @@ class PropertiesForSale extends Component {
         ctr.sendResults(LISTENERS.ShowForSale, {show: value});
     }
 
+    propertySelected(x, y) {
+        ctr.sendResults(LISTENERS.CoordinateUpdate, {x, y});
+    }
+
+    changePage(pageChange) {
+        let page = this.state.page + pageChange;
+        if (page < 0)
+            page = 0;
+        if (page > this.state.pages)
+            page = this.state.pages;
+        this.setState({page});        
+    }
+
     render() {
         return (
-            <div>
-                Show for sale properties on canvas 
-                <label className="switch">
+            <div className='uiBase'>
+                <div className='header'>
+                    Properties For Sale
+                    <label className="switch">
+                    Show
                     <input 
                         type="checkbox" 
                         checked={this.state.showPopertiesForSale} 
@@ -43,31 +87,25 @@ class PropertiesForSale extends Component {
                     ></input>
                     <span className="slider"></span>
                 </label>
-                <table cellSpacing={0} cellPadding={0} className='header'>
-                    <thead>
-                        <tr>
-                            <td style={{width: '15%'}}>{'X'}</td>
-                            <td style={{width: '15%'}}>{'Y'}</td>
-                            <td style={{width: '35%'}}>{'ETH Price'}</td>
-                            <td style={{width: '35%'}}>{'PXL Price'}</td>
-                        </tr>
-                    </thead>
-                </table>
-                <div className='tableData'>
-                    <table cellSpacing={0} cellPadding={0} className='data'>
-                        <tbody>
-                            {Object.keys(SDM.forSaleProperties).map((x) =>
-                                {return Object.keys(SDM.forSaleProperties[x]).map((y) => 
-                                    <tr key={x * 100 + y} onClick={() => this.propertySelected(x, y)}>
-                                        <td style={{width: '15%'}}>{x}</td>
-                                        <td style={{width: '15%'}}>{y}</td>
-                                        <td style={{width: '35%'}}>{SDM.forSaleProperties[x][y].salePriceETH == 0 ? 'N/A' : SDM.forSaleProperties[x][y].salePriceETH}</td>
-                                        <td style={{width: '35%'}}>{SDM.forSaleProperties[x][y].salePricePXL == 0 ? 'N/A' : SDM.forSaleProperties[x][y].salePricePXL}</td>
-                                    </tr>
-                                )}
-                            )}
-                        </tbody>
-                    </table>
+                </div>
+                <div className='containerParent'>
+                    <PanelContainerOwned
+                        data={this.state.orderedItems}
+                        onClick={(x, y) => this.propertySelected(x, y)}
+                        viewStart={this.state.page * PAGE_SIZE}
+                        viewEnd={(this.state.page + 1) * PAGE_SIZE}
+                    />
+                </div>
+                <div className='footer'>
+                    <div className='bottomNav' onClick={() => this.changePage(-1)}>
+                        <img className='icon' src={Assets.ICON_LEFT_ARROW}></img>
+                    </div>
+                    <div className='bottomNav'>
+                        {(this.state.page + 1) + ' / ' + (this.state.pages + 1)}
+                    </div>
+                    <div className='bottomNav' onClick={() => this.changePage(1)}>
+                        <img className='icon' src={Assets.ICON_RIGHT_ARROW}></img>
+                        </div>
                 </div>
             </div>
         );

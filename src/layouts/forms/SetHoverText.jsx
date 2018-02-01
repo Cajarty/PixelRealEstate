@@ -12,7 +12,8 @@ class SetHoverText extends Component {
     }
 
     componentDidMount() {
-        ctr.getHoverText(ctr.account[0], (data) => {
+        ctr.getHoverText(ctr.account, (data) => {
+            console.info(data);
             this.setState({hoverText: Func.HexToString(data[0]) + Func.HexToString(data[1])});
         });
     }

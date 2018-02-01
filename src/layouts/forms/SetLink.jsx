@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import {Contract, ctr} from '../../contract/contract.jsx';
+import * as Func from '../../functions/functions.jsx';
 
 class SetHoverText extends Component {
     constructor(props) {
@@ -11,8 +12,7 @@ class SetHoverText extends Component {
 
     componentDidMount() {
         ctr.getLink(ctr.account[0], (data) => {
-            console.info(data);
-            //this.setState({hoverText: })
+            this.setState({linkText: Func.HexToString(data[0]) + Func.HexToString(data[1])});
         });
     }
 

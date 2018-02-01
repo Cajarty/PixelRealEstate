@@ -53,7 +53,6 @@ export class ServerDataManager {
 
     setupEvents() {
         ctr.listenForEvent(EVENTS.PropertyColorUpdate, 'SDM-PropertyColorUpdate', (data) => {
-            console.info(data);
             let xy = {x: 0, y: 0};
             if (data.args.x == null || data.args.y == null)
                 xy = ctr.fromID(Func.BigNumberToNumber(data.args.property));
@@ -248,7 +247,7 @@ export class ServerDataManager {
 
     orderPropertyListAsync(objList, compFunc) {
         let index = 0;
-        let block = 40;
+        let block = 100;
         let sortedArray = [];
 
         let objArr = [];
@@ -261,7 +260,6 @@ export class ServerDataManager {
 
         let repromise = (res, rej) => {
             setTimeout(() => {
-                console.info('a call');
                 sortedArray = this.partialOrderPropertyListByIndex(sortedArray, objArr, index, index + block, compFunc);
                 index += block;
                 if (index < objArr.length)

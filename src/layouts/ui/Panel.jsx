@@ -13,7 +13,7 @@ export class Panel extends Component {
 
 export class PanelItem extends Component {
     render() {
-        return (<div className='panelItem' style={{width: this.props.width}}>{this.props.data}</div>);
+        return (<div className={'panelItem' + (this.props.title ? ' itemTitle' : '')} style={{width: this.props.width}}>{this.props.data}</div>);
     }
 }
 

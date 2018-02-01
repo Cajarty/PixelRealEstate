@@ -46,7 +46,7 @@
     }
 
     #header {
-        height: 100vh !important ;
+        min-height: 100vh !important ;
         background-color: none;
         position:relative;
     }
@@ -59,15 +59,15 @@
         background-image: url("images/pixelbg3.png");
         background-size: 75% 75%;
         width: 100vw;
-        height: 100vh;
+        min-height: 100vh !important;
         position: absolute;
         top: 0;
 
-        -webkit-filter: blur(10px);
-        -moz-filter: blur(10px);
-        -o-filter: blur(10px);
-        -ms-filter: blur(10px);
-        filter: blur(10px);
+        -webkit-filter: blur(15px);
+        -moz-filter: blur(15px);
+        -o-filter: blur(15px);
+        -ms-filter: blur(15px);
+        filter: blur(15px);
     }
 
     #inner,
@@ -86,10 +86,275 @@
         border: 2px solid black;
     }
 
+    .shadow {
+        fill: black;
+        stroke: black; 
+        stroke-width: 1;
+    }
+
+    .pixel {
+        fill: white;
+        stroke: white; 
+        stroke-width: 1;
+    }
+
+    </style>
+
+    <!-- NAVBAR -->
+    <style>
+/* Remove dark-nav class from nav tag to see the light version  */
+#nav-header {
+  padding: 0;
+  margin: 0;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  outline: none;
+  font-family: arial;
+  font-size: 18px;
+}
+#nav-header {
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+.container-nav:after, .container-nav:before {
+  content: "";
+  display: block;
+  clear: both;
+  width: 90% !important;
+}
+
+/* Start navbar */
+.nav {
+  background-color: #f8f8f8;
+  /*border-bottom: 1px solid #ececec;*/
+  min-height: 50px;
+  height: auto;
+}
+.nav .nav-heading {float: left}
+
+.nav .nav-heading .toggle-nav {
+  padding: 2px 10px;
+  border-radius: 5px;
+  border: none;
+  display: none;
+  background-color: transparent;
+}
+.nav .nav-heading > a {
+  text-decoration: none;
+  color: #000;
+  line-height: 60px;
+  font-weight: 400;
+  font-size: 19px;
+}
+
+/* Start menu */
+.nav .menu {
+  float: right;
+}
+.nav .menu:after {
+  content: "";
+  clear: both;
+  display: block;
+}
+.nav .list {
+  float: right;
+  margin: 0;
+}
+.nav .list > li {
+  float: left;
+  list-style: none;
+}
+.nav .list > li > a {
+  color: #555;
+  text-decoration: none;
+  display: block;
+  line-height: 60px;
+  padding: 0 10px;
+}
+.nav .list > li > a:hover,
+.nav .list > li.active > a {
+  color: #333
+}
+
+/* Start drodpwn menu */
+.categories {
+  position: relative;
+}
+.nav .list .categories .drop-down {
+  list-style: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #FFF;
+  border: 1px solid #ccc;
+  padding: 5px 0;
+  min-width: 160px;
+  width: auto;
+  white-space: nowrap;
+  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+  display: none;
+  z-index: 99999
+}
+.nav .list .drop-down > .seprator {
+  height: 1px;
+  width: 100%;
+  margin: 9px 0;
+  background-color: #e5e5e5
+}
+.drop-down > li > a {
+  color: #333;
+  display: block;
+  padding: 3px 20px;
+  text-decoration: none;
+}
+.show {
+  display: block
+}
+
+/* Sub dropdown menu */
+.categories .drop-down .sub-drop-down {position: relative}
+.categories .drop-down .sub-drop-down:hover .sub-dropdown {
+  display: block;
+}
+.categories .drop-down .sub-dropdown {
+  position: absolute;
+  top: -20px;
+  left: 107%;
+  list-style: none;
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  border-radius: 3px;
+  padding: 10px;
+  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+  display: none;
+}
+.categories .drop-down .sub-dropdown:before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 20px;
+  left: -20px;
+  border-top: 10px solid transparent;
+  border-left: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: 10px solid #cccccc
+}
+.categories .drop-down .sub-dropdown > li > a {
+  color: #555;
+  padding: 5px 0;
+  display: block
+}
+/* End sub dropdown menu */
+/* Dark theme */
+.dark-nav {background-color: black}
+
+.dark-nav .list > li > a {color: #BBB}
+
+.dark-nav .list > li > a:hover,
+.dark-nav .list > li.active > a {color: #FFF}
+
+.dark-nav .nav-heading > a {color: #EEE}
+
+.dark-nav .nav-heading .toggle-nav {color: #EEE}
+
+/* End Dark theme */
+
+/* Start media query for navbar */
+@media (max-width: 767px) {
+  .nav .container {
+    padding-right: 0;
+    padding-left: 0;
+  }
+  .nav .nav-heading {
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+    /*border-bottom: 1px solid #e7e7e7*/
+  }
+  .nav .nav-heading .brand {float: left}
+
+  .nav .nav-heading .toggle-nav {
+    display: block;
+    float: right;
+    margin-top: 14px;
+  }
+
+  .nav .menu {
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+    display: none;
+  }
+
+  .nav .list {
+    float: none;
+    width: 100%;
+  }
+  .nav .list > li {
+    float: none;
+    width: 100%;
+  }
+  .nav .list > li > a {padding: 12px 0;line-height: 1;}
+
+  .nav .list .categories .drop-down {
+    background-color: transparent;
+    border: none;
+    position: static;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    padding: 0
+  }
+  .categories .drop-down .sub-dropdown {
+    position: static;
+    background-color: transparent;
+    border: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    padding-left: 20px;
+  }
+  .categories .drop-down .sub-dropdown > li > a {
+    color: #888;
+  }
+  .categories .drop-down .sub-dropdown:before {
+    display: none
+  }
+  /* Simple reset for dark theme */
+  .dark-nav .menu {background-color: black}
+  .dark-nav .nav-heading {border-bottom-color: #31343c}
+  .dark-nav .list .drop-down > li > a {color: #AAA}
+  .dark-nav .list .categories .drop-down .seprator {background-color: #2a2d38}
+
+}
+
     </style>
 
     <body>
     
+        <header id="nav-header">
+        <!--  Remove dark nav  -->
+            <nav class="nav dark-nav">
+                <div class="container container-nav" style="width:90% !important">
+                    <div class="nav-heading">
+                        <button class="toggle-nav" data-toggle="open-navbar1"><i class="fa fa-align-right"></i></button>
+                        <a style="border-bottom: 0 !important;" class="brand" href="#">PixelProperty</a>
+                    </div>
+                    <div class="menu" id="open-navbar1">
+                        <ul class="list">
+                            <li><a style="border-bottom: 0 !important;" href="#intro">Intro</a></li>
+                            <li><a style="border-bottom: 0 !important;" href="#setting-up">Setting Up</a></li>
+                            <li><a style="border-bottom: 0 !important;" href="#about-us">About Us</a></li>
+                            <li><a style="border-bottom: 0 !important;" href="#technical-details">Technical Details</a></li>
+                            <li><a style="border-bottom: 0 !important;" href="#road-map">Road Map</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
         <!-- scrolling link to full canvas -->
         <!-- <div id="scrolling-canvas-link">Checkout the full Canvas</div> -->
 
@@ -97,7 +362,637 @@
         <section id="header">
             <div class="inner">
                 <h1 id="header-title">
-                    <span class="inline" id="div-pixel"></span><span class="inline" id="div-property"></span>       
+                    <span class="inline" id="div-pixel">
+                        <svg class="svg-letter" id="letter-00" data-index="00" width="96" height="108" style="margin:5px;">
+                            <rect data-x="15" data-y="15" class="pixels shadow shadow-00" x="15" y="15" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="15" class="pixels shadow shadow-00" x="27" y="15" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="15" class="pixels shadow shadow-00" x="39" y="15" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="15" class="pixels shadow shadow-00" x="51" y="15" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="15" class="pixels shadow shadow-00" x="63" y="15" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="27" class="pixels shadow shadow-00" x="15" y="27" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="27" class="pixels shadow shadow-00" x="27" y="27" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="27" class="pixels shadow shadow-00" x="63" y="27" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="27" class="pixels shadow shadow-00" x="75" y="27" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="39" class="pixels shadow shadow-00" x="15" y="39" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="39" class="pixels shadow shadow-00" x="27" y="39" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="39" class="pixels shadow shadow-00" x="63" y="39" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="39" class="pixels shadow shadow-00" x="75" y="39" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="51" class="pixels shadow shadow-00" x="15" y="51" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="51" class="pixels shadow shadow-00" x="27" y="51" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="51" class="pixels shadow shadow-00" x="39" y="51" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="51" class="pixels shadow shadow-00" x="51" y="51" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="51" class="pixels shadow shadow-00" x="63" y="51" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="63" class="pixels shadow shadow-00" x="15" y="63" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="63" class="pixels shadow shadow-00" x="27" y="63" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="75" class="pixels shadow shadow-00" x="15" y="75" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="75" class="pixels shadow shadow-00" x="27" y="75" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="87" class="pixels shadow shadow-00" x="15" y="87" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="87" class="pixels shadow shadow-00" x="27" y="87" width="22" height="22"></rect>
+                            <rect data-x="12" data-y="12" class="pixels pixel pixel-00" x="12" y="12" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="12" class="pixels pixel pixel-00" x="24" y="12" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="12" class="pixels pixel pixel-00" x="36" y="12" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="12" class="pixels pixel pixel-00" x="48" y="12" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="12" class="pixels pixel pixel-00" x="60" y="12" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="24" class="pixels pixel pixel-00" x="12" y="24" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="24" class="pixels pixel pixel-00" x="24" y="24" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="24" class="pixels pixel pixel-00" x="60" y="24" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="24" class="pixels pixel pixel-00" x="72" y="24" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="36" class="pixels pixel pixel-00" x="12" y="36" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="36" class="pixels pixel pixel-00" x="24" y="36" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="36" class="pixels pixel pixel-00" x="60" y="36" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="36" class="pixels pixel pixel-00" x="72" y="36" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="48" class="pixels pixel pixel-00" x="12" y="48" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="48" class="pixels pixel pixel-00" x="24" y="48" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="48" class="pixels pixel pixel-00" x="36" y="48" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="48" class="pixels pixel pixel-00" x="48" y="48" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="48" class="pixels pixel pixel-00" x="60" y="48" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="60" class="pixels pixel pixel-00" x="12" y="60" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="60" class="pixels pixel pixel-00" x="24" y="60" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="72" class="pixels pixel pixel-00" x="12" y="72" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="72" class="pixels pixel pixel-00" x="24" y="72" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="84" class="pixels pixel pixel-00" x="12" y="84" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="84" class="pixels pixel pixel-00" x="24" y="84" width="12" height="12"></rect>
+                        </svg>
+                        <svg class="svg-letter" id="letter-01" data-index="01" width="72" height="108" style="margin:5px;">
+                            <rect data-x="15" data-y="15" class="pixels shadow shadow-01" x="15" y="15" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="15" class="pixels shadow shadow-01" x="27" y="15" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="15" class="pixels shadow shadow-01" x="39" y="15" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="15" class="pixels shadow shadow-01" x="51" y="15" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="27" class="pixels shadow shadow-01" x="27" y="27" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="27" class="pixels shadow shadow-01" x="39" y="27" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="39" class="pixels shadow shadow-01" x="27" y="39" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="39" class="pixels shadow shadow-01" x="39" y="39" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="51" class="pixels shadow shadow-01" x="27" y="51" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="51" class="pixels shadow shadow-01" x="39" y="51" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="63" class="pixels shadow shadow-01" x="27" y="63" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="63" class="pixels shadow shadow-01" x="39" y="63" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="75" class="pixels shadow shadow-01" x="27" y="75" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="75" class="pixels shadow shadow-01" x="39" y="75" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="87" class="pixels shadow shadow-01" x="15" y="87" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="87" class="pixels shadow shadow-01" x="27" y="87" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="87" class="pixels shadow shadow-01" x="39" y="87" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="87" class="pixels shadow shadow-01" x="51" y="87" width="22" height="22"></rect>
+                            <rect data-x="12" data-y="12" class="pixels pixel pixel-01" x="12" y="12" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="12" class="pixels pixel pixel-01" x="24" y="12" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="12" class="pixels pixel pixel-01" x="36" y="12" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="12" class="pixels pixel pixel-01" x="48" y="12" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="24" class="pixels pixel pixel-01" x="24" y="24" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="24" class="pixels pixel pixel-01" x="36" y="24" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="36" class="pixels pixel pixel-01" x="24" y="36" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="36" class="pixels pixel pixel-01" x="36" y="36" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="48" class="pixels pixel pixel-01" x="24" y="48" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="48" class="pixels pixel pixel-01" x="36" y="48" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="60" class="pixels pixel pixel-01" x="24" y="60" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="60" class="pixels pixel pixel-01" x="36" y="60" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="72" class="pixels pixel pixel-01" x="24" y="72" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="72" class="pixels pixel pixel-01" x="36" y="72" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="84" class="pixels pixel pixel-01" x="12" y="84" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="84" class="pixels pixel pixel-01" x="24" y="84" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="84" class="pixels pixel pixel-01" x="36" y="84" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="84" class="pixels pixel pixel-01" x="48" y="84" width="12" height="12"></rect>
+                        </svg>
+                        <svg class="svg-letter" id="letter-02" data-index="02" width="96" height="108" style="margin:5px;">
+                            <rect data-x="15" data-y="15" class="pixels shadow shadow-02" x="15" y="15" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="15" class="pixels shadow shadow-02" x="27" y="15" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="15" class="pixels shadow shadow-02" x="75" y="15" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="27" class="pixels shadow shadow-02" x="15" y="27" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="27" class="pixels shadow shadow-02" x="27" y="27" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="27" class="pixels shadow shadow-02" x="75" y="27" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="39" class="pixels shadow shadow-02" x="27" y="39" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="39" class="pixels shadow shadow-02" x="39" y="39" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="39" class="pixels shadow shadow-02" x="63" y="39" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="51" class="pixels shadow shadow-02" x="39" y="51" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="51" class="pixels shadow shadow-02" x="51" y="51" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="63" class="pixels shadow shadow-02" x="27" y="63" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="63" class="pixels shadow shadow-02" x="51" y="63" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="63" class="pixels shadow shadow-02" x="63" y="63" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="75" class="pixels shadow shadow-02" x="15" y="75" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="75" class="pixels shadow shadow-02" x="63" y="75" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="75" class="pixels shadow shadow-02" x="75" y="75" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="87" class="pixels shadow shadow-02" x="15" y="87" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="87" class="pixels shadow shadow-02" x="63" y="87" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="87" class="pixels shadow shadow-02" x="75" y="87" width="22" height="22"></rect>
+                            <rect data-x="12" data-y="12" class="pixels pixel pixel-02" x="12" y="12" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="12" class="pixels pixel pixel-02" x="24" y="12" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="12" class="pixels pixel pixel-02" x="72" y="12" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="24" class="pixels pixel pixel-02" x="12" y="24" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="24" class="pixels pixel pixel-02" x="24" y="24" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="24" class="pixels pixel pixel-02" x="72" y="24" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="36" class="pixels pixel pixel-02" x="24" y="36" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="36" class="pixels pixel pixel-02" x="36" y="36" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="36" class="pixels pixel pixel-02" x="60" y="36" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="48" class="pixels pixel pixel-02" x="36" y="48" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="48" class="pixels pixel pixel-02" x="48" y="48" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="60" class="pixels pixel pixel-02" x="24" y="60" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="60" class="pixels pixel pixel-02" x="48" y="60" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="60" class="pixels pixel pixel-02" x="60" y="60" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="72" class="pixels pixel pixel-02" x="12" y="72" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="72" class="pixels pixel pixel-02" x="60" y="72" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="72" class="pixels pixel pixel-02" x="72" y="72" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="84" class="pixels pixel pixel-02" x="12" y="84" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="84" class="pixels pixel pixel-02" x="60" y="84" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="84" class="pixels pixel pixel-02" x="72" y="84" width="12" height="12"></rect>
+                        </svg>
+                        <svg class="svg-letter" id="letter-03" data-index="03" width="96" height="108" style="margin:5px;">
+                            <rect data-x="15" data-y="15" class="pixels shadow shadow-03" x="15" y="15" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="15" class="pixels shadow shadow-03" x="27" y="15" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="15" class="pixels shadow shadow-03" x="39" y="15" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="15" class="pixels shadow shadow-03" x="51" y="15" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="15" class="pixels shadow shadow-03" x="63" y="15" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="15" class="pixels shadow shadow-03" x="75" y="15" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="27" class="pixels shadow shadow-03" x="15" y="27" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="27" class="pixels shadow shadow-03" x="27" y="27" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="39" class="pixels shadow shadow-03" x="15" y="39" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="39" class="pixels shadow shadow-03" x="27" y="39" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="51" class="pixels shadow shadow-03" x="15" y="51" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="51" class="pixels shadow shadow-03" x="27" y="51" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="51" class="pixels shadow shadow-03" x="39" y="51" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="51" class="pixels shadow shadow-03" x="51" y="51" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="51" class="pixels shadow shadow-03" x="63" y="51" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="63" class="pixels shadow shadow-03" x="15" y="63" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="63" class="pixels shadow shadow-03" x="27" y="63" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="75" class="pixels shadow shadow-03" x="15" y="75" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="75" class="pixels shadow shadow-03" x="27" y="75" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="87" class="pixels shadow shadow-03" x="15" y="87" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="87" class="pixels shadow shadow-03" x="27" y="87" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="87" class="pixels shadow shadow-03" x="39" y="87" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="87" class="pixels shadow shadow-03" x="51" y="87" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="87" class="pixels shadow shadow-03" x="63" y="87" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="87" class="pixels shadow shadow-03" x="75" y="87" width="22" height="22"></rect>
+                            <rect data-x="12" data-y="12" class="pixels pixel pixel-03" x="12" y="12" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="12" class="pixels pixel pixel-03" x="24" y="12" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="12" class="pixels pixel pixel-03" x="36" y="12" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="12" class="pixels pixel pixel-03" x="48" y="12" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="12" class="pixels pixel pixel-03" x="60" y="12" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="12" class="pixels pixel pixel-03" x="72" y="12" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="24" class="pixels pixel pixel-03" x="12" y="24" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="24" class="pixels pixel pixel-03" x="24" y="24" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="36" class="pixels pixel pixel-03" x="12" y="36" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="36" class="pixels pixel pixel-03" x="24" y="36" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="48" class="pixels pixel pixel-03" x="12" y="48" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="48" class="pixels pixel pixel-03" x="24" y="48" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="48" class="pixels pixel pixel-03" x="36" y="48" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="48" class="pixels pixel pixel-03" x="48" y="48" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="48" class="pixels pixel pixel-03" x="60" y="48" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="60" class="pixels pixel pixel-03" x="12" y="60" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="60" class="pixels pixel pixel-03" x="24" y="60" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="72" class="pixels pixel pixel-03" x="12" y="72" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="72" class="pixels pixel pixel-03" x="24" y="72" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="84" class="pixels pixel pixel-03" x="12" y="84" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="84" class="pixels pixel pixel-03" x="24" y="84" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="84" class="pixels pixel pixel-03" x="36" y="84" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="84" class="pixels pixel pixel-03" x="48" y="84" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="84" class="pixels pixel pixel-03" x="60" y="84" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="84" class="pixels pixel pixel-03" x="72" y="84" width="12" height="12"></rect>
+                        </svg>
+                        <svg class="svg-letter" id="letter-04" data-index="04" width="96" height="108" style="margin:5px;">
+                            <rect data-x="15" data-y="15" class="pixels shadow shadow-04" x="15" y="15" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="15" class="pixels shadow shadow-04" x="27" y="15" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="27" class="pixels shadow shadow-04" x="15" y="27" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="27" class="pixels shadow shadow-04" x="27" y="27" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="39" class="pixels shadow shadow-04" x="15" y="39" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="39" class="pixels shadow shadow-04" x="27" y="39" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="51" class="pixels shadow shadow-04" x="15" y="51" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="51" class="pixels shadow shadow-04" x="27" y="51" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="63" class="pixels shadow shadow-04" x="15" y="63" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="63" class="pixels shadow shadow-04" x="27" y="63" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="75" class="pixels shadow shadow-04" x="15" y="75" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="75" class="pixels shadow shadow-04" x="27" y="75" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="87" class="pixels shadow shadow-04" x="15" y="87" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="87" class="pixels shadow shadow-04" x="27" y="87" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="87" class="pixels shadow shadow-04" x="39" y="87" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="87" class="pixels shadow shadow-04" x="51" y="87" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="87" class="pixels shadow shadow-04" x="63" y="87" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="87" class="pixels shadow shadow-04" x="75" y="87" width="22" height="22"></rect>
+                            <rect data-x="12" data-y="12" class="pixels pixel pixel-04" x="12" y="12" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="12" class="pixels pixel pixel-04" x="24" y="12" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="24" class="pixels pixel pixel-04" x="12" y="24" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="24" class="pixels pixel pixel-04" x="24" y="24" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="36" class="pixels pixel pixel-04" x="12" y="36" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="36" class="pixels pixel pixel-04" x="24" y="36" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="48" class="pixels pixel pixel-04" x="12" y="48" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="48" class="pixels pixel pixel-04" x="24" y="48" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="60" class="pixels pixel pixel-04" x="12" y="60" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="60" class="pixels pixel pixel-04" x="24" y="60" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="72" class="pixels pixel pixel-04" x="12" y="72" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="72" class="pixels pixel pixel-04" x="24" y="72" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="84" class="pixels pixel pixel-04" x="12" y="84" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="84" class="pixels pixel pixel-04" x="24" y="84" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="84" class="pixels pixel pixel-04" x="36" y="84" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="84" class="pixels pixel pixel-04" x="48" y="84" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="84" class="pixels pixel pixel-04" x="60" y="84" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="84" class="pixels pixel pixel-04" x="72" y="84" width="12" height="12"></rect>
+                        </svg>
+                    <span class="inline" id="div-property">
+                        <svg class="svg-letter" id="letter-10" data-index="10" width="96" height="108" style="margin:5px;">
+                            <rect data-x="15" data-y="15" class="pixels shadow shadow-10" x="15" y="15" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="15" class="pixels shadow shadow-10" x="27" y="15" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="15" class="pixels shadow shadow-10" x="39" y="15" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="15" class="pixels shadow shadow-10" x="51" y="15" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="15" class="pixels shadow shadow-10" x="63" y="15" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="27" class="pixels shadow shadow-10" x="15" y="27" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="27" class="pixels shadow shadow-10" x="27" y="27" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="27" class="pixels shadow shadow-10" x="63" y="27" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="27" class="pixels shadow shadow-10" x="75" y="27" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="39" class="pixels shadow shadow-10" x="15" y="39" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="39" class="pixels shadow shadow-10" x="27" y="39" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="39" class="pixels shadow shadow-10" x="63" y="39" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="39" class="pixels shadow shadow-10" x="75" y="39" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="51" class="pixels shadow shadow-10" x="15" y="51" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="51" class="pixels shadow shadow-10" x="27" y="51" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="51" class="pixels shadow shadow-10" x="39" y="51" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="51" class="pixels shadow shadow-10" x="51" y="51" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="51" class="pixels shadow shadow-10" x="63" y="51" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="63" class="pixels shadow shadow-10" x="15" y="63" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="63" class="pixels shadow shadow-10" x="27" y="63" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="75" class="pixels shadow shadow-10" x="15" y="75" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="75" class="pixels shadow shadow-10" x="27" y="75" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="87" class="pixels shadow shadow-10" x="15" y="87" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="87" class="pixels shadow shadow-10" x="27" y="87" width="22" height="22"></rect>
+                            <rect data-x="12" data-y="12" class="pixels pixel pixel-10" x="12" y="12" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="12" class="pixels pixel pixel-10" x="24" y="12" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="12" class="pixels pixel pixel-10" x="36" y="12" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="12" class="pixels pixel pixel-10" x="48" y="12" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="12" class="pixels pixel pixel-10" x="60" y="12" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="24" class="pixels pixel pixel-10" x="12" y="24" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="24" class="pixels pixel pixel-10" x="24" y="24" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="24" class="pixels pixel pixel-10" x="60" y="24" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="24" class="pixels pixel pixel-10" x="72" y="24" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="36" class="pixels pixel pixel-10" x="12" y="36" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="36" class="pixels pixel pixel-10" x="24" y="36" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="36" class="pixels pixel pixel-10" x="60" y="36" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="36" class="pixels pixel pixel-10" x="72" y="36" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="48" class="pixels pixel pixel-10" x="12" y="48" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="48" class="pixels pixel pixel-10" x="24" y="48" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="48" class="pixels pixel pixel-10" x="36" y="48" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="48" class="pixels pixel pixel-10" x="48" y="48" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="48" class="pixels pixel pixel-10" x="60" y="48" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="60" class="pixels pixel pixel-10" x="12" y="60" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="60" class="pixels pixel pixel-10" x="24" y="60" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="72" class="pixels pixel pixel-10" x="12" y="72" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="72" class="pixels pixel pixel-10" x="24" y="72" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="84" class="pixels pixel pixel-10" x="12" y="84" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="84" class="pixels pixel pixel-10" x="24" y="84" width="12" height="12"></rect>
+                        </svg>
+                        <svg class="svg-letter" id="letter-11" data-index="11" width="96" height="108" style="margin:5px;">
+                            <rect data-x="15" data-y="15" class="pixels shadow shadow-11" x="15" y="15" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="15" class="pixels shadow shadow-11" x="27" y="15" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="15" class="pixels shadow shadow-11" x="39" y="15" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="15" class="pixels shadow shadow-11" x="51" y="15" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="15" class="pixels shadow shadow-11" x="63" y="15" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="27" class="pixels shadow shadow-11" x="15" y="27" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="27" class="pixels shadow shadow-11" x="27" y="27" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="27" class="pixels shadow shadow-11" x="63" y="27" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="27" class="pixels shadow shadow-11" x="75" y="27" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="39" class="pixels shadow shadow-11" x="15" y="39" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="39" class="pixels shadow shadow-11" x="27" y="39" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="39" class="pixels shadow shadow-11" x="63" y="39" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="39" class="pixels shadow shadow-11" x="75" y="39" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="51" class="pixels shadow shadow-11" x="15" y="51" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="51" class="pixels shadow shadow-11" x="27" y="51" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="51" class="pixels shadow shadow-11" x="39" y="51" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="51" class="pixels shadow shadow-11" x="51" y="51" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="51" class="pixels shadow shadow-11" x="63" y="51" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="63" class="pixels shadow shadow-11" x="15" y="63" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="63" class="pixels shadow shadow-11" x="27" y="63" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="63" class="pixels shadow shadow-11" x="63" y="63" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="63" class="pixels shadow shadow-11" x="75" y="63" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="75" class="pixels shadow shadow-11" x="15" y="75" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="75" class="pixels shadow shadow-11" x="27" y="75" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="75" class="pixels shadow shadow-11" x="63" y="75" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="75" class="pixels shadow shadow-11" x="75" y="75" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="87" class="pixels shadow shadow-11" x="15" y="87" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="87" class="pixels shadow shadow-11" x="27" y="87" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="87" class="pixels shadow shadow-11" x="63" y="87" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="87" class="pixels shadow shadow-11" x="75" y="87" width="22" height="22"></rect>
+                            <rect data-x="12" data-y="12" class="pixels pixel pixel-11" x="12" y="12" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="12" class="pixels pixel pixel-11" x="24" y="12" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="12" class="pixels pixel pixel-11" x="36" y="12" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="12" class="pixels pixel pixel-11" x="48" y="12" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="12" class="pixels pixel pixel-11" x="60" y="12" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="24" class="pixels pixel pixel-11" x="12" y="24" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="24" class="pixels pixel pixel-11" x="24" y="24" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="24" class="pixels pixel pixel-11" x="60" y="24" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="24" class="pixels pixel pixel-11" x="72" y="24" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="36" class="pixels pixel pixel-11" x="12" y="36" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="36" class="pixels pixel pixel-11" x="24" y="36" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="36" class="pixels pixel pixel-11" x="60" y="36" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="36" class="pixels pixel pixel-11" x="72" y="36" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="48" class="pixels pixel pixel-11" x="12" y="48" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="48" class="pixels pixel pixel-11" x="24" y="48" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="48" class="pixels pixel pixel-11" x="36" y="48" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="48" class="pixels pixel pixel-11" x="48" y="48" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="48" class="pixels pixel pixel-11" x="60" y="48" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="60" class="pixels pixel pixel-11" x="12" y="60" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="60" class="pixels pixel pixel-11" x="24" y="60" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="60" class="pixels pixel pixel-11" x="60" y="60" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="60" class="pixels pixel pixel-11" x="72" y="60" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="72" class="pixels pixel pixel-11" x="12" y="72" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="72" class="pixels pixel pixel-11" x="24" y="72" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="72" class="pixels pixel pixel-11" x="60" y="72" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="72" class="pixels pixel pixel-11" x="72" y="72" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="84" class="pixels pixel pixel-11" x="12" y="84" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="84" class="pixels pixel pixel-11" x="24" y="84" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="84" class="pixels pixel pixel-11" x="60" y="84" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="84" class="pixels pixel pixel-11" x="72" y="84" width="12" height="12"></rect>
+                        </svg>
+                        <svg class="svg-letter" id="letter-12" data-index="12" width="96" height="108" style="margin:5px;">
+                            <rect data-x="27" data-y="15" class="pixels shadow shadow-12" x="27" y="15" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="15" class="pixels shadow shadow-12" x="39" y="15" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="15" class="pixels shadow shadow-12" x="51" y="15" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="15" class="pixels shadow shadow-12" x="63" y="15" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="27" class="pixels shadow shadow-12" x="15" y="27" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="27" class="pixels shadow shadow-12" x="27" y="27" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="27" class="pixels shadow shadow-12" x="63" y="27" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="27" class="pixels shadow shadow-12" x="75" y="27" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="39" class="pixels shadow shadow-12" x="15" y="39" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="39" class="pixels shadow shadow-12" x="27" y="39" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="39" class="pixels shadow shadow-12" x="63" y="39" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="39" class="pixels shadow shadow-12" x="75" y="39" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="51" class="pixels shadow shadow-12" x="15" y="51" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="51" class="pixels shadow shadow-12" x="27" y="51" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="51" class="pixels shadow shadow-12" x="63" y="51" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="51" class="pixels shadow shadow-12" x="75" y="51" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="63" class="pixels shadow shadow-12" x="15" y="63" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="63" class="pixels shadow shadow-12" x="27" y="63" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="63" class="pixels shadow shadow-12" x="63" y="63" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="63" class="pixels shadow shadow-12" x="75" y="63" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="75" class="pixels shadow shadow-12" x="15" y="75" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="75" class="pixels shadow shadow-12" x="27" y="75" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="75" class="pixels shadow shadow-12" x="63" y="75" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="75" class="pixels shadow shadow-12" x="75" y="75" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="87" class="pixels shadow shadow-12" x="27" y="87" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="87" class="pixels shadow shadow-12" x="39" y="87" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="87" class="pixels shadow shadow-12" x="51" y="87" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="87" class="pixels shadow shadow-12" x="63" y="87" width="22" height="22"></rect>
+                            <rect data-x="24" data-y="12" class="pixels pixel pixel-12" x="24" y="12" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="12" class="pixels pixel pixel-12" x="36" y="12" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="12" class="pixels pixel pixel-12" x="48" y="12" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="12" class="pixels pixel pixel-12" x="60" y="12" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="24" class="pixels pixel pixel-12" x="12" y="24" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="24" class="pixels pixel pixel-12" x="24" y="24" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="24" class="pixels pixel pixel-12" x="60" y="24" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="24" class="pixels pixel pixel-12" x="72" y="24" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="36" class="pixels pixel pixel-12" x="12" y="36" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="36" class="pixels pixel pixel-12" x="24" y="36" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="36" class="pixels pixel pixel-12" x="60" y="36" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="36" class="pixels pixel pixel-12" x="72" y="36" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="48" class="pixels pixel pixel-12" x="12" y="48" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="48" class="pixels pixel pixel-12" x="24" y="48" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="48" class="pixels pixel pixel-12" x="60" y="48" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="48" class="pixels pixel pixel-12" x="72" y="48" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="60" class="pixels pixel pixel-12" x="12" y="60" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="60" class="pixels pixel pixel-12" x="24" y="60" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="60" class="pixels pixel pixel-12" x="60" y="60" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="60" class="pixels pixel pixel-12" x="72" y="60" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="72" class="pixels pixel pixel-12" x="12" y="72" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="72" class="pixels pixel pixel-12" x="24" y="72" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="72" class="pixels pixel pixel-12" x="60" y="72" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="72" class="pixels pixel pixel-12" x="72" y="72" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="84" class="pixels pixel pixel-12" x="24" y="84" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="84" class="pixels pixel pixel-12" x="36" y="84" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="84" class="pixels pixel pixel-12" x="48" y="84" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="84" class="pixels pixel pixel-12" x="60" y="84" width="12" height="12"></rect>
+                        </svg>
+                        <svg class="svg-letter" id="letter-13" data-index="13" width="96" height="108" style="margin:5px;">
+                            <rect data-x="15" data-y="15" class="pixels shadow shadow-13" x="15" y="15" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="15" class="pixels shadow shadow-13" x="27" y="15" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="15" class="pixels shadow shadow-13" x="39" y="15" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="15" class="pixels shadow shadow-13" x="51" y="15" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="15" class="pixels shadow shadow-13" x="63" y="15" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="27" class="pixels shadow shadow-13" x="15" y="27" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="27" class="pixels shadow shadow-13" x="27" y="27" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="27" class="pixels shadow shadow-13" x="63" y="27" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="27" class="pixels shadow shadow-13" x="75" y="27" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="39" class="pixels shadow shadow-13" x="15" y="39" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="39" class="pixels shadow shadow-13" x="27" y="39" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="39" class="pixels shadow shadow-13" x="63" y="39" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="39" class="pixels shadow shadow-13" x="75" y="39" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="51" class="pixels shadow shadow-13" x="15" y="51" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="51" class="pixels shadow shadow-13" x="27" y="51" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="51" class="pixels shadow shadow-13" x="39" y="51" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="51" class="pixels shadow shadow-13" x="51" y="51" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="51" class="pixels shadow shadow-13" x="63" y="51" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="63" class="pixels shadow shadow-13" x="15" y="63" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="63" class="pixels shadow shadow-13" x="27" y="63" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="75" class="pixels shadow shadow-13" x="15" y="75" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="75" class="pixels shadow shadow-13" x="27" y="75" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="87" class="pixels shadow shadow-13" x="15" y="87" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="87" class="pixels shadow shadow-13" x="27" y="87" width="22" height="22"></rect>
+                            <rect data-x="12" data-y="12" class="pixels pixel pixel-13" x="12" y="12" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="12" class="pixels pixel pixel-13" x="24" y="12" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="12" class="pixels pixel pixel-13" x="36" y="12" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="12" class="pixels pixel pixel-13" x="48" y="12" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="12" class="pixels pixel pixel-13" x="60" y="12" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="24" class="pixels pixel pixel-13" x="12" y="24" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="24" class="pixels pixel pixel-13" x="24" y="24" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="24" class="pixels pixel pixel-13" x="60" y="24" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="24" class="pixels pixel pixel-13" x="72" y="24" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="36" class="pixels pixel pixel-13" x="12" y="36" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="36" class="pixels pixel pixel-13" x="24" y="36" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="36" class="pixels pixel pixel-13" x="60" y="36" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="36" class="pixels pixel pixel-13" x="72" y="36" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="48" class="pixels pixel pixel-13" x="12" y="48" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="48" class="pixels pixel pixel-13" x="24" y="48" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="48" class="pixels pixel pixel-13" x="36" y="48" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="48" class="pixels pixel pixel-13" x="48" y="48" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="48" class="pixels pixel pixel-13" x="60" y="48" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="60" class="pixels pixel pixel-13" x="12" y="60" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="60" class="pixels pixel pixel-13" x="24" y="60" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="72" class="pixels pixel pixel-13" x="12" y="72" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="72" class="pixels pixel pixel-13" x="24" y="72" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="84" class="pixels pixel pixel-13" x="12" y="84" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="84" class="pixels pixel pixel-13" x="24" y="84" width="12" height="12"></rect>
+                        </svg>
+                        <svg class="svg-letter" id="letter-14" data-index="14" width="96" height="108" style="margin:5px;">
+                            <rect data-x="15" data-y="15" class="pixels shadow shadow-14" x="15" y="15" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="15" class="pixels shadow shadow-14" x="27" y="15" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="15" class="pixels shadow shadow-14" x="39" y="15" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="15" class="pixels shadow shadow-14" x="51" y="15" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="15" class="pixels shadow shadow-14" x="63" y="15" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="15" class="pixels shadow shadow-14" x="75" y="15" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="27" class="pixels shadow shadow-14" x="15" y="27" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="27" class="pixels shadow shadow-14" x="27" y="27" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="39" class="pixels shadow shadow-14" x="15" y="39" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="39" class="pixels shadow shadow-14" x="27" y="39" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="51" class="pixels shadow shadow-14" x="15" y="51" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="51" class="pixels shadow shadow-14" x="27" y="51" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="51" class="pixels shadow shadow-14" x="39" y="51" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="51" class="pixels shadow shadow-14" x="51" y="51" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="51" class="pixels shadow shadow-14" x="63" y="51" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="63" class="pixels shadow shadow-14" x="15" y="63" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="63" class="pixels shadow shadow-14" x="27" y="63" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="75" class="pixels shadow shadow-14" x="15" y="75" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="75" class="pixels shadow shadow-14" x="27" y="75" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="87" class="pixels shadow shadow-14" x="15" y="87" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="87" class="pixels shadow shadow-14" x="27" y="87" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="87" class="pixels shadow shadow-14" x="39" y="87" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="87" class="pixels shadow shadow-14" x="51" y="87" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="87" class="pixels shadow shadow-14" x="63" y="87" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="87" class="pixels shadow shadow-14" x="75" y="87" width="22" height="22"></rect>
+                            <rect data-x="12" data-y="12" class="pixels pixel pixel-14" x="12" y="12" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="12" class="pixels pixel pixel-14" x="24" y="12" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="12" class="pixels pixel pixel-14" x="36" y="12" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="12" class="pixels pixel pixel-14" x="48" y="12" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="12" class="pixels pixel pixel-14" x="60" y="12" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="12" class="pixels pixel pixel-14" x="72" y="12" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="24" class="pixels pixel pixel-14" x="12" y="24" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="24" class="pixels pixel pixel-14" x="24" y="24" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="36" class="pixels pixel pixel-14" x="12" y="36" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="36" class="pixels pixel pixel-14" x="24" y="36" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="48" class="pixels pixel pixel-14" x="12" y="48" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="48" class="pixels pixel pixel-14" x="24" y="48" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="48" class="pixels pixel pixel-14" x="36" y="48" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="48" class="pixels pixel pixel-14" x="48" y="48" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="48" class="pixels pixel pixel-14" x="60" y="48" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="60" class="pixels pixel pixel-14" x="12" y="60" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="60" class="pixels pixel pixel-14" x="24" y="60" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="72" class="pixels pixel pixel-14" x="12" y="72" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="72" class="pixels pixel pixel-14" x="24" y="72" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="84" class="pixels pixel pixel-14" x="12" y="84" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="84" class="pixels pixel pixel-14" x="24" y="84" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="84" class="pixels pixel pixel-14" x="36" y="84" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="84" class="pixels pixel pixel-14" x="48" y="84" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="84" class="pixels pixel pixel-14" x="60" y="84" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="84" class="pixels pixel pixel-14" x="72" y="84" width="12" height="12"></rect>
+                        </svg>
+                        <svg class="svg-letter" id="letter-15" data-index="15" width="96" height="108" style="margin:5px;">
+                            <rect data-x="15" data-y="15" class="pixels shadow shadow-15" x="15" y="15" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="15" class="pixels shadow shadow-15" x="27" y="15" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="15" class="pixels shadow shadow-15" x="39" y="15" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="15" class="pixels shadow shadow-15" x="51" y="15" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="15" class="pixels shadow shadow-15" x="63" y="15" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="27" class="pixels shadow shadow-15" x="15" y="27" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="27" class="pixels shadow shadow-15" x="27" y="27" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="27" class="pixels shadow shadow-15" x="63" y="27" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="27" class="pixels shadow shadow-15" x="75" y="27" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="39" class="pixels shadow shadow-15" x="15" y="39" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="39" class="pixels shadow shadow-15" x="27" y="39" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="39" class="pixels shadow shadow-15" x="63" y="39" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="39" class="pixels shadow shadow-15" x="75" y="39" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="51" class="pixels shadow shadow-15" x="15" y="51" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="51" class="pixels shadow shadow-15" x="27" y="51" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="51" class="pixels shadow shadow-15" x="39" y="51" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="51" class="pixels shadow shadow-15" x="51" y="51" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="51" class="pixels shadow shadow-15" x="63" y="51" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="63" class="pixels shadow shadow-15" x="15" y="63" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="63" class="pixels shadow shadow-15" x="27" y="63" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="63" class="pixels shadow shadow-15" x="63" y="63" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="63" class="pixels shadow shadow-15" x="75" y="63" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="75" class="pixels shadow shadow-15" x="15" y="75" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="75" class="pixels shadow shadow-15" x="27" y="75" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="75" class="pixels shadow shadow-15" x="63" y="75" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="75" class="pixels shadow shadow-15" x="75" y="75" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="87" class="pixels shadow shadow-15" x="15" y="87" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="87" class="pixels shadow shadow-15" x="27" y="87" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="87" class="pixels shadow shadow-15" x="63" y="87" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="87" class="pixels shadow shadow-15" x="75" y="87" width="22" height="22"></rect>
+                            <rect data-x="12" data-y="12" class="pixels pixel pixel-15" x="12" y="12" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="12" class="pixels pixel pixel-15" x="24" y="12" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="12" class="pixels pixel pixel-15" x="36" y="12" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="12" class="pixels pixel pixel-15" x="48" y="12" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="12" class="pixels pixel pixel-15" x="60" y="12" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="24" class="pixels pixel pixel-15" x="12" y="24" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="24" class="pixels pixel pixel-15" x="24" y="24" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="24" class="pixels pixel pixel-15" x="60" y="24" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="24" class="pixels pixel pixel-15" x="72" y="24" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="36" class="pixels pixel pixel-15" x="12" y="36" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="36" class="pixels pixel pixel-15" x="24" y="36" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="36" class="pixels pixel pixel-15" x="60" y="36" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="36" class="pixels pixel pixel-15" x="72" y="36" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="48" class="pixels pixel pixel-15" x="12" y="48" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="48" class="pixels pixel pixel-15" x="24" y="48" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="48" class="pixels pixel pixel-15" x="36" y="48" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="48" class="pixels pixel pixel-15" x="48" y="48" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="48" class="pixels pixel pixel-15" x="60" y="48" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="60" class="pixels pixel pixel-15" x="12" y="60" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="60" class="pixels pixel pixel-15" x="24" y="60" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="60" class="pixels pixel pixel-15" x="60" y="60" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="60" class="pixels pixel pixel-15" x="72" y="60" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="72" class="pixels pixel pixel-15" x="12" y="72" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="72" class="pixels pixel pixel-15" x="24" y="72" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="72" class="pixels pixel pixel-15" x="60" y="72" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="72" class="pixels pixel pixel-15" x="72" y="72" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="84" class="pixels pixel pixel-15" x="12" y="84" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="84" class="pixels pixel pixel-15" x="24" y="84" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="84" class="pixels pixel pixel-15" x="60" y="84" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="84" class="pixels pixel pixel-15" x="72" y="84" width="12" height="12"></rect>
+                        </svg>
+                        <svg class="svg-letter" id="letter-16" data-index="16" width="96" height="108" style="margin:5px;">
+                            <rect data-x="15" data-y="15" class="pixels shadow shadow-16" x="15" y="15" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="15" class="pixels shadow shadow-16" x="27" y="15" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="15" class="pixels shadow shadow-16" x="39" y="15" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="15" class="pixels shadow shadow-16" x="51" y="15" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="15" class="pixels shadow shadow-16" x="63" y="15" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="15" class="pixels shadow shadow-16" x="75" y="15" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="27" class="pixels shadow shadow-16" x="39" y="27" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="27" class="pixels shadow shadow-16" x="51" y="27" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="39" class="pixels shadow shadow-16" x="39" y="39" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="39" class="pixels shadow shadow-16" x="51" y="39" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="51" class="pixels shadow shadow-16" x="39" y="51" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="51" class="pixels shadow shadow-16" x="51" y="51" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="63" class="pixels shadow shadow-16" x="39" y="63" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="63" class="pixels shadow shadow-16" x="51" y="63" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="75" class="pixels shadow shadow-16" x="39" y="75" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="75" class="pixels shadow shadow-16" x="51" y="75" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="87" class="pixels shadow shadow-16" x="39" y="87" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="87" class="pixels shadow shadow-16" x="51" y="87" width="22" height="22"></rect>
+                            <rect data-x="12" data-y="12" class="pixels pixel pixel-16" x="12" y="12" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="12" class="pixels pixel pixel-16" x="24" y="12" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="12" class="pixels pixel pixel-16" x="36" y="12" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="12" class="pixels pixel pixel-16" x="48" y="12" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="12" class="pixels pixel pixel-16" x="60" y="12" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="12" class="pixels pixel pixel-16" x="72" y="12" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="24" class="pixels pixel pixel-16" x="36" y="24" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="24" class="pixels pixel pixel-16" x="48" y="24" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="36" class="pixels pixel pixel-16" x="36" y="36" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="36" class="pixels pixel pixel-16" x="48" y="36" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="48" class="pixels pixel pixel-16" x="36" y="48" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="48" class="pixels pixel pixel-16" x="48" y="48" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="60" class="pixels pixel pixel-16" x="36" y="60" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="60" class="pixels pixel pixel-16" x="48" y="60" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="72" class="pixels pixel pixel-16" x="36" y="72" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="72" class="pixels pixel pixel-16" x="48" y="72" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="84" class="pixels pixel pixel-16" x="36" y="84" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="84" class="pixels pixel pixel-16" x="48" y="84" width="12" height="12"></rect>
+                        </svg>
+                        <svg class="svg-letter" id="letter-17" data-index="17" width="96" height="108" style="margin:5px;">
+                            <rect data-x="15" data-y="15" class="pixels shadow shadow-17" x="15" y="15" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="15" class="pixels shadow shadow-17" x="27" y="15" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="15" class="pixels shadow shadow-17" x="75" y="15" width="22" height="22"></rect>
+                            <rect data-x="15" data-y="27" class="pixels shadow shadow-17" x="15" y="27" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="27" class="pixels shadow shadow-17" x="27" y="27" width="22" height="22"></rect>
+                            <rect data-x="75" data-y="27" class="pixels shadow shadow-17" x="75" y="27" width="22" height="22"></rect>
+                            <rect data-x="27" data-y="39" class="pixels shadow shadow-17" x="27" y="39" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="39" class="pixels shadow shadow-17" x="39" y="39" width="22" height="22"></rect>
+                            <rect data-x="63" data-y="39" class="pixels shadow shadow-17" x="63" y="39" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="51" class="pixels shadow shadow-17" x="39" y="51" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="51" class="pixels shadow shadow-17" x="51" y="51" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="63" class="pixels shadow shadow-17" x="39" y="63" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="63" class="pixels shadow shadow-17" x="51" y="63" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="75" class="pixels shadow shadow-17" x="39" y="75" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="75" class="pixels shadow shadow-17" x="51" y="75" width="22" height="22"></rect>
+                            <rect data-x="39" data-y="87" class="pixels shadow shadow-17" x="39" y="87" width="22" height="22"></rect>
+                            <rect data-x="51" data-y="87" class="pixels shadow shadow-17" x="51" y="87" width="22" height="22"></rect>
+                            <rect data-x="12" data-y="12" class="pixels pixel pixel-17" x="12" y="12" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="12" class="pixels pixel pixel-17" x="24" y="12" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="12" class="pixels pixel pixel-17" x="72" y="12" width="12" height="12"></rect>
+                            <rect data-x="12" data-y="24" class="pixels pixel pixel-17" x="12" y="24" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="24" class="pixels pixel pixel-17" x="24" y="24" width="12" height="12"></rect>
+                            <rect data-x="72" data-y="24" class="pixels pixel pixel-17" x="72" y="24" width="12" height="12"></rect>
+                            <rect data-x="24" data-y="36" class="pixels pixel pixel-17" x="24" y="36" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="36" class="pixels pixel pixel-17" x="36" y="36" width="12" height="12"></rect>
+                            <rect data-x="60" data-y="36" class="pixels pixel pixel-17" x="60" y="36" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="48" class="pixels pixel pixel-17" x="36" y="48" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="48" class="pixels pixel pixel-17" x="48" y="48" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="60" class="pixels pixel pixel-17" x="36" y="60" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="60" class="pixels pixel pixel-17" x="48" y="60" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="72" class="pixels pixel pixel-17" x="36" y="72" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="72" class="pixels pixel pixel-17" x="48" y="72" width="12" height="12"></rect>
+                            <rect data-x="36" data-y="84" class="pixels pixel pixel-17" x="36" y="84" width="12" height="12"></rect>
+                            <rect data-x="48" data-y="84" class="pixels pixel pixel-17" x="48" y="84" width="12" height="12"></rect>
+                        </svg>
+                    </span>       
                 </h1>
                 <img id="scrolling-canvas2" src="images/coming-soon.png" style="border: 5px solid black; opacity:.8;">
             </div>
@@ -105,6 +1000,7 @@
         </section>
 
        <!-- Landing -->
+        <div id="intro"></div>
         <section id="one" class="main style1 special">
             <div class="container">
                 <!-- <div style="width: 50%; text-align: center;"> -->
@@ -112,7 +1008,7 @@
                     <h2>What is PixelProperty?</h2>
                 </header>
                 <p>
-                    PixelProperty is a constantly evolving canvas of a tradable digital property where the owners of property may upload any image they like, or rent their property to other users.
+                    PixelProperty is a constantly evolving canvas of tradable digital property where the owners of property may upload any image they like, or rent their property to other users.
                 </p>
             </div>
          </section>
@@ -123,38 +1019,179 @@
                     <h2>What is Digital Property?</h2>
                 </header>
                 <p>
-                    Digital properties in PixelProperty are tradable blockchain tokens powered by Ethereum. Each property is a separate individual token, which can have its appearance altered to its owners desire. Where Bitcoin and Ethereum are cryptocurrencies, these are cryptocollectables. Cryptocollectables can be bought, sold, or traded like any collectable item.
+                    Digital properties in PixelProperty are tradable blockchain tokens powered by Ethereum. Each property is a separate individual token, which can have its appearance altered as desired. Where Bitcoin, Ethereum and PixelPropertyCoin are cryptocurrencies, these are cryptocollectables. Cryptocollectables can be bought, sold, or traded like any collectable item. PixelPropertyCoin (PPC) is the cryptocurrency of our network used to power the digital property ecosystem.
                 </p>
             </div>
         </section>
 
+        <!-- @todo links -->
        <!--  <section id="three" class="main style1 special">
             <div class="container">
                 <header class="major">
                     <h2>Interested in jumping in?</h2>
                 </header>
                 <p>
-                    Viewing the digital canvas does not require any extra setup. You can checkout the canvas on our [Canvas] page.
+                    Viewing the digital canvas does not require any extra setup. You can checkout the canvas on our <a href="#">Canvas</a> page.
                 </p>
                 <p>
-                    When you want to interact with the canvas through our website, you must have an Ethereum account, as well as have [MetaMask] installed. You can view the [Setting Up] page for simple instructions on installing MetaMask.
+                    When you want to interact with the canvas through our website, you must have an Ethereum account, as well as have MetaMask installed. You can view the <a href="#">Setting Up</a> page for simple instructions on installing <a href="#">MetaMask</a>.
                 </p>
             </div>
-         </section> -->
+        </section> -->
 
-         <section id="four" class="main style1 special">
+        <section id="four" class="main style1 special">
             <div class="container">
                 <header class="major">
-                    <h2>White Paper & Technical Road Map</h2>
+                    <h2>White Paper</h2>
                 </header>
-                <h5>COMING SOON</h5><br/>
-                <input disabled="disabled" style="margin-right: 20px;" type="button" value="Download Full Whitepaper" onclick="window.location = '.doc';">
-                <input disabled="disabled" style="margin-left: 20px;" type="button" value="Download Full Road Map" onclick="window.location = '.doc';">
+                <!-- <h5>COMING SOON</h5><br/> -->
+                <input style="margin: 10px;" type="button" value="Download Full Whitepaper" onclick="window.location = 'assets/docs/PixelProperty WhitePaper v1.3.docx';">
+                <!-- <input disabled="disabled" style="margin: 10px;" type="button" value="Road Map Coming Soon" onclick="window.location = '.doc';"> -->
             </div>
-         </section>
+        </section>
+
+        <div id="setting-up"></div>
+        <section id="five" class="main style2">
+            <div class="container">
+                <header class="major">
+                    <h2>Setting Up</h2>
+                </header>
+                <p>
+                    PixelProperty.io uses MetaMask on our website for interacting with the PixelProperty Ethereum Smart Contract. What this means is we require users install a simple tool known as MetaMask to simplify the experience, letting you jump in easier.
+                </p>
+                <a type="button" href="https://metamask.io/">Install MetaMask</a>
+                <br/><br/><br/>
+                <header class="major">
+                    <h2>Getting Started</h2>
+                </header>
+                <h3>What do I need to use PixelProperty?</h3>
+                <ul>
+                    <li>
+                        A computer running Brave, FireFox or Google Chrome
+                    </li>
+                    <li>
+                        MetaMask installed, which lets us more easily communicate with the digital real estate market
+                    </li>
+                    <li>
+                        Ether (ETH), a form of digital currency that PixelProperty uses in it’s digital real estate economy, or PixelPropertyCoin (PPC), the cryptocurrency which powers the PixelProperty ecosystem.
+                    </li>
+                </ul>
+                <h3>Installing MetaMask</h3>
+                <p>
+                    PixelProperty uses MetaMask to communicate with the digital real estate market, which is run on a Smart Contract through Ethereum. MetaMask is a digital wallet for Ethereum, meaning your funds are stored securely in this wallet, rather than you having to trust us with your finds through our website. Remember, MetaMask is a wallet, so protect it. Your MetaMask passwords or seed words must be kept secret, but don’t lose them!
+                    <br/>
+                    We suggest printing a paper copy off of your password and seed words, then putting it somewhere for safe keeping. These cannot be recovered if you lose them.
+                </p>
+                <h3>How do I get ETH?</h3>
+                <p>
+                    <strong>For U.S. citizens</strong>, ETH can be bought within MetaMask itself. 
+                    <br />
+                    <strong>For non U.S. citizens</strong>, you will have to buy it from an exchange. Exchanges such as Coinbase, Quadriga, and Kraken.
+                    <br />
+                    <i>Note: PixelProperty is not affiliated with any of the listed exchanges.</i>
+                </p>
+                <h3>How do I send ETH to MetaMask</h3>
+                <p>
+                    Once you have acquired ETH on the exchange of your choice, you must send it to your MetaMask ETH address.
+                    <br />
+                    You can find your MetaMask ETH address by clicking on the “...” menu button then selecting “Copy To Clipboard”. At this point, the address is copied, so when you send your ETH out of the exchange, you can simply paste the address in.
+                    <!-- [“Frequently Asked Questions” button] -->
+                </p>
+            </div>
+        </section>
+
+        <div id="about-us"></div>
+        <section id="six" class="main style1 special">
+            <div class="container">
+                <header class="major">
+                    <h2>About Us</h2>
+                </header>
+                <p>
+                    In PixelProperty, property owners own 10x10 regions of pixels which they can customize to their liking visually, set hover text for, clickable links for, trade, sell, or share the usage with the community.
+                </p>
+                <p>
+                    PixelProperty is the world's first digital property market as well as one of the world's first cryptocollectables through blockchain technology. Blockchain technology is the technology that powers Bitcoin, Ethereum and other cryptocollectables. Each piece of property is completely owned by the user, as they are each their own unique Ethereum token.
+                </p>
+                <!-- Team Members -->
+            </div>
+        </section>
+
+        <div id="technical-details"></div>
+        <section id="seven" class="main style2">
+            <div class="container">
+                <header class="major">
+                    <h2>Technical Details</h2>
+                </header>
+                <ol>
+                    <li>
+                        PixelProperty is a Ethereum Smart Contract powered by the Ethereum network.
+                    </li>
+                    <li>
+                        Each digital property is a unique, non-fungible token on Ethereum, which allows for it’s owner to change it’s display image, hover text, clickable link, as well as can be listed for sale or rent.
+                    </li>
+                    <li>
+                        There are 10,000 unique properties in the PixelProperty digital property market. No new ones will ever be created, nor can any property ever be destroyed.
+                    </li>
+                    <li>
+                        PixelPropertyCoin is the ERC20 cryptocurrency of PixelProperty, which is inflated by at most 20,000 per hour and is destroyed whenever a user changes the display image for a property.
+                    </li>
+                    <li>
+                        PixelProperty follows a sustainable income model, rather than an ICO. Each property will be available for purchase at launch, however the cost to purchase each property will go up incrementally with each sale.
+                    </li>
+                    <li>
+                        The starting price in ETH for a digital property is 0.01 ETH. Every ten purchases, the price is increased by 0.001 ETH, with that incrementing value going up by 0.0005 ETH every ten purchases as well.
+                    </li>
+                    <li>
+                        The starting price in PPC for a digital property is 1000 PPC. Every ten purchases, the price is increased by 20 PPC, with that incrementing value going up by 1 PPC every ten purchases as well.
+                    </li>
+                    <li>
+                        Initial purchases can be done in any fraction of ETH vs PPC. A user can pay 90% of the current ETH price and 10% of the current PPC, as long as, in total, the amount paid in each coin adds up to a total of 100% paid.
+                    </li>
+                    <li>
+                        Properties in PixelProperty follow the free market after their initial purchase. Similar to the values of regular properties, stamps or collectable cards, the price of a digital property in the future is determined by pure supply and demand.
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <div id="road-map"></div>
+        <section id="eight" class="main style1">
+            <div class="container">
+                <header class="major">
+                    <h2>Financial Road Map</h2>
+                </header>
+                <ul>
+                    <li>
+                        1 ETH - 100% of the initial 1 ETH earned will be reinvested into purchasing further advertisement, building the market growth.
+                    </li>
+                    <li>
+                        10 ETH - At least 50% of the initial 10 ETH earned will be reinvested into purchasing further advertisement to increase market growth. The rest will be used to pay for web hosting, as well as to recoup the costs of initial development and deployment.
+                    </li>
+                    <li>
+                        50 ETH - At least 25% of the initial 50 ETH earned will be reinvested into purchasing further advertisement for increasing market growth. The rest will be used to pay for web hosting and cover ongoing development for the items in the Roadmap.
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="nine" class="main style2">
+            <div class="container">
+                <header class="major">
+                    <h2>Development Road Map</h2>
+                </header>
+                <ul>
+                    <li>
+                        Q1 2018 &bull; Canvas Reusable JavaScript Widget/Tool/Plugin/Script/Thingy
+                    </li>
+                    <li>
+                        Q2 2018 &bull; Canvas Viewing Android & iOS applications
+                    </li>
+                </ul>
+            </div>
+        </section>
 
        <!-- Footer -->
-         <section id="footer">
+         <section id="footer" class="slides">
           <ul class="icons">
               <li><a href="https://twitter.com/pixelpropertyio" class="icon alt fa-twitter"><span class="label">Twitter</span></a></li>
               <!-- <li><a href="#" class="icon alt fa-facebook"><span class="label">Facebook</span></a></li> -->
@@ -186,20 +1223,51 @@
                 //         triggerHook: 'onLeave'
                 //     }
                 // });
-                // // var slides = document.querySelectorAll('section');
-                // var slides = $('section');
+                // var slides = document.querySelectorAll('section');
+                // var slides = $('.slides');
                 // for (var i = 0; i < slides.length; i++) {
                 //     new ScrollMagic.Scene({
                 //         triggerElement: slides[i]
                 //     })
                 //     .setPin(slides[i])
-                //     .addIndicators()
+                //     // .addIndicators()
                 //     .addTo(controller);
                 // }
                 // var scene = new ScrollMagic.Scene({triggerElement: "#scrolling-trigger-1", duration: 0})
                                                 // .setPin('#scrolling-canvas-link')
                                                 // .addTo(controller);
             // });
+            /*global $, console*/
+            /*
+              By Mostafa Omar
+              https://www.facebook.com/MustafaOmarIbrahiem
+            */
+            $(function () {
+              'use strict';
+              // Start navbar 
+              (function () {
+                // Add class active when the user clicks the lis of the menu
+                $('.nav .list li').on('click', 'a', function () {
+                  $(this).parent().addClass('active').siblings().removeClass('active');
+                });
+                var openCategories = $('.nav #open-categories'),
+                    categories = $('.drop-down');
+                // Toggle categories on clicking
+                openCategories.on('click', function () {
+                  $("#" + $(this).data('dropdown')).toggleClass('show');
+                  // When the user clicks the window if the categories is not the target, close it.
+                  $(window).on('mouseup', function (e) {
+                    if (categories.hasClass('show') && !categories.is(e.target) && categories.has(e.target).length === 0 && !openCategories.is(e.target)) {console.log("d");
+                      categories.removeClass('show');
+                    }
+                  });
+                });
+                // Toggle menu, This will be shown in Extra small screens only
+                $('.nav .toggle-nav').on('click', function () {
+                  $("#" + $(this).data('toggle')).slideToggle(300);
+                });
+              }());
+            });
         </script>
     </body>
 </html>

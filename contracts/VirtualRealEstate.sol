@@ -125,7 +125,7 @@ contract VirtualRealEstate is StandardToken {
     function VirtualRealEstate() public {
         owner = msg.sender;
         totalSupply = 0;
-        FREE_COLOR_SETTING_UNTIL = now;// + 1 days;
+        FREE_COLOR_SETTING_UNTIL = now + 1 days;
         pricePPC = 10;
         priceETH = 10000;//1000000000000000000; //0.001 ETH
     }

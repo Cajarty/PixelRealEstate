@@ -23,7 +23,8 @@ class PlaceMarketTrade extends Component {
     }
 
     placeTrade() {
-
+        
+        ctr.setBuyETHOffer(this.state.valueX, this.state.valueY, this.state.valuePrice)
     }
 
     handleInput(key, value) {

@@ -1,7 +1,5 @@
 import axios from 'axios';
 
-const SERVER_URL = 'http://localhost:6500';
-
 /*
 Wrapper class for axios.
 
@@ -15,9 +13,11 @@ export default class Axios {
         if (Axios.instance != null)
             throw new Error('Axios instance exists, request usage through "Axios.instace".');
 
+        console.info(process);
+
         Axios.instance = this;
         Axios.instance.axios = axios.create({
-            baseURL: SERVER_URL,
+            baseURL: process.env.CACHE_SERVER_URL,
             timeout: 10000,
             headers: {
                 'Accept': 'application/jsonp',

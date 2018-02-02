@@ -20,6 +20,8 @@ var publicUrl = '';
 // Get environment variables to inject into our app.
 var env = getClientEnvironment(publicUrl);
 
+env['process.env'].CACHE_SERVER_URL = '"http://127.0.0.1:6500"';
+
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
 // The production configuration is different and lives in a separate file.

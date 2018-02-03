@@ -90,6 +90,8 @@ export class Contract {
         this.setupEvents();
         
         this.getAccountsInterval = setInterval(() => this.getAccounts(), 1000);
+
+        
     }
 
     getAccounts() {

@@ -7,8 +7,6 @@ contract VirtualRealEstate:
         event SetUserSetLink(address indexed user, bytes32[2] newLink);
         event PropertySetForSale(uint24 indexed property, uint256 forSalePrice);
         event DelistProperty(uint24 indexed property);
-        event ListTradeOffer(address indexed offerOwner, uint256 eth, uint256 ppc, bool isBuyingPPC);
-        event UpdateTradeOffer(address indexed accepter, address indexed offerOwner, uint256 ppcBought, uint256 timestamp); //Added timestamp
         event SetPropertyPublic(uint24 indexed property);
         event SetPropertyPrivate(uint24 indexed property, uint32 numHoursPrivate);
 
@@ -18,7 +16,6 @@ contract VirtualRealEstate:
         getLink(address user) view returns(bytues32[2])
         getPropertyColors(uint24 propertyID)view returns(uint256[10])
         getPropertyData(uint24 propertyID) view returns(address, uint256, uint256, uint256, bool)
-        getTradeOffer(address offerOwner) view returns(uint256, uint256, bool)
 
     functions:
         setHoverText(bytes32[2] text)
@@ -30,16 +27,6 @@ contract VirtualRealEstate:
         setPropertyMode(uint24 propertyID, bool isInPrivateMode, uint32 numHoursPrivate)
             - SetPropertyPrivate(propertyID, numHoursPrivate)
             - SetPropertyPublic(propertyID)
-        setBuyETHOffer(uint256 ethPer, uint256 offeredPPC)
-            - ListTradeOffer(msg.sender, ethPer, offeredPPC, false)
-        setBuyPPCOffer(uint256 ppcToBuy, uint256 ethPer)
-            - ListTradeOffer(msg.sender, ethPer, ppcToBuy, true)
-        cancelTradeOffer()
-            - UpdateTradeOffer(0, msg.sender, 0, now);
-        acceptOfferBuyingETH(address ownerOfTradeOffer)
-            - UpdateTradeOffer(msg.sender, ownerOfTradeOffer, tradedPPC, now)
-        acceptOfferBuyingPPC(address ownerOfTradeOffer, uint256 ppcValue)
-            - UpdateTradeOffer(msg.sender, ownerOfTradeOffer, payedValue, now)
         setRowColors(uint24 propertyID, uint8 row, uint24 newColorData)
             - PropertyColorUpdatePixel(propertyID, row, newColorData)
         transferProperty(uint24 propertyID, address newOwner)

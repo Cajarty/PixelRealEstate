@@ -35,10 +35,13 @@ class PropertiesForSale extends Component {
         let promise = SDM.orderPropertyListAsync(SDM.forSaleProperties, this.state.compare.func);
 
         let relisten = (results) => {
+            if (this.cancelSort)
+                return;
             this.setState({
                 orderedItems: results.data, 
-                pages: Math.floor((results.data.length - 1) / PAGE_SIZE)});
-            if (results.promise && !this.cancelSort)
+                pages: Math.floor((results.data.length - 1) / PAGE_SIZE)
+            });
+            if (results.promise)
                 results.promise.then(relisten);
         }
 

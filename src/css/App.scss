@@ -11,24 +11,28 @@ body {
     background-color: $color2;
 }
 
-.left {
-    width: calc((100vw - 20px - 90vh) / 2);
-    float: left;
-    display: inline-block;
-    z-index: 10000;
-}
-
-.center {
-    width: calc(90vh + 20px);
-    text-align: center;
-    display: inline-block;
-}
-
-.right {
-    width: calc((100vw - 20px - 90vh) / 2);
-    float: right;
-    display: inline-block;
-    z-index: 10000;
+.top {
+    height: 100vh;
+    .leftMain {
+        width: calc((100vw - 36px - 90vh) / 2);
+        float: left;
+        display: inline-block;
+        z-index: 5000;
+        height: 100vh;
+    }
+    .centerMain {
+        width: calc(90vh + 20px);
+        text-align: center;
+        display: inline-block;
+        height: 100vh;
+    }
+    .rightMain {
+        width: calc((100vw - 36px - 90vh) / 2);
+        float: right;
+        display: inline-block;
+        z-index: 5000;
+        height: 100vh;
+    }
 }
 
 .contractAction {
@@ -37,4 +41,9 @@ body {
 
 .hidden {
     display: none;
+}
+
+::placeholder {
+    color: $color3;
+    opacity: .5;
 }

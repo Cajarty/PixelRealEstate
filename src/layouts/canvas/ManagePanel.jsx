@@ -20,19 +20,13 @@ class ManagePanel extends Component {
                 <div className='contractAction'>
                     <Pullout side='left' >
                         <PulloutTab icon={Assets.ICON_MONEY} tabName='Inspect'>
-                            <PixelDescriptionBox
-                                x={this.props.clickX}
-                                y={this.props.clickY}
-                            ></PixelDescriptionBox>
+                            <PixelDescriptionBox/>
                         </PulloutTab>
                         <PulloutTab icon={Assets.ICON_MONEY} tabName='Owned'>
                             <PropertiesOwned/>
                         </PulloutTab>
                         <PulloutTab icon={Assets.ICON_MONEY} tabName='Property Market'>
                             <PropertiesForSale/>
-                        </PulloutTab>
-                        <PulloutTab icon={Assets.ICON_MONEY} tabName='Coin Market'>
-                            
                         </PulloutTab>
                     </Pullout>
                 </div>

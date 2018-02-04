@@ -6,6 +6,7 @@ import * as Func from '../../functions/functions.jsx';
 import Axios from '../../network/Axios.jsx';
 import * as Compress from 'lzwcompress';
 import Zoom from './Zoom';
+import {GFD, GlobalFormData} from '../../functions/GlobalFormData';
 
 
 class ZoomCanvas extends Component {
@@ -17,8 +18,8 @@ class ZoomCanvas extends Component {
             loadValue: 0,
             cancelToken: null,
             loaded: false,
-            hoverX: 0,
-            hoverY: 0,
+            hoverX: -1,
+            hoverY: -1,
             hideCanvas: true,
             queuedUpdates: [],
             canvasLoaded: false,
@@ -26,17 +27,9 @@ class ZoomCanvas extends Component {
         this.setCanvasProperty = this.setCanvasProperty.bind(this);
     }
 
-    componentWillReceiveProps(newProps) {
-        this.drawWindow(newProps.x, newProps.y);
-    }
-
     drawWindow(x, y) {
         if (x == -1 || y == -1) {
-            this.setState({
-                hideCanvas: true,
-                hoverX: -1,
-                hoverY: -1,
-            })
+            this.setState({hideCanvas: true})
             return;
         }
         this.setState({hideCanvas: false})
@@ -96,6 +89,15 @@ class ZoomCanvas extends Component {
                 this.setState({queuedUpdates: update});
             }
         });
+
+        GFD.listen('hoverX', 'zoomCanvas', (hoverX) => {
+            this.setState({hoverX});
+            this.drawWindow(hoverX, GFD.getData('hoverY'));
+        })
+        GFD.listen('hoverY', 'zoomCanvas', (hoverY) => {
+            this.setState({hoverY});
+            this.drawWindow(GFD.getData('hoverX'), hoverY);
+        })
     }
 
     setCanvasProperty(x, y, rgbArr) {
@@ -131,7 +133,7 @@ class ZoomCanvas extends Component {
                     width={100}
                     height={100}
                 ></canvas>
-                <div className='location'>{'x: ' + this.state.hoverX + ' y: ' + this.state.hoverY}</div>
+                <div className={'location ' + (this.state.hoverX == -1 || this.state.hoverY == -1 ? 'hideElement' : '')}>{'x: ' + (this.state.hoverX + 1) + ' y: ' + (this.state.hoverY + 1)}</div>
             </div>
         );
     }

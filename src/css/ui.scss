@@ -6,6 +6,10 @@
     width: 400px;
     height: 90vh;
     transform: translate(0, -50%);
+    &.left,
+    &.right {
+        z-index: 10000;
+    }
 }
 
 .pullout.open {
@@ -231,7 +235,27 @@ input[type="number"] {
     -moz-appearance: textfield;
 }
 
-input:focus {
+input {
+    outline: none;
+}
+
+input:active[type=button] {
     background-color: darken($color3, 10%);
     outline: none;
+}
+
+input:focus[type=number] {
+    background-color: darken($color3, 10%);
+    outline: none;
+}
+
+.SetPixelColorForm {
+    canvas {
+        border: 1px solid $color5;
+        &#large {
+            margin: 4px;
+            height: 100%;
+            vertical-align: middle;
+        }
+    }
 }

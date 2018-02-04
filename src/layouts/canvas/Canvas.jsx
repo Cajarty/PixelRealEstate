@@ -5,6 +5,7 @@ import * as Func from '../../functions/functions.jsx';
 import * as Compress from 'lzwcompress';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 import Zoom from './Zoom';
+import {GFD, GlobalFormData} from '../../functions/GlobalFormData';
 
 const FOR_SALE_IMAGE = [0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,50,52,0,255,13,13,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,4,4,0,255,122,126,0,255,196,202,0,255,173,179,0,255,68,70,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,82,84,0,255,124,128,0,255,103,106,0,255,38,40,0,255,170,175,0,255,5,5,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,78,80,0,255,146,150,0,255,111,114,0,255,32,33,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,1,1,0,255,98,101,0,255,201,207,0,255,166,171,0,255,64,66,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,102,105,0,255,58,59,0,255,176,181,0,255,38,40,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,103,106,0,255,64,66,0,255,102,105,0,255,32,33,0,255,143,147,0,255,60,61,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,21,22,0,255,176,181,0,255,184,190,0,255,168,173,0,255,163,168,0,255,5,5,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,109,112,0,255,52,54,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255,0,0,0,255];
 
@@ -30,11 +31,13 @@ class Canvas extends Component {
         this.canvas.onmousemove = (e) => {          
             let rect = this.canvas.getBoundingClientRect();
             let x = (e.clientX - rect.left) * (1000 / rect.width);
-            let y = (e.clientY - rect.top) * (1000 / rect.height);
-            this.props.hover(x, y);
+            let y = (e.clientY - rect.top) * (1000 / rect.height);  
+            GFD.setData('hoverX', x);
+            GFD.setData('hoverY', y);
         };
-        this.canvas.onmouseout = (e) => {          
-            this.props.hover(-1, -1);
+        this.canvas.onmouseout = (e) => {        
+            GFD.setData('hoverX', -1);
+            GFD.setData('hoverY', -1);
         };
         this.canvas.onclick = (e) => {         
             if (!e.isTrusted)
@@ -43,7 +46,8 @@ class Canvas extends Component {
             let rect = this.canvas.getBoundingClientRect();
             let x = Math.floor((e.clientX - rect.left) * (1000 / rect.width) / 10);
             let y = Math.floor((e.clientY - rect.top) * (1000 / rect.height) / 10); 
-            ctr.sendResults(LISTENERS.CoordinateUpdate, {x, y});
+            GFD.setData('x', x + 1);
+            GFD.setData('y', y + 1);
         };
 
         ctr.listenForResults(LISTENERS.ServerDataManagerInit, 'canvas', (results) => {

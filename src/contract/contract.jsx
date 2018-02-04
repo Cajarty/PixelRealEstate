@@ -17,7 +17,6 @@ export const ERROR_TYPE = {
 export const LISTENERS = {
     Error: 'Error',
     Alert: 'Alert',
-    CoordinateUpdate: 'CoordinateUpdate',
     ShowForSale: 'ShowForSale',
     ServerDataManagerInit: 'ServerDataManagerInit',
 }; 

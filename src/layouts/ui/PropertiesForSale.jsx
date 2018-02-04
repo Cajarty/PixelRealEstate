@@ -4,6 +4,7 @@ import {SDM, ServerDataManager, Compares} from '../../contract/ServerDataManager
 import TimeAgo from 'react-timeago';
 import PanelContainerOwned from './PanelContainerOwned';
 import * as Assets from '../../const/assets.jsx';
+import {GFD, GlobalFormData} from '../../functions/GlobalFormData';
 
 const PAGE_SIZE = 10;
 
@@ -61,7 +62,8 @@ class PropertiesForSale extends Component {
     }
 
     propertySelected(x, y) {
-        ctr.sendResults(LISTENERS.CoordinateUpdate, {x, y});
+        GFD.setData('x', x);
+        GFD.setData('y', y);
     }
 
     changePage(pageChange) {

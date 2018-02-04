@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
-import {Contract, ctr} from '../../contract/contract.jsx';
+import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
+import * as Func from '../../functions/functions';
+import {GFD, GlobalFormData} from '../../functions/GlobalFormData';
 
 class SellPixelForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            valueX: 0,
-            valueY: 0,
+            x: '',
+            y: '',
             valuePrice: 100000000000000000,
         };
     }
@@ -14,22 +16,37 @@ class SellPixelForm extends Component {
     componentWillReceiveProps(newProps) {
         let update = {};
         Object.keys(newProps).map((i) => {
-            if (newProps[i] != this.props[i])
+            if (newProps[i] != this.props[i]) {
                 update[i] = newProps[i];
-        })
+            }
+        });
         this.setState(update);
     }
 
     componentDidMount() {
-        this.setState({
-            valueX: this.props.valueX,
-            valueY: this.props.valueY,
+        GFD.listen('x', 'sellPixel', (x) => {
+            this.setState({x});
+        })
+        GFD.listen('y', 'sellPixel', (y) => {
+            this.setState({y});
         })
     }
 
-    handleInput(key, event) {
+    componentWillUnmount() {
+        GFD.closeAll('sellPixel');
+    }
+
+    setX(x) {
+        GFD.setData('x', x);
+    }
+    
+    setY(y) {
+        GFD.setData('y', y);
+    }
+
+    handlePrice(key, value) {
         let obj = {};
-        obj[key] = parseInt(event.target.value);
+        obj[key] = parseInt(value);
         this.setState(obj);
     }
 
@@ -49,7 +66,13 @@ class SellPixelForm extends Component {
                             <div className='inputTitle'> X: </div>
                         </td>
                         <td>
-                            <input id='sellPixelX' type='number' onChange={(e) => this.handleInput('valueX', e)} value={this.state.valueX}></input>
+                            <input 
+                                id='sellPixelX' 
+                                type='number' 
+                                placeholder='1-100'
+                                onChange={(e) => this.setX(e.target.value)} 
+                                value={this.state.x}
+                                ></input>
                         </td>
                     </tr>
                     <tr>
@@ -57,7 +80,13 @@ class SellPixelForm extends Component {
                             <div className='inputTitle'> Y: </div>
                         </td>
                         <td>
-                            <input id='sellPixelY' type='number' onChange={(e) => this.handleInput('valueY', e)} value={this.state.valueY}></input>
+                            <input 
+                                id='sellPixelY' 
+                                type='number' 
+                                placeholder='1-100'
+                                onChange={(e) => this.setY(e.target.value)} 
+                                value={this.state.y}
+                            ></input>
                         </td>
                     </tr>
                     <tr>
@@ -65,12 +94,12 @@ class SellPixelForm extends Component {
                             <div className='inputTitle'> Price: </div>
                         </td>
                         <td>
-                            <input id='sellPrice' type='number' onChange={(e) => this.handleInput('valuePrice', e)} value={this.state.valuePrice}></input>
+                            <input id='sellPrice' type='number' onChange={(e) => this.handlePrice('valuePrice', e.target.value)} value={this.state.valuePrice}></input>
                         </td>
                     </tr>
                     <tr>
                         <td colSpan={2}>
-                            <input type='button' value='Sell Pixel' onClick={() => ctr.sellProperty(this.state.valueX, this.state.valueY, this.state.valuePrice)}></input>
+                            <input type='button' value='Sell Pixel' onClick={() => ctr.sellProperty(this.state.x - 1, this.state.y - 1, this.state.valuePrice)}></input>
                         </td>
                     </tr>
                 </tbody>

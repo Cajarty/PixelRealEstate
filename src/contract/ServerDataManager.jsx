@@ -266,7 +266,7 @@ export class ServerDataManager {
                     res({promise: new Promise(repromise), data: sortedArray});
                 else 
                     res({promise: null, data: sortedArray});
-            }, 100);
+            }, 10);
         }
 
         return new Promise(repromise);

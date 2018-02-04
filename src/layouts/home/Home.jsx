@@ -1,17 +1,13 @@
 import React, { Component } from 'react';
 import {VisitPage} from '../../functions/functions.jsx';
 import * as Routes from '../../const/routes.jsx';
+import CanvasPage from '../canvas/CanvasPage';
 
 class Home extends Component {
 
 
   render() {
-    return (
-      <div className='page tiled'>
-        <div className='title'>PixelRealEstate</div>
-        <button onClick={() => VisitPage(Routes.CANVAS)}>View The Land</button>
-      </div>
-    )
+    return <CanvasPage/>;
   }
 }
 

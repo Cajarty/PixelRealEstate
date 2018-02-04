@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import {Contract, ctr} from '../../contract/contract.jsx';
 import * as Const from '../../const/const.jsx';
+import * as Func from '../../functions/functions';
+import {GFD, GlobalFormData} from '../../functions/GlobalFormData';
 
 const PREVIEW_WIDTH = 100;
 const PREVIEW_HEIGHT = 100;
@@ -9,21 +11,34 @@ class SetPixelColorForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            valueX: 0,
-            valueY: 0,
+            x: '',
+            y: '',
             ctxLrg: null,
             ctxSml: null,
             imageData: null,
         };
     }
-
+    
     componentWillReceiveProps(newProps) {
         let update = {};
         Object.keys(newProps).map((i) => {
-            if (newProps[i] != this.props[i])
+            if (newProps[i] != this.props[i]) {
                 update[i] = newProps[i];
-        })
+            }
+        });
         this.setState(update);
+    }
+
+    componentWillUnmount() {
+        GFD.closeAll('UpdatePixel');
+    }
+
+    setX(x) {
+        GFD.setData('x', x);
+    }
+    
+    setY(y) {
+        GFD.setData('y', y);
     }
 
     componentDidMount() {
@@ -34,15 +49,13 @@ class SetPixelColorForm extends Component {
         this.setState({
             ctxLrg, 
             ctxSml,
-            valueX: this.props.valueX,
-            valueY: this.props.valueY,
         });
-    }
-
-    handleInput(key, event) {
-        let obj = {};
-        obj[key] = parseInt(event.target.value);
-        this.setState(obj);
+        GFD.listen('x', 'UpdatePixel', (x) => {
+            this.setState({x});
+        })
+        GFD.listen('y', 'UpdatePixel', (y) => {
+            this.setState({y});
+        })
     }
 
     uploadImage(e) {
@@ -70,12 +83,12 @@ class SetPixelColorForm extends Component {
     }
 
     sendColors() {
-        ctr.setColors(this.state.valueX, this.state.valueY, this.state.imageData);
+        ctr.setColors(this.state.x - 1, this.state.y - 1, this.state.imageData);
     }
 
     render() {
         return (
-            <table cellSpacing={0} cellPadding={0} className='form'>
+            <table cellSpacing={0} cellPadding={0} className='SetPixelColorForm form'>
                 <tbody>
                     <tr>
                         <td colSpan={2}>
@@ -97,7 +110,13 @@ class SetPixelColorForm extends Component {
                             <div className='inputTitle'> X: </div>
                         </td>
                         <td>
-                            <input id='xInput' type='number' onChange={(e) => this.handleInput('valueX', e)} value={this.state.valueX}></input>
+                            <input 
+                                id='xInput' 
+                                type='number' 
+                                placeholder='1-100'
+                                onChange={(e) => this.setX(e.target.value)} 
+                                value={this.state.x}
+                            ></input>
                         </td>
                     </tr>
                     <tr>
@@ -105,7 +124,13 @@ class SetPixelColorForm extends Component {
                             <div className='inputTitle'> Y: </div>
                         </td>
                         <td>
-                            <input id='yInput' type='number' onChange={(e) => this.handleInput('valueY', e)} value={this.state.valueY}></input>
+                            <input 
+                                id='yInput' 
+                                type='number'
+                                placeholder='1-100'
+                                onChange={(e) => this.setY(e.target.value)} 
+                                value={this.state.y}
+                            ></input>
                         </td>
                     </tr>
                     <tr>

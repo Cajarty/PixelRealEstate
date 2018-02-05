@@ -158,9 +158,11 @@ contract VirtualRealEstate is StandardToken {
     }
     function getProjectedPayout(uint24 propertyID) public view returns(uint256) {
         Property storage property = map[propertyID];
-        require(property.lastUpdate != 0);
-        uint256 hoursSinceLastColorChange = (now - property.lastUpdate) / (5 seconds); //ERRORs on property.lastUpdate = 0
-        return hoursSinceLastColorChange * PROPERTY_GENERATES_PER_HOUR;
+        if (!property.isInPrivateMode && property.lastUpdate != 0) {
+            uint256 hoursSinceLastColorChange = (now - property.lastUpdate) / (5 seconds); //ERRORs on property.lastUpdate = 0
+            return hoursSinceLastColorChange * PROPERTY_GENERATES_PER_HOUR;
+        }
+        return 0;
     }
     //Change a 10x10 == 70 | 30 | 0 cost
     function setColors(uint24 propertyID, uint256[10] newColors) public validPropertyID(propertyID) returns(bool) {
@@ -191,26 +193,23 @@ contract VirtualRealEstate is StandardToken {
         
         //If we're in Public Mode, payouts occur
         
-        if (!property.isInPrivateMode && property.lastUpdate != 0) {
-            uint256 payout = getProjectedPayout(propertyID);
-    
-            if (payout > 0) {
-                address propertyOwnerPayee = property.owner;
-                address lastUpdaterPayee = property.lastUpdater;
-                if (propertyOwnerPayee == 0) {
-                    if (lastUpdaterPayee != 0) {
-                        propertyOwnerPayee = lastUpdaterPayee;
-                    }
-                }
-                //Payout half to ownerPayee and half to updaterPayee
-                if (propertyOwnerPayee != 0) {
-                    balances[propertyOwnerPayee] += payout / 2;
-                }
+        uint256 payout = getProjectedPayout(propertyID);
+        if (payout > 0) {
+            address propertyOwnerPayee = property.owner;
+            address lastUpdaterPayee = property.lastUpdater;
+            if (propertyOwnerPayee == 0) {
                 if (lastUpdaterPayee != 0) {
-                    balances[lastUpdaterPayee] += payout / 2;
+                    propertyOwnerPayee = lastUpdaterPayee;
                 }
-                totalSupply += payout;
             }
+            //Payout half to ownerPayee and half to updaterPayee
+            if (propertyOwnerPayee != 0) {
+                balances[propertyOwnerPayee] += payout / 2;
+            }
+            if (lastUpdaterPayee != 0) {
+                balances[lastUpdaterPayee] += payout / 2;
+            }
+            totalSupply += payout;
         }
         
         //Burn the coins from the sender

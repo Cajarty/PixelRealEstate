@@ -156,6 +156,12 @@ contract VirtualRealEstate is StandardToken {
             return (property.owner, 0, property.salePrice, property.lastUpdate, property.isInPrivateMode);
         }
     }
+    function getProjectedPayout(uint24 propertyID) public view returns(uint256) {
+        Property storage property = map[propertyID];
+        require(property.lastUpdate != 0);
+        uint256 hoursSinceLastColorChange = (now - property.lastUpdate) / (5 seconds); //ERRORs on property.lastUpdate = 0
+        return hoursSinceLastColorChange * PROPERTY_GENERATES_PER_HOUR;
+    }
     //Change a 10x10 == 70 | 30 | 0 cost
     function setColors(uint24 propertyID, uint256[10] newColors) public validPropertyID(propertyID) returns(bool) {
         Property storage property = map[propertyID];
@@ -186,8 +192,7 @@ contract VirtualRealEstate is StandardToken {
         //If we're in Public Mode, payouts occur
         
         if (!property.isInPrivateMode && property.lastUpdate != 0) {
-            uint256 hoursSinceLastColorChange = (now - property.lastUpdate) / (5 seconds); //ERRORs on property.lastUpdate = 0
-            uint256 payout = hoursSinceLastColorChange * PROPERTY_GENERATES_PER_HOUR;
+            uint256 payout = getProjectedPayout(propertyID);
     
             if (payout > 0) {
                 address propertyOwnerPayee = property.owner;

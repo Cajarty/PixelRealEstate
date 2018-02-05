@@ -303,6 +303,8 @@ contract('VirtualRealEstate', function(accounts) {
     }).then(function(sc) {
       return pixelPropertyInstance.balanceOf(accounts[5], { from: accounts[0] });
     }).then(function(balance) {
+      console.log("THIS ONE");
+      console.log(balance);
       assert.equal(balance, changeColorCosts1Goal, "Should be one less than balance");
     });
   });

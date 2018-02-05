@@ -4,7 +4,8 @@ import {SDM, ServerDataManager, Compares} from '../../contract/ServerDataManager
 import TimeAgo from 'react-timeago';
 import PanelContainerOwned from './PanelContainerOwned';
 import * as Assets from '../../const/assets.jsx';
-import {GFD, GlobalFormData} from '../../functions/GlobalFormData';
+import {GFD, GlobalState} from '../../functions/GlobalState';
+import Dropdown from 'react-dropdown';
 
 const PAGE_SIZE = 10;
 
@@ -14,7 +15,7 @@ class PropertiesForSale extends Component {
         this.state = {
             showPopertiesForSale: false,
             orderedItems: [],
-            compare: Compares.xDesc,
+            compare: Compares.yAsc,
             page: 0, //on page #
             pages: 0, //total pages
         };
@@ -23,16 +24,15 @@ class PropertiesForSale extends Component {
 
     componentDidMount() {
         ctr.listenForEvent(EVENTS.PropertySetForSale, 'PropertiesForSale', (data) => {
-            this.reorderItems();
+            this.reorderItems(this.state.compare.func);
             this.forceUpdate();
         });
-        this.reorderItems();
+        this.reorderItems(this.state.compare.func);
     }
 
-    reorderItems() {
-        console.info(SDM.forSaleProperties)
+    reorderItems(orderFunc) {
         //get my current market trade and populate fields
-        let promise = SDM.orderPropertyListAsync(SDM.forSaleProperties, this.state.compare.func);
+        let promise = SDM.orderPropertyListAsync(SDM.forSaleProperties, orderFunc);
 
         let relisten = (results) => {
             if (this.cancelSort)
@@ -78,6 +78,11 @@ class PropertiesForSale extends Component {
         this.setState({page});        
     }
 
+    reorderList(value) {
+        this.setState({compare: Compares[value.value]});
+        this.reorderItems(Compares[value.value].func);
+    }
+
     render() {
         return (
             <div className='uiBase'>
@@ -92,6 +97,16 @@ class PropertiesForSale extends Component {
                     ></input>
                     <span className="slider"></span>
                 </label>
+                <div>
+                    <Dropdown 
+                        className='dropdown'
+                        value={this.state.compare}
+                        options={Object.keys(Compares).map((i) => {
+                            return Compares[i];
+                        })} 
+                        onChange={value => {this.reorderList(value)}}
+                    />
+                </div>
                 </div>
                 <div className='containerParent'>
                     <PanelContainerOwned
@@ -117,4 +132,4 @@ class PropertiesForSale extends Component {
     }
 }
 
-export default PropertiesForSale
+export default PropertiesForSale;

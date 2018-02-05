@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import {Contract, ctr, EVENTS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions.jsx';
 import Timestamp from 'react-timestamp';
-import {GFD, GlobalFormData} from '../../functions/GlobalFormData';
+import {GFD, GlobalState} from '../../functions/GlobalState';
+import Hours from '../ui/Hours';
 
 class PixelDescriptionBox extends Component {
     constructor(props) {
@@ -14,7 +15,8 @@ class PixelDescriptionBox extends Component {
             dataCtx: null,
             owner: "",
             isForSale: false,
-            salePrice: 0,
+            ETHPrice: 0,
+            PPCPrice: 0,
             lastUpdate: 0,
             isInPrivate: false,
         }
@@ -95,15 +97,17 @@ class PixelDescriptionBox extends Component {
     loadProperty(x, y) {
         if (x === '' || y === '')
             return;
-        ctr.getPropertyData(x, y, (data) => {
-            let price = Func.BigNumberToNumber(data[1]);
+        ctr.getPropertyData(x, y, (data) => {  
+            let ethp = Func.BigNumberToNumber(data[1]);
+            let ppcp = Func.BigNumberToNumber(data[2]);
             this.setState({
                 owner: data[0],
-                isForSale: price != 0,
-                salePrice: price,
-                lastUpdate: data[2], //deal with this: with timestamp for since last time ::: data[2]
-                isInPrivate: data[3],
-            })
+                isForSale: ppcp != 0,
+                ETHPrice: ethp,
+                PPCPrice: ppcp,
+                lastUpdate: Func.BigNumberToNumber(data[3]),
+                isInPrivate: data[4],
+            });
         });
         ctr.getPropertyColors(x, y, (x, y, data) => {
             this.setCanvas(data);
@@ -148,7 +152,11 @@ class PixelDescriptionBox extends Component {
                         {this.state.isForSale ? (
                             <tr>
                                 <th>Price</th>
-                                <td>{this.state.salePrice}</td>
+                                <td>
+                                    {this.state.ETHPrice == 0 ? '' : this.state.ETHPrice + ' ETH'}
+                                    {this.state.ETHPrice != 0 && this.state.PPCPrice != 0 ? ' - ' : ''}
+                                    {this.state.PPCPrice == 0 ? '' : this.state.PPCPrice + ' PPC'}
+                                </td>
                             </tr>
                         ) : null}
                         <tr>

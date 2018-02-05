@@ -3,7 +3,7 @@ import {Contract, ctr, EVENTS, LISTENERS} from '../../contract/contract.jsx';
 import {SDM, ServerDataManager, Compares} from '../../contract/ServerDataManager.jsx';
 import PanelContainerOwned from './PanelContainerOwned';
 import * as Assets from '../../const/assets.jsx';
-import {GFD, GlobalFormData} from '../../functions/GlobalFormData';
+import {GFD, GlobalState} from '../../functions/GlobalState';
 
 const PAGE_SIZE = 10;
 

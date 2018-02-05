@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import {Contract, ctr} from '../../contract/contract.jsx';
 import * as Const from '../../const/const.jsx';
 import * as Func from '../../functions/functions';
-import {GFD, GlobalFormData} from '../../functions/GlobalFormData';
+import {GFD, GlobalState} from '../../functions/GlobalState';
 
 const PREVIEW_WIDTH = 100;
 const PREVIEW_HEIGHT = 100;

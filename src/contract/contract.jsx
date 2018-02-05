@@ -149,12 +149,14 @@ export class Contract {
         });
     }
 
-    buyProperty(x, y, price, useEth = true) {
+    buyProperty(x, y, eth, ppc) {
         this.VRE.deployed().then((i) => {
-            if (useEth)
-                return i.buyPropertyInETH(this.toID(x, y), { value: price, from: this.account });
-            else
-                return i.buyPropertyInPXL(this.toID(x, y), price, { from: this.account });
+            if (eth == 0)
+                return i.buyPropertyInPPC(this.toID(x, y), ppc, {from: this.account });
+            else if (ppc == 0)
+                return i.buyPropertyInETH(this.toID(x, y), { value: eth, from: this.account });
+            else 
+                return i.buyProperty(this.toID(x, y), ppc, {value: eth, from: this.account});
         }).then(() => {
             this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " purchase complete."});
         }).catch((e) => {
@@ -200,10 +202,10 @@ export class Contract {
         });
     }
 
-    getForSalePrice(x, y) {
+    getForSalePrices(x, y, callback) {
         this.VRE.deployed().then((i) => {
             return i.getForSalePrices.call(this.toID(x, y)).then((r) => {
-                return r;
+                return callback(r);
             });
         }).catch((e) => {
             console.log(e);

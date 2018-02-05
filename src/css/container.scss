@@ -1,13 +1,18 @@
 .uiBase {
     height: 100%;
+    position: relative;
     .header {
-        height: 40px;
+        position: relative;
+        z-index: 20000;
+        height: 70px;
         font: $font3;
         text-align: center;
     }
     .containerParent {
-        height: calc(100% - 90px);
-        overflow-y: auto;
+        height: calc(100% - 120px);
+        overflow-y: overlay;
+        position: relative;
+        z-index: 12000;
         .panelItem {
             &.itemTitle {
                 font-weight: 600;
@@ -18,6 +23,8 @@
         height: 50px;
         display: inline-block;
         width: 100%;
+        position: relative;
+        z-index: 16000;
         .bottomNav {
             display: inline-block;
             height: 40px;

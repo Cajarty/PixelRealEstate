@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
-import {GFD, GlobalFormData} from '../../functions/GlobalFormData';
+import {GFD, GlobalState} from '../../functions/GlobalState';
 
 class SellPixelForm extends Component {
     constructor(props) {

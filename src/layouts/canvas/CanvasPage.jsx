@@ -18,7 +18,7 @@ class CanvasPage extends Component {
             pixelData: null,
             loadingPPC: true,
             PPCOwned: 0,
-            showAdvanced: false,
+            showAdvanced: true,
         }
     }
 
@@ -29,6 +29,14 @@ class CanvasPage extends Component {
         });
         ctr.listenForEvent(EVENTS.Transfer, 'CanvasPagePPCListener', (data) => {
             if (data.args._from === ctr.account || data.args._to === ctr.account) {
+                this.setState({loadingPPC: true});
+                ctr.getBalance((balance) => {
+                    this.setState({PPCOwned: balance, loadingPPC: false});
+                });
+            }
+        });
+        ctr.listenForEvent(EVENTS.PropertyBought, 'CanvasPagePPCListener', (data) => {
+            if (data.args.newOwner === ctr.account) {
                 this.setState({loadingPPC: true});
                 ctr.getBalance((balance) => {
                     this.setState({PPCOwned: balance, loadingPPC: false});
@@ -48,6 +56,7 @@ class CanvasPage extends Component {
     componentWillUnmount() {
         ctr.stopListeningForEvent(EVENTS.Transfer, 'CanvasPagePPCListener');
         ctr.stopListeningForEvent(EVENTS.PropertyColorUpdate, 'CanvasPagePPCListener');
+        ctr.stopListeningForEvent(EVENTS.PropertyBought, 'CanvasPagePPCListener');
     }
 
     render() {

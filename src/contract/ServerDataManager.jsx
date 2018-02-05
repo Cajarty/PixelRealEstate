@@ -4,19 +4,23 @@ import * as Func from '../functions/functions.jsx';
 
 export const Compares = {
     xAsc: { 
-        name: 'X - Ascending',
+        label: 'X - Ascending',
+        value: 'xAsc',
         func: (a,b) => {return a.x < b.x;}
     }, 
     xDesc: {
-        name: 'X - Descending',
+        label: 'X - Descending',
+        value: 'xDesc',
         func: (a,b) => {return a.x > b.x;}
     },
     yAsc: {
-        name: 'Y - Ascending', 
+        label: 'Y - Ascending', 
+        value: 'yAsc',
         func: (a,b) => {return a.y < b.y;}
     },
     yDesc: {
-        name: 'Y - Descending',
+        label: 'Y - Descending',
+        value: 'yDesc',
         func: (a,b) => {return a.y > b.y;}
     }
 };
@@ -60,6 +64,9 @@ export class ServerDataManager {
                 xy.x = data.args.x;
                 xy.y = data.args.y;
             }
+
+            this.forceUpdatePropertyData(xy.x, xy.y);
+
             if (data.args.colorsRGB == null)
                 this.insertPropertyImage(xy.x, xy.y, Func.ContractDataToRGBAArray(data.args.colors));
             else
@@ -150,8 +157,23 @@ export class ServerDataManager {
         for (let y = yy * 10; y < (yy + 1) * 10; y++)
             for (let x = xx * 10; x < (xx + 1) * 10; x++)
                 for (let i = 0; i < 4; i++)
-                    this.pixelData[y * 4000 + x * 4 + i] = RGBArray[counter++];
-        
+                    this.pixelData[y][x * 4 + i] = RGBArray[counter++];
+    }
+
+    forceUpdatePropertyData(x, y) {
+        ctr.getPropertyData(x, y, (data) => {
+            let ethp = Func.BigNumberToNumber(data[1]);
+            let ppcp = Func.BigNumberToNumber(data[2]);
+            let update = {
+                owner: data[0],
+                isForSale: ppcp != 0,
+                ETHPrice: ethp,
+                PPCPrice: ppcp,
+                lastUpdate: Func.BigNumberToNumber(data[3]),
+                isInPrivate: data[4],
+            };
+            this.updateProperty(x, y, update);
+        });
     }
 
     /*
@@ -202,10 +224,12 @@ export class ServerDataManager {
     Updates a property at a location with the new passed in data.
     */
     updateProperty(x, y, update) {
+        console.info(x, y, update);
         if (this.allProperties[x] == null) {
             this.allProperties[x] = {};
         }
         this.allProperties[x][y] = Object.assign({}, this.allProperties[x][y] || {}, update);
+        this.organizeProperty(x, y);
     }
 
     /*

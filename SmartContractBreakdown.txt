@@ -16,6 +16,7 @@ contract VirtualRealEstate:
         getLink(address user) view returns(bytues32[2])
         getPropertyColors(uint24 propertyID)view returns(uint256[10])
         getPropertyData(uint24 propertyID) view returns(address, uint256, uint256, uint256, bool)
+        getProjectedPayout(uint24 propertyID) view returns(uint256)
 
     functions:
         setHoverText(bytes32[2] text)

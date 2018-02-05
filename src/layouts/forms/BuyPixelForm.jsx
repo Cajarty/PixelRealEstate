@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
-import {Contract, ctr} from '../../contract/contract.jsx';
+import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
+import * as Func from '../../functions/functions';
+import {GFD, GlobalFormData} from '../../functions/GlobalFormData';
 
 class BuyPixelForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            valueX: 0,
-            valueY: 0,
+            x: '',
+            y: '',
             payWithETH: true,
             valuePrice: 100000000000000000,
         };
@@ -15,24 +17,38 @@ class BuyPixelForm extends Component {
     componentWillReceiveProps(newProps) {
         let update = {};
         Object.keys(newProps).map((i) => {
-            if (newProps[i] != this.props[i])
+            if (newProps[i] != this.props[i]) {
                 update[i] = newProps[i];
-        })
+            }
+        });
         this.setState(update);
     }
 
     componentDidMount() {
-        this.setState({
-            valueX: this.props.valueX,
-            valueY: this.props.valueY,
+        GFD.listen('x', 'buyPixel', (x) => {
+            this.setState({x});
+        })
+        GFD.listen('y', 'buyPixel', (y) => {
+            this.setState({y});
         })
     }
 
-    handleInput(key, value) {
-        let obj = {};
-        obj[key] = value;
-        this.setState(obj);
-        console.info(ctr.getForSalePrice(this.state.x, this.state.y)); //TODO get this to work and store and set the prices.
+    componentWillUnmount() {
+        GFD.closeAll('buyPixel');
+    }
+
+    setX(x) {
+        GFD.setData('x', x);
+    }
+    
+    setY(y) {
+        GFD.setData('y', y);
+        console.info(ctr.getForSalePrice(GFD.getData('x') - 1, y - 1)); //TODO get this to work and store and set the prices.
+    }
+
+    buyProperty() {
+        if (this.state.valueX >= 1 && this.state.valueX <= 100 && this.state.valueY >= 1 && this.state.valueY <= 100)
+            ctr.buyProperty(this.state.x - 1, this.state.y - 1, this.state.valuePrice);
     }
 
     render() {
@@ -49,13 +65,25 @@ class BuyPixelForm extends Component {
                     <tr>
                         <td>
                             <div className='inputTitle'> X: </div>
-                            <input id='buyPixelX' type='number' onChange={(e) => this.handleInput('valueX', parseInt(e.target.value))} value={this.state.valueX}></input>
+                            <input 
+                                id='buyPixelX' 
+                                type='number' 
+                                onChange={(e) => this.setX(e.target.value)} 
+                                value={this.state.x} 
+                                placeholder='1-100'
+                            ></input>
                         </td>
                     </tr>
                     <tr>
                         <td>
                             <div className='inputTitle'> Y: </div>
-                            <input id='buyPixelY' type='number' onChange={(e) => this.handleInput('valueY', parseInt(e.target.value))} value={this.state.valueY}></input>
+                            <input 
+                                id='buyPixelY' 
+                                type='number' 
+                                onChange={(e) => this.setY(e.target.value)} 
+                                value={this.state.y} 
+                                placeholder='1-100'
+                            ></input>
                         </td>
                     </tr>
                     <tr>
@@ -70,7 +98,7 @@ class BuyPixelForm extends Component {
                     </tr>
                     <tr>
                         <td>
-                            <input type='button' value='Buy Pixel' onClick={() => ctr.buyProperty(this.state.valueX, this.state.valueY, this.state.valuePrice)}></input>
+                            <input type='button' value='Buy Pixel' onClick={() => this.buyProperty()}></input>
                         </td>
                     </tr>
                 </tbody>

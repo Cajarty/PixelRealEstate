@@ -14,25 +14,16 @@ class CanvasPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            hoverX: -1,
-            hoverY: -1,
-            clickX: '',
-            clickY: '',
             pixelDataUpdateVersion: 0,
             pixelData: null,
             loadingPPC: true,
             PPCOwned: 0,
+            showAdvanced: false,
         }
     }
 
     componentDidMount() {
         SDM.init();
-        ctr.listenForResults(LISTENERS.CoordinateUpdate, 'coordinateUpdate', (data) => {
-            this.setState({
-                clickX: data.x,
-                clickY: data.y
-            });
-        });
         ctr.getBalance((balance) => {
             this.setState({PPCOwned: balance, loadingPPC: false});
         });
@@ -55,47 +46,28 @@ class CanvasPage extends Component {
     }
 
     componentWillUnmount() {
-        ctr.stopListeningForResults(LISTENERS.CoordinateUpdate, 'coordinateUpdate');
         ctr.stopListeningForEvent(EVENTS.Transfer, 'CanvasPagePPCListener');
         ctr.stopListeningForEvent(EVENTS.PropertyColorUpdate, 'CanvasPagePPCListener');
-    }
-
-    canvasHover(x, y) {
-        this.setState({
-            hoverX: x, 
-            hoverY: y
-        });
     }
 
     render() {
         return (
             <div>
-                <div className='banner'>
+                <div className={'banner' + (this.state.showAdvanced ? '' : ' hideElement')}>
                     PPC Owned: {this.state.PPCOwned}{this.state.loadingPPC ? ' LOADING' : ''}
                 </div>
                 <div className='top'>
-                        <ManagePanel
-                            clickX={this.state.clickX}
-                            clickY={this.state.clickY}
-                        />
-                    <div className='left'>
+                    <div className='leftMain'>
+                        <ManagePanel/>
                         <div>
-                            <ZoomCanvas 
-                                x={this.state.hoverX} 
-                                y={this.state.hoverY}
-                            />
+                            <ZoomCanvas/>
                         </div>
                     </div>
-                    <div className='center'>
-                        <Canvas 
-                            hover={(x, y) => this.canvasHover(x, y)}
-                        />
+                    <div className='centerMain'>
+                        <Canvas/>
                     </div>
-                    <div className='right'>
-                        <ActionPanel
-                            clickX={this.state.clickX}
-                            clickY={this.state.clickY}
-                        />
+                    <div className='rightMain'>
+                        <ActionPanel/>
                     </div>
                 </div>
                 <div className='middle-top'>

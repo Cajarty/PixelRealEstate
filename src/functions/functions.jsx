@@ -5,6 +5,10 @@ var bigInt = require("big-integer");
 var BigNumber = require('bignumber.js');
 var utf8 = require("utf8");
 
+export const Clamp = (min, max, value) => {
+    return Math.max(min, Math.min(max, value));
+}
+
 export const StringToHex = function(str) {
     str = utf8.encode(str);
     var hex = "";

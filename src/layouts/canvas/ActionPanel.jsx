@@ -4,11 +4,9 @@ import SetPixelColorForm from '../forms/SetPixelColorForm';
 import SellPixelForm from '../forms/SellPixelForm';
 import Pullout from '../ui/Pullout';
 import PulloutTab from '../ui/PulloutTab';
-import GetPixelColorForm from '../forms/GetPixelColorForm';
 import * as Assets from '../../const/assets.jsx';
 import SetHoverText from '../forms/SetHoverText';
 import SetLink from '../forms/SetLink';
-import PlaceMarketTrade from '../forms/PlaceMarketTrade';
 
 class ActionPanel extends Component {
     constructor(props) {
@@ -23,29 +21,17 @@ class ActionPanel extends Component {
                 <div className='contractAction'>
                  <Pullout side='right' >
                     <PulloutTab icon={Assets.ICON_MONEY} tabName='Buy Property'>
-                        <BuyPixelForm
-                            valueX={this.props.clickX}
-                            valueY={this.props.clickY}
-                        />
+                        <BuyPixelForm/>
                     </PulloutTab>
                     <PulloutTab icon={Assets.ICON_MONEY} tabName='Sell Property'>
-                        <SellPixelForm
-                            valueX={this.props.clickX}
-                            valueY={this.props.clickY}
-                        />
+                        <SellPixelForm/>
                     </PulloutTab>
                     <PulloutTab icon={Assets.ICON_MONEY} tabName='Update Property'>
-                        <SetPixelColorForm
-                            valueX={this.props.clickX}
-                            valueY={this.props.clickY}
-                        />
+                        <SetPixelColorForm/>
                     </PulloutTab>
                     <PulloutTab icon={Assets.ICON_MONEY} tabName='Set Property Info'>
                         <SetHoverText/>
                         <SetLink/>
-                    </PulloutTab>
-                    <PulloutTab icon={Assets.ICON_MONEY} tabName='Exchange Currency'>
-                        <PlaceMarketTrade/>
                     </PulloutTab>
                  </Pullout>
                 </div>

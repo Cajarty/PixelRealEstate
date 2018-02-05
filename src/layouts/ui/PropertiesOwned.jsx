@@ -3,6 +3,7 @@ import {Contract, ctr, EVENTS, LISTENERS} from '../../contract/contract.jsx';
 import {SDM, ServerDataManager, Compares} from '../../contract/ServerDataManager.jsx';
 import PanelContainerOwned from './PanelContainerOwned';
 import * as Assets from '../../const/assets.jsx';
+import {GFD, GlobalFormData} from '../../functions/GlobalFormData';
 
 const PAGE_SIZE = 10;
 
@@ -31,10 +32,13 @@ class PropertiesOwned extends Component {
         let promise = SDM.orderPropertyListAsync(SDM.ownedProperties, this.state.compare.func);
 
         let relisten = (results) => {
+            if (this.cancelSort)
+                return;
             this.setState({
                 orderedItems: results.data, 
-                pages: Math.floor((results.data.length - 1) / PAGE_SIZE)});
-            if (results.promise && !this.cancelSort)
+                pages: Math.floor((results.data.length - 1) / PAGE_SIZE)
+            });
+            if (results.promise)
                 results.promise.then(relisten);
         }
 
@@ -53,7 +57,8 @@ class PropertiesOwned extends Component {
     }
 
     propertySelected(x, y) {
-        ctr.sendResults(LISTENERS.CoordinateUpdate, {x, y});
+        GFD.setData('x', x);
+        GFD.setData('y', y);
     }
 
     changePage(pageChange) {

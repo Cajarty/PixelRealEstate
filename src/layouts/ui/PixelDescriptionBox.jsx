@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {Contract, ctr, EVENTS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions.jsx';
 import Timestamp from 'react-timestamp';
+import {GFD, GlobalFormData} from '../../functions/GlobalFormData';
 
 class PixelDescriptionBox extends Component {
     constructor(props) {
@@ -19,17 +20,21 @@ class PixelDescriptionBox extends Component {
         }
     }
 
-    componentWillReceiveProps(newProps) {
-        let update = {x: this.state.x, y: this.state.y};
-        Object.keys(newProps).map((i) => {
-            if (newProps[i] != this.props[i])
-                update[i] = newProps[i];
-        })
+    setX(x) {
+        GFD.setData('x', x);
+    }
+    
+    setY(y) {
+        GFD.setData('y', y);
+    }
 
-        //update property view if new area clicked
-        if (update.x !== this.state.x || update.y !== this.state.y) {
-            this.loadProperty(update.x, update.y);
-        }
+    componentWillReceiveProps(newProps) {
+        let update = {};
+        Object.keys(newProps).map((i) => {
+            if (newProps[i] != this.props[i]) {
+                update[i] = newProps[i];
+            }
+        });
         this.setState(update);
     }
 
@@ -44,9 +49,15 @@ class PixelDescriptionBox extends Component {
         this.setState({
             ctx, 
             dataCtx,
-            x: this.props.x == null ? '' : this.props.x,
-            y: this.props.y == null ? '' : this.props.y,
         });
+
+        GFD.listen('x', 'pixelBrowse', (x) => {
+            this.setState({x});
+        })
+        GFD.listen('y', 'pixelBrowse', (y) => {
+            this.loadProperty(GFD.getData('x') - 1, y - 1);
+            this.setState({y});
+        })
 
         ctr.listenForEvent(EVENTS.PropertyColorUpdate, 'PixelDescriptionBox', (data) => {
             let xy = {x: 0, y: 0, colors: []};
@@ -68,14 +79,8 @@ class PixelDescriptionBox extends Component {
         });
     }
 
-    setXY(key, event) {
-        let obj = {
-            x: this.state.x == '' ? 0 : this.state.x, 
-            y: this.state.y == '' ? 0 : this.state.y
-        };
-        obj[key] = Math.max(0 ,Math.min(100, event.target.value));
-        this.loadProperty(obj.x, obj.y);
-        this.setState(obj);
+    componentWillUnmount() {
+        GFD.closeAll('pixelBrowse');
     }
 
     setCanvas(rgbArr) {
@@ -88,6 +93,8 @@ class PixelDescriptionBox extends Component {
     }
 
     loadProperty(x, y) {
+        if (x === '' || y === '')
+            return;
         ctr.getPropertyData(x, y, (data) => {
             let price = Func.BigNumberToNumber(data[1]);
             this.setState({
@@ -114,11 +121,21 @@ class PixelDescriptionBox extends Component {
                     <tbody>
                         <tr>
                             <th>X</th>
-                            <td><input type='number' value={this.state.x} onChange={(e) => this.setXY('x', e)}></input></td>
+                            <td><input 
+                                    type='number' 
+                                    placeholder='1-100'
+                                    value={this.state.x} 
+                                    onChange={(e) => this.setX(e.target.value)}
+                                ></input></td>
                         </tr>
                         <tr>
                             <th>Y</th>
-                            <td><input type='number' value={this.state.y} onChange={(e) => this.setXY('y', e)}></input></td>
+                            <td><input 
+                                    type='number' 
+                                    placeholder='1-100'
+                                    value={this.state.y} 
+                                    onChange={(e) => this.setY(e.target.value)}
+                                ></input></td>
                         </tr>
                         <tr>
                             <th>Owner</th>

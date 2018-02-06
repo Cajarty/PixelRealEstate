@@ -170,6 +170,8 @@ contract('VirtualRealEstate', function(accounts) {
       assert.equal(propertyData[2], 0, "Should be delisted and back to 0 wei" ); //For sale
       return pixelPropertyInstance.listForSale(3, 10000, { from: accounts[0] }); 
     }).then(function(result) {
+      return pixelPropertyInstance.addCoin(accounts[1], 10000, {from: accounts[0]});
+    }).then(function(result) {
       return pixelPropertyInstance.getPropertyData(3, { from: accounts[0] });
     }).then(function(propertyData) {
       assert.equal(propertyData[2], 10000, "Should be listed for sale for 10000 wei" ); //For sale

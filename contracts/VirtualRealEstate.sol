@@ -117,7 +117,7 @@ contract VirtualRealEstate is StandardToken {
     function VirtualRealEstate() public {
         owner = msg.sender;
         totalSupply = 0;
-        FREE_COLOR_SETTING_UNTIL = now + 1 days;
+        FREE_COLOR_SETTING_UNTIL = now;// + 1 days;
         pricePPC = 10;
         priceETH = 10000;//1000000000000000000; //0.001 ETH
     }
@@ -381,7 +381,7 @@ contract VirtualRealEstate is StandardToken {
         Property storage property = map[propertyID];
         
         require(msg.sender == property.owner); //Must be the owner
-        
+
         property.salePrice = 0;
         
         DelistProperty(propertyID);

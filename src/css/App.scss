@@ -13,12 +13,22 @@ body {
 
 .top {
     height: 100vh;
+    .infoBox {
+        display: inline-block;
+        width: 100%;
+    }
     .leftMain {
-        width: calc((100vw - 36px - 90vh) / 2);
+        width: $panelWidth;
         float: left;
         display: inline-block;
         z-index: 5000;
-        height: 100vh;
+        height: calc(90vh + 20px);
+        margin-left: 60px;
+        padding: 6px;
+        &.full {
+            margin-left: 0px;
+            width: $panelWidthSimple;
+        }
     }
     .centerMain {
         width: calc(90vh + 20px);
@@ -27,11 +37,17 @@ body {
         height: 100vh;
     }
     .rightMain {
-        width: calc((100vw - 36px - 90vh) / 2);
+        width: $panelWidth;
         float: right;
         display: inline-block;
         z-index: 5000;
-        height: 100vh;
+        height: calc(90vh + 20px);
+        margin-right: 60px;
+        padding: 6px;
+        &.full {
+            margin-right: 0px;
+            width: $panelWidthSimple;
+        }
     }
 }
 

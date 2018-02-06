@@ -330,6 +330,7 @@ contract VirtualRealEstate is StandardToken {
         uint256 amountTransfered = 0;
         amountTransfered = property.salePrice * USER_BUY_CUT_PERCENT / 100;
         
+        balances[msg.sender] -= amountTransfered;
         balances[property.owner] += amountTransfered;
         balances[owner] += ppcValue - amountTransfered;
         

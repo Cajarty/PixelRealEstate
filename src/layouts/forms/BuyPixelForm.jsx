@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
-import {GFD, GlobalFormData} from '../../functions/GlobalFormData';
+import {GFD, GlobalState} from '../../functions/GlobalState';
 
 class BuyPixelForm extends Component {
     constructor(props) {
@@ -9,8 +9,11 @@ class BuyPixelForm extends Component {
         this.state = {
             x: '',
             y: '',
-            payWithETH: true,
-            valuePrice: 100000000000000000,
+            ETHPrice: 0,
+            PPCPrice: 0,
+            PPCSelected: 0,
+            ETHToPay: 0,
+            PPCToPay: 0,
         };
     }
 
@@ -30,6 +33,17 @@ class BuyPixelForm extends Component {
         })
         GFD.listen('y', 'buyPixel', (y) => {
             this.setState({y});
+            ctr.getForSalePrices(GFD.getData('x') - 1, y - 1, (data) => {
+                let eth = Func.BigNumberToNumber(data[0]);
+                let ppc = Func.BigNumberToNumber(data[1]);
+                this.setState({
+                    ETHPrice: eth, 
+                    PPCPrice: ppc,
+                    PPCSelected: 0,
+                    ETHToPay: (eth != 0 ? eth : 0),
+                    PPCToPay: (eth == 0 ? ppc : 0),
+                });
+            });
         })
     }
 
@@ -43,12 +57,34 @@ class BuyPixelForm extends Component {
     
     setY(y) {
         GFD.setData('y', y);
-        console.info(ctr.getForSalePrice(GFD.getData('x') - 1, y - 1)); //TODO get this to work and store and set the prices.
     }
 
     buyProperty() {
-        if (this.state.valueX >= 1 && this.state.valueX <= 100 && this.state.valueY >= 1 && this.state.valueY <= 100)
-            ctr.buyProperty(this.state.x - 1, this.state.y - 1, this.state.valuePrice);
+        if (this.state.x >= 1 && this.state.x <= 100 && this.state.y >= 1 && this.state.y <= 100) {
+            ctr.buyProperty(this.state.x - 1, this.state.y - 1, this.state.ETHToPay, this.state.PPCToPay);
+        }
+    }
+    
+    updatePriceSlider(value) {
+        let totals = this.calculateTotal(value);
+
+        this.setState({
+            PPCSelected: value,
+            ETHToPay: totals.ETH,
+            PPCToPay: totals.PPC
+        });
+    }
+
+    calculateTotal(ppcSelected) {
+        let obj = {
+            ETH: this.state.ETHPrice, 
+            PPC: this.state.PPCPrice
+        };
+        if (this.state.ETHPrice == 0)
+            return obj;
+        obj.PPC = ppcSelected;
+        obj.ETH = Math.ceil(((this.state.PPCPrice - ppcSelected) / this.state.PPCPrice) * this.state.ETHPrice);
+        return obj;
     }
 
     render() {
@@ -89,11 +125,28 @@ class BuyPixelForm extends Component {
                     <tr>
                         <td>
                             <div className='inputTitle'> Price: </div>
-                            <label className="switch">
-                                <input type="checkbox" checked={this.state.payWithETH} onChange={(e) => this.handleInput('payWithETH', e.target.checked)}></input>
-                                <span className="slider"></span>
-                            </label>
-                            <input id='buyPrice' type='number' disabled onChange={(e) => {}} value={this.state.valuePrice}></input>
+                            {this.state.ETHPrice != 0 &&
+                                <div className='priceSliderBase'>
+                                    <div className='ETH'>
+                                        ETH {this.state.ETHPrice}
+                                    </div>
+                                    <input 
+                                        type="range" 
+                                        min={0} 
+                                        max={this.state.PPCPrice} 
+                                        value={this.state.PPCSelected} 
+                                        onChange={(e) => this.updatePriceSlider(e.target.value)}
+                                    ></input>
+                                    <div className='PPC'>
+                                        PPC {this.state.PPCPrice}
+                                    </div>
+                                </div>
+                            }
+                            <div className='total'>
+                                {this.state.ETHToPay == 0 ? '' : this.state.ETHToPay + ' ETH'}
+                                {this.state.ETHToPay != 0 && this.state.PPCToPay != 0 ? ', ' : ''}
+                                {this.state.PPCToPay == 0 ? '' : this.state.PPCToPay + ' PPC'}
+                            </div>
                         </td>
                     </tr>
                     <tr>

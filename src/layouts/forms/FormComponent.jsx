@@ -1,4 +1,4 @@
-import {GFD, GlobalFormData} from '../../functions/GlobalFormData';
+import {GFD, GlobalState} from '../../functions/GlobalState';
 
 class BuyPixelForm extends Component {
     constructor(props) {
@@ -14,7 +14,7 @@ class BuyPixelForm extends Component {
     setX(x) {
         GFD.setData('x', x);
     }
-    
+
     setY(y) {
         GFD.setData('y', y);
     }

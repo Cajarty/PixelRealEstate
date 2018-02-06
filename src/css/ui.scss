@@ -259,3 +259,40 @@ input:focus[type=number] {
         }
     }
 }
+
+.dropdown {
+    background-color: red;
+    z-index: 20000;
+    .Dropdown-option {
+        padding: 4px;
+        background-color: $color1;
+        color: $color5;
+    }
+    .Dropdown-placeholder {
+        padding: 4px;
+        background-color: $color2;
+        color: $color5;
+    }
+    *> {
+        z-index: 20000;
+    }
+}
+
+.priceSliderBase {
+    .ETH {
+        display: block;
+        width: calc(100% - 10px);
+        margin-left: 10px;
+        text-align: left;
+    }
+    .PPC {
+        display: block;
+        width: calc(100% - 10px);
+        margin-right: 10px;
+        text-align: right;
+    }
+    .total {
+        display: inline-block;
+        text-align: center;
+    }
+}

@@ -6,7 +6,7 @@ import * as Func from '../../functions/functions.jsx';
 import Axios from '../../network/Axios.jsx';
 import * as Compress from 'lzwcompress';
 import Zoom from './Zoom';
-import {GFD, GlobalFormData} from '../../functions/GlobalFormData';
+import {GFD, GlobalState} from '../../functions/GlobalState';
 
 
 class ZoomCanvas extends Component {

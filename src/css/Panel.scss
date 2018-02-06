@@ -6,5 +6,18 @@
     box-shadow: black 1px 1px 1px 1px;
     div {
         display: inline-block;
+        vertical-align: middle;
+    }
+    .panelDivider {
+        -webkit-margin-before: 1px;
+        -webkit-margin-after: 1px;
+        border: solid black 1px;
+        border-top: none;
+    }
+    &:active {
+        box-shadow: black 0px 0px 1px 1px;
+    }
+    &:hover {
+        cursor: pointer;
     }
 }

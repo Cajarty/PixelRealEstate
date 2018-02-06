@@ -27,9 +27,9 @@ class PanelContainer extends Component {
                 {this.state.dataView.map((child, i) => (
                     <Panel key={i}>
                         <PanelItem width='10%' title data='X:'/>
-                        <PanelItem width='40%' data={child.x}/>
+                        <PanelItem width='40%' data={child.x + 1}/>
                         <PanelItem width='10%' title data='Y:'/>
-                        <PanelItem width='40%' data={child.y}/>
+                        <PanelItem width='40%' data={child.y + 1}/>
                     </Panel>
                 ))}
             </div>

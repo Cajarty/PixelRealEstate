@@ -33,14 +33,14 @@
 
         #pixel-canvas,
         #scrolling-canvas2 {
-            width: 300px !important;
-            height: 300px !important;
+            width: 60% !important;
+            height: 60% !important;
         }
     }
 
     #pixel-canvas {
-        height: 430px;
-        width: 430px;
+        height: 550px;
+        width: 550px;
     }
 
     #div-pixel, #div-property {
@@ -115,8 +115,14 @@
         left: 85vw;
         z-index: 100;
         position: absolute;
-        background: white;
-        border: 2px solid black;
+        /*background: lightgrey;*/
+        /*border: 2px solid white;*/
+        border: 1px solid white !important;
+    }
+
+    #scrolling-canvas-link > a {
+        color: white !important;
+        background-color: black !important;
     }
 
     .shadow {
@@ -394,7 +400,9 @@
             </nav>
         </header>
         <!-- scrolling link to full canvas -->
-        <!-- <div id="scrolling-canvas-link">Checkout the full Canvas</div> -->
+        <div id="scrolling-canvas-link">
+            <a class="button" disabled="disabled">View the Canvas</a>
+        </div>
 
        <!-- Header -->
         <section id="header">
@@ -1035,7 +1043,6 @@
                     </span>       
                 </h1>
                 <canvas width="1000" height="1000" id="pixel-canvas"></canvas>
-                <!-- <img id="scrolling-canvas2" src="images/coming-soon.png" style="border: 5px solid black; opacity:.8;"> -->
             </div>
             <div id="bg-image"></div>
         </section>
@@ -1323,8 +1330,8 @@
 
             });
 
-            // $(function() {
-                // var controller = new ScrollMagic.Controller();
+            $(function() {
+                var controller = new ScrollMagic.Controller();
                 // var controller = new ScrollMagic.Controller({
                 //     globalSceneOptions: {
                 //         triggerHook: 'onLeave'
@@ -1337,13 +1344,13 @@
                 //         triggerElement: slides[i]
                 //     })
                 //     .setPin(slides[i])
-                //     // .addIndicators()
-                //     .addTo(controller);
+                    // .addIndicators()
+                    // .addTo(controller);
                 // }
-                // var scene = new ScrollMagic.Scene({triggerElement: "#scrolling-trigger-1", duration: 0})
-                                                // .setPin('#scrolling-canvas-link')
-                                                // .addTo(controller);
-            // });
+                var scene = new ScrollMagic.Scene({triggerElement: "#scrolling-trigger-1", duration: 0})
+                                                .setPin('#scrolling-canvas-link')
+                                                .addTo(controller);
+            });
             /*global $, console*/
             /*
               By Mostafa Omar

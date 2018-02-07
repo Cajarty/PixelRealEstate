@@ -31,9 +31,15 @@
             margin: 0;
         }
 
+        #pixel-canvas,
         #scrolling-canvas2 {
             max-width: 95% !important;
         }
+    }
+
+    #pixel-canvas {
+        height: 430px;
+        width: 430px;
     }
 
     #div-pixel, #div-property {
@@ -1027,7 +1033,8 @@
                         </svg>
                     </span>       
                 </h1>
-                <img id="scrolling-canvas2" src="images/coming-soon.png" style="border: 5px solid black; opacity:.8;">
+                <canvas id="pixel-canvas"></canvas>
+                <!-- <img id="scrolling-canvas2" src="images/coming-soon.png" style="border: 5px solid black; opacity:.8;"> -->
             </div>
             <div id="bg-image"></div>
         </section>
@@ -1286,6 +1293,34 @@
          <script src="assets/js/pixel.js"></script>
 
         <script type="text/javascript">
+
+            $(function() {
+
+                var ctx = $('#pixel-canvas')[0].getContext('2d');
+                ctx.imageSmoothingEnabled = false;
+                ctx.webkitImageSmoothingEnabled = false;
+
+                function setCanvas(rgbArr) {
+                    var ctxID = ctx.createImageData(1000,1000);
+                    for (var i = 0; i < Object.keys(rgbArr).length; i++) {
+                        for (var j = 0; j < rgbArr[i].length; j++) {
+                            ctxID.data[i * rgbArr[i].length + j] = rgbArr[i][j];
+                        }
+                    }
+                    ctx.putImageData(ctxID, 0, 0);
+                }   
+
+                $.ajax({
+                    url: "162.213.250.102:6500/getPixelData",
+                    type: 'GET',
+                    success: function(response) {
+                        console.log('response', response);
+                        setCanvas(response.data);
+                    }
+                });
+
+            });
+
             // $(function() {
                 // var controller = new ScrollMagic.Controller();
                 // var controller = new ScrollMagic.Controller({

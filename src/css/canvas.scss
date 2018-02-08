@@ -31,10 +31,20 @@
         opacity: 1;
     }
     .zoomCanvas {
-        width: calc((100vw - 144px - 90vh) / 2);
-        height: calc((100vw - 144px - 90vh) / 2);
+        width: $panelWidth;
+        height: $panelWidth;
+        max-height: calc(50vh - 12px);
+        max-width: calc(50vh - 12px);
         display: block;
         float: right;
+        &.full {
+            width: $panelWidthSimple;
+            height: $panelWidthSimple;
+        }
+    }
+    &.full {
+        width: $panelWidthSimple;
+        height: $panelWidthSimple;
     }
 }
 
@@ -42,4 +52,26 @@
     height: 40px;
     text-align: center;
     font: $font2;
+    .headerButtons {
+        .ppcLabel {
+            width: 50%;
+            display: inline-block;
+        }
+        input[type=button].headerButton {
+            width: inherit;
+            font: $font4;
+            color: white;
+            font-weight: 400;
+            margin: 4px;
+            padding: 4px;
+            border: none;
+            background-color: unset;
+            &.left {
+                float: left;
+            }
+            &.right {
+                float: right;
+            }
+        }
+    }
 }

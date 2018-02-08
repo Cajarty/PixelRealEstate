@@ -3,6 +3,7 @@ import {Contract, ctr} from '../../contract/contract.jsx';
 import * as Const from '../../const/const.jsx';
 import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
+import { ChromePicker } from 'react-color';
 
 const PREVIEW_WIDTH = 100;
 const PREVIEW_HEIGHT = 100;
@@ -46,6 +47,17 @@ class SetPixelColorForm extends Component {
         let ctxSml = this.canvasSml.getContext("2d");
         ctxLrg.imageSmoothingEnabled = false;
         ctxSml.imageSmoothingEnabled = false;
+        this.canvasLrg.onclick = (ev) => {
+            if (!ev.isTrusted)
+                return;
+            
+            let pixelClick = {
+                x: Math.floor(ev.offsetX / 10), 
+                y: Math.floor(ev.offsetY / 10), 
+            };
+
+            this.drawPixel(pixelClick.x, pixelClick.y);
+        };
         this.setState({
             ctxLrg, 
             ctxSml,
@@ -56,6 +68,7 @@ class SetPixelColorForm extends Component {
         GFD.listen('y', 'UpdatePixel', (y) => {
             this.setState({y});
         })
+        this.drawImages();
     }
 
     uploadImage(e) {
@@ -71,15 +84,25 @@ class SetPixelColorForm extends Component {
         reader.onload = () => {
             let img = new Image();
             img.onload = () => {
-                this.state.ctxLrg.drawImage(img, 0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT);
-                this.state.ctxSml.drawImage(img, 0, 0, Const.PROPERTY_LENGTH, Const.PROPERTY_LENGTH);
-                this.setState({
-                    imageData: this.state.ctxSml.getImageData(0, 0, Const.PROPERTY_LENGTH, Const.PROPERTY_LENGTH).data,
-                });
+                this.drawImages(img);
             }
             img.src = event.target.result;
         };
         reader.readAsDataURL(files[0]);
+    }
+
+    drawImages(img) {
+        if (img != null) {
+            this.state.ctxLrg.drawImage(img, 0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT);
+            this.state.ctxSml.drawImage(img, 0, 0, Const.PROPERTY_LENGTH, Const.PROPERTY_LENGTH);
+
+            this.setState({
+                imageData: this.state.ctxSml.getImageData(0, 0, Const.PROPERTY_LENGTH, Const.PROPERTY_LENGTH).data,
+            });
+
+        }
+
+        //this.state.ctxLrg.drawImage();
     }
 
     sendColors() {
@@ -103,6 +126,11 @@ class SetPixelColorForm extends Component {
                         </td>
                         <td>
                             <canvas id='normal' width={Const.PROPERTY_LENGTH} height={Const.PROPERTY_LENGTH} ref={(canvasSml) => { this.canvasSml = canvasSml; }}></canvas>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colSpan={2}>
+                            <ChromePicker className='colorPicker'/>
                         </td>
                     </tr>
                     <tr>

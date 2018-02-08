@@ -258,6 +258,13 @@ input:focus[type=number] {
             vertical-align: middle;
         }
     }
+    .colorPicker {
+        width: 200px !important;
+        margin: 10px auto;
+        input {
+            background-color: unset;
+        }
+    }
 }
 
 .dropdown {

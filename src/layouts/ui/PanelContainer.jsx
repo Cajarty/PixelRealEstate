@@ -21,6 +21,13 @@ class PanelContainer extends Component {
         this.setState({dataView: newProps.data.slice(start, end)});
     }
 
+    componentWillUnmount() {
+        //stop listeneing for update.
+        /*
+        add an event listener here and cleanup if you want live updating tables too
+        */
+    }
+
     render() {
         return (
             <div className='panelContainer'>

@@ -64,6 +64,7 @@ contract VirtualRealEstate is StandardToken {
     mapping (address => bytes32[2]) ownerLink;
     //propertyRenter to link
     mapping (address => bytes32[2]) ownerHoverText;
+    mapping (address => uint32) moderators; // 0 = Not, 1 = nsfw-power, 2 = ban-power, 3 = set-moderator-level-power
     
     uint256 priceETH;
     uint256 PRICE_ETH_MIN_INCREASE = 1000;//10000000000000000000000; //0.0001 ETH
@@ -101,6 +102,7 @@ contract VirtualRealEstate is StandardToken {
         bool isInPrivateMode;
         uint256 lastUpdate;
         uint256 becomePublic;
+        uint256 flag; //0 == none, 1 == nsfw, 2 == ban
     }
     
     modifier ownerOnly() {
@@ -120,6 +122,23 @@ contract VirtualRealEstate is StandardToken {
         FREE_COLOR_SETTING_UNTIL = now;// + 1 days;
         pricePPC = 10;
         priceETH = 10000;//1000000000000000000; //0.001 ETH
+        moderators[msg.sender] = 3;
+    }
+    function setFlag(uint24 propertyID, uint256 flag) public validPropertyID(propertyID)  {
+        Property storage property = map[propertyID];
+
+        require(flag < 3);
+
+        uint256 moderationLevel = moderators[msg.sender];
+        require(moderationLevel >= 1); //Must be moderator or higher
+    
+        if (flag == 2) { //If ban, must be higher than nsfw
+            require(moderationLevel >= 2);
+            require(property.isInPrivateMode); //Can't ban an owner's property if a public user did it
+            property.colors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        }
+
+        property.flag = flag;
     }
     function setHoverText(bytes32[2] text) public {
         ownerHoverText[msg.sender] = text;
@@ -173,6 +192,8 @@ contract VirtualRealEstate is StandardToken {
         
         //If it's in private mode, we must be the owner, but it's free
         if (property.isInPrivateMode) {
+            require(property.flag != 2); //Banned properties can't be set in private mode, only public
+
             //If it's still privately owned
             if (property.becomePublic > now) {
                 require(msg.sender == property.owner);
@@ -310,6 +331,7 @@ contract VirtualRealEstate is StandardToken {
         PropertyBought(propertyID, property.owner, msg.value, ppcValue, now);
 
         property.owner = msg.sender;
+        property.flag = 0;
         
         return true;
     }
@@ -339,6 +361,7 @@ contract VirtualRealEstate is StandardToken {
         property.salePrice = 0;
         property.owner = msg.sender;
         property.isInPrivateMode = false;
+        property.flag = 0;
         
         return true;
     }
@@ -357,6 +380,7 @@ contract VirtualRealEstate is StandardToken {
         property.owner = msg.sender;
         
         PropertyBought(propertyID, property.owner, msg.value, 0, now);
+        property.flag = 0;
         
         return true;
     }
@@ -387,6 +411,12 @@ contract VirtualRealEstate is StandardToken {
         DelistProperty(propertyID);
         
         return true;
+    }
+    function setModeratorLevel(address user, uint32 level) public {
+        require(moderators[msg.sender] == 3);
+        require(level < 4);
+        require(user != 0);
+        moderators[user] = level;
     }
     
     //////////////////////////////////////////////////////

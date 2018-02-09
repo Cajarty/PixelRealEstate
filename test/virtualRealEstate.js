@@ -435,6 +435,8 @@ contract('VirtualRealEstate', function(accounts) {
     });
   });
 
+  //###MODERATION FUNCTIONS####
+
   //####OWNER FUNCTIONS####
   //#Can withdraw a set amount that is only up to owners justified amount
   //#Can withdrawAll which pays to the owner everything

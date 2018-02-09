@@ -1,0 +1,36 @@
+#canvas-pixel {
+    margin: auto;
+    display: block;
+    height: 90%;
+    width: 90%;
+    text-align: center;
+    background-color: orange;
+}
+
+@font-face {
+    font-family: 'Unibody8Pro-Bold';
+    src: url('../fonts/Unibody8Pro-Bold.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Roboto-Regular';
+    src: url('../fonts/Roboto-Regular.ttf');
+}
+
+.font-pixel {
+    font-family: 'Unibody8Pro-Bold';
+}
+
+.font-roboto {
+    font-family: 'Roboto-Regular';
+}
+
+#main {
+    height: auto;
+    min-height: 100vh !important;
+    padding: 40px 0;
+}
+
+.h-card-small {
+    font-size: 1em !important;
+}

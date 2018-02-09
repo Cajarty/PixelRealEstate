@@ -26,12 +26,12 @@ $(function () {
     function init() {
         var secondFeature = $('#features').offset().top;
         var scroll = $(window).scrollTop();
-        if (scroll >= 150) {
+        if (scroll >= 40) {
             $('.sticky-navigation').css({"background-color": '#d81b60'});
         } else {
             $('.sticky-navigation').css({"background-color": 'transparent'});
         }
-        if (scroll >= secondFeature - 200) {
+        if (scroll >= secondFeature - 10) {
             $(".mobileScreen").css({'background-position': 'center top'});
         }
         return false;

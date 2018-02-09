@@ -148,6 +148,9 @@ contract VirtualRealEstate is StandardToken {
         ownerLink[msg.sender] = link;
         SetUserSetLink(msg.sender, link);
     }
+    function getSystemSalePrices(uint24 propertyID) public validPropertyID(propertyID) view returns(uint256, uint256) {
+        return (priceETH, pricePPC);
+    }
     function getForSalePrices(uint24 propertyID) public validPropertyID(propertyID) view returns(uint256, uint256) {
         Property storage property = map[propertyID];
         if (property.owner == 0) {

@@ -250,6 +250,12 @@ input:focus[type=number] {
 }
 
 .SetPixelColorForm {
+    #large {
+        background-color: black;
+    }
+    #normal {
+        background-color: black;
+    }
     canvas {
         border: 1px solid $color5;
         &#large {
@@ -263,6 +269,17 @@ input:focus[type=number] {
         margin: 10px auto;
         input {
             background-color: unset;
+        }
+    }
+    .toolButton {
+        display: inline-block;
+        width: 15%;
+        margin: 2%;
+        padding: 3%;
+        background-color: $color3;
+        &:active,
+        &.active {
+            background-color: darken($color3, 20%);
         }
     }
 }

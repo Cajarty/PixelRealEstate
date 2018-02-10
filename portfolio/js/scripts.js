@@ -34,7 +34,6 @@ $(function () {
         if (scroll >= secondFeature - 10) {
             $(".mobileScreen").css({'background-position': 'center top'});
         }
-        return false;
     }
 
     //canvas

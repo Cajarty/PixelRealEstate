@@ -34,3 +34,26 @@
 .h-card-small {
     font-size: 1em !important;
 }
+
+
+#span-pixel, 
+#span-property {
+    display: inline-block;
+    min-height: 82.5px;
+}
+
+.shadow {
+    fill: black;
+    stroke: black; 
+    stroke-width: 1;
+}
+
+.pixel {
+    fill: white;
+    stroke: white; 
+    stroke-width: 1;
+}
+
+/*#div-property {
+    word-break:break-all;
+}*/

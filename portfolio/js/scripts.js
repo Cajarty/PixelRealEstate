@@ -11,6 +11,22 @@ $(function () {
     //scroll menu
     $(window).scroll(function () {
         init();
+
+        var $sections = $('section');
+        var currentScroll = $(this).scrollTop();
+        var $currentSection;
+
+        $sections.each(function() {
+            var divPosition = $(this).offset().top;
+            if (divPosition - 1 < currentScroll + 75) {
+                $currentSection = $(this);
+            }
+            var id = $currentSection.attr('id');
+            $('.nav-link').removeClass('active').blur();
+            $("[href=\\#" + id + "]").addClass('active');
+            // $('.nav-link').css("color", "hsla(0,0%,100%,.5)");
+            // $("[href=\\#" + id + "]").css("color", "white");
+        });
     });
 
     //page scroll
@@ -57,8 +73,15 @@ $(function () {
         header:{'Access-Control-Allow-Origin': '*'},
         crossDomain: true,
         dataType: 'json',
+        beforeSend: function() {
+
+        },
         success: function(response) {
+            $('#canvas-pixel').css('background', 'initial')
             setCanvas(response);
         }
     });
+
+    // auto highlight link from scroll
+
 });

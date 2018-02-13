@@ -183,7 +183,7 @@ $(function() {
     }
 
     // have to refresh the div when placing svg with jquery
-    $("#main").html($("#main").html());
+    $("#main-info").html($("#main-info").html());
 
     // var size = 12;
     // var size2 = size + 10;

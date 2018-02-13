@@ -198,7 +198,7 @@ $(function() {
             svgY: y,
             svgWidth: elementSize / rand,
             svgHeight: elementSize / rand
-        }, {duration: 300});
+        }, {duration: 200});
     }
 
     function implode(element, elementSize) {

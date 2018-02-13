@@ -4,9 +4,9 @@
     height: 90%;
     width: 90%;
     text-align: center;
-    background: "url('img/loading.svg')");
-    background-repeat: 'no-repeat';
-    background-position: 'center';
+    background: url('../img/loading.svg');
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 /*#canvas-pixel {

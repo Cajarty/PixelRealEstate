@@ -42,10 +42,10 @@ $(function () {
     function init() {
         var secondFeature = $('#features').offset().top;
         var scroll = $(window).scrollTop();
-        if (scroll >= 40) {
+        if (scroll >= 40 && $(window).width() > 960) {
             $('.sticky-navigation').css({"background-color": '#d81b60'});
         } else {
-            $('.sticky-navigation').css({"background-color": 'transparent'});
+            $('.sticky-navigation').css({"background-color": '#d81b60'});
         }
         if (scroll >= secondFeature - 10) {
             $(".mobileScreen").css({'background-position': 'center top'});

@@ -9,6 +9,50 @@
     background-position: center;
 }
 
+.mobile-title {
+    display: none !important;
+}
+
+.back-btn {
+    margin-left: 30px !important;
+}
+
+@media only screen and (max-width: 960px)  {
+    svg {
+        display: none !important;
+    }
+
+    .span-pixel,
+    .span-property {
+        display: none !important;
+    }
+
+    .mobile-title {
+        display: inline-block !important;
+        font-size: 2.9em !important;
+    }
+
+    .pt-4 {
+        padding-top: 2px !important;
+    }
+
+    section {
+        padding: 20px !important;
+    }
+
+    .text-primary  {
+        font-size: 1.1em !important;
+    }
+    
+    .footer-title {
+        font-size: 1.1em !important;
+    }
+
+    .back-btn {
+        margin-left: 1px !important;
+    }
+}
+
 /*#canvas-pixel {
     -webkit-filter: blur(0px);
     -webkit-animation: fadein linear 1.5s;

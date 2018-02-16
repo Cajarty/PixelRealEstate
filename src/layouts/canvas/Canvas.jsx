@@ -34,6 +34,10 @@ class Canvas extends Component {
             let y = (e.clientY - rect.top) * (1000 / rect.height);  
             GFD.setData('hoverX', x);
             GFD.setData('hoverY', y);
+            GFD.setData('canvasTopOffset', rect.top); //move this and other 3 to a "on canvas resize"
+            GFD.setData('canvasLeftOffset', rect.left);
+            GFD.setData('canvasWidth', rect.width);
+            GFD.setData('canvasHeight', rect.height);
         };
         this.canvas.onmouseout = (e) => {        
             GFD.setData('hoverX', -1);

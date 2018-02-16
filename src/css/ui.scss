@@ -320,3 +320,10 @@ input:focus[type=number] {
         text-align: center;
     }
 }
+
+.hoverLabel {
+    background-color: green;
+    border: white 2px solid;
+    position: absolute;
+    pointer-events: none;
+}

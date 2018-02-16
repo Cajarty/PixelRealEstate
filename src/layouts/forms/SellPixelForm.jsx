@@ -9,7 +9,7 @@ class SellPixelForm extends Component {
         this.state = {
             x: '',
             y: '',
-            valuePrice: 100000000000000000,
+            valuePrice: 0,
         };
     }
 
@@ -30,6 +30,12 @@ class SellPixelForm extends Component {
         GFD.listen('y', 'sellPixel', (y) => {
             this.setState({y});
         })
+        ctr.getSystemSalePrices((data) => {
+            let ppc = Func.BigNumberToNumber(data[1]);
+            this.setState({
+                valuePrice: ppc, 
+            });
+        });
     }
 
     componentWillUnmount() {

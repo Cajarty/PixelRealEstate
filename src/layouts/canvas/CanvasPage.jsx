@@ -9,6 +9,7 @@ import ZoomCanvas from './ZoomCanvas';
 import Axios from '../../network/Axios.jsx';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 import TimeAgo from 'react-timeago';
+import HoverLabel from './HoverLabel';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -105,6 +106,7 @@ class CanvasPage extends Component {
                         </div>
                     </div>
                     <div className='centerMain'>
+                        <HoverLabel/>
                         <Canvas/>
                     </div>
                     <div className={this.state.showAdvanced ? 'rightMain' : 'rightMain full'}>

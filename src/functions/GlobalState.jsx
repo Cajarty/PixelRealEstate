@@ -7,6 +7,8 @@ export class GlobalState {
             y: null,
             hoverX: null,
             hoverY: null,
+            canvasTopOffset: null,
+            canvasLeftOffset: null,
         };
         this.limiters = {
             

@@ -202,6 +202,16 @@ export class Contract {
         });
     }
 
+    getSystemSalePrices(callback) {
+        this.VRE.deployed().then((i) => {
+            return i.getSystemSalePrices.call().then((r) => {
+                return callback(r);
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
+    }
+
     getForSalePrices(x, y, callback) {
         this.VRE.deployed().then((i) => {
             return i.getForSalePrices.call(this.toID(x, y)).then((r) => {

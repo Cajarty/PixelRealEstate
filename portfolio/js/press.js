@@ -27,16 +27,32 @@ $(function() {
         if (fail) {
             return;
         }
-        // prevent bot spam
+        // // prevent bot spam
         if (email.val() != '') {
             spam = true;
         }
 
         $('.form-control').css('border', '1px solid #ced4da');
 
-        for (var i = 0; i < elements.length; i++) {
-            elements[i].val('');
-        }
+        // var data = {'name': name.val(), 'email': email2.val(), 'spam': email.val(), 'subject': subject.val(), 'message': message.val()};
+        // data = JSON.stringify(data);
+
+        // $.ajax({
+        //     type: "POST",
+        //     dataType: "json",
+        //     contentType: "application/json; charset=utf-8",
+        //     url: 'php/mail.php',
+        //     data: data,
+        //     success: function(data) {
+        //         console.log('success', data);
+        //         for (var i = 0; i < elements.length; i++) {
+        //             elements[i].val('');
+        //         }
+        //     },
+        //     error: function(error) {
+        //         console.log('error', error);
+        //     }
+        // });
 
         $(this).parent().slideToggle();
         $('#div-success').slideToggle();

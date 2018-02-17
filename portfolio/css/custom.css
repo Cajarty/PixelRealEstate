@@ -17,14 +17,19 @@
     margin-left: 30px !important;
 }
 
+#span-slogan {
+    font-size: 2em;
+}
+
 @media only screen and (max-width: 960px)  {
     svg {
         display: none !important;
     }
 
-    .span-pixel,
-    .span-property {
+    #span-pixel,
+    #span-property {
         display: none !important;
+        min-height: 0 !important;
     }
 
     .mobile-title {
@@ -33,9 +38,18 @@
         padding-top: 0 !important;
     }
 
+    #span-slogan {
+        font-size: 1.25em !important;
+        padding-top: 60px !important;
+    }
+
     #main-info {
         padding-top: 60px !important;
-    }scr
+    }
+
+    #canvas-pixel {
+        padding-top: 90px !important;
+    }
 
     section {
         padding: 20px !important;

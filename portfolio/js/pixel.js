@@ -244,7 +244,7 @@ $(function() {
                     svgX: rect.data('x'),
                     svgY: rect.data('y'),
                 }, {duration: duration})
-            }, 1 * i);
+            }, .1 * i);
         });
     }
 

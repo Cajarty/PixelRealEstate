@@ -21,6 +21,19 @@
     font-size: 2em;
 }
 
+.img-fadeIn {
+    -webkit-filter: blur(0px);
+    -webkit-animation: fadein linear 1.5s;
+}
+
+@-webkit-keyframes fadein {
+    0% { -webkit-filter: blur(100px);}
+    25% { -webkit-filter: blur(75px);}
+    50% { -webkit-filter: blur(50px);}
+    75% { -webkit-filter: blur(25px);}
+    100% { -webkit-filter: blur(0px);}
+}
+
 @media only screen and (max-width: 960px)  {
     svg {
         display: none !important;
@@ -47,8 +60,14 @@
         padding-top: 60px !important;
     }
 
+    #main {
+        padding: 5px !important;
+    }
+
     #canvas-pixel {
         padding-top: 90px !important;
+        height: 100% !important;
+        width: 100% !important;
     }
 
     section {

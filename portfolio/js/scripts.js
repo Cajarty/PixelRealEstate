@@ -74,11 +74,13 @@ $(function () {
         crossDomain: true,
         dataType: 'json',
         beforeSend: function() {
-
+            $('#canvas-pixel').fadeOut(5000);
         },
         success: function(response) {
-            $('#canvas-pixel').css('background', 'initial')
+            $('#canvas-pixel').css('background', 'initial');
+            $('#canvas-pixel').stop().hide().addClass('img-fadeIn').fadeIn(3000);
             setCanvas(response);
+
         }
     });
 

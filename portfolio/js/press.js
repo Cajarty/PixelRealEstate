@@ -34,28 +34,35 @@ $(function() {
 
         $('.form-control').css('border', '1px solid #ced4da');
 
-        // var data = {'name': name.val(), 'email': email2.val(), 'spam': email.val(), 'subject': subject.val(), 'message': message.val()};
-        // data = JSON.stringify(data);
+        var data = {'name': name.val(), 'email': email2.val(), 'spam': email.val(), 'subject': subject.val(), 'message': message.val()};
+        data = JSON.stringify(data);
 
-        // $.ajax({
-        //     type: "POST",
-        //     dataType: "json",
-        //     contentType: "application/json; charset=utf-8",
-        //     url: 'php/mail.php',
-        //     data: data,
-        //     success: function(data) {
-        //         console.log('success', data);
-        //         for (var i = 0; i < elements.length; i++) {
-        //             elements[i].val('');
-        //         }
-        //     },
-        //     error: function(error) {
-        //         console.log('error', error);
-        //     }
-        // });
+        var sendBtn = $(this);
 
-        $(this).parent().slideToggle();
-        $('#div-success').slideToggle();
-
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            url: 'php/mail.php',
+            data: data,
+            success: function(data) {
+                console.log('success', data);
+                if (data.message == 'sent') {
+                    for (var i = 0; i < elements.length; i++) {
+                        elements[i].val('');
+                    }
+                    sendBtn.parent().slideToggle();
+                    $('#div-success').slideToggle();
+                } else {
+                    sendBtn.parent().slideToggle();
+                    $('#div-fail').slideToggle();
+                }
+            },
+            error: function(error) {
+                console.log('error', error);
+                sendBtn.parent().slideToggle();
+                $('#div-fail').slideToggle();
+            }
+        });
     });
 });

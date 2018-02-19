@@ -41,5 +41,5 @@
         $mail->send();
         echo json_encode(['success' => true, 'message' => 'sent']);
     } catch (Exception $e) {
-        echo json_encode(['success' => false, 'message' => 'fail']);
+        echo json_encode(['success' => false, 'message' => 'fail', 'error' => var_export($e), 'mail' => $mail->ErrorInfo]);
     }

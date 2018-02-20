@@ -128,6 +128,7 @@
 
     #main-info {
         padding-top: 60px !important;
+        top: 30% !important;
     }
 
     #main {
@@ -199,7 +200,7 @@
 #main-info {
     /*top: 50%;*/
     position: relative;
-    top: 45%;
+    top: 35%;
     transform: translateY(-50%);
     -ms-transform: translateY(-50%);
     -moz-transform: translateY(-50%);

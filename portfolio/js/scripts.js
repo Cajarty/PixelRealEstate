@@ -79,6 +79,7 @@ $(function () {
         success: function(response) {
             $('#canvas-pixel').css('background', 'initial');
             $('#canvas-pixel').stop().hide().addClass('img-fadeIn').fadeIn(3000);
+            $('#canvas-overlay').fadeIn(3000);
             setCanvas(response);
 
         }

@@ -1,3 +1,9 @@
+#canvas-div {
+    /*position: relative;*/
+    /*height: 100%;*/
+    /*width:;*/
+}
+
 #canvas-pixel {
     margin: auto;
     display: block;
@@ -7,6 +13,28 @@
     background: url('../img/loading.svg');
     background-repeat: no-repeat;
     background-position: center;
+    /*position: relative;*/
+}
+
+#canvas-overlay {
+    position: absolute;
+    display: block;
+    margin: auto;
+    color: white;
+    width: 100%;
+    height: 90%;
+    top: 0;
+    left: 0;
+    text-align: center;
+    font-size: 2.5em;
+    font-family: 'Unibody8Pro-Bold';
+}
+
+#canvas-overlay-text {
+    position: relative;
+    top: 50%; 
+    transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
 }
 
 .mobile-title {
@@ -22,16 +50,39 @@
 }
 
 .img-fadeIn {
-    -webkit-filter: blur(0px);
+    -webkit-filter: blur(25px);
     -webkit-animation: fadein linear 1.5s;
 }
 
 @-webkit-keyframes fadein {
     0% { -webkit-filter: blur(100px);}
-    25% { -webkit-filter: blur(75px);}
-    50% { -webkit-filter: blur(50px);}
-    75% { -webkit-filter: blur(25px);}
-    100% { -webkit-filter: blur(0px);}
+    33% { -webkit-filter: blur(75px);}
+    66% { -webkit-filter: blur(50px);}
+    100% { -webkit-filter: blur(25px);}
+    /*100% { -webkit-filter: blur(0px);}*/
+}
+
+#span-create,
+#span-control,
+#span-complete,
+#span-pixel, 
+#span-property {
+    display: inline-block;
+    min-height: 82.5px;
+}
+
+#wrapper-compete {
+    padding-bottom: 25px;
+}
+
+#span-create {
+    margin-left: -30%;
+}
+#span-control {
+    margin-left: -10%;
+}
+#span-compete {
+    margin-left: 5%;
 }
 
 @media only screen and (max-width: 960px)  {
@@ -39,6 +90,15 @@
         display: none !important;
     }
 
+    #canvas-overlay {
+        font-size: 1.5em !important;
+        height: 100% !important;
+    }
+
+    #span-create,
+    #span-control,
+    #span-compete,
+    #wrapper-compete,
     #span-pixel,
     #span-property {
         display: none !important;
@@ -146,13 +206,6 @@
     font-size: 1em !important;
 }
 
-
-#span-pixel, 
-#span-property {
-    display: inline-block;
-    min-height: 82.5px;
-}
-
 .shadow {
     fill: black;
     stroke: black; 
@@ -173,4 +226,8 @@
 .btn-primary:hover,
 .btn-white:hover {
     color: black !important;
+}
+
+.icon-links > a > i:hover {
+    color: white;
 }

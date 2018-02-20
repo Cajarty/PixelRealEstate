@@ -16,7 +16,7 @@
         
         $email = filter_var($data->email, FILTER_SANITIZE_EMAIL);
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            echo json_encode(['success' => true, 'message' => 'fail']);
+            jdie(true, 'fail');
         }
         
         //Server settings
@@ -39,7 +39,13 @@
         $mail->Body = $data->message . "<br/><br/>" . 'Sent from: "' . $data->name . ' <' . $email . '>"';
 
         $mail->send();
-        echo json_encode(['success' => true, 'message' => 'sent']);
+        jdie(true, 'sent');
     } catch (Exception $e) {
+        jdie(false, 'fail');
         echo json_encode(['success' => false, 'message' => 'fail', 'error' => var_export($e), 'mail' => $mail->ErrorInfo]);
+    }
+
+    function jdie($success, $message) {
+        echo json_encode(['success' => $success, 'message' => $message]);
+        die();
     }

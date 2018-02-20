@@ -10,7 +10,8 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
         <!--icons-->
         <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" />
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+        <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" /> -->
+        <link rel="stylesheet" href="css/font-awesome.min.css" />
         <!-- Custom CSS -->
         <link rel="stylesheet" href="css/custom.css" />
     </head>
@@ -20,7 +21,7 @@
             <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="ion-grid icon-sm"></span>
             </button>
-            <a class="navbar-brand hero-heading" href="#"><span class="font-pixel">PIXELPROPERTY</span></a>
+            <a class="navbar-brand hero-heading" href="#"><span class="font-pixel">PIXEL PROPERTY</span></a>
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav ml-auto font-roboto">
                     <li class="nav-item mr-3">
@@ -51,17 +52,27 @@
                 <div class="row d-md-flex brand">
                     <div class="col-md-6 hidden-sm-down wow fadeIn" id="canvas-div">
                         <canvas width="1000" height="1000" id="canvas-pixel"></canvas>
+                        <div id="canvas-overlay" style="display: none;">
+                            <div id="canvas-overlay-text">
+                                TBA
+                                <br/>
+                                Friday, Feb. 23rd
+                            </div>
+                        </div>
                     </div>
                     <div id="main-info-wrapper" class="col-md-6 col-sm-12 text-white wow fadeIn text-center">
                     <div id="main-info">
-                        <span class="mobile-title font-pixel">PIXEL PROPERTY</span>
-                        <span id="span-pixel"></span>
-                        <span id="span-property"></span>
+                        <span class="mobile-title font-pixel">CREATE CONTROL COMPETE</span>
+                        <!-- <span id="span-pixel"></span>
+                        <span id="span-property"></span> -->
+                        <div id="wrapper-create"><span id="span-create"></span></div>
+                        <span id="span-control"></span>
+                        <div id="wrapper-compete"><span id="span-compete"></span></div>
                         <span id="span-slogan" class="pt-4 font-pixel">Evolving Digital Canvas</span>
                         <p class="mt-5 mb-3 mr-3 ml-auto font-roboto" style="text-align:left;">
-                            PixelProperty is a constantly evolving digital canvas where property owners and users control the organic growth of the canvas.
+                            PixelProperty is an evolving public art canvas where owners and users work together to play, design and trade.
                         </p>
-                        <p class="mt-5 mb-3 mr-3 ml-auto font-roboto" style="text-align:left;">
+                       <!--  <p class="mt-5 mb-3 mr-3 ml-auto font-roboto" style="text-align:left;">
                             Digital Properties (DP) in PixelProperty are tradable blockchain tokens powered by Ethereum.
                             <br/>
                             Each DP is a separate individual token, which can have its appearance altered as desired.
@@ -69,11 +80,27 @@
                             PixelPropertyToken (PPT) is our supporting cryptocurrency that not only functions like Bitcoin and Ethereum, but is also used to power the Digital Property ecosystem.
                             <br/>
                             Since PPT is an ERC20 cryptocurrency, it can be bought, sold, or traded like any token.
-                        </p>
+                        </p> -->
                         <p class="mt-5">
                             <a href="#" class="btn btn-white mb-2 page-scroll">View the full Canvas</a>
                         </p>
                     </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-light" id="intro">
+            <div class="container">
+                <div class="row-mb-3">
+                    <div class="col-md-10 col-sm-12 mx-auto text-center wow fadeIn">
+                        <h2 class="text-primary font-pixel">WHAT IS PIXEL PROPERTY?</h2>
+                        <p class="pt-3">
+                            PixelProperty will be the world's first physical art canvas built using blockchain technology. PixelProperty is composed of customizable Digital Properties that allow users and owners to share, advertise, and earn.
+                        </p>
+                        <p>
+                            PixelPropertyToken (PPT) is awarded for your contributions to the canvas, a cryptocurrency used to power the Digital Property ecosystem. You are in control of your Properties  and Tokens—trade and track ownership through the power of blockchain technology.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -190,28 +217,38 @@
                 </div>
                 <div class="row mt-3">
                     <h4 class="text-primary">INSTALLING METAMASK</h4>
+                </div>
+                <div>
                     <p>
-                        PixelProperty uses MetaMask to communicate with the digital real estate market, which is run on a Smart Contract through Ethereum. MetaMask is a digital wallet for Ethereum, meaning your funds are stored securely in this wallet, outside of PixelProperty.io. MetaMask is a wallet, protect it! Your MetaMask passwords or seed words must be kept secret, but don’t lose them.
-                        <br/>
+                        PixelProperty uses MetaMask to communicate with the digital real estate market, which is run on a Smart Contract through Ethereum. MetaMask is a digital wallet for Ethereum, meaning your funds are stored securely in this wallet, outside of PixelProperty.io. <strong>MetaMask is a wallet, protect it!</strong> Your MetaMask passwords or seed words must be kept secret, but don’t lose them. 
+                    </p>
+                    <p>
                         We suggest you print off a paper copy of your password and seed words, and store them somewhere for safe keeping. These cannot be recovered if you lose them.
                     </p>
                     <a href="https://metamask.io/" class="btn btn-primary page-scroll">Install MetaMask</a>
                 </div>
                 <div class="row mt-3">
                     <h4 class="text-primary">HOW DO I GET ETHER (ETH)?</h4>
+                </div>
+                <div>
                     <p>
                         <strong>For U.S. citizens</strong>, ETH can be bought within MetaMask itself.
-                        <br/>
+                    </p>
+                    <p>
                         <strong>For non U.S. citizens</strong>, you will have to buy it from an exchange. Exchanges such as <a href="https://www.coinbase.com/">Coinbase</a>, <a href="https://www.quadrigacx.com/">Quadriga</a>, and <a href="https://www.kraken.com/">Kraken</a>.
-                        <br/>
+                    </p>
+                    <p>
                         <i>Note: PixelProperty is not affiliated with any of the listed exchanges.</i>
                     </p>
                 </div>
                 <div class="row mt-3">
                     <h4 class="text-primary">HOW DO I SEND ETH TO METAMASK?</h4>
+                </div>
+                <div>
                     <p>
                         Once you have acquired ETH on the exchange of your choice, you must send it to your MetaMask ETH address.
-                        <br/>
+                    </p>
+                    <p>
                         You can find your MetaMask ETH address in the MetaMask extension by clicking on the “...” menu button, then selecting “Copy To Clipboard”. Provide this copied address where requested to receive funds from a market or other address.
                     </p>
                 </div>
@@ -255,7 +292,7 @@
                         </ol>
                     </div>
                 </div>
-                <div class="col-sm-12 pt-5 mx-auto text-center wow fadeIn">
+                <div class="col-sm-12 pt-3 mx-auto text-center wow fadeIn">
                     <input class="btn btn-primary" type="button" value="View Full Whitepaper" onclick="window.location = 'docs/PixelProperty White Paper v1.3.2.pdf';">
                 </div>
             </div>
@@ -268,7 +305,7 @@
                     <div class="col-md-10 col-sm-10 mx-auto text-center wow fadeIn">
                         <h2 class="text-primary font-pixel">ABOUT US</h2>
                         <p class="pt-3">
-                            Our vision is to create an ecosystem of digital property with tangible value. We plan on accomplishing this vision by bridging the digital cryptocollectable world with the physical realm we live in through various product and services. The first and primary product for our ecosystem is PixelProperty.io, The Evolving Blockchain Canvas. Upon completion of PixelProperty.io, the next planned service is to build a live updating billboard to showcase The Evolving Blockchain Canvas. This billboard will be the first of many steps in bringing a real world representation to digital blockchain properties.
+                            Our vision is to create an ecosystem of digital property with tangible value. We plan on accomplishing this vision by bridging the digital cryptocollectable world with the real world through various products and services. The first and primary product for our ecosystem is PixelProperty.io, The Evolving Blockchain Canvas. Upon completion of PixelProperty.io, the next planned service is to bring a live updating billboard to showcase The Evolving Blockchain Canvas. This billboard will be the first of many steps in bringing a real world representation to digital blockchain properties.
                         </p>
                     </div>
                 </div>
@@ -282,15 +319,15 @@
                 </div>
                 <div class="row d-md-flex mt-5 text-center">
                     <div class="team col-sm-4 mt-2 wow fadeIn">
-                        <img src="http://via.placeholder.com/200x200" alt="Male" class="img-team img-fluid rounded-circle"/>
+                        <img src="img/jaegar.png" alt="Male" class="img-team img-fluid rounded-circle"/>
                         <h5>Jaegar Sarauer</h5>
                     </div>
                     <div class="team col-sm-4 mt-2 wow fadeIn">
-                        <img src="http://via.placeholder.com/200x200" alt="Male" class="img-team img-fluid rounded-circle"/>
+                        <img src="img/carson.png" alt="Male" class="img-team img-fluid rounded-circle"/>
                         <h5>Carson Roscoe</h5>
                     </div>
                     <div class="team col-sm-4 mt-2 wow fadeIn">
-                        <img src="http://via.placeholder.com/200x200" alt="Male" class="img-team img-fluid rounded-circle"/>
+                        <img src="img/arthur.png" alt="Male" class="img-team img-fluid rounded-circle"/>
                         <h5>Arthur Pankiewicz</h5>
                     </div>
                 </div>
@@ -298,14 +335,14 @@
         </section>
 
         <section class="bg-white" id="road-maps">
-            <div class="container-fluid">
+            <div class="container">
                 <div class="row">
                     <div class="col-md-6 offset-md-3 col-sm-8 offset-sm-2 col-xs-12 text-center wow fadeIn">
-                        <h2 class="text-primary font-pixel">ROAD MAPS</h2>
+                        <h2 class="text-primary font-pixel">ROAD MAP</h2>
                     </div>
                 </div>
                 <div class="row pt-5">
-                    <div class="col-sm-12 col-md-5 offset-md-1 wow fadeInLeft">
+                    <div class="col-sm-12 col-md-12 wow fadeInLeft">
                         <h4 class="text-primary">DEVELOPMENT</h4>
                         <ul class="list-default">                        
                             <li><strong>Q2 2018</strong> &bull; Embeddable Javascript Canvas
@@ -313,6 +350,7 @@
                                     <li>By creating an user-friendly Javascript snippet that communicates with dedicated servers, the canvas will be shareable on any forum or website.</li>
                                 </ul>
                             </li>
+                            <li><strong>Q2 2018</strong> &bull; Targeted Marketing</li>
                             <li><strong>Q3 2018</strong> &bull; Website Update
                                 <ul class="list-default">
                                     <li>Additional updates to the website to create a moderator panel. The moderator panel is an integrated moderation system built into our contract which does not interfere but warns the systems that present the Canvas to the public. Users continue to hold power over what they express on their Properties, but moderators may suggest against viewing certain content.</li>
@@ -323,9 +361,10 @@
                                     <li>Applications for Android and iOS systems will be created to replicate the functionality available on PixelProperty.io</li>
                                 </ul>
                             </li>
+                            <li><strong>Q4 2018</strong> &bull; Live Updating Billboard</li>
                         </ul>
                     </div>
-                    <div class="col-sm-12 col-md-5 wow fadeInRight">
+                    <!-- <div class="col-sm-12 col-md-5 wow fadeInRight">
                         <h4 class="text-primary">FINANCIAL</h4>
                         <ul class="list-default">                        
                             <li><strong>1 ETH</strong> &bull; 100% of the initial 1 ETH earned will be reinvested into advertisements to help build the market growth</li>
@@ -333,7 +372,7 @@
                             <li><strong>50 ETH</strong> &bull; At least 25% of the initial 50 ETH earned will be reinvested into advertisements and ongoing development of the items in the Roadmap</li>
                             <li><strong>$2,000,000 USD</strong> &bull; Development will begin for creating a live updating billboard in a city with a population of at least one million</li>
                         </ul>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </section>
@@ -344,10 +383,11 @@
                 <div class="row">
                     <div class="col-md-6 offset-md-3 col-sm-12 col-xs-12 text-center wow fadeIn">
                         <h1 class="footer-title font-pixel">PIXELPROPERTY</h1>
-                        <p class="mt-5">
-                            <a href="https://twitter.com/pixelpropertyio" target="_blank"><em class="ion-social-twitter text-twitter-alt icon-sm"></em></a>
-                            <!-- <a href="https://facebook.com/" target="_blank"><em class="ion-social-github text-facebook-alt icon-sm mr-3"></em></a>
-                            <a href="https://www.linkedin.com/" target="_blank"><em class="ion-social-linkedin text-linkedin-alt icon-sm mr-3"></em></a> -->
+                        <p class="mt-5 icon-links">
+                            <a href="https://twitter.com/pixelpropertyio" target="_blank"><i class="fa fa-twitter fa-2x mr-3" aria-hidden="true"></i></a>
+                            <a href="https://www.facebook.com/pixelpropertyio" target="_blank"><i class="fa fa-facebook fa-2x mr-3" aria-hidden="true"></i></a>
+                            <a href="https://www.instagram.com/pixelpropertyio" target="_blank"><i class="fa fa-instagram fa-2x mr-3" aria-hidden="true"></i></a>
+                            <a href="https://www.steemit.com/@pixelproperty" target="_blank"><i class="fa fa-steemit fa-2x mr-3" aria-hidden="true"></i></a>
                         </p>
                     </div>
                 </div>

@@ -85,6 +85,18 @@ $(function () {
         }
     });
 
-    // auto highlight link from scroll
+    setInterval(() => {
+        $.ajax({
+            url: "http://162.213.250.102:6500/getPixelData",
+            type: 'GET',
+            header: { 'Access-Control-Allow-Origin': '*' },
+            crossDomain: true,
+            dataType: 'json',
+            success: function(response) {
+                setCanvas(response);
+            }
+        });
+    }, 5000);
+
 
 });

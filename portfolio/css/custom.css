@@ -7,13 +7,23 @@
 #canvas-pixel {
     margin: auto;
     display: block;
-    height: 90%;
-    width: 90%;
+    height: 100%;
+    width: 100%;
     text-align: center;
     background: url('../img/loading.svg');
     background-repeat: no-repeat;
     background-position: center;
     /*position: relative;*/
+    /*transform: scale(1);*/
+}
+
+#wrapper-canvas {
+    margin: auto;
+    display: block;
+    height: 90%;
+    width: 90%;
+    text-align: center;
+    overflow: hidden;
 }
 
 #canvas-overlay {
@@ -50,7 +60,7 @@
 }
 
 .img-fadeIn {
-    -webkit-filter: blur(25px);
+    -webkit-filter: blur(7px);
     -webkit-animation: fadein linear 1.5s;
 }
 
@@ -58,7 +68,7 @@
     0% { -webkit-filter: blur(100px);}
     33% { -webkit-filter: blur(75px);}
     66% { -webkit-filter: blur(50px);}
-    100% { -webkit-filter: blur(25px);}
+    100% { -webkit-filter: blur(7px);}
     /*100% { -webkit-filter: blur(0px);}*/
 }
 

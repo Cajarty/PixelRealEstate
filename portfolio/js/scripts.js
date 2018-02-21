@@ -68,7 +68,7 @@ $(function () {
     }   
 
     $.ajax({
-        url: "http://162.213.250.102:6500/getPixelData",
+        url: "https://pixelproperty.io:6500/getPixelData",
         type: 'GET',
         header:{'Access-Control-Allow-Origin': '*'},
         crossDomain: true,
@@ -80,23 +80,28 @@ $(function () {
             $('#canvas-pixel').css('background', 'initial');
             $('#canvas-pixel').stop().hide().addClass('img-fadeIn').fadeIn(3000);
             $('#canvas-overlay').fadeIn(3000);
-            setCanvas(response);
-
+            setInterval(() => {
+                $.ajax({
+                    url: "https://pixelproperty.io:6500/getPixelData",
+                    type: 'GET',
+                    header: { 'Access-Control-Allow-Origin': '*' },
+                    crossDomain: true,
+                    dataType: 'json',
+                    success: function(response) {
+                        setCanvas(response);
+                    }
+                });
+            }, 5000);
+        },
+        error: function(response) {
+            console.log('error', response);
+            $('#canvas-pixel').css('background', 'initial');
+            $('#canvas-pixel').stop().hide().addClass('img-fadeIn').fadeIn(3000);
+            $('#canvas-overlay').fadeIn(3000);
         }
     });
 
-    setInterval(() => {
-        $.ajax({
-            url: "http://162.213.250.102:6500/getPixelData",
-            type: 'GET',
-            header: { 'Access-Control-Allow-Origin': '*' },
-            crossDomain: true,
-            dataType: 'json',
-            success: function(response) {
-                setCanvas(response);
-            }
-        });
-    }, 5000);
+    
 
 
 });

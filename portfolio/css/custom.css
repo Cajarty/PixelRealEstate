@@ -57,6 +57,9 @@
 
 #span-slogan {
     font-size: 2em;
+    text-stroke: 1.5px white;
+    -webkit-text-stroke: 1.5px white;
+    text-shadow: 4px 4px #000;
 }
 
 .img-fadeIn {

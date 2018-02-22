@@ -53,22 +53,28 @@ $(function () {
     }
 
     //canvas
-    var ctx = $('#canvas-pixel')[0].getContext('2d');
-    ctx.imageSmoothingEnabled = false;
-    ctx.webkitImageSmoothingEnabled = false;
+    // var ctx = $('#canvas-pixel')[0].getContext('2d');
+    // ctx.imageSmoothingEnabled = false;
+    // ctx.webkitImageSmoothingEnabled = false;
 
-    function setCanvas(rgbArr) {
-        var ctxID = ctx.createImageData(1000,1000);
-        for (var i = 0; i < Object.keys(rgbArr).length; i++) {
-            for (var j = 0; j < rgbArr[i].length; j++) {
-                ctxID.data[i * rgbArr[i].length + j] = rgbArr[i][j];
-            }
-        }
-        ctx.putImageData(ctxID, 0, 0);
-    }   
+    // function setCanvas(rgbArr) {
+    //     var ctxID = ctx.createImageData(1000,1000);
+    //     for (var i = 0; i < Object.keys(rgbArr).length; i++) {
+    //         for (var j = 0; j < rgbArr[i].length; j++) {
+    //             ctxID.data[i * rgbArr[i].length + j] = rgbArr[i][j];
+    //         }
+    //     }
+    //     ctx.putImageData(ctxID, 0, 0);
+    // }   
 
+    setInterval(() => {
+        var timestamp = new Date().getTime();
+        var src = 'https://pixelproperty.io:6500/getImage.png';
+        $('#canvas-image').attr('src', src + '?' + timestamp);
+    }, 10000);
+/*
     $.ajax({
-        url: "https://pixelproperty.io:6500/getPixelData",
+        url: "https://pixelproperty.io:6500/getImage.png",
         type: 'GET',
         header:{'Access-Control-Allow-Origin': '*'},
         crossDomain: true,
@@ -80,6 +86,7 @@ $(function () {
             $('#canvas-pixel').css('background', 'initial');
             $('#canvas-pixel').stop().hide().addClass('img-fadeIn').fadeIn(3000);
             $('#canvas-overlay').fadeIn(3000);
+	    setCanvas(response);
             setInterval(() => {
                 $.ajax({
                     url: "https://pixelproperty.io:6500/getPixelData",
@@ -99,7 +106,7 @@ $(function () {
             $('#canvas-pixel').stop().hide().addClass('img-fadeIn').fadeIn(3000);
             $('#canvas-overlay').fadeIn(3000);
         }
-    });
+    });*/
 
     
 

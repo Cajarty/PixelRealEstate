@@ -168,12 +168,24 @@ $(function() {
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
     ];
+    var dot =[
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,1,1,0,0,0,0,0],
+        [0,1,1,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+    ];
 
     var spans   = ['#span-create','#span-control','#span-compete'];
-    var words   = [[c,r,e,a,t,e],[c,o,n,t,r,o,l],[c,o,m,p,e,t,e]];
-    // var words   = [[p,i,x,e,l],[p,r,o,p,e,r,t,y]];
+    var words   = [[c,r,e,a,t,e,dot],[c,o,n,t,r,o,l,dot],[c,o,m,p,e,t,e,dot]];
     var gap     = 0;
-    var size    = 5;
+    var size    = 6;
     var size2   = size + 3;
     var square  = '';
     var x       = 0;
@@ -236,7 +248,7 @@ $(function() {
     // var size = 12;
     // var size2 = size + 10;
 
-    function explode(element, elementSize, svgWidth, svgHeight) {
+    function explode(element, elementSize, svgWidth, svgHeight, color) {
         // element.clearQueue();
         var x = Math.floor(Math.random() * (svgWidth - elementSize)) + 1;
         var y = Math.floor(Math.random() * (svgHeight - elementSize)) + 1;
@@ -247,16 +259,18 @@ $(function() {
             svgWidth: elementSize / rand,
             svgHeight: elementSize / rand
         }, {duration: 200});
+        element.css('fill', color).css('stroke', color);
     }
 
-    function implode(element, elementSize) {
+    function implode(element, elementSize, color) {
         // element.clearQueue();
         element.animate({
-                svgX: element.data('x'),
-                svgY: element.data('y'),
-                svgWidth: elementSize,
-                svgHeight: elementSize
+            svgX: element.data('x'),
+            svgY: element.data('y'),
+            svgWidth: elementSize,
+            svgHeight: elementSize
         }, {duration: 100});
+        element.css('fill', color).css('stroke', color);
     }
 
     $('.svg-letter').mouseenter(function() {
@@ -269,7 +283,7 @@ $(function() {
         $('.shadow-' + index).each(function(i, obj) {
             explode($(this), size2, w, h);
         });
-    })
+    });
 
     $('.svg-letter').mouseleave(function() {
         var index = this.id.replace('letter-', '');
@@ -279,7 +293,7 @@ $(function() {
         $('.shadow-' + index).each(function(i, obj) {
             implode($(this), size2);
         });
-    })
+    });
 
     var times = [500,750,1000,1250];
 

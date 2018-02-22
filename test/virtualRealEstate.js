@@ -226,7 +226,7 @@ contract('VirtualRealEstate', function(accounts) {
       pixelPropertyInstance = instance;
       return pixelPropertyInstance.addCoin(accounts[2], 2);
     }).then(function(s) {
-      return pixelPropertyInstance.setColors(10, [5, 7234, 5, 5, 5, 5, 2341, 5, 5, 11234], { from: accounts[2] });
+      return pixelPropertyInstance.setColors(10, [5, 7234, 5, 5, 5, 5, 2341, 5, 5, 11234], 0, { from: accounts[2] });
     }).then(function(setColors) {
       return pixelPropertyInstance.getPropertyColors(10, { from: accounts[0] });
     }).then(function(coloursReturned) {
@@ -236,7 +236,7 @@ contract('VirtualRealEstate', function(accounts) {
       assert.equal(coloursReturned[9], 11234, "Should return 5 from the array of 5's" );
     });
   });
-  it("Changing the colour pays out 1 coins per hour since last change to the last colour changer and 1 to the owner of the property", function() {
+  it("Changing the colour pays out 1 coins per second since last change to the last colour changer and 1 to the owner of the property", function() {
     return VirtualRealEstate.deployed().then(function(instance) {
       pixelPropertyInstance = instance;
       return pixelPropertyInstance.addCoin(accounts[4], 1); //Fund setColors of owned property

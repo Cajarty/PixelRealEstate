@@ -1,5 +1,19 @@
 pragma solidity ^0.4.2;
 
+/*
+ToDo:
+- ##Users pay however much they want, no requirement on cost
+- ##Users can earn earnings on a property for up to (N+1)^2 minutes
+- ##Users get private use of a property for N/2 minutes
+- ##Owners in private mode costs 1 coins a minute
+- ##Timer is now 2 coins a second not 2 coins a hour
+- ##No free mode during the first 3 days, but "increased earnings" paying zero or 1 coin is treated like 2 coins
+    - ##So for the first 3 days, setting it for free gets it set to private for 1 minute and earns you 1->9 coins [Validate with Jaegar first]
+- ##Property prices start at 0.005 ETH and 100 PPT
+- Make sure total circulating supply actually is calculated right. Unit test that plz
+- Make getHoverText and getLink use a different data type
+*/
+
 contract Token {
     uint256 public totalSupply;
     function balanceOf(address _owner) public constant returns (uint256 balance);
@@ -75,7 +89,7 @@ contract VirtualRealEstate is StandardToken {
     
     uint256 USER_BUY_CUT_PERCENT = 98; //%
     
-    uint256 PROPERTY_GENERATES_PER_HOUR = 2;
+    uint256 PROPERTY_GENERATES_PER_MINUTE = 1;
     uint256 FREE_COLOR_SETTING_UNTIL;
     
     event PropertyColorUpdate(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address lastUpdaterPayee);
@@ -86,7 +100,7 @@ contract VirtualRealEstate is StandardToken {
     event PropertySetForSale(uint24 indexed property, uint256 forSalePrice);
     event DelistProperty(uint24 indexed property);
     event SetPropertyPublic(uint24 indexed property);
-    event SetPropertyPrivate(uint24 indexed property, uint32 numHoursPrivate);
+    event SetPropertyPrivate(uint24 indexed property, uint32 numMinutesPrivate);
     
     struct TradeOffer {
         uint256 ethPer;
@@ -100,9 +114,10 @@ contract VirtualRealEstate is StandardToken {
         uint256 salePrice;
         address lastUpdater;
         bool isInPrivateMode;
-        uint256 lastUpdate;
+        uint256 lastUpdate; //Last Update
         uint256 becomePublic;
-        uint256 flag; //0 == none, 1 == nsfw, 2 == ban
+        uint256 earnUntil;
+        uint32 flag; //0 == none, 1 == nsfw, 2 == ban
     }
     
     modifier ownerOnly() {
@@ -120,11 +135,11 @@ contract VirtualRealEstate is StandardToken {
         owner = msg.sender;
         totalSupply = 0;
         FREE_COLOR_SETTING_UNTIL = now;// + 1 days;
-        pricePPC = 10;
+        pricePPC = 100;
         priceETH = 10000;//1000000000000000000; //0.001 ETH
         moderators[msg.sender] = 3;
     }
-    function setFlag(uint24 propertyID, uint256 flag) public validPropertyID(propertyID)  {
+    function setFlag(uint24 propertyID, uint32 flag) public validPropertyID(propertyID)  {
         Property storage property = map[propertyID];
 
         require(flag < 3);
@@ -178,91 +193,88 @@ contract VirtualRealEstate is StandardToken {
             return (property.owner, 0, property.salePrice, property.lastUpdate, property.isInPrivateMode);
         }
     }
+    function tryForcePublic(uint24 propertyID) public validPropertyID(propertyID) {
+        Property storage property = map[propertyID];
+        //If its private when it shouldnt be
+        if (property.isInPrivateMode && property.becomePublic < now) {
+            property.isInPrivateMode = false;
+        }
+    }
     function getProjectedPayout(uint24 propertyID) public view returns(uint256) {
         Property storage property = map[propertyID];
         if (!property.isInPrivateMode && property.lastUpdate != 0) {
-            uint256 hoursSinceLastColorChange = (now - property.lastUpdate) / (5 seconds); //ERRORs on property.lastUpdate = 0
-            return hoursSinceLastColorChange * PROPERTY_GENERATES_PER_HOUR;
+            uint256 minutesSinceLastColourChange = (now - property.lastUpdate) / (1 minutes); //ERRORs on property.lastUpdate = 0
+            return minutesSinceLastColourChange * PROPERTY_GENERATES_PER_MINUTE;
         }
         return 0;
     }
     //Change a 10x10 == 70 | 30 | 0 cost
-    function setColors(uint24 propertyID, uint256[10] newColors) public validPropertyID(propertyID) returns(bool) {
+    function setColors(uint24 propertyID, uint256[10] newColors, uint256 pptToSpend) public validPropertyID(propertyID) returns(bool) {
         Property storage property = map[propertyID];
-        
-        //Cost 2 if no owner, 1 if owned
-        uint256 cost = property.owner != 0 ? 1 : 2;
-        
-        //If it's in private mode, we must be the owner, but it's free
-        if (property.isInPrivateMode) {
-            require(property.flag != 2); //Banned properties can't be set in private mode, only public
 
-            //If it's still privately owned
-            if (property.becomePublic > now) {
-                require(msg.sender == property.owner);
-                cost = 0;
-            }
-            //No long erin private mode, ran out
-            else {
-                property.isInPrivateMode = false;
-                property.becomePublic = 0;
-            }
-        } 
-        //If we're in the first few days, setting the color is free
-        else if (now <= FREE_COLOR_SETTING_UNTIL) {
-            cost = 0;
+        tryForcePublic(propertyID);
+        
+        uint256 pptSpent = pptToSpend;
+
+        //If first 3 days and we spent <2 coins, treat it as if we spent 2
+        if (now <= FREE_COLOR_SETTING_UNTIL && pptSpent < 2) { 
+            pptSpent = 2;
         }
-        
-        require(balances[msg.sender] >= cost);
-        
-        //If we're in Public Mode, payouts occur
-        
-        uint256 payout = getProjectedPayout(propertyID);
-        if (payout > 0) {
-            address propertyOwnerPayee = property.owner;
-            address lastUpdaterPayee = property.lastUpdater;
-            if (propertyOwnerPayee == 0) {
-                if (lastUpdaterPayee != 0) {
-                    propertyOwnerPayee = lastUpdaterPayee;
+        //If we are in the first 3 days, set pptToSpend to = 2, but don't charge them. Maybe give them the amount they don't have to subtract later?
+
+        bool updateOccured = false;
+
+        if (property.isInPrivateMode) {
+            require(msg.sender == property.owner);
+            require(property.flag != 2);
+            //TODO: What if a owner tries to set a property which is locked by a Free-Use user?
+            updateOccured = true;
+        } else if (property.becomePublic < now) {
+            require(balances[msg.sender] >= pptToSpend);
+            uint256 minutesOfEarning = (pptSpent + 1) * (pptSpent + 1) * (1 minutes); //(N+1)^2 coins earned max/minutes we can earn from
+            uint256 minutesOfLock = (pptSpent / 2) * (1 minutes); //N/2 minutes of user-private mode
+            balances[msg.sender] -= pptToSpend;
+            totalSupply -= pptToSpend;
+            uint256 payoutEach = getProjectedPayout(propertyID);
+            if (payoutEach > 0) {
+                if (property.lastUpdater != 0) {
+                    balances[msg.sender] += payoutEach;
+                    totalSupply += payoutEach;
+                }
+                if (property.owner != 0) {
+                    balances[property.owner] += payoutEach;
+                    totalSupply += payoutEach;
                 }
             }
-            //Payout half to ownerPayee and half to updaterPayee
-            if (propertyOwnerPayee != 0) {
-                balances[propertyOwnerPayee] += payout / 2;
-            }
-            if (lastUpdaterPayee != 0) {
-                balances[lastUpdaterPayee] += payout / 2;
-            }
-            totalSupply += payout;
+            updateOccured = true;
+            property.becomePublic = now + minutesOfLock;
+            property.earnUntil = now + minutesOfEarning;
         }
         
-        //Burn the coins from the sender
-        balances[msg.sender] -= cost; //Burn the coin to set the color
-        
-        property.colors = newColors;
-        property.lastUpdater = msg.sender;
-        property.lastUpdate = now;
-        uint256 timeUpdate = now;
-        
-        PropertyColorUpdate(propertyID, newColors, timeUpdate, lastUpdaterPayee);
-        
+        if (updateOccured) {
+            PropertyColorUpdate(propertyID, newColors, now, property.lastUpdater);
+            property.colors = newColors;
+            property.lastUpdater = msg.sender;
+            property.lastUpdate = now;
+        }
         return true;
     }
-    function setPropertyMode(uint24 propertyID, bool isInPrivateMode, uint32 numHoursPrivate) public validPropertyID(propertyID) {
+    function setPropertyMode(uint24 propertyID, bool isInPrivateMode, uint32 numMinutesPrivate) public validPropertyID(propertyID) {
         Property storage property = map[propertyID];
         require(msg.sender == property.owner);
         if (isInPrivateMode) {
-            require(numHoursPrivate > 0);
-            require(balances[msg.sender] >= numHoursPrivate);
-            balances[msg.sender] -= numHoursPrivate;
-            property.becomePublic = now + (1 seconds) * numHoursPrivate; //TODO: seconds to hours
+            require(numMinutesPrivate > 0);
+            require(balances[msg.sender] >= numMinutesPrivate);
+            balances[msg.sender] -= numMinutesPrivate;
+            totalSupply -= numMinutesPrivate;
+            property.becomePublic = now + (1 minutes) * numMinutesPrivate;
         } else {
             property.becomePublic = 0;
         }
         property.isInPrivateMode = isInPrivateMode;
         
         if (isInPrivateMode) {
-            SetPropertyPrivate(propertyID, numHoursPrivate);
+            SetPropertyPrivate(propertyID, numMinutesPrivate);
         } else {
             SetPropertyPublic(propertyID);
         }
@@ -443,9 +455,7 @@ contract VirtualRealEstate is StandardToken {
     ///TODO: TESTING ONLY: REMOVE BEFORE RELEASE:///
     ////////////////////////////////////////////////
     function addCoin(address user, uint256 amount) public ownerOnly() {
+        require(msg.sender == owner);
         balances[user] += amount;
     }
-    //setPropertyMode ->seconds to hours
-    //setColors -> 5 seconds to 1 hour
-    //FREE_COLOR_SETTING_UNTIL in constructor needs to be changed to have the +1 days
 }

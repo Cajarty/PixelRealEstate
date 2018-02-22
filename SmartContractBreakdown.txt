@@ -24,7 +24,7 @@ contract VirtualRealEstate:
             - SetUserHoverText(msg.sender, text)
         setLink(bytes32[2] link)
             - SetUserSetLink(msg.sender, link)
-        setColors(uint24 propertyID, uint256[10] newColors)
+        setColors(uint24 propertyID, uint256[10] newColors, pptToSpend)
             - PropertyColorUpdate(propertyID, newColors, timeUpdate, lastUpdaterPayee)
         setPropertyMode(uint24 propertyID, bool isInPrivateMode, uint32 numHoursPrivate)
             - SetPropertyPrivate(propertyID, numHoursPrivate)
@@ -48,3 +48,6 @@ contract VirtualRealEstate:
         withdraw(uint256 amount)
         withdrawAll()
         changeOwners(address newOwner)
+
+ChangeLog:
+21/02/2018: Added uint256 pptToSpend as setColors parameter

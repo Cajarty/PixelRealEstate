@@ -36,7 +36,7 @@ class PropertySalesLog extends Component {
         return (
             <div className='tableDataContainer'>
                 <div className='title'>
-                    Sales History
+                    Trade History
                 </div>
                 <table cellSpacing={0} cellPadding={0} className='header'>
                     <thead>

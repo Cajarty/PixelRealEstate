@@ -22,7 +22,17 @@ export const Compares = {
         label: 'Y - Descending',
         value: 'yDesc',
         func: (a,b) => {return a.y > b.y;}
-    }
+    },
+    priceAsc: {
+        label: 'Price - Ascending',
+        value: 'priceAsc',
+        func: (a,b) => {return a.PPCPrice < b.PPCPrice;}
+    },
+    priceDesc: {
+        label: 'Price - Descending',
+        value: 'priceDesc',
+        func: (a,b) => {return a.PPCPrice > b.PPCPrice;}
+    },
 };
 
 export class ServerDataManager {

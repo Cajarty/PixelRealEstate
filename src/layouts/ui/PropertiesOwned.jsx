@@ -3,6 +3,7 @@ import {Contract, ctr, EVENTS, LISTENERS} from '../../contract/contract.jsx';
 import {SDM, ServerDataManager, Compares} from '../../contract/ServerDataManager.jsx';
 import PanelContainerOwned from './PanelContainerOwned';
 import * as Assets from '../../const/assets.jsx';
+import Dropdown from 'react-dropdown';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 
 const PAGE_SIZE = 10;
@@ -70,11 +71,26 @@ class PropertiesOwned extends Component {
         this.setState({page});        
     }
 
+    reorderList(value) {
+        this.setState({compare: Compares[value.value]});
+        this.reorderItems(Compares[value.value].func);
+    }
+
     render() {
         return (
             <div className='uiBase'>
                 <div className='header'>
                     Your Owned Properties
+                    <div>
+                        <Dropdown 
+                            className='dropdown'
+                            value={this.state.compare}
+                            options={Object.keys(Compares).map((i) => {
+                                return Compares[i];
+                            })} 
+                            onChange={value => {this.reorderList(value)}}
+                        />
+                    </div>
                 </div>
                 <div className='containerParent'>
                     <PanelContainerOwned

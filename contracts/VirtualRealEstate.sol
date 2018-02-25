@@ -134,7 +134,7 @@ contract VirtualRealEstate is StandardToken {
     function VirtualRealEstate() public {
         owner = msg.sender;
         totalSupply = 0;
-        FREE_COLOR_SETTING_UNTIL = now;// + 1 days;
+        FREE_COLOR_SETTING_UNTIL = now + 3 days;
         pricePPT = 100;
         priceETH = 10000;//1000000000000000000; //0.001 ETH
         moderators[msg.sender] = 3;
@@ -203,7 +203,8 @@ contract VirtualRealEstate is StandardToken {
     function getProjectedPayout(uint24 propertyID) public view returns(uint256) {
         Property storage property = map[propertyID];
         if (!property.isInPrivateMode && property.lastUpdate != 0) {
-            uint256 minutesSinceLastColourChange = (now - property.lastUpdate) / (1 seconds); //ERRORs on property.lastUpdate = 0
+            uint256 earnedUntil = (now < property.earnUntil) ? now : property.earnUntil;
+            uint256 minutesSinceLastColourChange = (earnedUntil - property.lastUpdate) / (1 seconds);
             return minutesSinceLastColourChange * PROPERTY_GENERATES_PER_MINUTE;
         }
         return 0;
@@ -217,7 +218,7 @@ contract VirtualRealEstate is StandardToken {
         uint256 pptSpent = pptToSpend;
 
         //If first 3 days and we spent <2 coins, treat it as if we spent 2
-        if (now <= FREE_COLOR_SETTING_UNTIL && pptSpent < 2) { 
+        if (now <= FREE_COLOR_SETTING_UNTIL && pptToSpend < 2) { 
             pptSpent = 2;
         }
         //If we are in the first 3 days, set pptToSpend to = 2, but don't charge them. Maybe give them the amount they don't have to subtract later?

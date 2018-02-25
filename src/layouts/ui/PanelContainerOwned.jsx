@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {Panel, PanelItem, PanelPropertyCanvas, PanelDivider} from './Panel';
+import {Panel, PanelItem, PanelPropertyCanvas, PanelDivider, PanelButton} from './Panel';
 import PanelContainer from './PanelContainer';
 import Timestamp from 'react-timestamp';
 import Hours from '../ui/Hours';
@@ -10,6 +10,10 @@ class PanelContainerOwned extends PanelContainer {
         this.state = {
             dataView: []
         }
+    }
+
+    cancelSale() {
+        console.info("hellode")
     }
 
     render() {
@@ -26,8 +30,11 @@ class PanelContainerOwned extends PanelContainer {
                         <PanelDivider/>
                         <PanelItem width='30%' title data='For Sale'/>
                         <PanelItem width='20%' data={child.isForSale ? 'Yes' : 'No'}/>
+                        {child.isForSale ? <PanelButton width='50%' onClick={() => this.cancelSale()} data='Cancel Sale'/> :null}
+                        {child.isForSale ? <PanelItem width='40%' title data='PPT Price:'/> :null}
+                        {child.isForSale ? <PanelItem width='60%' data={child.PPCPrice}/> :null}
                         <PanelItem width='30%' title data='Private'/>
-                        <PanelItem width='20%' data={child.isInPrivate ? 'Yes' : 'No'}/>
+                        <PanelItem width={child.isForSale ? '20%' : '70%'} data={child.isInPrivate ? 'Yes' : 'No'}/>
                         <PanelItem width='50%' title data='Last Update'/>
                         <PanelItem width='50%' data={child.lastUpdate != null && child.lastUpdate > 0 ? <Hours time={child.lastUpdate} /> : 'Never'}/>
                     </Panel>

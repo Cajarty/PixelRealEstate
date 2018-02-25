@@ -13,6 +13,12 @@ export class Panel extends Component {
     }
 }
 
+export class PanelButton extends Component {
+    render() {
+        return (<input type='button' className={'panelButton'} style={{width: this.props.width}} onClick={() => this.props.onClick()} value={this.props.data}></input>);
+    }
+}
+
 export class PanelItem extends Component {
     render() {
         return (<div className={'panelItem' + (this.props.title ? ' itemTitle' : '')} style={{width: this.props.width}}>{this.props.data}</div>);

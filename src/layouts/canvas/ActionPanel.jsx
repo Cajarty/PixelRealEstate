@@ -8,6 +8,7 @@ import * as Assets from '../../const/assets.jsx';
 import SetHoverText from '../forms/SetHoverText';
 import SetLink from '../forms/SetLink';
 import GiftProperty from '../forms/GiftProperty';
+import ChangePropertyMode from '../forms/ChangePropertyMode';
 
 class ActionPanel extends Component {
     constructor(props) {
@@ -34,6 +35,7 @@ class ActionPanel extends Component {
                     <PulloutTab icon={Assets.ICON_MONEY} tabName='Set Property Info'>
                         <SetHoverText/>
                         <SetLink/>
+                        <ChangePropertyMode/>
                     </PulloutTab>
                  </Pullout>
                 </div>

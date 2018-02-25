@@ -177,6 +177,16 @@ export class Contract {
         });
     }
 
+    setPropertyMode(x, y, isPrivate, callback, minutesPrivate = 0) {
+        this.VRE.deployed().then((i) => {
+            return i.setPropertyMode(this.toID(x, y), isPrivate, minutesPrivate, {from: this.account }).then((r) => {
+                return callback(r);
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
+    }
+
     //array of 2 32 bytes of string
     setHoverText(text) {
         let str1 = Func.StringToHex(text.slice(0, 32)).padEnd(66, '0');

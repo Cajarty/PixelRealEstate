@@ -2,14 +2,19 @@ import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
+import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 
-class GiftProperty extends Component {
+const TOKENS_TO_MINUTES = 1;
+
+class ChangePropertyMode extends Component {
     constructor(props) {
         super(props);
         this.state = {
             x: '',
             y: '',
-            valueNewOwner: '',
+            isPrivate: false,
+            minutesPrivate: 0,
+            tokenCost: 0,
         };
     }
 
@@ -24,16 +29,27 @@ class GiftProperty extends Component {
     }
 
     componentDidMount() {
-        GFD.listen('x', 'giftPixel', (x) => {
+        GFD.listen('x', 'ChangePropertyMode', (x) => {
             this.setState({x});
         })
-        GFD.listen('y', 'giftPixel', (y) => {
+        GFD.listen('y', 'ChangePropertyMode', (y) => {
             this.setState({y});
+            this.setState({
+                isPrivate: SDM.allProperties[GFD.getData('x') - 1][y - 1].isPrivate,
+                becomePublic: SDM.allProperties[GFD.getData('x') - 1][y - 1].becomePublic 
+            });
+            ctr.getPropertyData(GFD.getData('x') - 1, y - 1, (data) => {
+                console.info(data);
+                this.setState({
+                    isPrivate: data[4],
+                    becomePublic: data[5]
+                });
+            });
         })
     }
 
     componentWillUnmount() {
-        GFD.closeAll('giftPixel');
+        GFD.closeAll('ChangePropertyMode');
     }
 
     setX(x) {
@@ -44,8 +60,35 @@ class GiftProperty extends Component {
         GFD.setData('y', y);
     }
 
-    handleNewOwner(newOwner) {
-        this.setState({valueNewOwner: newOwner});
+    setPropertyMode() {
+        let x = GFD.getData('x') - 1;
+        let y = GFD.getData('y') - 1;
+        if (SDM.allProperties[x][y].becomePublic) {
+            ctr.sendResults(LISTENERS.Alert, {result: false, message: "Property is temorarily reserved by a user."});
+            return;
+        }
+        if (SDM.allProperties[x][y].becomePublic) {
+            ctr.sendResults(LISTENERS.Alert, {result: false, message: "Property is already in private mode."});
+            return;
+        }
+        ctr.setPropertyMode(x, y, true, this.state.minutesPrivate, () => {
+            console.info("Mode toggled, confirmed through a transaction");
+        })
+    }
+
+
+    changeTokens(t) {
+        this.setState({
+            tokenCost: t,
+            minutesPrivate: t * TOKENS_TO_MINUTES
+        })
+    }
+
+    changeTime(t) {
+        this.setState({
+            tokenCost: t * (1 / TOKENS_TO_MINUTES),
+            minutesPrivate: t
+        })
     }
 
     render() {
@@ -55,7 +98,7 @@ class GiftProperty extends Component {
                     <tr>
                         <td colSpan={2}>
                             <div className='title'>
-                                Gift Property:
+                                Set Property Private:
                             </div>
                         </td>
                     </tr>
@@ -89,15 +132,29 @@ class GiftProperty extends Component {
                     </tr>
                     <tr>
                         <td>
-                            <div className='inputTitle'> New Owner: </div>
+                            <div className='inputTitle'>PPT:</div>
                         </td>
                         <td>
-                            <input id='address' type='text' onChange={(e) => this.handleNewOwner(e.target.value)} value={this.state.valueNewOwner}></input>
+                            <div className='inputTitle'>Time (Minutes):</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input id='tokens' type='number' onChange={(e) => this.changeTokens(e.target.value)} value={this.state.tokenCost}></input>
+                        </td>
+                        <td>
+                            <input id='time' type='number' onChange={(e) => this.changeTime(e.target.value)} value={this.state.minutesPrivate}></input>
                         </td>
                     </tr>
                     <tr>
                         <td colSpan={2}>
-                            <input type='button' value='Gift Property' onClick={() => ctr.transferProperty(this.state.x - 1, this.state.y - 1, this.state.valueNewOwner, () => {})}></input>
+                            <div>{this.state.isPrivate ? "This Property is already in private mode." : ""}</div>
+                            <div>{this.state.becomePublic != 0 ? "This Property is temporarily reserved by a user." : ""}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colSpan={2}>
+                            <input type='button' value='Set Property' onClick={() => ctr.setPropertyMode()}></input>
                         </td>
                     </tr>
                 </tbody>
@@ -107,4 +164,4 @@ class GiftProperty extends Component {
     }
 }
 
-export default GiftProperty
+export default ChangePropertyMode

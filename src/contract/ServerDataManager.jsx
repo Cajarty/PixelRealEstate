@@ -88,7 +88,6 @@ export class ServerDataManager {
             this.organizeProperty(data.args);
         });
         ctr.listenForEvent(EVENTS.PropertyBought, 'SDM-PropertyBought', (data) => {
-            console.info("her: ", data);
             let pos = ctr.fromID(Func.BigNumberToNumber(data.args.property));
             this.updateProperty(pos.x, pos.y, {owner: data.args.newOwner});
             this.organizeProperty(pos.x, pos.y);

@@ -5,9 +5,6 @@ import Pullout from '../ui/Pullout';
 import PulloutTab from '../ui/PulloutTab';
 import * as Assets from '../../const/assets.jsx';
 import PropertiesForSale from '../ui/PropertiesForSale';
-// import PixelsRented from '../ui/PixelsRented.jsx';
-// import PixelsForSale from '../ui/PixelsForSale.jsx';
-// import PixelsForRent from '../ui/PixelsForRent.jsx';
 
 class ManagePanel extends Component {
     constructor(props) {
@@ -27,6 +24,8 @@ class ManagePanel extends Component {
                         </PulloutTab>
                         <PulloutTab icon={Assets.ICON_MONEY} tabName='Property Market'>
                             <PropertiesForSale/>
+                        </PulloutTab>
+                        <PulloutTab icon={Assets.ICON_MONEY} tabName='Property Offers'>
                         </PulloutTab>
                     </Pullout>
                 </div>

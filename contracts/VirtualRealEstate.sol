@@ -279,7 +279,7 @@ contract VirtualRealEstate is StandardToken {
             SetPropertyPublic(propertyID);
         }
     }
-    //Change pixel or 10x1 costs 7 | 3 | 0
+    //TODO: Repurpose this if we want or discard otherwise. Isn't harmfull but kinda useless.
     function setRowColors(uint24 propertyID, uint8 row, uint24 newColorData) public validPropertyID(propertyID) returns(bool) {
         Property storage property = map[propertyID];
         
@@ -295,6 +295,7 @@ contract VirtualRealEstate is StandardToken {
         require(balances[msg.sender] >= cost);
         
         balances[msg.sender] -= cost; //Burn the coin to set the color
+        totalSupply -= cost;
         
         property.colors[row] = newColorData;
         property.lastUpdater = msg.sender;

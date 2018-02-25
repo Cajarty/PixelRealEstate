@@ -4,15 +4,16 @@ import { default as Web3 } from 'web3';
 import * as Const from '../const/const.jsx';
 import * as Func from '../functions/functions.jsx';
 import { default as contract } from 'truffle-contract';
+import {GFD, GlobalState} from '../functions/GlobalState';
 
 // Import our contract artifacts and turn them into usable abstractions.
 import VirtualRealEstate from '../../build/contracts/VirtualRealEstate.json'
 
 
 export const ERROR_TYPE = {
-    success: 'success',
-    warning: 'warning',
-    error: 'error',
+    Success: 'success',
+    Warning: 'warning',
+    Error: 'error',
 }
 export const LISTENERS = {
     Error: 'Error',
@@ -96,12 +97,18 @@ export class Contract {
     getAccounts() {
         window.web3.eth.getAccounts((err, accs) => {
             if (err != null) {
-                this.sendResults(LISTENERS.Alert, {errorId: 1, errorType: ERROR_TYPE.Error, message: "There was an error fetching your accounts."});
+                if (GFD.getData('advancedMode')) {
+                    this.sendResults(LISTENERS.Error, {errorId: 1, errorType: ERROR_TYPE.Error, message: "In order to fully interact with the client, it is required to have the MetaMask.io web-plugin installed. MetaMask allows you to store your earnings securely in your own Ethereum lite-wallet. "});
+                } else {
+                    this.sendResults(LISTENERS.Error, {errorId: 1, errorType: ERROR_TYPE.Error, message: "The canvas is updating every 15 seconds. Get instant updates with https://metamask.io/ ."});
+                }
                 return;
             }
 
             if (accs.length == 0) {
-                this.sendResults(LISTENERS.Error, {errorId: 0, errorType: ERROR_TYPE.Error, message: "Couldn't get any accounts! Make sure you're logged into Metamask."});
+                if (GFD.getData('advancedMode')) {
+                    this.sendResults(LISTENERS.Error, {errorId: 0, errorType: ERROR_TYPE.Error, message: "Couldn't get any accounts! Make sure you're logged into Metamask."});
+                }
                 return;
             }
 

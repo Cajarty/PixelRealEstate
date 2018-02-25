@@ -1,5 +1,5 @@
 .errorBox {
-    width: 80%;
+    width: 100%;
     margin: auto;
     .error {
         background-color: orange;
@@ -16,6 +16,7 @@
         }
         .message {
             display: inline-block;
+            width: calc(100% - 30px);
         }
     }
 }

@@ -10,6 +10,8 @@ import Axios from '../../network/Axios.jsx';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 import TimeAgo from 'react-timeago';
 import HoverLabel from './HoverLabel';
+import {GFD, GlobalState} from '../../functions/GlobalState';
+import * as Strings from '../../const/strings';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -19,7 +21,7 @@ class CanvasPage extends Component {
             pixelData: null,
             loadingPPC: true,
             PPCOwned: 0,
-            showAdvanced: false,
+            advancedMode: false
         }
     }
 
@@ -52,6 +54,9 @@ class CanvasPage extends Component {
                 });
             }
         });
+        GFD.listen('advancedMode', 'CanvasPage', (advancedMode) => {
+            this.setState({advancedMode})
+        });
     }
 
     componentWillUnmount() {
@@ -64,11 +69,17 @@ class CanvasPage extends Component {
         this.portfolioLink.click();
     }
 
+    changeMode() {
+        let newMode = !this.state.advancedMode;
+        GFD.setData('advancedMode', newMode);
+        this.setState({advancedMode: newMode})
+    }
+
     render() {
         return (
             <div>
                 <a 
-                    href='http://pixelproperty.io/' 
+                    href='https://pixelproperty.io/' 
                     target='_blank' 
                     className='hideElement' 
                     ref={(portfolioLink) => { this.portfolioLink = portfolioLink; }} 
@@ -82,46 +93,44 @@ class CanvasPage extends Component {
                             value='More info...' 
                             onClick={() => this.visitPortfolio()}
                         ></input>
-                        {this.state.showAdvanced ? 
-                            <div className='ppcLabel'>PPC Owned: {this.state.PPCOwned}{this.state.loadingPPC ? ' LOADING' : ''}</div>
+                        {this.state.advancedMode ? 
+                            <div className='ppcLabel'>PPT Owned: {this.state.PPCOwned}{this.state.loadingPPC ? ' LOADING' : ''}</div>
                         : null}
                         <input 
                             type='button' 
                             className='headerButton right' 
-                            value={this.state.showAdvanced ? 'Hide Advanced' : 'Show Advanced'}
-                            onClick={() => this.setState({showAdvanced: !this.state.showAdvanced})
-                        }></input>
+                            value={this.state.advancedMode ? 'Viewing Mode' : 'Interactive Mode'}
+                            onClick={() => this.changeMode()}
+                        ></input>
                     </div>
                 </div>
                 <div className='top'>
-                    <div className={this.state.showAdvanced ? '' : ' hideElement'}>
+                    <div className={this.state.advancedMode ? '' : ' hideElement'}>
                         <ManagePanel />
                     </div>
-                    <div className={this.state.showAdvanced ? 'leftMain' : 'leftMain full'}>
-                        <div>
-                            <ZoomCanvas/>
-                            <div className='infoBox'>
-                                Some nice info
-                            </div>
+                    <div className={this.state.advancedMode ? 'leftMain' : 'leftMain full'}>
+                        <ZoomCanvas/>
+                        <div className='infoBox'>
+                            Some nice info
                         </div>
                     </div>
                     <div className='centerMain'>
                         <HoverLabel/>
                         <Canvas/>
                     </div>
-                    <div className={this.state.showAdvanced ? 'rightMain' : 'rightMain full'}>
-                            <div className='infoBox'>
-                                Some more nice info
-                            </div>
+                    <div className={this.state.advancedMode ? 'rightMain' : 'rightMain full'}>
+                        <ErrorBox/>
+                        <div className='infoBox'>
+                            {this.state.advancedMode ? Strings.ADVANCED_MODE_INTRO_RIGHT : Strings.SIMPLE_MODE_INTRO_RIGHT}
+                        </div>
                     </div>
-                    <div className={this.state.showAdvanced ? '' : ' hideElement'}>
+                    <div className={this.state.advancedMode ? '' : ' hideElement'}>
                         <ActionPanel/>
                     </div>
                 </div>
                 <div className='middle-top'>
-                    <ErrorBox/>
                 </div>
-                <div className={'middle' + (this.state.showAdvanced ? '' : ' hideElement')}>
+                <div className={'middle' + (this.state.advancedMode ? '' : ' hideElement')}>
                     <PropertySalesLog/>
                 </div>
                 <div className='bottom'>

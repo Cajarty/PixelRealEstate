@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../contract/contract.jsx';
+import * as Assets from '../const/assets';
 
 class ErrorBox extends Component {
     constructor(props) {
@@ -28,7 +29,7 @@ class ErrorBox extends Component {
         let hideErrors = this.state.hideErrors;
         let errors = this.state.errors;
         delete errors[errorId];
-        hideErrors[errorId] = setTimeout(() => this.removeHideError(errorId), 3000);
+        hideErrors[errorId] = setTimeout(() => this.removeHideError(errorId), 60000);
         this.setState({hideErrors, errors});
     }
 
@@ -48,7 +49,7 @@ class ErrorBox extends Component {
                {Object.keys(this.state.errors).map((i) => 
                     <div key={i} className={'error ' + (this.state.errors[i].errorType)}>
                         <div className='message'>{this.state.errors[i].message}</div>
-                        <div className='close' onClick={() => this.hideError(i)}>Close</div>
+                        <img className='close icon' src={Assets.CLOSE} draggable={false} onClick={() => this.hideError(i)}></img>
                     </div>
                )}
             </div>

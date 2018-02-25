@@ -6,6 +6,7 @@ import PanelContainerOwned from './PanelContainerOwned';
 import * as Assets from '../../const/assets.jsx';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import Dropdown from 'react-dropdown';
+import PanelContainerForSale from './PanelContainerForSale';
 
 const PAGE_SIZE = 10;
 
@@ -109,7 +110,7 @@ class PropertiesForSale extends Component {
                 </div>
                 </div>
                 <div className='containerParent'>
-                    <PanelContainerOwned
+                    <PanelContainerForSale
                         data={this.state.orderedItems}
                         onClick={(x, y) => this.propertySelected(x, y)}
                         viewStart={this.state.page * PAGE_SIZE}

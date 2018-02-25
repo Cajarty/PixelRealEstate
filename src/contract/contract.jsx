@@ -150,6 +150,7 @@ export class Contract {
     }
 
     buyProperty(x, y, eth, ppc) {
+        console.info(x, y, eth, ppc);
         this.VRE.deployed().then((i) => {
             if (eth == 0)
                 return i.buyPropertyInPPC(this.toID(x, y), ppc, {from: this.account });
@@ -235,6 +236,16 @@ export class Contract {
     getHoverText(address, callback) {
         this.VRE.deployed().then((i) => {
             return i.getHoverText.call(address).then((r) => {
+                return callback(r);
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
+    }
+
+    transferProperty(x, y, newOwner, callback) { 
+        this.VRE.deployed().then((i) => {
+            return i.transferProperty(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account}).then((r) => {
                 return callback(r);
             });
         }).catch((e) => {

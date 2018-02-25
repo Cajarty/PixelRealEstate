@@ -22,7 +22,17 @@ export const Compares = {
         label: 'Y - Descending',
         value: 'yDesc',
         func: (a,b) => {return a.y > b.y;}
-    }
+    },
+    priceAsc: {
+        label: 'Price - Ascending',
+        value: 'priceAsc',
+        func: (a,b) => {return a.PPCPrice < b.PPCPrice;}
+    },
+    priceDesc: {
+        label: 'Price - Descending',
+        value: 'priceDesc',
+        func: (a,b) => {return a.PPCPrice > b.PPCPrice;}
+    },
 };
 
 export class ServerDataManager {
@@ -78,6 +88,7 @@ export class ServerDataManager {
             this.organizeProperty(data.args);
         });
         ctr.listenForEvent(EVENTS.PropertyBought, 'SDM-PropertyBought', (data) => {
+            console.info("her: ", data);
             let pos = ctr.fromID(Func.BigNumberToNumber(data.args.property));
             this.updateProperty(pos.x, pos.y, {owner: data.args.newOwner});
             this.organizeProperty(pos.x, pos.y);
@@ -92,20 +103,15 @@ export class ServerDataManager {
             this.organizeProperty(pos.x, pos.y);
         });
         ctr.listenForEvent(EVENTS.DelistProperty, 'SDM-DelistProperty', (data) => {
-            this.insertProperty(data.args);
-            this.organizeProperty(data.args);
+            let pos = ctr.fromID(Func.BigNumberToNumber(data.args.property));
+            this.updateProperty(pos.x, pos.y, {isForSale: false});
+            this.organizeProperty(pos.x, pos.y);
         });
         ctr.listenForEvent(EVENTS.ListTradeOffer, 'SDM-ListTradeOffer', (data) => {
-            this.insertProperty(data.args);
-            this.organizeProperty(data.args);
         });
         ctr.listenForEvent(EVENTS.AcceptTradeOffer, 'SDM-AcceptTradeOffer', (data) => {
-            this.insertProperty(data.args);
-            this.organizeProperty(data.args);
         });
         ctr.listenForEvent(EVENTS.CancelTradeOffer, 'SDM-CancelTradeOffer', (data) => {
-            this.insertProperty(data.args);
-            this.organizeProperty(data.args);
         });
         ctr.listenForEvent(EVENTS.SetPropertyPublic, 'SDM-SetPropertyPublic', (data) => {
             this.insertProperty(data.args);

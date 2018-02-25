@@ -3,13 +3,13 @@ import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 
-class SellPixelForm extends Component {
+class GiftProperty extends Component {
     constructor(props) {
         super(props);
         this.state = {
             x: '',
             y: '',
-            valuePrice: 0,
+            valueNewOwner: '',
         };
     }
 
@@ -24,22 +24,16 @@ class SellPixelForm extends Component {
     }
 
     componentDidMount() {
-        GFD.listen('x', 'sellPixel', (x) => {
+        GFD.listen('x', 'giftPixel', (x) => {
             this.setState({x});
         })
-        GFD.listen('y', 'sellPixel', (y) => {
+        GFD.listen('y', 'giftPixel', (y) => {
             this.setState({y});
         })
-        ctr.getSystemSalePrices((data) => {
-            let ppc = Func.BigNumberToNumber(data[1]);
-            this.setState({
-                valuePrice: ppc, 
-            });
-        });
     }
 
     componentWillUnmount() {
-        GFD.closeAll('sellPixel');
+        GFD.closeAll('giftPixel');
     }
 
     setX(x) {
@@ -50,10 +44,8 @@ class SellPixelForm extends Component {
         GFD.setData('y', y);
     }
 
-    handlePrice(key, value) {
-        let obj = {};
-        obj[key] = parseInt(value);
-        this.setState(obj);
+    handleNewOwner(newOwner) {
+        this.setState({valueNewOwner: newOwner});
     }
 
     render() {
@@ -63,7 +55,7 @@ class SellPixelForm extends Component {
                     <tr>
                         <td colSpan={2}>
                             <div className='title'>
-                                Sell Property:
+                                Gift Property:
                             </div>
                         </td>
                     </tr>
@@ -97,15 +89,15 @@ class SellPixelForm extends Component {
                     </tr>
                     <tr>
                         <td>
-                            <div className='inputTitle'> Price: </div>
+                            <div className='inputTitle'> New Owner: </div>
                         </td>
                         <td>
-                            <input id='sellPrice' type='number' onChange={(e) => this.handlePrice('valuePrice', e.target.value)} value={this.state.valuePrice}></input>
+                            <input id='address' type='text' onChange={(e) => this.handleNewOwner(e.target.value)} value={this.state.valueNewOwner}></input>
                         </td>
                     </tr>
                     <tr>
                         <td colSpan={2}>
-                            <input type='button' value='Sell Pixel' onClick={() => ctr.sellProperty(this.state.x - 1, this.state.y - 1, this.state.valuePrice)}></input>
+                            <input type='button' value='Gift Property' onClick={() => ctr.transferProperty(this.state.x - 1, this.state.y - 1, this.state.valueNewOwner, () => {})}></input>
                         </td>
                     </tr>
                 </tbody>
@@ -115,4 +107,4 @@ class SellPixelForm extends Component {
     }
 }
 
-export default SellPixelForm
+export default GiftProperty

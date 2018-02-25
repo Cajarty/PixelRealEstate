@@ -94,7 +94,7 @@ class BuyPixelForm extends Component {
                     <tr>
                         <td>
                             <div className='title'>
-                                Buy Pixel:
+                                Buy Property:
                             </div>
                         </td>
                     </tr>

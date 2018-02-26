@@ -12,3 +12,4 @@ export const PENCIL = BASE_PATH + 'pencil.svg';
 export const REDO = BASE_PATH + 'redo.svg';
 export const UNDO = BASE_PATH + 'undo.svg';
 export const CLOSE = BASE_PATH + 'close.svg';
+export const LOADING = BASE_PATH + 'loading.svg';

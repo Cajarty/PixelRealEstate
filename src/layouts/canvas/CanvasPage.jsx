@@ -12,6 +12,7 @@ import TimeAgo from 'react-timeago';
 import HoverLabel from './HoverLabel';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import * as Strings from '../../const/strings';
+import HoverBox from './HoverBox';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -116,6 +117,7 @@ class CanvasPage extends Component {
                     </div>
                     <div className='centerMain'>
                         <HoverLabel/>
+                        <HoverBox/>
                         <Canvas/>
                     </div>
                     <div className={this.state.advancedMode ? 'rightMain' : 'rightMain full'}>

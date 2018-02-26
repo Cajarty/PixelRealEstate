@@ -327,3 +327,9 @@ input:focus[type=number] {
     position: absolute;
     pointer-events: none;
 }
+
+.hoverBox {
+    border: black 1px solid;
+    position: absolute;
+    pointer-events: none;
+}

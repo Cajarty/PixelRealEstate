@@ -77,12 +77,6 @@ class HoverLabel extends Component {
                     minHeight: (this.state.canvasHeight / 100) + 'px'
                 }}
                 >
-                {console.info({
-                    left: this.state.offsetX + Math.floor(this.state.hoverX / 10) * (this.state.canvasWidth / 100),
-                    top: this.state.offsetY + Math.floor(this.state.hoverY / 10) * (this.state.canvasHeight / 100),
-                    minWidth: (this.state.canvasWidth / 100),
-                    minHeight: (this.state.canvasHeight / 100)
-                })}
             </div>
         );
     }

@@ -13,6 +13,7 @@ import HoverLabel from './HoverLabel';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import * as Strings from '../../const/strings';
 import HoverBox from './HoverBox';
+import * as Assets from '../../const/assets';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -91,11 +92,17 @@ class CanvasPage extends Component {
                         <input 
                             type='button' 
                             className='headerButton left' 
-                            value='More info...' 
+                            value='Homepage' 
                             onClick={() => this.visitPortfolio()}
                         ></input>
                         {this.state.advancedMode ? 
-                            <div className='ppcLabel'>PPT Owned: {this.state.PPCOwned}{this.state.loadingPPC ? ' LOADING' : ''}</div>
+                            <div className='ppcLabel'>
+                                <img className='token icon' src={Assets.TOKEN} draggable={false}></img>
+                                <div className='text'>
+                                    {this.state.PPCOwned}
+                                    {this.state.loadingPPC ? <img className='loading icon' src={Assets.LOADING} draggable={false}></img> : ''}
+                                </div>
+                            </div>
                         : null}
                         <input 
                             type='button' 

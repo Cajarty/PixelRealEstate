@@ -61,8 +61,33 @@
     font: $font2;
     .headerButtons {
         .ppcLabel {
-            width: 50%;
+            width: calc(100% - 400px - 60px);
+            border-right: solid black 2px;
+            border-left: solid black 2px;
+            border-bottom: solid black 2px;
+            border-radius: 0px;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            padding: 8px;
             display: inline-block;
+            margin-bottom: 4px;
+            .token {
+                width: 16px;
+                vertical-align: middle;
+                margin: 0px 8px;
+            }
+            .text {
+                display: inline-block;
+                font: $font4;
+                color: white;
+                font-weight: 400;
+                vertical-align: middle;
+            }
+            .loading {
+                width: 16px;
+                vertical-align: middle;
+                margin: 0px 8px;
+            }
         }
         input[type=button].headerButton {
             width: inherit;
@@ -75,9 +100,25 @@
             background-color: unset;
             &.left {
                 float: left;
+                border-right: solid black 2px;
+                border-bottom: solid black 2px;
+                border-radius: 0px;
+                border-bottom-right-radius: 8px;
+                margin-left: 0px;
+                margin-top: 0px;
+                width: 200px;
+                padding: 8px;
             }
             &.right {
                 float: right;
+                border-left: solid black 2px;
+                border-bottom: solid black 2px;
+                border-radius: 0px;
+                border-bottom-left-radius: 8px;
+                margin-right: 0px;
+                margin-top: 0px;
+                width: 200px;
+                padding: 8px;
             }
         }
     }

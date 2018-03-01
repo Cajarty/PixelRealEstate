@@ -86,6 +86,7 @@ contract VirtualRealEstate is StandardToken {
     uint256 pricePPT;
     uint256 PRICE_PPT_MIN_INCREASE = 10;
     uint256 PRICE_PPT_MIN_PERCENT = 20;
+    uint256 payoutInterval;
     
     uint256 USER_BUY_CUT_PERCENT = 98; //%
     
@@ -138,6 +139,7 @@ contract VirtualRealEstate is StandardToken {
         pricePPT = 100;
         priceETH = 10000;//1000000000000000000; //0.001 ETH
         moderators[msg.sender] = 3;
+        payoutInterval = (1 minutes);
     }
     function setFlag(uint24 propertyID, uint32 flag) public validPropertyID(propertyID)  {
         Property storage property = map[propertyID];
@@ -204,7 +206,7 @@ contract VirtualRealEstate is StandardToken {
         Property storage property = map[propertyID];
         if (!property.isInPrivateMode && property.lastUpdate != 0) {
             uint256 earnedUntil = (now < property.earnUntil) ? now : property.earnUntil;
-            uint256 minutesSinceLastColourChange = (earnedUntil - property.lastUpdate) / (1 seconds);
+            uint256 minutesSinceLastColourChange = (earnedUntil - property.lastUpdate) / payoutInterval;
             return minutesSinceLastColourChange * PROPERTY_GENERATES_PER_MINUTE;
         }
         return 0;
@@ -232,8 +234,8 @@ contract VirtualRealEstate is StandardToken {
             updateOccured = true;
         } else if (property.becomePublic < now) {
             require(balances[msg.sender] >= pptToSpend);
-            uint256 minutesOfEarning = (pptSpent + 1) * (pptSpent + 1) * (1 seconds); //(N+1)^2 coins earned max/minutes we can earn from
-            uint256 minutesOfLock = (pptSpent / 2) * (1 seconds); //N/2 minutes of user-private mode
+            uint256 minutesOfEarning = (pptSpent + 1) * (pptSpent + 1) * payoutInterval; //(N+1)^2 coins earned max/minutes we can earn from
+            uint256 minutesOfLock = (pptSpent / 2) * payoutInterval; //N/2 minutes of user-private mode
             balances[msg.sender] -= pptToSpend;
             totalSupply -= pptToSpend;
             uint256 payoutEach = getProjectedPayout(propertyID);
@@ -268,7 +270,7 @@ contract VirtualRealEstate is StandardToken {
             require(balances[msg.sender] >= numMinutesPrivate);
             balances[msg.sender] -= numMinutesPrivate;
             totalSupply -= numMinutesPrivate;
-            property.becomePublic = now + (1 seconds) * numMinutesPrivate;
+            property.becomePublic = now + payoutInterval * numMinutesPrivate;
         } else {
             property.becomePublic = 0;
         }

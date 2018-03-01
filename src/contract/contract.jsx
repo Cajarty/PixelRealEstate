@@ -304,6 +304,7 @@ export class Contract {
         //returns address, price, renter, rent length, rentedUntil, rentPrice
         this.VRE.deployed().then((i) => {
             i.getPropertyData.call(this.toID(x, y)).then((r) => {
+                console.info(r);
                 return callback(r);
             });
         }).catch((e) => {
@@ -311,9 +312,9 @@ export class Contract {
         });
     }
 
-    setColors(x, y, data) {
+    setColors(x, y, data, PPT) {
         this.VRE.deployed().then((i) => {
-            return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), {from: this.account });
+            return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), PPT, {from: this.account });
         }).then(() => {
             this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " pixels changed."});
             this.sendEvent(EVENTS.PropertyColorUpdate, {args: {x: x, y: y, colorsRGB: data, lastUpdate: new Date().getTime()}});

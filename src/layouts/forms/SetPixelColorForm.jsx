@@ -22,6 +22,7 @@ class SetPixelColorForm extends Component {
         this.state = {
             x: '',
             y: '',
+            ppt: '0',
             ctxLrg: null,
             ctxSml: null,
             imageData: null,
@@ -55,6 +56,13 @@ class SetPixelColorForm extends Component {
     
     setY(y) {
         GFD.setData('y', y);
+    }
+
+    handlePrice(key, value) {
+        console.info(parseInt(value))
+        let obj = {};
+        obj[key] = parseInt(value) < 0 ? 0 : parseInt(value);
+        this.setState(obj);
     }
 
     componentDidMount() {
@@ -211,7 +219,7 @@ class SetPixelColorForm extends Component {
     }
 
     setPixels() {
-        ctr.setColors(this.state.x - 1, this.state.y - 1, this.state.imageData);
+        ctr.setColors(this.state.x - 1, this.state.y - 1, this.state.imageData, this.state.ppt);
     }
 
     render() {
@@ -285,6 +293,14 @@ class SetPixelColorForm extends Component {
                                 onChange={(e) => this.setY(e.target.value)} 
                                 value={this.state.y}
                             ></input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div className='inputTitle'> Tokens: </div>
+                        </td>
+                        <td>
+                            <input id='tokens' type='number' onChange={(e) => this.handlePrice('ppt', e.target.value)} value={this.state.ppt}></input>
                         </td>
                     </tr>
                     <tr>

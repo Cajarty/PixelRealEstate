@@ -102,6 +102,7 @@ contract VirtualRealEstate is StandardToken {
     event DelistProperty(uint24 indexed property);
     event SetPropertyPublic(uint24 indexed property);
     event SetPropertyPrivate(uint24 indexed property, uint32 numMinutesPrivate);
+    event Bid(uint24 indexed property, uint256 bid);
     
     struct TradeOffer {
         uint256 ethPer;
@@ -118,6 +119,7 @@ contract VirtualRealEstate is StandardToken {
         uint256 lastUpdate; //Last Update
         uint256 becomePublic;
         uint256 earnUntil;
+        uint256 lastBid;
         uint32 flag; //0 == none, 1 == nsfw, 2 == ban
     }
     
@@ -187,12 +189,12 @@ contract VirtualRealEstate is StandardToken {
         return map[propertyID].colors;
     }
     
-    function getPropertyData(uint24 propertyID) public validPropertyID(propertyID) view returns(address, uint256, uint256, uint256, bool) {
+    function getPropertyData(uint24 propertyID) public validPropertyID(propertyID) view returns(address, uint256, uint256, uint256, bool, uint256, uint256) {
         Property storage property = map[propertyID];
         if (property.owner == 0) {
-            return (property.owner, priceETH, pricePPT, property.lastUpdate, property.isInPrivateMode);
+            return (property.owner, priceETH, pricePPT, property.lastUpdate, property.isInPrivateMode, property.becomePublic, property.lastBid);
         } else {
-            return (property.owner, 0, property.salePrice, property.lastUpdate, property.isInPrivateMode);
+            return (property.owner, 0, property.salePrice, property.lastUpdate, property.isInPrivateMode, property.becomePublic, property.lastBid);
         }
     }
     function tryForcePublic(uint24 propertyID) public validPropertyID(propertyID) {
@@ -436,6 +438,14 @@ contract VirtualRealEstate is StandardToken {
         require(level < 4);
         require(user != 0);
         moderators[user] = level;
+    }
+
+    function makeBid(uint24 propertyID, uint256 bidAmount) public validPropertyID(propertyID) {
+        if (balances[msg.sender] >= bidAmount) {
+            Property storage property = map[propertyID];
+            Bid(propertyID, bidAmount);
+            property.lastBid = bidAmount;
+        }
     }
     
     //////////////////////////////////////////////////////

@@ -8,14 +8,15 @@ contract VirtualRealEstate:
         event PropertySetForSale(uint24 indexed property, uint256 forSalePrice);
         event DelistProperty(uint24 indexed property);
         event SetPropertyPublic(uint24 indexed property);
-        event SetPropertyPrivate(uint24 indexed property, uint32 numHoursPrivate);
+        event SetPropertyPrivate(uint24 indexed property, uint32 numHoursPrivate)
+        event Bid(uint24 indexed property, uint256 bid);
 
     views:
         getForSalePrices(uint24 propertyID) view returns(uint256, uint256) 
         getHoverText(address user) view returns(byte[64])
         getLink(address user) view returns(byte[64])
         getPropertyColors(uint24 propertyID)view returns(uint256[10])
-        getPropertyData(uint24 propertyID) view returns(address, uint256, uint256, uint256, bool)
+        getPropertyData(uint24 propertyID) view returns(address, uint256, uint256, uint256, bool, uint256 lastBid)
         getProjectedPayout(uint24 propertyID) view returns(uint256)
         getSystemSalePrices(uint24 propertyID) view returns(uint256, uint256)
 
@@ -43,6 +44,8 @@ contract VirtualRealEstate:
             - PropertySetForSale(propertyID, property.salePrice)
         delist(uint24 propertyID)
             - DelistProperty(propertyID)
+        makeBid(uint24 propertyID, uint256 amountToBid)
+            - Bid(propertyID, amountToBid)
 
     ownerFunctions:
         withdraw(uint256 amount)
@@ -52,3 +55,5 @@ contract VirtualRealEstate:
 ChangeLog:
 21/02/2018: Added (uint256 pptToSpend) as setColors 3rd parameter
 24/02/2018: setHoverText/getHoverText/setLink/getLink & corresponding events are now byte[64] as data-type (from bytes32[2])
+28/02/2018: Added becomePublic timestamp to getPropertyData return
+28/02/2018: Added Bid event, makeBid function and added lastBid return to getPropertyData

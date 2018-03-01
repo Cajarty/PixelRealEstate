@@ -4,6 +4,7 @@ import * as Func from '../../functions/functions.jsx';
 import Timestamp from 'react-timestamp';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import Hours from '../ui/Hours';
+import Moment from 'react-moment';
 
 class PixelDescriptionBox extends Component {
     constructor(props) {
@@ -18,7 +19,11 @@ class PixelDescriptionBox extends Component {
             ETHPrice: 0,
             PPCPrice: 0,
             lastUpdate: 0,
+            reserved: 0,
+            latestBid: 0,
             isInPrivate: false,
+            maxEarnings: 0,
+            earnings: 0,
         }
     }
 
@@ -81,8 +86,16 @@ class PixelDescriptionBox extends Component {
         });
     }
 
+    calculateEarnings(last = this.state.lastUpdate, max = this.state.maxEarnings) {
+        let now = new Date().getTime();
+        let maxTime = (last + (max * 60)) * 1000;
+        let current = Math.min(now, maxTime);
+        return Math.floor((current - (last * 1000)) / 60000);
+    }
+
     componentWillUnmount() {
         GFD.closeAll('pixelBrowse');
+        this.stopTokenEarnedInterval();
     }
 
     setCanvas(rgbArr) {
@@ -100,18 +113,40 @@ class PixelDescriptionBox extends Component {
         ctr.getPropertyData(x, y, (data) => {  
             let ethp = Func.BigNumberToNumber(data[1]);
             let ppcp = Func.BigNumberToNumber(data[2]);
+            let reserved = Func.BigNumberToNumber(data[5]);
+            let lastUpdate = Func.BigNumberToNumber(data[3]);
+            let maxEarnings = Math.pow((reserved - lastUpdate) / 30, 2);
             this.setState({
                 owner: data[0],
                 isForSale: ppcp != 0,
                 ETHPrice: ethp,
                 PPCPrice: ppcp,
-                lastUpdate: Func.BigNumberToNumber(data[3]),
+                lastUpdate,
                 isInPrivate: data[4],
+                reserved,
+                latestBid: Func.BigNumberToNumber(data[6]),
+                maxEarnings,
+                earnings: this.calculateEarnings(lastUpdate, maxEarnings),
             });
         });
         ctr.getPropertyColors(x, y, (x, y, data) => {
             this.setCanvas(data);
         });
+        this.startTokenEarnedInterval();
+    }
+
+    startTokenEarnedInterval() {
+        this.setState({
+            tokenEarnedInterval: setInterval(() => {
+                let newEarned = this.calculateEarnings(this.state.lastUpdate, this.state.maxEarnings);
+                if (this.state.earnings != newEarned)
+                    this.setState({earnings: newEarned});
+            }, 1000)
+        })
+    }
+
+    stopTokenEarnedInterval() {
+        clearInterval(this.state.tokenEarnedInterval);
     }
 
     render() {
@@ -160,8 +195,43 @@ class PixelDescriptionBox extends Component {
                             </tr>
                         ) : null}
                         <tr>
+                            <th>Latest Bid</th>
+                            <td>{this.state.latestBid == 0 ? "None" : this.state.latestBid}</td>
+                        </tr>
+                        <tr>
                             <th>Last Color Change</th>
                             <td>{this.state.lastUpdate == 0 ? 'Never' : <Timestamp time={this.state.lastUpdate} precision={2} autoUpdate/>}</td>
+                        </tr>
+                        <tr>
+                            <th>Current Payout</th>
+                            <td>
+                                {this.state.lastUpdate == 0 ? "None" :
+                                    <div>
+                                        {this.state.earnings}
+                                        /
+                                        {this.state.maxEarnings}
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Reserved</th>
+                            <td>{this.state.reserved == 0 || this.state.reserved * 1000 <= new Date().getTime() ? 
+                                'No' 
+                            : 
+                                <Moment 
+                                    onChange={
+                                        (val) => {
+                                            if (this.state.reserved * 1000 <= new Date().getTime())
+                                                this.forceUpdate();
+                                        }
+                                    } 
+                                    interval={1000} 
+                                    fromNow 
+                                    ago>
+                                    {this.state.reserved * 1000}
+                                </Moment>
+                            }</td>
                         </tr>
                         <tr>
                             <th>Is Private</th>

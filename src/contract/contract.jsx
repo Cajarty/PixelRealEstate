@@ -304,7 +304,6 @@ export class Contract {
         //returns address, price, renter, rent length, rentedUntil, rentPrice
         this.VRE.deployed().then((i) => {
             i.getPropertyData.call(this.toID(x, y)).then((r) => {
-                console.info(r);
                 return callback(r);
             });
         }).catch((e) => {

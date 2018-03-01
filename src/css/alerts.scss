@@ -1,0 +1,28 @@
+@import './animation.scss';
+.alertContainer {
+    width: 30%;
+    position: fixed;
+    right: 12px;
+    bottom: 4px;
+}
+
+.alert {
+    @include animation(fadein, 1s);
+    text-align: center;
+    width: 100%;
+    height: 32px;
+    font: $font2;
+    background-color: $color4;
+    margin: auto;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    border-width: 2px;
+    border-style: solid;
+    border-color: $color5;
+    border-image: initial;
+    border-radius: 8px;
+}
+
+.fadeOut {
+    @include animation(fadeout, 1s);
+}

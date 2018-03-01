@@ -2,21 +2,74 @@
 // Import libraries we need.
 import { default as Web3 } from 'web3';
 import * as Const from '../const/const.jsx';
+import * as Func from '../functions/functions.jsx';
 import { default as contract } from 'truffle-contract';
 
 // Import our contract artifacts and turn them into usable abstractions.
 import VirtualRealEstate from '../../build/contracts/VirtualRealEstate.json'
 
+
+export const ERROR_TYPE = {
+    success: 'success',
+    warning: 'warning',
+    error: 'error',
+}
+export const LISTENERS = {
+    Error: 'Error',
+    Alert: 'Alert',
+    ShowForSale: 'ShowForSale',
+    ServerDataManagerInit: 'ServerDataManagerInit',
+}; 
+
+export const EVENTS = { 
+    PropertyColorUpdate: 'PropertyColorUpdate',                     //(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address lastUpdaterPayee);
+    PropertyColorUpdatePixel: 'PropertyColorUpdatePixel',           //(uint24 indexed property, uint8 row, uint24 rgb);
+
+    SetUserHoverText: 'SetUserHoverText',                           //(address indexed user, bytes32[2] newHoverText);
+    SetUserSetLink: 'SetUserSetLink',                               //(address indexed user, bytes32[2] newLink);
+
+    PropertyBought: 'PropertyBought',                               //(uint24 indexed property,  address newOwner);
+    PropertySetForSale: 'PropertySetForSale',                       //(uint24 indexed property, uint256 forSalePrice);
+    DelistProperty: 'DelistProperty',                               //(uint24 indexed property);
+
+    ListTradeOffer: 'ListTradeOffer',                               //(address indexed offerOwner, uint256 eth, uint256 pxl, bool isBuyingPxl);
+    AcceptTradeOffer: 'AcceptTradeOffer',                           //(address indexed accepter, address indexed offerOwner);
+    CancelTradeOffer: 'CancelTradeOffer',                           //(address indexed offerOwner);
+
+    SetPropertyPublic: 'SetPropertyPublic',                         //(uint24 indexed property);
+    SetPropertyPrivate: 'SetPropertyPrivate',                       //(uint24 indexed property, uint32 numHoursPrivate);
+
+    //token events    
+    Transfer: 'Transfer',                                           //(address indexed _from, address indexed _to, uint256 _value);
+    Approval: 'Approval',                                           //(address indexed _owner, address indexed _spender, uint256 _value);
+};
+
 export class Contract {
     constructor() {
-        this.accounts;
-        this.account;
+
+        this.accounts = null;
+        this.account = null;
         this.VRE = contract(VirtualRealEstate);
+
+        this.propertyTradeLog = [];
+
+        this.getAccountsInterval = null;
+
+        this.events = {
+            event: null,
+        }
+        
+        Object.keys(EVENTS).map((index) => {
+            this.events[index] = {};
+        });
+
+        this.listeners = {};
+        Object.keys(LISTENERS).map((index) => {
+            this.listeners[index] = {};
+        });
+        
         this.setup();
-        this.pixelsOwned = {};
-        this.pixelsRented = {};
-        this.pixelsForSale = {};
-        this.pixelsForRent = {};
+        this.test();
     }
 
     setup() {
@@ -32,129 +85,234 @@ export class Contract {
         }
         this.VRE.setProvider(window.web3.currentProvider);
 
-        // Get the initial account balance so it can be displayed.
+        this.getAccounts();
+        this.setupEvents();
+        
+        this.getAccountsInterval = setInterval(() => this.getAccounts(), 1000);
+
+        
+    }
+
+    getAccounts() {
         window.web3.eth.getAccounts((err, accs) => {
             if (err != null) {
-                alert("There was an error fetching your accounts.");
+                this.sendResults(LISTENERS.Alert, {errorId: 1, errorType: ERROR_TYPE.Error, message: "There was an error fetching your accounts."});
                 return;
             }
 
             if (accs.length == 0) {
-                alert("Couldn't get any accounts! Make sure your Ethereum client is configured correctly.");
+                this.sendResults(LISTENERS.Error, {errorId: 0, errorType: ERROR_TYPE.Error, message: "Couldn't get any accounts! Make sure you're logged into Metamask."});
                 return;
             }
 
+            this.sendResults(LISTENERS.Error, {removeErrors: [0, 1], message: ''});
+
             this.accounts = accs;
             this.account = this.accounts[0];
-            /*
-            VRE.deployed().then((instance) => {
+        });
+    }
 
-                for (let i = 0; i < WIDTH * HEIGHT; i++) {
-                    instance.getColor.call(i, { from: account }).then((r) => {
-                        setCanvasPixel(i % WIDTH, Math.floor(i / WIDTH), r[0], r[1], r[2]);
-                    });
+    setupEvents() {
+        this.VRE.deployed().then((instance) => {
+            this.events.event = instance.allEvents({fromBlock: 0, toBlock: 'latest'});
+            this.events.event.watch((error, result) => {
+                if (error) {
+                    console.info(result, error);
+                } else {
+                    this.sendEvent(result.event, result);
                 }
-
-                event = instance.PixelColorUpdate();
-                event.watch((error, result) => {
-                    if (error)
-                        console.info(result, error);
-                    let x = result.args.pixel.c[0] % WIDTH;
-                    let y = Math.floor(result.args.pixel.c[0] / WIDTH);
-                    console.info('pixel update: ', x, y);
-                    setCanvasPixel(x, y, result.args.red.c[0], result.args.green.c[0], result.args.blue.c[0]);
-                });
-            }).catch((c) => {
-                console.info(c);
             });
-        });*/
+        }).catch((c) => {
+            console.info(c);
         });
     }
 
     toID(x, y) {
-
+        return y * Const.PROPERTIES_WIDTH + x;
     }
 
     fromID(id) {
-        
+        let obj = {x: 0, y: 0};
+        obj.x = id % Const.PROPERTIES_WIDTH;
+        obj.y = Math.floor(id / 100);
+        return obj;
     }
 
-    buyProperty(x, y, price) {
+    getBalance(callback) {
         this.VRE.deployed().then((i) => {
-            let pos = (y * Const.CANVAS_HEIGHT) + x;
-            return i.buy(pos, { value: price, from: this.account });
-        }).then(function() {
-            console.info("Pixel " + x + "x" + y + " purchase complete.");
+            i.balanceOf(this.account, { from: this.account }).then((r) => {
+                callback(Func.BigNumberToNumber(r));
+            });
         }).catch((e) => {
-            console.log(e);
-            console.info("Error buying pixel.");
+            console.info(e);
+            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to retrieve PPC balance."});
+        });
+    }
+
+    buyProperty(x, y, eth, ppc) {
+        this.VRE.deployed().then((i) => {
+            if (eth == 0)
+                return i.buyPropertyInPPC(this.toID(x, y), ppc, {from: this.account });
+            else if (ppc == 0)
+                return i.buyPropertyInETH(this.toID(x, y), { value: eth, from: this.account });
+            else 
+                return i.buyProperty(this.toID(x, y), ppc, {value: eth, from: this.account});
+        }).then(() => {
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " purchase complete."});
+        }).catch((e) => {
+            console.info(e);
+            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to purchase property " + x + "x" + y + "."});
         });
     }
 
     sellProperty(x, y, price) {
         this.VRE.deployed().then((i) => {
-            let pos = (y * Const.CANVAS_HEIGHT) + x;
-            return i.listforSale(pos, { value: price, from: this.account });
-        }).then(function() {
-            console.info("Pixel " + x + "x" + y + " purchase complete.");
+            return i.listForSale(this.toID(parseInt(x), parseInt(y)), price, {from: this.account });
+        }).then(() => {
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " listed for sale."});
         }).catch((e) => {
             console.log(e);
-            console.info("Error buying pixel.");
+            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to put property " + x + "x" + y + " on market."});
         });
     }
 
     //array of 2 32 bytes of string
-    setHoverText() {
+    setHoverText(text) {
+        let str1 = Func.StringToHex(text.slice(0, 32)).padEnd(66, '0');
+        let str2 = Func.StringToHex(text.slice(32, 64)).padEnd(66, '0');
         this.VRE.deployed().then((i) => {
-            let pos = (y * Const.CANVAS_HEIGHT) + x;
-            return i.listforSale(pos, { value: price, from: this.account });
+            return i.setHoverText([str1, str2], {from: this.account });
         }).then(function() {
-            console.info("Pixel " + x + "x" + y + " purchase complete.");
+            console.info("Hover text set!");
         }).catch((e) => {
             console.log(e);
-            console.info("Error buying pixel.");
         });
     }
 
     //array of 2 32 bytes
-    setLink() {
-
+    setLink(text) {
+        let str1 = Func.StringToHex(text.slice(0, 32)).padEnd(66, '0');
+        let str2 = Func.StringToHex(text.slice(32, 64)).padEnd(66, '0');
+        this.VRE.deployed().then((i) => {
+            return i.setLink([str1, str2], {from: this.account });
+        }).then(function() {
+            console.info("Property links updated!");
+        }).catch((e) => {
+            console.log(e);
+        });
     }
 
-    getForSalePrice(x, y) {
-        //return price
+    getSystemSalePrices(callback) {
+        this.VRE.deployed().then((i) => {
+            return i.getSystemSalePrices.call().then((r) => {
+                return callback(r);
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
+    }
+
+    getForSalePrices(x, y, callback) {
+        this.VRE.deployed().then((i) => {
+            return i.getForSalePrices.call(this.toID(x, y)).then((r) => {
+                return callback(r);
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
     }
 
     getForRentPrice(x, y) {
-        //returns price
+        this.VRE.deployed().then((i) => {
+            return i.getForRentPrice.call(this.toID(x, y)).then((r) => {
+                return r;
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
     }
 
-    getHoverText(x, y) {
-        //returns array of 2 32 bytes of string
+    getHoverText(address, callback) {
+        this.VRE.deployed().then((i) => {
+            return i.getHoverText.call(address).then((r) => {
+                return callback(r);
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
     }
 
-    getLink(x, y) {
-        //returns array of 2 32 bytes of string
+    getLink(address, callback) {
+        this.VRE.deployed().then((i) => {
+            return i.getLink.call(address).then((r) => {
+                return callback(r);
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
     }
 
-    getPropertyColors(x, y) {
-        //returns array of 10 256 bits
+    getPropertyColorsOfRow(x, row, callback) {
+        this.VRE.deployed().then((i) => {
+            return i.getPropertyColorsOfRow.call(x, row).then((r) => {
+                callback(x, row, Func.ContractDataToRGBAArray(r));
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
     }
 
-    getPropertyData(x, y) {
+    getPropertyColors(x, y, callback) {
+        this.VRE.deployed().then((i) => {
+            return i.getPropertyColors.call(this.toID(x, y)).then((r) => {
+                callback(x, y, Func.ContractDataToRGBAArray(r));
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
+    }
+
+    getPropertyData(x, y, callback) {
         //returns address, price, renter, rent length, rentedUntil, rentPrice
+        this.VRE.deployed().then((i) => {
+            i.getPropertyData.call(this.toID(x, y)).then((r) => {
+                return callback(r);
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
     }
 
-    setColors(x, y/*, array of 10 of big ints (256)*/) {
-
+    setColors(x, y, data) {
+        this.VRE.deployed().then((i) => {
+            return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), {from: this.account });
+        }).then(() => {
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " pixels changed."});
+            this.sendEvent(EVENTS.PropertyColorUpdate, {args: {x: x, y: y, colorsRGB: data, lastUpdate: new Date().getTime()}});
+        }).catch((e) => {
+            console.info(e);
+            this.sendResults(LISTENERS.Error, {result: false, message: "Error uploading pixels."});
+        });
     }
 
     rentProperty(x, y, price) {
-
+        this.VRE.deployed().then((i) => {
+            return i.setLink(this.toID(x, y), {value: price, from: this.account });
+        }).then(function() {
+            console.info("Pixel " + x + "x" + y + " update complete.");
+        }).catch((e) => {
+            console.log(e);
+        });
     }
 
     stopRenting(x, y) {
-
+        this.VRE.deployed().then((i) => {
+            return i.setLink(this.toID(x, y), {from: this.account });
+        }).then(function() {
+            console.info("Pixel " + x + "x" + y + " update complete.");
+        }).catch((e) => {
+            console.log(e);
+        });
     }
 
     /*
@@ -170,6 +328,60 @@ export class Contract {
     delist(x, y, delistFromSale, delistFromRent) {
 
     }
+
+    /*
+    Subscriber functions for gnereal updates.
+    Events that are being used:
+        Alerts
+    */
+    listenForResults(listener, key, callback) {
+        this.listeners[listener][key] = callback;
+    }
+
+    stopListeningForResults(listener, key) {
+        delete this.listeners[listener][key];
+    }
+
+    sendResults(listener, result) {
+        Object.keys(this.listeners[listener]).map((i) => {
+            this.listeners[listener][i](result);
+        });
+    }
+
+    /*
+    Subscriber functions for function call returns from events fired on the 
+    contract.
+    */
+    listenForEvent(event, key, callback) {
+        this.events[event][key] = callback;
+    }
+
+    stopListeningForEvent(event, key) {
+        delete this.events[event][key];
+    }
+
+    sendEvent(event, result) {
+        Object.keys(this.events[event]).map((i) => {
+            this.events[event][i](result);
+        });
+    }
+
+    test() {
+       // this.buyProperty(46, 20, 10000000000000000);
+    }
 }
+/*
+class Test {
+    constructor(test, expected) {
+        this.test = test;
+        this.expected = expected;
+    }
+
+    assert() {
+        if (this.test !== this.expected)
+            throw new Error('Test Failed!');
+        return this.test + ' === ' + this.expected;
+    }
+}*/
 
 export const ctr = new Contract();

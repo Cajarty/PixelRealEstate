@@ -46,8 +46,8 @@ $(function() {
         [0,0,2,0,0,0],
         [0,0,0,0,0,0],
         [0,0,2,0,0,0],
-        [0,0,0,0,0,0],
-        [0,1,1,1,1,0],
+        [0,0,2,0,0,0],
+        [0,1,0,0,1,0],
         [0,0,0,0,0,0],
         [0,0,0,0,0,0],
     ];
@@ -71,8 +71,8 @@ $(function() {
         [0,2,0,0,0,2,0,0],
         [0,0,0,0,0,0,0,0],
         [0,2,0,0,0,2,0,0],
+        [0,2,0,0,0,2,0,0],
         [0,0,0,0,0,0,0,0],
-        [0,1,1,0,0,1,1,0],
         [0,0,1,1,1,1,0,0],
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
@@ -85,8 +85,8 @@ $(function() {
         [0,2,0,0,0,0,0,0],
         [0,0,0,1,1,1,0,0],
         [0,2,0,0,0,0,0,0],
+        [0,2,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
-        [0,1,1,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
     ];
@@ -124,8 +124,8 @@ $(function() {
         [0,2,0,0,0,0,0,0],
         [0,0,0,1,1,1,0,0],
         [0,2,0,0,0,2,0,0],
+        [0,2,0,0,0,2,0,0],
         [0,0,0,0,0,0,0,0],
-        [0,1,1,0,0,1,1,0],
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
     ];
@@ -137,8 +137,8 @@ $(function() {
         [0,0,0,2,0,0,0,0],
         [0,0,0,0,0,0,0,0],
         [0,0,0,2,0,0,0,0],
+        [0,0,0,2,0,0,0,0],
         [0,0,0,0,0,0,0,0],
-        [0,0,0,1,1,0,0,0],
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
     ];
@@ -285,24 +285,32 @@ $(function() {
         element.css('fill', color).css('stroke', color);
     }
 
+    var colors = ['#18c22a', '#18b0c2', '#7f18c2', '#88d474', '#525252', 'black', 'white'];
+
     $('.svg-letter').mouseenter(function() {
         var index = this.id.replace('letter-', '');
         var w = $(this).attr('width');
         var h = $(this).attr('height');
+        var color1 = colors[Math.floor(Math.random() * colors.length)];
+        var color2 = colors[Math.floor(Math.random() * colors.length)];
         $('.pixel-' + index).each(function(i, obj) {
+            // $(this).css('fill', 'yellow').css('stroke', 'yellow');
             explode($(this), size, w, h);
-        });
+        }).css('fill', color1).css('stroke', color1);
         $('.shadow-' + index).each(function(i, obj) {
+            // $(this).css('fill', 'purple').css('stroke', 'purple');
             explode($(this), size2, w, h);
-        });
+        }).css('fill', color2).css('stroke', color2);
     });
 
     $('.svg-letter').mouseleave(function() {
         var index = this.id.replace('letter-', '');
         $('.pixel-' + index).each(function(i, obj) {
+            $(this).css('fill', 'white').css('stroke', 'white');
             implode($(this), size);
         });
         $('.shadow-' + index).each(function(i, obj) {
+            $(this).css('fill', 'black').css('stroke', 'black');
             implode($(this), size2);
         });
     });

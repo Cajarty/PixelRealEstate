@@ -1,0 +1,77 @@
+.canvas {
+    display: block;
+    image-rendering: optimizeSpeed;
+    image-rendering: crisp-edges;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -o-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    -ms-interpolation-mode: nearest-neighbor;
+    height: 90vh;
+    width: 90vh;
+}
+
+.canvasContainer {
+    margin: 0px;
+    border: 10px solid $color5;
+    display: inline-block;
+}
+
+.zoomCanvasContainer {
+    float: right;
+    margin: 0px;
+    border: 2px solid $color5;
+    display: inline-block;
+    z-index: -100;
+    &.hide {
+        @include animation(fadeout, .5s);
+        opacity: 0;
+    }
+    &.show {
+        @include animation(fadein, .2s);
+        opacity: 1;
+    }
+    .zoomCanvas {
+        width: $panelWidth;
+        height: $panelWidth;
+        max-height: calc(50vh - 12px);
+        max-width: calc(50vh - 12px);
+        display: block;
+        float: right;
+        &.full {
+            width: $panelWidthSimple;
+            height: $panelWidthSimple;
+        }
+    }
+    &.full {
+        width: $panelWidthSimple;
+        height: $panelWidthSimple;
+    }
+}
+
+.banner {
+    height: 40px;
+    text-align: center;
+    font: $font2;
+    .headerButtons {
+        .ppcLabel {
+            width: 50%;
+            display: inline-block;
+        }
+        input[type=button].headerButton {
+            width: inherit;
+            font: $font4;
+            color: white;
+            font-weight: 400;
+            margin: 4px;
+            padding: 4px;
+            border: none;
+            background-color: unset;
+            &.left {
+                float: left;
+            }
+            &.right {
+                float: right;
+            }
+        }
+    }
+}

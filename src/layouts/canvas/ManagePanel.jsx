@@ -1,6 +1,10 @@
 import React, { Component } from 'react'
 import PixelDescriptionBox from '../ui/PixelDescriptionBox.jsx';
-import PixelsOwned from '../ui/PixelsOwned.jsx';
+import PropertiesOwned from '../ui/PropertiesOwned.jsx';
+import Pullout from '../ui/Pullout';
+import PulloutTab from '../ui/PulloutTab';
+import * as Assets from '../../const/assets.jsx';
+import PropertiesForSale from '../ui/PropertiesForSale';
 // import PixelsRented from '../ui/PixelsRented.jsx';
 // import PixelsForSale from '../ui/PixelsForSale.jsx';
 // import PixelsForRent from '../ui/PixelsForRent.jsx';
@@ -13,17 +17,19 @@ class ManagePanel extends Component {
     render() {
         return (
             <div>
-                <PixelDescriptionBox
-                    x={10}
-                    y={10}
-                    color={'FF0000'}
-                    owner={'myself'}
-                    forSale={0}
-                    forRent={0}
-                ></PixelDescriptionBox>
-                <PixelsOwned
-                
-                ></PixelsOwned>
+                <div className='contractAction'>
+                    <Pullout side='left' >
+                        <PulloutTab icon={Assets.ICON_MONEY} tabName='Inspect'>
+                            <PixelDescriptionBox/>
+                        </PulloutTab>
+                        <PulloutTab icon={Assets.ICON_MONEY} tabName='Owned'>
+                            <PropertiesOwned/>
+                        </PulloutTab>
+                        <PulloutTab icon={Assets.ICON_MONEY} tabName='Property Market'>
+                            <PropertiesForSale/>
+                        </PulloutTab>
+                    </Pullout>
+                </div>
             </div>
         );
     }

@@ -1,0 +1,21 @@
+@import './Style.scss';
+@import './alerts.scss';
+@import './animation.scss';
+@import './App.scss';
+@import './canvas.scss';
+@import './PixelDescriptionBox.scss';
+@import './ui.scss';
+@import './Zoom.scss';
+@import './ErrorBox.scss';
+@import './switch.scss';
+@import './Panel.scss';
+@import './container.scss';
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+.hideElement {
+    display: none;
+}

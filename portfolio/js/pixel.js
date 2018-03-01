@@ -286,6 +286,7 @@ $(function() {
     }
 
     var colors = ['#18c22a', '#18b0c2', '#7f18c2', '#88d474', '#525252', 'black', 'white'];
+    var colors = ['#B3C4EE', '#B3E5E1', '#F4E3F7', '#FBF5B5', '#E3F5C0', '#F4DFD6', 'black', 'white'];
 
     $('.svg-letter').mouseenter(function() {
         var index = this.id.replace('letter-', '');

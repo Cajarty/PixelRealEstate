@@ -137,6 +137,7 @@ class CanvasPage extends Component {
                             : 
                                 <div>
                                     {Strings.SIMPLE_MODE_INTRO_RIGHT}
+                                    <br/>
                                     {Strings.ADDRESSES[Math.floor(Math.random() * Strings.ADDRESSES.length)]}
                                 </div>
                             }

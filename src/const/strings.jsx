@@ -7,3 +7,7 @@ export const CHANGELOG = [
         message: "Not Much."
     }
 ];
+
+export const ADDRESSES = [
+    
+];

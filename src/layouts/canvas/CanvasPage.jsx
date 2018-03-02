@@ -130,7 +130,16 @@ class CanvasPage extends Component {
                     <div className={this.state.advancedMode ? 'rightMain' : 'rightMain full'}>
                         <ErrorBox/>
                         <div className='infoBox'>
-                            {this.state.advancedMode ? Strings.ADVANCED_MODE_INTRO_RIGHT : Strings.SIMPLE_MODE_INTRO_RIGHT}
+                            {this.state.advancedMode ? 
+                                <div>
+                                    {Strings.ADVANCED_MODE_INTRO_RIGHT}
+                                </div> 
+                            : 
+                                <div>
+                                    {Strings.SIMPLE_MODE_INTRO_RIGHT}
+                                    {Strings.ADDRESSES[Math.floor(Math.random() * Strings.ADDRESSES.length)]}
+                                </div>
+                            }
                         </div>
                     </div>
                     <div className={this.state.advancedMode ? '' : ' hideElement'}>

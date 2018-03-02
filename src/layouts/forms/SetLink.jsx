@@ -11,8 +11,8 @@ class SetHoverText extends Component {
     }
 
     componentDidMount() {
-        ctr.getLink(ctr.account[0], (data) => {
-            this.setState({linkText: Func.HexToString(data[0]) + Func.HexToString(data[1])});
+        ctr.getLink(ctr.account, (data) => {
+            this.setState({linkText: data});
         });
     }
 
@@ -36,7 +36,13 @@ class SetHoverText extends Component {
                     <tr>
                         <td>
                             <div className='inputTitle'>Link</div>
-                            <input id='linkText' type='text' onChange={(e) => this.handleInput('linkText', e.target.value)} value={this.state.linkText}></input>
+                            <input 
+                                id='linkText' 
+                                type='text' 
+                                maxLength={64} 
+                                onChange={(e) => this.handleInput('linkText', e.target.value)} 
+                                value={this.state.linkText}
+                            ></input>
                         </td>
                     </tr>
                     <tr>

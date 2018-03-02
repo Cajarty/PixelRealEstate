@@ -10,6 +10,7 @@ class PixelDescriptionBox extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            tokenEarnedInterval: null,
             x: '', 
             y: '',
             ctx: null,

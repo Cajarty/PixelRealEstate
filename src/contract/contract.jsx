@@ -196,10 +196,12 @@ export class Contract {
 
     //array of 2 32 bytes of string
     setHoverText(text) {
-        let str1 = Func.StringToHex(text.slice(0, 32)).padEnd(66, '0');
-        let str2 = Func.StringToHex(text.slice(32, 64)).padEnd(66, '0');
+        let array = [];
+        for (let i = 0; i < text.length && i < 64; i++) {
+            array.push(Func.StringToHex(text.charAt(i)));
+        }
         this.VRE.deployed().then((i) => {
-            return i.setHoverText([str1, str2], {from: this.account });
+            return i.setHoverText(array, {from: this.account });
         }).then(function() {
             console.info("Hover text set!");
         }).catch((e) => {
@@ -209,12 +211,14 @@ export class Contract {
 
     //array of 2 32 bytes
     setLink(text) {
-        let str1 = Func.StringToHex(text.slice(0, 32)).padEnd(66, '0');
-        let str2 = Func.StringToHex(text.slice(32, 64)).padEnd(66, '0');
+        let array = [];
+        for (let i = 0; i < text.length && i < 64; i++) {
+            array.push(Func.StringToHex(text.charAt(i)));
+        }
         this.VRE.deployed().then((i) => {
-            return i.setLink([str1, str2], {from: this.account });
+            return i.setLink(array, {from: this.account });
         }).then(function() {
-            console.info("Property links updated!");
+            console.info("Property link updated!");
         }).catch((e) => {
             console.log(e);
         });
@@ -253,7 +257,11 @@ export class Contract {
     getHoverText(address, callback) {
         this.VRE.deployed().then((i) => {
             return i.getHoverText.call(address).then((r) => {
-                return callback(r);
+                let str = "";
+                for (let i = 0; i < r.length; i++) {
+                    str += Func.HexToString(r[i]);
+                }
+                return callback(str);
             });
         }).catch((e) => {
             console.log(e);
@@ -273,7 +281,11 @@ export class Contract {
     getLink(address, callback) {
         this.VRE.deployed().then((i) => {
             return i.getLink.call(address).then((r) => {
-                return callback(r);
+                let str = "";
+                for (let i = 0; i < r.length; i++) {
+                    str += Func.HexToString(r[i]);
+                }
+                return callback(str);
             });
         }).catch((e) => {
             console.log(e);

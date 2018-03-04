@@ -99,7 +99,6 @@ export const Base64ToImageData = ( /*obj[0..999][0..500]*/ data) => {
 }
 
 export const ContractDataToRGBAArray = (/*uint256[10]*/ contractDataArray) => {
-
     let result = [];
     let contractDataArraySize = 10;
     let pixelsPerBigInt = 10;

@@ -1,10 +1,9 @@
 contract VirtualRealEstate:
     events:
         event PropertyColorUpdate(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address lastUpdaterPayee);
-        event PropertyColorUpdatePixel(uint24 indexed property, uint8 row, uint24 rgb);
         event PropertyBought(uint24 indexed property,  address newOwner, uint256 ethAmount, uint256 pptAmount, uint256 timestamp);
-        event SetUserHoverText(address indexed user, byte[64] newHoverText);
-        event SetUserSetLink(address indexed user, byte[64] newLink);
+        event SetUserHoverText(address indexed user, uint256[2] newHoverText);
+        event SetUserSetLink(address indexed user, uint256[2] newLink);
         event PropertySetForSale(uint24 indexed property, uint256 forSalePrice);
         event DelistProperty(uint24 indexed property);
         event SetPropertyPublic(uint24 indexed property);
@@ -13,24 +12,24 @@ contract VirtualRealEstate:
 
     views:
         getForSalePrices(uint24 propertyID) view returns(uint256, uint256) 
-        getHoverText(address user) view returns(byte[64])
-        getLink(address user) view returns(byte[64])
+        getHoverText(address user) view returns(uint256[2])
+        getLink(address user) view returns(uint256[2])
         getPropertyColors(uint24 propertyID)view returns(uint256[10])
-        getPropertyData(uint24 propertyID) view returns(address, uint256, uint256, uint256, bool, uint256 lastBid)
+        getPropertyData(uint24 propertyID) view returns(address, uint256, uint256, uint256, bool, uint8 flag)
         getProjectedPayout(uint24 propertyID) view returns(uint256)
         getSystemSalePrices(uint24 propertyID) view returns(uint256, uint256)
 
     functions:
-        setHoverText(byte[64] text)
+        setHoverText(uint256[2] text)
             - SetUserHoverText(msg.sender, text)
-        setLink(byte[64] link)
+        setLink(uint256[2] link)
             - SetUserSetLink(msg.sender, link)
         setColors(uint24 propertyID, uint256[10] newColors, pptToSpend)
             - PropertyColorUpdate(propertyID, newColors, timeUpdate, lastUpdaterPayee)
         setPropertyMode(uint24 propertyID, bool isInPrivateMode, uint32 numHoursPrivate)
             - SetPropertyPrivate(propertyID, numHoursPrivate)
             - SetPropertyPublic(propertyID)
-        setRowColors(uint24 propertyID, uint8 row, uint24 newColorData)
+        setRowColors(uint24 propertyID, uint8 row, uint256 newColorData, uint256 pptToSpend)
             - PropertyColorUpdatePixel(propertyID, row, newColorData)
         transferProperty(uint24 propertyID, address newOwner)
             - PropertyBought(propertyID, newOwner, 0, 0, now)
@@ -57,3 +56,6 @@ ChangeLog:
 24/02/2018: setHoverText/getHoverText/setLink/getLink & corresponding events are now byte[64] as data-type (from bytes32[2])
 28/02/2018: Added becomePublic timestamp to getPropertyData return
 28/02/2018: Added Bid event, makeBid function and added lastBid return to getPropertyData
+03/03/2018: Changed SetHoverText/SetLink/GetHoverText/GetLink to uint256[2] data type
+03/03/2018: Changed SetRowColors parameters to include pptSpent
+03/03/2018: Replaced "lastBid" from getPropertyData returns with "flag"

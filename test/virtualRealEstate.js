@@ -1,34 +1,46 @@
 var VirtualRealEstate = artifacts.require("./VirtualRealEstate.sol");
+var bigInt = require("big-integer");
+var BigNumber = require('bignumber.js');
 
-let byteArrayOnes = [0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1];
-let byteArrayTwos = [0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2];
-let byteArrayLong = [0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3];
-let byteArrayShort = [0x4, 0x4, 0x4];
+let byteArrayOnes = [1,1];
+let byteArrayTwos = [2,2];
+let byteArrayLong = [3,3];
+let byteArrayShort = [4,4];
 
-let stringToBytes = function(string) {
+let stringToBigInts = (string) => {
   let result = [];
-  let len = string.length;
-  let padChar = '\u0000'.charCodeAt(0);
-  for(let i = 0; i < string.length; i++) {
-    result.push(string.charCodeAt(i));
+  let innerResult = new bigInt("0", 10);
+  for(let i = 0; i < string.length && i < 32; i++) {
+      let binary = string.charCodeAt(i);
+      innerResult = innerResult.shiftLeft(8);
+      innerResult = innerResult.or(binary);
   }
-  while(len < 64) {
-    result.push(padChar);
-    len++;
+  result.push(new BigNumber(innerResult.toString(), 10));
+  innerResult = new bigInt("0", 10);
+  for(let i = 32; i < string.length; i++) {
+      let binary = string.charCodeAt(i);
+      innerResult = innerResult.shiftLeft(8);
+      innerResult = innerResult.or(binary);
   }
+  result.push(new BigNumber(innerResult.toString(), 10));
   return result;
-};
+}
 
-let bytesToString = function(bytes) {
-  let result = "";
-  for(let i = 0; i < bytes.length; i++) {
-    let char = String.fromCharCode(bytes[i]);
-    if (char == '\u0000') {
-      break;
-    }
-    result += char;
+let bigIntsToString = (bigInts) => {
+  let result = [];
+  for(let i = 0; i < 2; i++) {
+      let uint256 = bigInt(bigInts[i].toString(10), 10);
+      if (uint256 != 0) {
+          for(let j = 0; j < 32; j++) {
+              let ascii = uint256.and(255).toJSNumber();
+              if (ascii != 0) {
+                  result.push(String.fromCharCode(ascii));
+                  uint256 = uint256.shiftRight(8); 
+              }
+          }
+      }
   }
-  return result;
+  return result.reverse().join("");
 }
 
 contract('VirtualRealEstate', function(accounts) {
@@ -249,6 +261,8 @@ contract('VirtualRealEstate', function(accounts) {
      assert.equal(coloursReturned[0], 5, "Should return 5 from the array of 5's" );
      return pixelPropertyInstance.balanceOf(accounts[4], { from: accounts[0] });
    }).then(function(balance) {
+     console.log("HERE");
+     console.log(balance);
      assert.equal(balance, 4, "Should have earned four coins from setting it and having it set for four seconds");
      return pixelPropertyInstance.balanceOf(accounts[3], { from: accounts[0] });
    }).then(function(balance) {
@@ -287,7 +301,7 @@ contract('VirtualRealEstate', function(accounts) {
    }).then(function(setText) {
      return pixelPropertyInstance.getHoverText(accounts[0], { from: accounts[0] });
    }).then(function(hoverText) {
-     assert.equal( hoverText[3], 0x10, "Should match byteArrayOnes");
+     assert.equal( hoverText[0], 1, "Should match byteArrayOnes");
    });
  });
 
@@ -298,7 +312,7 @@ contract('VirtualRealEstate', function(accounts) {
    }).then(function(setText) {
      return pixelPropertyInstance.getLink(accounts[0], { from: accounts[0] });
    }).then(function(link) {
-     assert.equal(link[3], 0x20, "Should match byteArrayTwos");
+     assert.equal(link[1], 2, "Should match byteArrayTwos");
    });
  });
  it("A user can change their hover text", function() {
@@ -306,12 +320,12 @@ contract('VirtualRealEstate', function(accounts) {
      pixelPropertyInstance = instance;
      return pixelPropertyInstance.getHoverText(accounts[0], { from: accounts[0] });
    }).then(function(hoverText) {
-     assert.equal(hoverText[3], 0x10, "Should still match byteArrayOnes");
+     assert.equal(hoverText[0], 1, "Should still match byteArrayOnes");
      return pixelPropertyInstance.setHoverText(byteArrayTwos, { from: accounts[0] });
    }).then(function(setText) {
      return pixelPropertyInstance.getHoverText(accounts[0], { from: accounts[0] });
    }).then(function(hoverText) {
-     assert.equal(hoverText[3], 0x20, "Should now match byteArrayTwos");
+     assert.equal(hoverText[0], 2, "Should now match byteArrayTwos");
    });
  });
  it("A user can change their link text", function() {
@@ -319,33 +333,33 @@ contract('VirtualRealEstate', function(accounts) {
      pixelPropertyInstance = instance;
      return pixelPropertyInstance.getLink(accounts[0], { from: accounts[0] });
    }).then(function(link) {
-     assert.equal(link[3], 0x20, "Should still match byteArrayTwos");
+     assert.equal(link[0], 2, "Should still match byteArrayTwos");
      return pixelPropertyInstance.setLink(byteArrayLong, { from: accounts[0] });
    }).then(function(setLink) {
      return pixelPropertyInstance.getLink(accounts[0], { from: accounts[0] });
    }).then(function(link) {
-     assert.equal(link[4], 0x30, "Should now match byteArrayLong");
+     assert.equal(link[0], 3, "Should now match byteArrayLong");
    });
  });
  it("A user can change their hover text with strings (Version 1)", function() {
    return VirtualRealEstate.deployed().then(function(instance) {
      pixelPropertyInstance = instance;
-     return pixelPropertyInstance.setHoverText(stringToBytes("This goes really long and has 1"), { from: accounts[0] });
+     return pixelPropertyInstance.setHoverText(stringToBigInts("This goes really long and has 1"), { from: accounts[0] });
    }).then(function(setText) {
      return pixelPropertyInstance.getHoverText(accounts[0], { from: accounts[0] });
    }).then(function(hoverText) {
-     assert.equal(bytesToString(hoverText), "This goes really long and has 1", "Should say 123...");
+     assert.equal(bigIntsToString(hoverText), "This goes really long and has 1", "Should say 123...");
    });
  });
 
  it("A user can change their hover text with strings (Version 2)", function() {
    return VirtualRealEstate.deployed().then(function(instance) {
      pixelPropertyInstance = instance;
-     return pixelPropertyInstance.setHoverText(stringToBytes("This string is short"), { from: accounts[0] });
+     return pixelPropertyInstance.setHoverText(stringToBigInts("This string is short"), { from: accounts[0] });
    }).then(function(setText) {
      return pixelPropertyInstance.getHoverText(accounts[0], { from: accounts[0] });
    }).then(function(hoverText) {
-     assert.equal(bytesToString(hoverText), "This string is short", "Should match the short string");
+     assert.equal(bigIntsToString(hoverText), "This string is short", "Should match the short string");
    });
  });
 

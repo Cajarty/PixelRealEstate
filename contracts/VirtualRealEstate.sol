@@ -1,19 +1,5 @@
 pragma solidity ^0.4.2;
 
-/*
-ToDo:
-- ##Users pay however much they want, no requirement on cost
-- ##Users can earn earnings on a property for up to (N+1)^2 minutes
-- ##Users get private use of a property for N/2 minutes
-- ##Owners in private mode costs 1 coins a minute
-- ##Timer is now 2 coins a second not 2 coins a hour
-- ##No free mode during the first 3 days, but "increased earnings" paying zero or 1 coin is treated like 2 coins
-    - ##So for the first 3 days, setting it for free gets it set to private for 1 minute and earns you 1->9 coins [Validate with Jaegar first]
-- ##Property prices start at 0.005 ETH and 100 PPT
-- ##Make sure total circulating supply actually is calculated right. Unit test that plz
-- Make getHoverText and getLink use a different data type
-*/
-
 contract Token {
     uint256 public totalSupply;
     function balanceOf(address _owner) public constant returns (uint256 balance);
@@ -24,9 +10,9 @@ contract Token {
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
+
 /*  ERC 20 token */
 contract StandardToken is Token {
-
     function transfer(address _to, uint256 _value) public returns (bool success) {
       if (balances[msg.sender] >= _value && _value > 0) {
         balances[msg.sender] -= _value;
@@ -72,12 +58,9 @@ contract VirtualRealEstate is StandardToken {
     address owner;
     uint256 ownerEth = 0;
     
-    //Mapping of propertyID to property
     mapping (uint24 => Property) map;
-    //propertyOwner to link
-    mapping (address => byte[64]) ownerLink;
-    //propertyRenter to link
-    mapping (address => byte[64]) ownerHoverText;
+    mapping (address => uint256[2]) ownerLink;
+    mapping (address => uint256[2]) ownerHoverText;
     mapping (address => uint32) moderators; // 0 = Not, 1 = nsfw-power, 2 = ban-power, 3 = set-moderator-level-power
     
     uint256 priceETH;
@@ -91,36 +74,28 @@ contract VirtualRealEstate is StandardToken {
     uint256 USER_BUY_CUT_PERCENT = 98; //%
     
     uint256 PROPERTY_GENERATES_PER_MINUTE = 1;
-    uint256 FREE_COLOR_SETTING_UNTIL;
+    uint256 EXTA_COLOR_SPEND_UNTIL;
     
     event PropertyColorUpdate(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address lastUpdaterPayee);
-    event PropertyColorUpdatePixel(uint24 indexed property, uint8 row, uint24 rgb);
     event PropertyBought(uint24 indexed property,  address newOwner, uint256 ethAmount, uint256 PPTAmount, uint256 timestamp); //Added ethAmount, PPTAmount and timestamp
-    event SetUserHoverText(address indexed user, byte[64] newHoverText);
-    event SetUserSetLink(address indexed user, byte[64] newLink);
+    event SetUserHoverText(address indexed user, uint256[2] newHoverText);
+    event SetUserSetLink(address indexed user, uint256[2] newLink);
     event PropertySetForSale(uint24 indexed property, uint256 forSalePrice);
     event DelistProperty(uint24 indexed property);
     event SetPropertyPublic(uint24 indexed property);
     event SetPropertyPrivate(uint24 indexed property, uint32 numMinutesPrivate);
     event Bid(uint24 indexed property, uint256 bid);
     
-    struct TradeOffer {
-        uint256 ethPer;
-        uint256 PPTAmount;
-        bool buyingPPT;
-    }
-    
     struct Property {
+        uint8 flag; //0 == none, 1 == nsfw, 2 == ban
+        bool isInPrivateMode;
         address owner;
+        address lastUpdater;
         uint256[10] colors; //10x10 rgb pixel colors per property
         uint256 salePrice;
-        address lastUpdater;
-        bool isInPrivateMode;
         uint256 lastUpdate; //Last Update
         uint256 becomePublic;
         uint256 earnUntil;
-        uint256 lastBid;
-        uint32 flag; //0 == none, 1 == nsfw, 2 == ban
     }
     
     modifier ownerOnly() {
@@ -137,13 +112,13 @@ contract VirtualRealEstate is StandardToken {
     function VirtualRealEstate() public {
         owner = msg.sender;
         totalSupply = 0;
-        FREE_COLOR_SETTING_UNTIL = now + 3 days;
+        EXTA_COLOR_SPEND_UNTIL = now + 3 days;
         pricePPT = 100;
         priceETH = 10000;//1000000000000000000; //0.001 ETH
         moderators[msg.sender] = 3;
         payoutInterval = (1 minutes);
     }
-    function setFlag(uint24 propertyID, uint32 flag) public validPropertyID(propertyID)  {
+    function setFlag(uint24 propertyID, uint8 flag) public validPropertyID(propertyID)  {
         Property storage property = map[propertyID];
 
         require(flag < 3);
@@ -159,11 +134,11 @@ contract VirtualRealEstate is StandardToken {
 
         property.flag = flag;
     }
-    function setHoverText(byte[64] text) public {
+    function setHoverText(uint256[2] text) public {
         ownerHoverText[msg.sender] = text;
         SetUserHoverText(msg.sender, text);
     }
-    function setLink(byte[64] link) public {
+    function setLink(uint256[2] link) public {
         ownerLink[msg.sender] = link;
         SetUserSetLink(msg.sender, link);
     }
@@ -178,10 +153,10 @@ contract VirtualRealEstate is StandardToken {
             return (0, property.salePrice);
         }
     }
-    function getHoverText(address user) public view returns(byte[64]) {
+    function getHoverText(address user) public view returns(uint256[2]) {
         return ownerHoverText[user];
     }
-    function getLink(address user) public view returns(byte[64]) {
+    function getLink(address user) public view returns(uint256[2]) {
         return ownerLink[user];
     }
     
@@ -189,12 +164,12 @@ contract VirtualRealEstate is StandardToken {
         return map[propertyID].colors;
     }
     
-    function getPropertyData(uint24 propertyID) public validPropertyID(propertyID) view returns(address, uint256, uint256, uint256, bool, uint256, uint256) {
-        Property storage property = map[propertyID];
+    function getPropertyData(uint24 propertyID) public validPropertyID(propertyID) view returns(address, uint256, uint256, uint256, bool, uint256, uint32) {
+        Property memory property = map[propertyID];
         if (property.owner == 0) {
-            return (property.owner, priceETH, pricePPT, property.lastUpdate, property.isInPrivateMode, property.becomePublic, property.lastBid);
+            return (property.owner, priceETH, pricePPT, property.lastUpdate, property.isInPrivateMode, property.becomePublic, property.flag);
         } else {
-            return (property.owner, 0, property.salePrice, property.lastUpdate, property.isInPrivateMode, property.becomePublic, property.lastBid);
+            return (property.owner, 0, property.salePrice, property.lastUpdate, property.isInPrivateMode, property.becomePublic, property.flag);
         }
     }
     function tryForcePublic(uint24 propertyID) public validPropertyID(propertyID) {
@@ -204,44 +179,34 @@ contract VirtualRealEstate is StandardToken {
             property.isInPrivateMode = false;
         }
     }
-    function getProjectedPayout(uint24 propertyID) public view returns(uint256) {
-        Property storage property = map[propertyID];
+    function _getProjectedPayout(Property memory property) private view returns(uint256) {
         if (!property.isInPrivateMode && property.lastUpdate != 0) {
             uint256 earnedUntil = (now < property.earnUntil) ? now : property.earnUntil;
-
             uint256 minutesSinceLastColourChange = (earnedUntil - property.lastUpdate) / payoutInterval;
             return minutesSinceLastColourChange * PROPERTY_GENERATES_PER_MINUTE;
         }
         return 0;
     }
-    //Change a 10x10 == 70 | 30 | 0 cost
-    function setColors(uint24 propertyID, uint256[10] newColors, uint256 pptToSpend) public validPropertyID(propertyID) returns(bool) {
-        Property storage property = map[propertyID];
-
-        tryForcePublic(propertyID);
-        
-        uint256 pptSpent = pptToSpend;
-
-        //If first 3 days and we spent <2 coins, treat it as if we spent 2
-        if (now <= FREE_COLOR_SETTING_UNTIL && pptToSpend < 2) { 
-            pptSpent = 2;
+    function getProjectedPayout(uint24 propertyID) public view returns(uint256) {
+        Property memory property = map[propertyID];
+        return _getProjectedPayout(property);
+    }
+    function _tryTriggerPayout(Property storage property, uint256 pptToSpend) private returns(bool) {
+        if (property.isInPrivateMode && property.becomePublic < now) {//If its private when it shouldnt be
+            property.isInPrivateMode = false;
         }
-        //If we are in the first 3 days, set pptToSpend to = 2, but don't charge them. Maybe give them the amount they don't have to subtract later?
-
-        bool updateOccured = false;
-
         if (property.isInPrivateMode) {
             require(msg.sender == property.owner);
             require(property.flag != 2);
-            //TODO: What if a owner tries to set a property which is locked by a Free-Use user?
-            updateOccured = true;
         } else if (property.becomePublic < now) {
+            uint256 pptSpent = pptToSpend;
+            if (pptToSpend < 2 && now <= EXTA_COLOR_SPEND_UNTIL) { //If first 3 days and we spent <2 coins, treat it as if we spent 2
+                pptSpent = 2;
+            }
             require(balances[msg.sender] >= pptToSpend);
-            uint256 minutesOfEarning = (pptSpent + 1) * (pptSpent + 1) * payoutInterval; //(N+1)^2 coins earned max/minutes we can earn from
-            uint256 minutesOfLock = (pptSpent / 2) * payoutInterval; //N/2 minutes of user-private mode
             balances[msg.sender] -= pptToSpend;
             totalSupply -= pptToSpend;
-            uint256 payoutEach = getProjectedPayout(propertyID);
+            uint256 payoutEach = _getProjectedPayout(property);
             if (payoutEach > 0) {
                 if (property.lastUpdater != 0) {
                     balances[property.lastUpdater] += payoutEach;
@@ -252,23 +217,40 @@ contract VirtualRealEstate is StandardToken {
                     totalSupply += payoutEach;
                 }
             }
-            updateOccured = true;
-            property.becomePublic = now + minutesOfLock;
-            property.earnUntil = now + minutesOfEarning;
+            property.becomePublic = now + (pptSpent * payoutInterval / 2); //N/2 minutes of user-private mode
+            property.earnUntil = now + (pptSpent + 1) * (pptSpent + 1) * payoutInterval; //(N+1)^2 coins earned max/minutes we can earn from
+        } else {
+            return false;
         }
-        
-        if (updateOccured) {
-            PropertyColorUpdate(propertyID, newColors, now, property.lastUpdater);
-            property.colors = newColors;
-            property.lastUpdater = msg.sender;
-            property.lastUpdate = now;
-        }
-        return updateOccured;
+        property.lastUpdater = msg.sender;
+        property.lastUpdate = now;
+        return true;
     }
-    function setPropertyMode(uint24 propertyID, bool isInPrivateMode, uint32 numMinutesPrivate) public validPropertyID(propertyID) {
+    //Change a 10x10 == 70 | 30 | 0 cost
+    function setColors(uint24 propertyID, uint256[10] newColors, uint256 pptToSpend) public validPropertyID(propertyID) returns(bool) {
+        Property storage property = map[propertyID];
+        if (_tryTriggerPayout(property, pptToSpend)) {
+            property.colors = newColors;
+            PropertyColorUpdate(propertyID, newColors, now, property.lastUpdater);
+            return true;
+        }
+        return false;
+    }
+    function setRowColors(uint24 propertyID, uint8 row, uint256 newColorData, uint256 pptToSpend) public validPropertyID(propertyID) returns(bool) {
+        require(row < 10);
+        Property storage property = map[propertyID];
+        if (_tryTriggerPayout(property, pptToSpend)) {
+            property.colors[row] = newColorData;
+            PropertyColorUpdate(propertyID, property.colors, now, property.lastUpdater);
+            return true;
+        }
+        return false;
+    }
+    function setPropertyMode(uint24 propertyID, bool setPrivateMode, uint32 numMinutesPrivate) public validPropertyID(propertyID) {
         Property storage property = map[propertyID];
         require(msg.sender == property.owner);
-        if (isInPrivateMode) {
+        if (setPrivateMode) {
+            require(property.isInPrivateMode || property.becomePublic <= now); //If inprivate, we can extend, otherwise it must not be locked by someone else
             require(numMinutesPrivate > 0);
             require(balances[msg.sender] >= numMinutesPrivate);
             balances[msg.sender] -= numMinutesPrivate;
@@ -277,50 +259,26 @@ contract VirtualRealEstate is StandardToken {
         } else {
             property.becomePublic = 0;
         }
-        property.isInPrivateMode = isInPrivateMode;
+        property.isInPrivateMode = setPrivateMode;
         
-        if (isInPrivateMode) {
+        if (setPrivateMode) {
             SetPropertyPrivate(propertyID, numMinutesPrivate);
         } else {
             SetPropertyPublic(propertyID);
         }
     }
-    //TODO: Repurpose this if we want or discard otherwise. Isn't harmfull but kinda useless.
-    function setRowColors(uint24 propertyID, uint8 row, uint24 newColorData) public validPropertyID(propertyID) returns(bool) {
-        Property storage property = map[propertyID];
-        
-        require(row >= 0 && row <= 9);
-        
-        uint256 cost = property.owner != 0 ? 1 : 2;
-        
-        if (property.isInPrivateMode) {
-                require(msg.sender == property.owner);
-                cost = 0;
-        } 
-        
-        require(balances[msg.sender] >= cost);
-        
-        balances[msg.sender] -= cost; //Burn the coin to set the color
-        totalSupply -= cost;
-        
-        property.colors[row] = newColorData;
-        property.lastUpdater = msg.sender;
-
-        PropertyColorUpdatePixel(propertyID, row, newColorData);
-        
-        return true;
+    function _transferProperty(Property storage property, uint24 propertyID, address newOwner, uint256 pptAmount, uint256 ethAmount, uint8 flag) private {
+        require(newOwner != 0);
+        property.owner = newOwner;
+        property.salePrice = 0;
+        property.isInPrivateMode = false;
+        property.flag = flag;
+        PropertyBought(propertyID, newOwner, ethAmount, pptAmount, now);
     }
-    
     function transferProperty(uint24 propertyID, address newOwner) public validPropertyID(propertyID) returns(bool) {
         Property storage property = map[propertyID];
-        
         require(property.owner == msg.sender);
-        require(newOwner != 0);
-        
-        property.owner = newOwner;
-
-        PropertyBought(propertyID, newOwner, 0, 0, now);
-        
+        _transferProperty(property, propertyID, newOwner, 0, 0, property.flag);
         return true;
     }
     function buyProperty(uint24 propertyID, uint256 PPTValue) public validPropertyID(propertyID) payable returns(bool) {
@@ -348,12 +306,7 @@ contract VirtualRealEstate is StandardToken {
         minPercent = priceETH * PRICE_ETH_MIN_PERCENT / 100;
         priceETH += ((minPercent < PRICE_ETH_MIN_INCREASE) ? minPercent : PRICE_ETH_MIN_INCREASE) * PPTLeft / PPTValue;
         
-        property.owner = msg.sender;
-        
-        PropertyBought(propertyID, property.owner, msg.value, PPTValue, now);
-
-        property.owner = msg.sender;
-        property.flag = 0;
+        _transferProperty(property, propertyID, msg.sender, msg.value, PPTValue, 0);
         
         return true;
     }
@@ -377,13 +330,8 @@ contract VirtualRealEstate is StandardToken {
         balances[msg.sender] -= amountTransfered;
         balances[property.owner] += amountTransfered;
         balances[owner] += PPTValue - amountTransfered;
-        
-        PropertyBought(propertyID, property.owner, 0, property.salePrice, now);
 
-        property.salePrice = 0;
-        property.owner = msg.sender;
-        property.isInPrivateMode = false;
-        property.flag = 0;
+        _transferProperty(property, propertyID, msg.sender, 0, property.salePrice, 0);
         
         return true;
     }
@@ -399,11 +347,7 @@ contract VirtualRealEstate is StandardToken {
         uint256 minPercent = priceETH * PRICE_ETH_MIN_PERCENT / 100;
         priceETH += (minPercent < PRICE_ETH_MIN_INCREASE) ? minPercent : PRICE_ETH_MIN_INCREASE;
         
-        property.owner = msg.sender;
-        
-        PropertyBought(propertyID, property.owner, msg.value, 0, now);
-        property.flag = 0;
-        
+        _transferProperty(property, propertyID, msg.sender, msg.value, 0, 0);
         return true;
     }
     
@@ -443,9 +387,7 @@ contract VirtualRealEstate is StandardToken {
 
     function makeBid(uint24 propertyID, uint256 bidAmount) public validPropertyID(propertyID) {
         if (balances[msg.sender] >= bidAmount) {
-            Property storage property = map[propertyID];
             Bid(propertyID, bidAmount);
-            property.lastBid = bidAmount;
         }
     }
     

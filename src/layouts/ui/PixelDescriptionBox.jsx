@@ -76,14 +76,15 @@ class PixelDescriptionBox extends Component {
                 xy.y = data.args.y;
             }
 
+            if (xy.x !== this.state.x - 1 || xy.y !== this.state.y - 1)
+                return;
+
             if (data.args.colorsRGB == null)
                 xy.colors = Func.ContractDataToRGBAArray(data.args.colors);
             else
                 xy.colors = data.args.colorsRGB;
 
-            if (xy.x === this.state.x && xy.y === this.state.y) {
-                this.setCanvas(xy.colors);
-            }
+            this.loadProperty(xy.x, xy.y, xy.colors);
         });
     }
 
@@ -108,7 +109,7 @@ class PixelDescriptionBox extends Component {
         this.state.ctx.drawImage(this.dataCanvas, 0, 0);
     }
 
-    loadProperty(x, y) {
+    loadProperty(x, y, data = null) {
         if (x === '' || y === '')
             return;
         ctr.getPropertyData(x, y, (data) => {  
@@ -130,9 +131,13 @@ class PixelDescriptionBox extends Component {
                 earnings: this.calculateEarnings(lastUpdate, maxEarnings),
             });
         });
-        ctr.getPropertyColors(x, y, (x, y, data) => {
+        if (data === null) {
+            ctr.getPropertyColors(x, y, (x, y, data) => {
+                this.setCanvas(data);
+            });
+        } else {
             this.setCanvas(data);
-        });
+        }
         this.startTokenEarnedInterval();
     }
 

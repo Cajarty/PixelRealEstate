@@ -328,7 +328,6 @@ export class Contract {
             return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), PPT, {from: this.account });
         }).then(() => {
             this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " pixels changed."});
-            this.sendEvent(EVENTS.PropertyColorUpdate, {args: {x: x, y: y, colorsRGB: data, lastUpdate: new Date().getTime()}});
         }).catch((e) => {
             console.info(e);
             this.sendResults(LISTENERS.Error, {result: false, message: "Error uploading pixels."});

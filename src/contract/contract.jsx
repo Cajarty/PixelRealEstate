@@ -5,6 +5,7 @@ import * as Const from '../const/const.jsx';
 import * as Func from '../functions/functions.jsx';
 import { default as contract } from 'truffle-contract';
 import {GFD, GlobalState} from '../functions/GlobalState';
+import {SDM, ServerDataManager} from '../contract/ServerDataManager';
 
 // Import our contract artifacts and turn them into usable abstractions.
 import VirtualRealEstate from '../../build/contracts/VirtualRealEstate.json'
@@ -130,6 +131,18 @@ export class Contract {
                 } else {
                     this.sendEvent(result.event, result);
                 }
+            });
+            SDM.init();
+            this.listenForResults(LISTENERS.ServerDataManagerInit, 'contract', () => {
+                this.stopListeningForResults(LISTENERS.ServerDataManagerInit, 'contract');
+                this.events.event.get((error, result) => {
+                    if (error) {
+                        console.info(result, error);
+                    } else {
+                        for (let i = 0; i < result.length; i++)
+                            this.sendEvent(result[i].event, result[i]);
+                    }
+                });
             });
         }).catch((c) => {
             console.info(c);
@@ -397,6 +410,7 @@ export class Contract {
     }
 
     sendEvent(event, result) {
+        console.info(event, result)
         Object.keys(this.events[event]).map((i) => {
             this.events[event][i](result);
         });

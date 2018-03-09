@@ -59,7 +59,6 @@ class SetPixelColorForm extends Component {
     }
 
     handlePrice(key, value) {
-        console.info(parseInt(value))
         let obj = {};
         obj[key] = parseInt(value) < 0 ? 0 : parseInt(value);
         this.setState(obj);

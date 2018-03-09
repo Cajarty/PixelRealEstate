@@ -21,12 +21,10 @@ class PropertyBids extends Component {
 
     setX(x) {
         GFD.setData('x', x);
-        this.loadBids(x - 1, this.state.y - 1);
     }
     
     setY(y) {
         GFD.setData('y', y);
-        this.loadBids(this.state.x - 1, y - 1);
     }
 
     componentWillReceiveProps(newProps) {
@@ -53,7 +51,6 @@ class PropertyBids extends Component {
         });
 
         GFD.listen('x', 'propertyBids', (x) => {
-            this.loadBids(x - 1, GFD.getData('y') - 1);
             this.setState({x});
         })
         GFD.listen('y', 'propertyBids', (y) => {
@@ -85,6 +82,7 @@ class PropertyBids extends Component {
 
     componentWillUnmount() {
         GFD.closeAll('propertyBids');
+        ctr.stopListeningForEvent(EVENTS.PropertyColorUpdate, 'propertyBids');
     }
 
     setCanvas(rgbArr) {
@@ -185,7 +183,7 @@ class PropertyBids extends Component {
                                 <th colSpan={2}>
                                     <table className='bidsTable'>
                                         <tbody>
-                                            {Object.keys(this.state.bids).map((key) => (
+                                            {Object.keys(this.state.bids).reverse().map((key) => (
                                                 <tr key={key}>
                                                     <td>
                                                         <Timestamp time={key} precision={2} />

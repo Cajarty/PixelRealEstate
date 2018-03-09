@@ -125,14 +125,13 @@ export class ServerDataManager {
         ctr.listenForEvent(EVENTS.Bid, 'SDM-Bid', (data) => {
             let bid = Func.BigNumberToNumber(data.args.bid);
             let xy = ctr.fromID(Func.BigNumberToNumber(data.args.property));
-            //let xy = ctr.fromID(Func.BigNumberToNumber(data.args.property));
+            let timestamp = Func.BigNumberToNumber(data.args.timestamp);
             let x = xy.x, y = xy.y;
-            console.info(bid, x, y);
             if (this.bids[x] == null) 
                 this.bids[x] = {};
             if (this.bids[x][y] == null)
                 this.bids[x][y] = {};
-            this.bids[x][y][Math.floor(new Date().getTime() / 1000)] = bid;//change this to propert timestamp
+            this.bids[x][y][timestamp] = bid;
         });
     }
 

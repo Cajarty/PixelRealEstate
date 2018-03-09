@@ -29,7 +29,6 @@ class CanvasPage extends Component {
     }
 
     componentDidMount() {
-        SDM.init();
         ctr.getBalance((balance) => {
             this.setState({PPCOwned: balance, loadingPPC: false});
         });

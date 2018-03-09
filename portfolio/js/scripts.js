@@ -75,7 +75,7 @@ $(function() {
             $('#canvas-image').attr('src', img.src);
         };
         img.src = src + '?' + timestamp;
-    }, 10000);
+    }, 5000);
     /*
         $.ajax({
             url: "https://pixelproperty.io:6500/getImage.png",

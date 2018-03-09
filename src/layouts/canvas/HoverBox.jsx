@@ -24,33 +24,33 @@ class HoverLabel extends Component {
     }
 
     componentDidMount() {
-        GFD.listen('hoverX', 'hoverLabel', (hoverX) => {
+        GFD.listen('hoverX', 'hoverBox', (hoverX) => {
             this.setState({
                 hoverX: hoverX,
             });
         })
-        GFD.listen('hoverY', 'hoverLabel', (hoverY) => {
+        GFD.listen('hoverY', 'hoverBox', (hoverY) => {
             this.setState({
                 hoverY: hoverY,
             });
             this.updateLabel(GFD.getData('hoverX'), hoverY);
         })
-        GFD.listen('canvasTopOffset', 'hoverLabel', (top) => {
+        GFD.listen('canvasTopOffset', 'hoverBox', (top) => {
             this.setState({
                 offsetY: top
             });
         })
-        GFD.listen('canvasLeftOffset', 'hoverLabel', (left) => {
+        GFD.listen('canvasLeftOffset', 'hoverBox', (left) => {
             this.setState({
                 offsetX: left
             });
         })
-        GFD.listen('canvasWidth', 'hoverLabel', (width) => {
+        GFD.listen('canvasWidth', 'hoverBox', (width) => {
             this.setState({
                 canvasWidth: width
             });
         })
-        GFD.listen('canvasHeight', 'hoverLabel', (height) => {
+        GFD.listen('canvasHeight', 'hoverBox', (height) => {
             this.setState({
                 canvasHeight: height
             });

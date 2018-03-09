@@ -1,336 +1,337 @@
-@import './animation.scss';
-.pullout {
-    border-radius: 16px;
-    top: 50%;
-    position: absolute;
-    width: 400px;
-    height: 90vh;
-    transform: translate(0, -50%);
-    &.left,
-    &.right {
-        z-index: 10000;
-    }
-}
-
-.pullout.open {
-    &.right {
-        right: -120px;
-        @include animation(openRightTab, 1s);
-    }
-    &.left {
-        left: -120px;
-        @include animation(openLeftTab, 1s);
-    }
-}
-
-.pullout.close {
-    &.right {
-        right: -340px;
-        @include animation(closeRightTab, 1s);
-    }
-    &.left {
-        left: -340px;
-        @include animation(closeLeftTab, 1s);
-    }
-}
-
-.child.open {
-    &.right {
-        right: -120px;
-    }
-    &.left {
-        left: -120px;
-    }
-    * {
-        opacity: 1;
-        @include animation(fadein, .5s);
-    }
-}
-
-.child.close {
-    &.right {
-        right: -340px;
-    }
-    &.left {
-        left: -340px;
-    }
-    * {
-        opacity: 0;
-        @include animation(fadeout, 1s);
-    }
-}
-
-.child.closed,
-.pullout.closed {
-    &.right {
-        right: -340px;
-    }
-    &.left {
-        left: -340px;
-    }
-}
-
-.tab:not(:last-child) {
-    border-bottom: solid $color5 1px;
-}
-
-.tabContainer {
-    display: inline-block;
-    background-color: $color3;
-    &.right {
-        float: left;
-        left: 0;
-        border-bottom-left-radius: 16px;
-        border-top-left-radius: 16px;
-        border-left: black solid 3px;
-    }
-    &.left {
-        float: right;
-        right: 0;
-        border-bottom-right-radius: 16px;
-        border-top-right-radius: 16px;
-        border-right: black solid 3px;
-    }
-    width: 57px;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    height: calc(100% - 6px);
-    border-top: black solid 3px;
-    border-bottom: black solid 3px;
-    color: $color4;
-    font-weight: 400;
-}
-
-.iconContainer {
-    width: 100%;
-    text-align: center;
-    position: relative;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    &:hover {}
-}
-
-.tab {
-    &.right:hover,
-    &.right.selected {
-        background: linear-gradient(to right, $color2, $color3);
-    }
-    &.left:hover,
-    &.left.selected {
-        background: linear-gradient(to left, $color2, $color3);
-    }
-}
-
-.tab {
-    width: 100%;
-}
-
-.tab.unselected {
-    //border-right: 1px solid $color5;
-}
-
-.tab:first-child,
-.tab:first-child {
-    &.left {
-        border-top-right-radius: 14px;
-    }
-    &.right {
-        border-top-left-radius: 14px;
-    }
-}
-
-.tab:last-child,
-.tab:last-child {
-    &.left {
-        border-bottom-right-radius: 14px;
-    }
-    &.right {
-        border-bottom-left-radius: 14px;
-    }
-}
-
-.sidebar {
-    &.left {
-        float: right;
-        margin-right: 60px;
-    }
-    &.right {
-        float: left;
-        margin-left: 60px;
-    }
-    overflow-y: auto;
-    width: 220px;
-    height: calc(100% - 6px);
-    display: inline-block;
-    border-top: 3px solid $color5;
-    border-bottom: 3px solid $color5;
-    background-color: $color3;
-    color: $color2;
-    font-weight: 400;
-}
-
-.title {
-    background-color: $color3;
-    line-height: 3em;
-    font: $font2;
-}
-
-.inputTitle {
-    font: $font3;
-    display: inline-block
-}
-
-input {
-    font-size: 22px;
-    border-radius: 6px;
-    border: $color5 solid 2px;
-    background-color: $color4;
-    display: inline-block;
-    width: calc(100% - 14px);
-    text-align: center;
-    &[type=button] {
-        width: calc(100% - 8px);
-    }
-}
-
-td {
-    text-align: center;
-}
-
-div.tableDataContainer {
-    width: 80%;
-    margin: auto;
-    background-color: $color3;
-    border-radius: 8px;
-    .title {
-        border-radius: 8px 8px 0px 0px;
-    }
-    tr {
-        width: 100%;
-    }
-    .dataContainer {
-        overflow-y: scroll;
-        max-height: 250px;
-        min-height: 250px;
-        border-radius: 0px 0px 8px 8px;
-        table.data {
-            width: 100%;
-            border-radius: 0px 0px 8px 8px;
+    @import './animation.scss';
+    .pullout {
+        border-radius: 16px;
+        top: 50%;
+        position: absolute;
+        width: 400px;
+        height: 90vh;
+        transform: translate(0, -50%);
+        &.left,
+        &.right {
+            z-index: 10000;
         }
     }
-    table.header {
-        text-align: center;
-        width: 100%;
-    }
-}
-
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-input[type="number"] {
-    -moz-appearance: textfield;
-}
-
-input {
-    outline: none;
-}
-
-input:active[type=button] {
-    background-color: darken($color3, 10%);
-    outline: none;
-}
-
-input:focus[type=number] {
-    background-color: darken($color3, 10%);
-    outline: none;
-}
-
-.SetPixelColorForm {
-    #large {
-        background-color: black;
-    }
-    #normal {
-        background-color: black;
-    }
-    canvas {
-        border: 1px solid $color5;
-        &#large {
-            margin: 4px;
-            height: 100%;
-            vertical-align: middle;
+    
+    .pullout.open {
+        &.right {
+            right: -120px;
+            @include animation(openRightTab, 1s);
+        }
+        &.left {
+            left: -120px;
+            @include animation(openLeftTab, 1s);
         }
     }
-    .colorPicker {
-        width: 200px !important;
-        margin: 10px auto;
-        input {
-            background-color: unset;
+    
+    .pullout.close {
+        &.right {
+            right: -340px;
+            @include animation(closeRightTab, 1s);
+        }
+        &.left {
+            left: -340px;
+            @include animation(closeLeftTab, 1s);
         }
     }
-    .toolButton {
+    
+    .child.open {
+        &.right {
+            right: -120px;
+        }
+        &.left {
+            left: -120px;
+        }
+        * {
+            opacity: 1;
+            @include animation(fadein, .5s);
+        }
+    }
+    
+    .child.close {
+        &.right {
+            right: -340px;
+        }
+        &.left {
+            left: -340px;
+        }
+        * {
+            opacity: 0;
+            @include animation(fadeout, 1s);
+        }
+    }
+    
+    .child.closed,
+    .pullout.closed {
+        &.right {
+            right: -340px;
+        }
+        &.left {
+            left: -340px;
+        }
+    }
+    
+    .tab:not(:last-child) {
+        border-bottom: solid $color5 1px;
+    }
+    
+    .tabContainer {
         display: inline-block;
-        width: 15%;
-        margin: 2%;
-        padding: 3%;
         background-color: $color3;
-        &:active,
-        &.active {
-            background-color: darken($color3, 20%);
+        &.right {
+            float: left;
+            left: 0;
+            border-bottom-left-radius: 16px;
+            border-top-left-radius: 16px;
+            border-left: black solid 3px;
+        }
+        &.left {
+            float: right;
+            right: 0;
+            border-bottom-right-radius: 16px;
+            border-top-right-radius: 16px;
+            border-right: black solid 3px;
+        }
+        width: 57px;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        height: calc(100% - 6px);
+        border-top: black solid 3px;
+        border-bottom: black solid 3px;
+        color: $color4;
+        font-weight: 400;
+    }
+    
+    .iconContainer {
+        width: 100%;
+        text-align: center;
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        &:hover {}
+    }
+    
+    .tab {
+        &.right:hover,
+        &.right.selected {
+            background: linear-gradient(to right, $color2, $color3);
+        }
+        &.left:hover,
+        &.left.selected {
+            background: linear-gradient(to left, $color2, $color3);
         }
     }
-}
-
-.dropdown {
-    background-color: red;
-    z-index: 20000;
-    .Dropdown-option {
-        padding: 4px;
-        background-color: $color1;
-        color: $color5;
+    
+    .tab {
+        width: 100%;
     }
-    .Dropdown-placeholder {
-        padding: 4px;
-        background-color: $color2;
-        color: $color5;
+    
+    .tab.unselected {
+        //border-right: 1px solid $color5;
     }
-    *> {
-        z-index: 20000;
+    
+    .tab:first-child,
+    .tab:first-child {
+        &.left {
+            border-top-right-radius: 14px;
+        }
+        &.right {
+            border-top-left-radius: 14px;
+        }
     }
-}
-
-.priceSliderBase {
-    .ETH {
-        display: block;
-        width: calc(100% - 10px);
-        margin-left: 10px;
-        text-align: left;
+    
+    .tab:last-child,
+    .tab:last-child {
+        &.left {
+            border-bottom-right-radius: 14px;
+        }
+        &.right {
+            border-bottom-left-radius: 14px;
+        }
     }
-    .PPC {
-        display: block;
-        width: calc(100% - 10px);
-        margin-right: 10px;
-        text-align: right;
-    }
-    .total {
+    
+    .sidebar {
+        &.left {
+            float: right;
+            margin-right: 60px;
+        }
+        &.right {
+            float: left;
+            margin-left: 60px;
+        }
+        overflow-y: auto;
+        width: 220px;
+        height: calc(100% - 6px);
         display: inline-block;
+        border-top: 3px solid $color5;
+        border-bottom: 3px solid $color5;
+        background-color: $color3;
+        color: $color2;
+        font-weight: 400;
+    }
+    
+    .title {
+        background-color: $color3;
+        line-height: 3em;
+        font: $font2;
+    }
+    
+    .inputTitle {
+        font: $font3;
+        display: inline-block
+    }
+    
+    input {
+        font-size: 22px;
+        border-radius: 6px;
+        border: $color5 solid 2px;
+        background-color: $color4;
+        display: inline-block;
+        width: calc(100% - 14px);
+        text-align: center;
+        &[type=button] {
+            width: calc(100% - 8px);
+        }
+    }
+    
+    td {
         text-align: center;
     }
-}
-
-.hoverLabel {
-    background-color: green;
-    border: white 2px solid;
-    position: absolute;
-    pointer-events: none;
-}
-
-.hoverBox {
-    border: black 1px solid;
-    position: absolute;
-    pointer-events: none;
-}
+    
+    div.tableDataContainer {
+        width: 80%;
+        margin: auto;
+        background-color: $color3;
+        border-radius: 8px;
+        .title {
+            border-radius: 8px 8px 0px 0px;
+        }
+        tr {
+            width: 100%;
+        }
+        .dataContainer {
+            overflow-y: scroll;
+            max-height: 250px;
+            min-height: 250px;
+            border-radius: 0px 0px 8px 8px;
+            table.data {
+                width: 100%;
+                border-radius: 0px 0px 8px 8px;
+            }
+        }
+        table.header {
+            text-align: center;
+            width: 100%;
+        }
+    }
+    
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+    
+    input {
+        outline: none;
+    }
+    
+    input:active[type=button] {
+        background-color: darken($color3, 10%);
+        outline: none;
+    }
+    
+    input:focus[type=number] {
+        background-color: darken($color3, 10%);
+        outline: none;
+    }
+    
+    .SetPixelColorForm {
+        #large {
+            background-color: black;
+        }
+        #normal {
+            background-color: black;
+        }
+        canvas {
+            border: 1px solid $color5;
+            &#large {
+                margin: 4px;
+                height: 100%;
+                vertical-align: middle;
+            }
+        }
+        .colorPicker {
+            width: 200px !important;
+            margin: 10px auto;
+            input {
+                background-color: unset;
+            }
+        }
+        .toolButton {
+            display: inline-block;
+            width: 15%;
+            margin: 2%;
+            padding: 3%;
+            background-color: $color3;
+            &:active,
+            &.active {
+                background-color: darken($color3, 20%);
+            }
+        }
+    }
+    
+    .dropdown {
+        background-color: red;
+        z-index: 20000;
+        .Dropdown-option {
+            padding: 4px;
+            background-color: $color1;
+            color: $color5;
+        }
+        .Dropdown-placeholder {
+            padding: 4px;
+            background-color: $color2;
+            color: $color5;
+        }
+        *> {
+            z-index: 20000;
+        }
+    }
+    
+    .priceSliderBase {
+        .ETH {
+            display: block;
+            width: calc(100% - 10px);
+            margin-left: 10px;
+            text-align: left;
+        }
+        .PPC {
+            display: block;
+            width: calc(100% - 10px);
+            margin-right: 10px;
+            text-align: right;
+        }
+        .total {
+            display: inline-block;
+            text-align: center;
+        }
+    }
+    
+    .hoverLabel {
+        background-color: green;
+        border: white 2px solid;
+        position: absolute;
+        pointer-events: none;
+        padding: 2px;
+    }
+    
+    .hoverBox {
+        border: black 1px solid;
+        position: absolute;
+        pointer-events: none;
+    }

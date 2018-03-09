@@ -9,6 +9,42 @@ export const Clamp = (min, max, value) => {
     return Math.max(min, Math.min(max, value));
 }
 
+export const StringToBigInts = (string) => {
+    let result = [];
+    let innerResult = new bigInt("0", 10);
+    for(let i = 0; i < string.length && i < 32; i++) {
+        let binary = string.charCodeAt(i);
+        innerResult = innerResult.shiftLeft(8);
+        innerResult = innerResult.or(binary);
+    }
+    result.push(new BigNumber(innerResult.toString(), 10));
+    innerResult = new bigInt("0", 10);
+    for(let i = 32; i < string.length; i++) {
+        let binary = string.charCodeAt(i);
+        innerResult = innerResult.shiftLeft(8);
+        innerResult = innerResult.or(binary);
+    }
+    result.push(new BigNumber(innerResult.toString(), 10));
+    return result;
+  }
+
+export const BigIntsToString = (bigInts) => {
+    let result = [];
+    for(let i = 0; i < 2; i++) {
+        let uint256 = bigInt(bigInts[i].toString(10), 10);
+        if (uint256 != 0) {
+            for(let j = 0; j < 32; j++) {
+                let ascii = uint256.and(255).toJSNumber();
+                if (ascii != 0) {
+                    result.push(String.fromCharCode(ascii));
+                    uint256 = uint256.shiftRight(8); 
+                }
+            }
+        }
+    }
+    return result.reverse().join("");
+  }
+
 export const StringToHex = function(str) {
     str = utf8.encode(str);
     var hex = "";

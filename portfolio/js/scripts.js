@@ -2,14 +2,14 @@
  Created on : Jul 4, 2017, 12:43:10 AM
  Author     : Atta-Ur-Rehman Shah (http://attacomsian.com)
  */
-$(function () {
+$(function() {
     //init 
     init();
     //init wow effects
     new WOW().init();
 
     //scroll menu
-    $(window).scroll(function () {
+    $(window).scroll(function() {
         init();
 
         var $sections = $('section');
@@ -30,7 +30,7 @@ $(function () {
     });
 
     //page scroll
-    $('a.page-scroll').bind('click', function (event) {
+    $('a.page-scroll').bind('click', function(event) {
         var $anchor = $(this);
         $('html, body').stop().animate({
             scrollTop: $($anchor.attr('href')).offset().top - 50
@@ -43,12 +43,12 @@ $(function () {
         var secondFeature = $('#features').offset().top;
         var scroll = $(window).scrollTop();
         if (scroll >= 40 && $(window).width() > 960) {
-            $('.sticky-navigation').css({"background-color": '#d81b60'});
+            $('.sticky-navigation').css({ "background-color": '#d81b60' });
         } else {
-            $('.sticky-navigation').css({"background-color": '#d81b60'});
+            $('.sticky-navigation').css({ "background-color": '#d81b60' });
         }
         if (scroll >= secondFeature - 10) {
-            $(".mobileScreen").css({'background-position': 'center top'});
+            $(".mobileScreen").css({ 'background-position': 'center top' });
         }
     }
 
@@ -69,46 +69,46 @@ $(function () {
 
     setInterval(() => {
         var timestamp = new Date().getTime();
-        var src = 'https://pixelproperty.io:6500/getImage.png';
+        var src = './img/canvas.png';
         $('#canvas-image').attr('src', src + '?' + timestamp);
     }, 10000);
-/*
-    $.ajax({
-        url: "https://pixelproperty.io:6500/getImage.png",
-        type: 'GET',
-        header:{'Access-Control-Allow-Origin': '*'},
-        crossDomain: true,
-        dataType: 'json',
-        beforeSend: function() {
-            $('#canvas-pixel').fadeOut(5000);
-        },
-        success: function(response) {
-            $('#canvas-pixel').css('background', 'initial');
-            $('#canvas-pixel').stop().hide().addClass('img-fadeIn').fadeIn(3000);
-            $('#canvas-overlay').fadeIn(3000);
-	    setCanvas(response);
-            setInterval(() => {
-                $.ajax({
-                    url: "https://pixelproperty.io:6500/getPixelData",
-                    type: 'GET',
-                    header: { 'Access-Control-Allow-Origin': '*' },
-                    crossDomain: true,
-                    dataType: 'json',
-                    success: function(response) {
-                        setCanvas(response);
-                    }
-                });
-            }, 5000);
-        },
-        error: function(response) {
-            console.log('error', response);
-            $('#canvas-pixel').css('background', 'initial');
-            $('#canvas-pixel').stop().hide().addClass('img-fadeIn').fadeIn(3000);
-            $('#canvas-overlay').fadeIn(3000);
-        }
-    });*/
+    /*
+        $.ajax({
+            url: "https://pixelproperty.io:6500/getImage.png",
+            type: 'GET',
+            header:{'Access-Control-Allow-Origin': '*'},
+            crossDomain: true,
+            dataType: 'json',
+            beforeSend: function() {
+                $('#canvas-pixel').fadeOut(5000);
+            },
+            success: function(response) {
+                $('#canvas-pixel').css('background', 'initial');
+                $('#canvas-pixel').stop().hide().addClass('img-fadeIn').fadeIn(3000);
+                $('#canvas-overlay').fadeIn(3000);
+    	    setCanvas(response);
+                setInterval(() => {
+                    $.ajax({
+                        url: "https://pixelproperty.io:6500/getPixelData",
+                        type: 'GET',
+                        header: { 'Access-Control-Allow-Origin': '*' },
+                        crossDomain: true,
+                        dataType: 'json',
+                        success: function(response) {
+                            setCanvas(response);
+                        }
+                    });
+                }, 5000);
+            },
+            error: function(response) {
+                console.log('error', response);
+                $('#canvas-pixel').css('background', 'initial');
+                $('#canvas-pixel').stop().hide().addClass('img-fadeIn').fadeIn(3000);
+                $('#canvas-overlay').fadeIn(3000);
+            }
+        });*/
 
-    
+
 
 
 });

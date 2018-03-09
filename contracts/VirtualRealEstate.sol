@@ -77,14 +77,14 @@ contract VirtualRealEstate is StandardToken {
     uint256 EXTA_COLOR_SPEND_UNTIL;
     
     event PropertyColorUpdate(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address lastUpdaterPayee);
-    event PropertyBought(uint24 indexed property,  address newOwner, uint256 ethAmount, uint256 PPTAmount, uint256 timestamp); //Added ethAmount, PPTAmount and timestamp
+    event PropertyBought(uint24 indexed property,  address newOwner, uint256 ethAmount, uint256 PPTAmount, uint256 timestamp);
     event SetUserHoverText(address indexed user, uint256[2] newHoverText);
     event SetUserSetLink(address indexed user, uint256[2] newLink);
     event PropertySetForSale(uint24 indexed property, uint256 forSalePrice);
     event DelistProperty(uint24 indexed property);
     event SetPropertyPublic(uint24 indexed property);
     event SetPropertyPrivate(uint24 indexed property, uint32 numMinutesPrivate);
-    event Bid(uint24 indexed property, uint256 bid);
+    event Bid(uint24 indexed property, uint256 bid, uint256 timestamp);
     
     struct Property {
         uint8 flag; //0 == none, 1 == nsfw, 2 == ban
@@ -386,9 +386,11 @@ contract VirtualRealEstate is StandardToken {
     }
 
     function makeBid(uint24 propertyID, uint256 bidAmount) public validPropertyID(propertyID) {
-        if (balances[msg.sender] >= bidAmount) {
-            Bid(propertyID, bidAmount);
-        }
+        require(bidAmount > 0);
+        require(balances[msg.sender] >= 1 + bidAmount);
+        Bid(propertyID, bidAmount, now);
+        balances[msg.sender]--;
+        totalSupply--;
     }
     
     //////////////////////////////////////////////////////

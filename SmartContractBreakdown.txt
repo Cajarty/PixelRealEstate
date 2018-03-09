@@ -8,7 +8,7 @@ contract VirtualRealEstate:
         event DelistProperty(uint24 indexed property);
         event SetPropertyPublic(uint24 indexed property);
         event SetPropertyPrivate(uint24 indexed property, uint32 numHoursPrivate)
-        event Bid(uint24 indexed property, uint256 bid);
+        event Bid(uint24 indexed property, uint256 bid, uint256 timestamp);
 
     views:
         getForSalePrices(uint24 propertyID) view returns(uint256, uint256) 
@@ -44,7 +44,7 @@ contract VirtualRealEstate:
         delist(uint24 propertyID)
             - DelistProperty(propertyID)
         makeBid(uint24 propertyID, uint256 amountToBid)
-            - Bid(propertyID, amountToBid)
+            - Bid(propertyID, amountToBid, now)
 
     ownerFunctions:
         withdraw(uint256 amount)
@@ -59,3 +59,4 @@ ChangeLog:
 03/03/2018: Changed SetHoverText/SetLink/GetHoverText/GetLink to uint256[2] data type
 03/03/2018: Changed SetRowColors parameters to include pptSpent
 03/03/2018: Replaced "lastBid" from getPropertyData returns with "flag"
+08/03/2018: Added timestamp to Bid event

@@ -40,6 +40,12 @@ class CanvasPage extends Component {
                 });
             }
         });
+        ctr.listenForEvent(EVENTS.AccountChange, 'CanvasPagePPCListener', (data) => {
+            this.setState({loadingPPC: true});
+            ctr.getBalance((balance) => {
+                this.setState({PPCOwned: balance, loadingPPC: false});
+            });
+        });
         ctr.listenForEvent(EVENTS.PropertyBought, 'CanvasPagePPCListener', (data) => {
             if (data.args.newOwner === ctr.account) {
                 this.setState({loadingPPC: true});

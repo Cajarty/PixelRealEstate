@@ -42,6 +42,7 @@ export const EVENTS = {
     SetPropertyPrivate: 'SetPropertyPrivate',                       //(uint24 indexed property, uint32 numHoursPrivate);
 
     Bid: 'Bid',                                                     //(uint24 indexed property, uint256 bid);
+    AccountChange: 'AccountChange',                                 //(newaccount)  -  not a contract event.
 
     //token events    
     Transfer: 'Transfer',                                           //(address indexed _from, address indexed _to, uint256 _value);
@@ -118,7 +119,10 @@ export class Contract {
             this.sendResults(LISTENERS.Error, {removeErrors: [0, 1], message: ''});
 
             this.accounts = accs;
-            this.account = this.accounts[0];
+            if (this.account != this.accounts[0]) {
+                this.account = this.accounts[0];
+                this.sendEvent(EVENTS.AccountChange, this.accounts[0]);
+            }
         });
     }
 
@@ -212,7 +216,7 @@ export class Contract {
     //array of 2 32 bytes of string
     setHoverText(text) {
         this.VRE.deployed().then((i) => {
-            return i.setHoverText(Func.StringToBigInts(text), {from: this.account, gas: 120000 });
+            return i.setHoverText(Func.StringToBigInts(text), {from: this.account});
         }).then(function() {
             console.info("Hover text set!");
         }).catch((e) => {
@@ -223,7 +227,7 @@ export class Contract {
     //array of 2 32 bytes
     setLink(text) {
         this.VRE.deployed().then((i) => {
-            return i.setLink(Func.StringToBigInts(text), {from: this.account, gas: 120000 });
+            return i.setLink(Func.StringToBigInts(text), {from: this.account });
         }).then(function() {
             console.info("Property link updated!");
         }).catch((e) => {

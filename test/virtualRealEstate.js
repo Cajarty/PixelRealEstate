@@ -10,17 +10,23 @@ let byteArrayShort = [4,4];
 let stringToBigInts = (string) => {
   let result = [];
   let innerResult = new bigInt("0", 10);
-  for(let i = 0; i < string.length && i < 32; i++) {
-      let binary = string.charCodeAt(i);
-      innerResult = innerResult.shiftLeft(8);
-      innerResult = innerResult.or(binary);
+  for(let i = 0; i < 32; i++) {
+    let binary = 0;
+    if (i < string.length) {
+      binary = string.charCodeAt(i);
+    }
+    innerResult = innerResult.shiftLeft(8);
+    innerResult = innerResult.or(binary);
   }
   result.push(new BigNumber(innerResult.toString(), 10));
   innerResult = new bigInt("0", 10);
-  for(let i = 32; i < string.length; i++) {
-      let binary = string.charCodeAt(i);
-      innerResult = innerResult.shiftLeft(8);
-      innerResult = innerResult.or(binary);
+  for(let i = 32; i < 64; i++) {
+    let binary = 0;
+    if (i < string.length) {
+      binary = string.charCodeAt(i);
+    }
+    innerResult = innerResult.shiftLeft(8);
+    innerResult = innerResult.or(binary);
   }
   result.push(new BigNumber(innerResult.toString(), 10));
   return result;
@@ -28,15 +34,16 @@ let stringToBigInts = (string) => {
 
 let bigIntsToString = (bigInts) => {
   let result = [];
+  bigInts.reverse();
   for(let i = 0; i < 2; i++) {
-      let uint256 = bigInt(bigInts[i].toString(10), 10);
+      let uint256 = new bigInt(bigInts[i].toString(10), 10);
       if (uint256 != 0) {
           for(let j = 0; j < 32; j++) {
               let ascii = uint256.and(255).toJSNumber();
               if (ascii != 0) {
-                  result.push(String.fromCharCode(ascii));
-                  uint256 = uint256.shiftRight(8); 
+                result.push(String.fromCharCode(ascii));
               }
+              uint256 = uint256.shiftRight(8); 
           }
       }
   }
@@ -44,7 +51,7 @@ let bigIntsToString = (bigInts) => {
 }
 
 contract('VirtualRealEstate', function(accounts) {
- //####PURCHASE, SELLING & TRANSFERING####
+  //####PURCHASE, SELLING & TRANSFERING####
  it("User0 can purchase a property at default price in ETH", function() {
    return VirtualRealEstate.deployed().then(function(instance) {
      pixelPropertyInstance = instance;
@@ -328,6 +335,7 @@ contract('VirtualRealEstate', function(accounts) {
      assert.equal(hoverText[0], 2, "Should now match byteArrayTwos");
    });
  });
+
  it("A user can change their link text", function() {
    return VirtualRealEstate.deployed().then(function(instance) {
      pixelPropertyInstance = instance;
@@ -344,11 +352,11 @@ contract('VirtualRealEstate', function(accounts) {
  it("A user can change their hover text with strings (Version 1)", function() {
    return VirtualRealEstate.deployed().then(function(instance) {
      pixelPropertyInstance = instance;
-     return pixelPropertyInstance.setHoverText(stringToBigInts("This goes really long and has 1"), { from: accounts[0] });
+     return pixelPropertyInstance.setHoverText(stringToBigInts("1234567890123456789012345678901234567890123456789012345678901234"), { from: accounts[0] });
    }).then(function(setText) {
      return pixelPropertyInstance.getHoverText(accounts[0], { from: accounts[0] });
    }).then(function(hoverText) {
-     assert.equal(bigIntsToString(hoverText), "This goes really long and has 1", "Should say 123...");
+     assert.equal(bigIntsToString(hoverText), "1234567890123456789012345678901234567890123456789012345678901234", "Should say 123...");
    });
  });
 

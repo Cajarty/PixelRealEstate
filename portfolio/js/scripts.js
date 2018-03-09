@@ -70,7 +70,11 @@ $(function() {
     setInterval(() => {
         var timestamp = new Date().getTime();
         var src = './img/canvas.png';
-        $('#canvas-image').attr('src', src + '?' + timestamp);
+        let img = new Image();
+        img.onload = () => {
+            $('#canvas-image').attr('src', img.src);
+        };
+        img.src = src + '?' + timestamp;
     }, 10000);
     /*
         $.ajax({

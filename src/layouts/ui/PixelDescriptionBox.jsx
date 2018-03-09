@@ -25,6 +25,8 @@ class PixelDescriptionBox extends Component {
             isInPrivate: false,
             maxEarnings: 0,
             earnings: 0,
+            hoverText: '',
+            link: '',
         }
     }
 
@@ -129,6 +131,14 @@ class PixelDescriptionBox extends Component {
                 latestBid: Func.BigNumberToNumber(data[6]),
                 maxEarnings,
                 earnings: this.calculateEarnings(lastUpdate, maxEarnings),
+            });
+            ctr.getHoverText(data[0], (data) => {
+                if (data != null && data.length > 0)
+                    this.setState({hoverText: data});
+            });
+            ctr.getLink(data[0], (data) => {
+                if (data != null && data.length > 0)
+                    this.setState({link: data});
             });
         });
         if (data === null) {
@@ -263,14 +273,18 @@ class PixelDescriptionBox extends Component {
                             <th>Is Private</th>
                             <td>{this.state.isInPrivate ? 'Yes' : 'No'}</td>
                         </tr>
+                        {this.state.hoverText != '' ? 
                         <tr>
                             <th>Comment</th>
-                            <td>IMPLEMENT</td>
+                            <td>{this.state.hoverText}</td>
                         </tr>
-                        <tr>
-                            <th>Link</th>
-                            <td>IMPLEMENT</td>
-                        </tr>
+                        : null}
+                        {this.state.link != '' ? 
+                            <tr>
+                                <th>Link</th>
+                                <td><a href={this.state.link}></a></td>
+                            </tr>
+                        : null}
                     </tbody>
                 </table>
             </div>

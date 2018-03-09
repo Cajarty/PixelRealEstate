@@ -8,6 +8,8 @@ import * as Assets from '../../const/assets.jsx';
 import SetHoverText from '../forms/SetHoverText';
 import SetLink from '../forms/SetLink';
 import {GFD, GlobalState} from '../../functions/GlobalState';
+import {Contract, ctr, EVENTS} from '../../contract/contract';
+import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 
 class HoverLabel extends Component {
     constructor(props) {
@@ -27,18 +29,23 @@ class HoverLabel extends Component {
     }
 
     componentDidMount() {
-        GFD.listen('hoverX', 'hoverLabel', (hoverX) => {
+        GFD.listen('hoverX', 'hoverLabel', (x) => {
+            let hoverX = Math.floor(x / 10);
+            if (hoverX != this.state.hoverX)
+                this.updateLabel(hoverX, this.state.hoverY);
             this.setState({
                 hoverX: hoverX,
-                labelX: this.state.offsetX + (hoverX * (this.state.canvasWidth / 1000)) + 10
+                labelX: this.state.offsetX + (x * (this.state.canvasWidth / 1000)) + 10
             });
         })
-        GFD.listen('hoverY', 'hoverLabel', (hoverY) => {
+        GFD.listen('hoverY', 'hoverLabel', (y) => {
+            let hoverY = Math.floor(y / 10);
+            if (hoverY != this.state.hoverY)
+                this.updateLabel(this.state.hoverX, hoverY);
             this.setState({
                 hoverY: hoverY,
-                labelY: this.state.offsetY + (hoverY * (this.state.canvasHeight / 1000)) + 10
+                labelY: this.state.offsetY + (y * (this.state.canvasHeight / 1000)) + 10
             });
-            this.updateLabel(this.state.hoverX, hoverY);
         })
         GFD.listen('canvasTopOffset', 'hoverLabel', (top) => {
             this.setState({
@@ -67,7 +74,13 @@ class HoverLabel extends Component {
         if (x < 0 || y < 0) {
             this.setState({show: false})
         } else {
-            this.setState({show: true, labelText: 'Test Text - Please Replace'});
+            if (SDM.allProperties[x] != null && SDM.allProperties[x][y] != null)
+            ctr.getHoverText(SDM.allProperties[x][y].owner, (data) => {
+                if (data != null && data.length > 0)
+                    this.setState({show: true, labelText: data});
+                else
+                    this.setState({show: false});
+            })
         }
     }
 

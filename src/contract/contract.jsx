@@ -40,6 +40,8 @@ export const EVENTS = {
     SetPropertyPublic: 'SetPropertyPublic',                         //(uint24 indexed property);
     SetPropertyPrivate: 'SetPropertyPrivate',                       //(uint24 indexed property, uint32 numHoursPrivate);
 
+    Bid: 'Bid',                                                     //(uint24 indexed property, uint256 bid);
+
     //token events    
     Transfer: 'Transfer',                                           //(address indexed _from, address indexed _to, uint256 _value);
     Approval: 'Approval',                                           //(address indexed _owner, address indexed _spender, uint256 _value);
@@ -196,12 +198,8 @@ export class Contract {
 
     //array of 2 32 bytes of string
     setHoverText(text) {
-        let array = [];
-        for (let i = 0; i < text.length && i < 64; i++) {
-            array.push(Func.StringToHex(text.charAt(i)));
-        }
         this.VRE.deployed().then((i) => {
-            return i.setHoverText(array, {from: this.account });
+            return i.setHoverText(Func.StringToBigInts(text), {from: this.account, gas: 120000 });
         }).then(function() {
             console.info("Hover text set!");
         }).catch((e) => {
@@ -211,12 +209,8 @@ export class Contract {
 
     //array of 2 32 bytes
     setLink(text) {
-        let array = [];
-        for (let i = 0; i < text.length && i < 64; i++) {
-            array.push(Func.StringToHex(text.charAt(i)));
-        }
         this.VRE.deployed().then((i) => {
-            return i.setLink(array, {from: this.account });
+            return i.setLink(Func.StringToBigInts(text), {from: this.account, gas: 120000 });
         }).then(function() {
             console.info("Property link updated!");
         }).catch((e) => {
@@ -257,11 +251,17 @@ export class Contract {
     getHoverText(address, callback) {
         this.VRE.deployed().then((i) => {
             return i.getHoverText.call(address).then((r) => {
-                let str = "";
-                for (let i = 0; i < r.length; i++) {
-                    str += Func.HexToString(r[i]);
-                }
-                return callback(str);
+                return callback(Func.BigIntsToString(r));
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
+    }
+
+    getLink(address, callback) {
+        this.VRE.deployed().then((i) => {
+            return i.getLink.call(address).then((r) => {
+                return callback(Func.BigIntsToString(r));
             });
         }).catch((e) => {
             console.log(e);
@@ -272,20 +272,6 @@ export class Contract {
         this.VRE.deployed().then((i) => {
             return i.transferProperty(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account}).then((r) => {
                 return callback(r);
-            });
-        }).catch((e) => {
-            console.log(e);
-        });
-    }
-
-    getLink(address, callback) {
-        this.VRE.deployed().then((i) => {
-            return i.getLink.call(address).then((r) => {
-                let str = "";
-                for (let i = 0; i < r.length; i++) {
-                    str += Func.HexToString(r[i]);
-                }
-                return callback(str);
             });
         }).catch((e) => {
             console.log(e);
@@ -320,6 +306,17 @@ export class Contract {
             });
         }).catch((e) => {
             console.log(e);
+        });
+    }
+
+    makeBid(x, y, bid) {
+        this.VRE.deployed().then((i) => {
+            return i.makeBid(this.toID(x, y), bid, {from: this.account });
+        }).then(() => {
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Bid for " + x + "x" + y + " sent to owner."});
+        }).catch((e) => {
+            console.info(e);
+            this.sendResults(LISTENERS.Error, {result: false, message: "Error placing bid."});
         });
     }
 

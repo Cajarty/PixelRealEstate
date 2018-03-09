@@ -1,6 +1,7 @@
 import {ctr, Contract, EVENTS, LISTENERS} from './contract.jsx';
 import Axios from '../network/Axios.jsx';
 import * as Func from '../functions/functions.jsx';
+import * as Assets from '../const/assets';
 
 export const Compares = {
     xAsc: { 

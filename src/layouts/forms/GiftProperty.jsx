@@ -3,7 +3,7 @@ import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 
-class GiftProperty extends Component {
+class TransferProperty extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -24,16 +24,16 @@ class GiftProperty extends Component {
     }
 
     componentDidMount() {
-        GFD.listen('x', 'giftPixel', (x) => {
+        GFD.listen('x', 'transferProperty', (x) => {
             this.setState({x});
         })
-        GFD.listen('y', 'giftPixel', (y) => {
+        GFD.listen('y', 'transferProperty', (y) => {
             this.setState({y});
         })
     }
 
     componentWillUnmount() {
-        GFD.closeAll('giftPixel');
+        GFD.closeAll('transferProperty');
     }
 
     setX(x) {
@@ -55,7 +55,7 @@ class GiftProperty extends Component {
                     <tr>
                         <td colSpan={2}>
                             <div className='title'>
-                                Gift Property:
+                                Transfer Property:
                             </div>
                         </td>
                     </tr>
@@ -97,7 +97,7 @@ class GiftProperty extends Component {
                     </tr>
                     <tr>
                         <td colSpan={2}>
-                            <input type='button' value='Gift Property' onClick={() => ctr.transferProperty(this.state.x - 1, this.state.y - 1, this.state.valueNewOwner, () => {})}></input>
+                            <input type='button' value='Transfer Property' onClick={() => ctr.transferProperty(this.state.x - 1, this.state.y - 1, this.state.valueNewOwner, () => {})}></input>
                         </td>
                     </tr>
                 </tbody>
@@ -107,4 +107,4 @@ class GiftProperty extends Component {
     }
 }
 
-export default GiftProperty
+export default TransferProperty

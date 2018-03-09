@@ -199,9 +199,9 @@ contract VirtualRealEstate is StandardToken {
             require(msg.sender == property.owner);
             require(property.flag != 2);
         } else if (property.becomePublic < now) {
-            uint256 pptSpent = pptToSpend;
+            uint256 pptSpent = pptToSpend + 1; //All pptSpent math uses N+1, so built in for convenience
             if (pptToSpend < 2 && now <= EXTA_COLOR_SPEND_UNTIL) { //If first 3 days and we spent <2 coins, treat it as if we spent 2
-                pptSpent = 2;
+                pptSpent = 3; //We're treating it like 2, but it's N+1 in the math using this
             }
             require(balances[msg.sender] >= pptToSpend);
             balances[msg.sender] -= pptToSpend;
@@ -217,8 +217,8 @@ contract VirtualRealEstate is StandardToken {
                     totalSupply += payoutEach;
                 }
             }
-            property.becomePublic = now + (pptSpent * payoutInterval / 2); //N/2 minutes of user-private mode
-            property.earnUntil = now + (pptSpent + 1) * (pptSpent + 1) * payoutInterval; //(N+1)^2 coins earned max/minutes we can earn from
+            property.becomePublic = now + (pptSpent * payoutInterval / 2); //(N+1)/2 minutes of user-private mode
+            property.earnUntil = now + (pptSpent) * (pptSpent) * payoutInterval; //(N+1)^2 coins earned max/minutes we can earn from
         } else {
             return false;
         }

@@ -30,30 +30,61 @@ class Canvas extends Component {
         ctx.webkitImageSmoothingEnabled = false;
         this.setState({ ctx });
         this.canvas.onmousemove = (e) => {          
+            let bodyRect = document.body.getBoundingClientRect();
             let rect = this.canvas.getBoundingClientRect();
             let x = (e.clientX - rect.left) * (1000 / rect.width);
             let y = (e.clientY - rect.top) * (1000 / rect.height);  
             GFD.setData('hoverX', x);
             GFD.setData('hoverY', y);
-            GFD.setData('canvasTopOffset', rect.top); //move this and other 3 to a "on canvas resize"
-            GFD.setData('canvasLeftOffset', rect.left);
+            GFD.setData('canvasTopOffset', rect.top - bodyRect.top); //move this and other 3 to a "on canvas resize"
+            GFD.setData('canvasLeftOffset', rect.left - bodyRect.left);
             GFD.setData('canvasWidth', rect.width);
             GFD.setData('canvasHeight', rect.height);
         };
         this.canvas.onmouseout = (e) => {        
             GFD.setData('hoverX', -1);
             GFD.setData('hoverY', -1);
+            // GFD.setData('pressX', -1);
+            // GFD.setData('pressY', -1);
+            // GFD.setData('pressTime', -1);
         };
-        this.canvas.onclick = (e) => {         
+        this.canvas.onclick = (e) => {    
             if (!e.isTrusted)
                 return;
-                
+
             let rect = this.canvas.getBoundingClientRect();
             let x = Math.floor((e.clientX - rect.left) * (1000 / rect.width) / 10);
             let y = Math.floor((e.clientY - rect.top) * (1000 / rect.height) / 10); 
             GFD.setData('x', x + 1);
             GFD.setData('y', y + 1);
+                
+            if (!GFD.getData('advancedMode') && SDM.allProperties[x] != null && SDM.allProperties[x][y] != null) {
+                ctr.getLink(SDM.allProperties[x][y].owner, (data) => {
+                    if (data != null && data.length > 0) {
+                        this.linkTag.href = data;
+                        this.linkTag.click();
+                    }
+                });
+            }
         };
+
+        // this.canvas.onmousedown = (e) => {     
+        //     if (!e.isTrusted)
+        //         return;
+
+        //     let rect = this.canvas.getBoundingClientRect();
+        //     let x = Math.floor((e.clientX - rect.left) * (1000 / rect.width) / 10);
+        //     let y = Math.floor((e.clientY - rect.top) * (1000 / rect.height) / 10); 
+        //     GFD.setData('pressX', x + 1);
+        //     GFD.setData('pressY', y + 1);
+        //     GFD.setData('pressTime', new Date().getTime());
+        // }
+
+        // this.canvas.onmouseup = (e) => {     
+        //     GFD.setData('pressX', -1);
+        //     GFD.setData('pressY', -1);
+        //     GFD.setData('pressTime', -1);
+        // }
 
         ctr.listenForResults(LISTENERS.ServerDataManagerInit, 'canvas', (results) => {
             if (results.imageLoaded) {
@@ -152,6 +183,7 @@ class Canvas extends Component {
                 <div className={!this.state.loaded ? 'loading' : 'hidden'}>
                     <img className='icon' src={Assets.LOADING} draggable={false}></img>
                 </div>
+                <a target='_blank' ref={(linkTag) => {this.linkTag = linkTag}} style={{display: 'hidden'}}></a>
             </div>
         );
     }

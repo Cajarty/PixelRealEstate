@@ -70,7 +70,6 @@ class HoverLabel extends Component {
     }
 
     updateLabel(x, y) {
-        //get hover text by property x,y here. also make sure to check its not te same property its requesting on a 1 pixel mouse move or something
         if (x < 0 || y < 0) {
             this.setState({show: false})
         } else {

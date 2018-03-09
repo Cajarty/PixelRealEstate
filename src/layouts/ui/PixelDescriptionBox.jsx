@@ -274,15 +274,15 @@ class PixelDescriptionBox extends Component {
                             <td>{this.state.isInPrivate ? 'Yes' : 'No'}</td>
                         </tr>
                         {this.state.hoverText != '' ? 
-                        <tr>
-                            <th>Comment</th>
-                            <td>{this.state.hoverText}</td>
-                        </tr>
+                            <tr>
+                                <th>Comment</th>
+                                <td>{this.state.hoverText}</td>
+                            </tr>
                         : null}
                         {this.state.link != '' ? 
                             <tr>
                                 <th>Link</th>
-                                <td><a href={this.state.link}></a></td>
+                                <td><a target="_blank" href={this.state.link}>{this.state.link}</a></td>
                             </tr>
                         : null}
                     </tbody>

@@ -6,7 +6,7 @@ class SetHoverText extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            linkText: '',
+            linkText: 'http://',
         };
     }
 
@@ -18,6 +18,9 @@ class SetHoverText extends Component {
 
     handleInput(key, value) {
         let obj = {};
+        if (!/^https?:\/\//i.test(value)) {
+            value = 'http://' + value;
+        }
         obj[key] = value;
         this.setState(obj);
     }

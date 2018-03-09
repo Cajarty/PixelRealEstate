@@ -14,6 +14,7 @@ import {GFD, GlobalState} from '../../functions/GlobalState';
 import * as Strings from '../../const/strings';
 import HoverBox from './HoverBox';
 import * as Assets from '../../const/assets';
+import ClickLoader from '../ui/ClickLoader';
 
 class CanvasPage extends Component {
     constructor(props) {

@@ -111,7 +111,7 @@ class PixelDescriptionBox extends Component {
         this.state.ctx.drawImage(this.dataCanvas, 0, 0);
     }
 
-    loadProperty(x, y, data = null) {
+    loadProperty(x, y, canvasData = null) {
         if (x === '' || y === '')
             return;
         ctr.getPropertyData(x, y, (data) => {  
@@ -141,12 +141,12 @@ class PixelDescriptionBox extends Component {
                     this.setState({link: data});
             });
         });
-        if (data === null) {
-            ctr.getPropertyColors(x, y, (x, y, data) => {
-                this.setCanvas(data);
+        if (canvasData === null) {
+            ctr.getPropertyColors(x, y, (x, y, canvasData) => {
+                this.setCanvas(canvasData);
             });
         } else {
-            this.setCanvas(data);
+            this.setCanvas(canvasData);
         }
         this.startTokenEarnedInterval();
     }

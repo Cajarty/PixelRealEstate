@@ -44,6 +44,7 @@ export class ServerDataManager {
         this.allProperties = {};
         this.forSaleProperties = {};
         this.ownedProperties = {};
+        this.bids = {};
 
         //for network requests
         this.cancelDataRequestToken = null;
@@ -63,6 +64,7 @@ export class ServerDataManager {
         ctr.stopListeningForEvent(EVENTS.CancelTradeOffer, 'SDM-CancelTradeOffer');
         ctr.stopListeningForEvent(EVENTS.SetPropertyPublic, 'SDM-SetPropertyPublic');
         ctr.stopListeningForEvent(EVENTS.SetPropertyPrivate, 'SDM-SetPropertyPrivate');
+        ctr.stopListeningForEvent(EVENTS.Bid, 'SDM-Bid');
     }
 
     setupEvents() {
@@ -119,6 +121,18 @@ export class ServerDataManager {
         ctr.listenForEvent(EVENTS.SetPropertyPrivate, 'SDM-SetPropertyPrivate', (data) => {
             this.insertProperty(data.args);
             this.organizeProperty(data.args);
+        });
+        ctr.listenForEvent(EVENTS.Bid, 'SDM-Bid', (data) => {
+            let bid = Func.BigNumberToNumber(data.args.bid);
+            let xy = ctr.fromID(Func.BigNumberToNumber(data.args.property));
+            //let xy = ctr.fromID(Func.BigNumberToNumber(data.args.property));
+            let x = xy.x, y = xy.y;
+            console.info(bid, x, y);
+            if (this.bids[x] == null) 
+                this.bids[x] = {};
+            if (this.bids[x][y] == null)
+                this.bids[x][y] = {};
+            this.bids[x][y][Math.floor(new Date().getTime() / 1000)] = bid;//change this to propert timestamp
         });
     }
 
@@ -229,7 +243,6 @@ export class ServerDataManager {
     Updates a property at a location with the new passed in data.
     */
     updateProperty(x, y, update) {
-        console.info(x, y, update);
         if (this.allProperties[x] == null) {
             this.allProperties[x] = {};
         }

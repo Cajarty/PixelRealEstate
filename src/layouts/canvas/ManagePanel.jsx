@@ -5,6 +5,7 @@ import Pullout from '../ui/Pullout';
 import PulloutTab from '../ui/PulloutTab';
 import * as Assets from '../../const/assets.jsx';
 import PropertiesForSale from '../ui/PropertiesForSale';
+import PropertyBids from '../ui/PropertyBids';
 
 class ManagePanel extends Component {
     constructor(props) {
@@ -25,7 +26,8 @@ class ManagePanel extends Component {
                         <PulloutTab icon={Assets.ICON_MONEY} tabName='Property Market'>
                             <PropertiesForSale/>
                         </PulloutTab>
-                        <PulloutTab icon={Assets.ICON_MONEY} tabName='Property Offers'>
+                        <PulloutTab icon={Assets.ICON_MONEY} tabName='Property Bids'>
+                            <PropertyBids/>
                         </PulloutTab>
                     </Pullout>
                 </div>

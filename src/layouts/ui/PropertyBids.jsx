@@ -5,35 +5,28 @@ import Timestamp from 'react-timestamp';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import Hours from '../ui/Hours';
 import Moment from 'react-moment';
+import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 
-class PixelDescriptionBox extends Component {
+class PropertyBids extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            tokenEarnedInterval: null,
             x: '', 
             y: '',
             ctx: null,
             dataCtx: null,
-            owner: "",
-            isForSale: false,
-            ETHPrice: 0,
-            PPCPrice: 0,
-            lastUpdate: 0,
-            reserved: 0,
-            latestBid: 0,
-            isInPrivate: false,
-            maxEarnings: 0,
-            earnings: 0,
+            bids: null,
         }
     }
 
     setX(x) {
         GFD.setData('x', x);
+        this.loadBids(x - 1, this.state.y - 1);
     }
     
     setY(y) {
         GFD.setData('y', y);
+        this.loadBids(this.state.x - 1, y - 1);
     }
 
     componentWillReceiveProps(newProps) {
@@ -59,15 +52,17 @@ class PixelDescriptionBox extends Component {
             dataCtx,
         });
 
-        GFD.listen('x', 'pixelBrowse', (x) => {
+        GFD.listen('x', 'propertyBids', (x) => {
+            this.loadBids(x - 1, GFD.getData('y') - 1);
             this.setState({x});
         })
-        GFD.listen('y', 'pixelBrowse', (y) => {
+        GFD.listen('y', 'propertyBids', (y) => {
+            this.loadBids(GFD.getData('x') - 1, y - 1);
             this.loadProperty(GFD.getData('x') - 1, y - 1);
             this.setState({y});
         })
 
-        ctr.listenForEvent(EVENTS.PropertyColorUpdate, 'PixelDescriptionBox', (data) => {
+        ctr.listenForEvent(EVENTS.PropertyColorUpdate, 'propertyBids', (data) => {
             let xy = {x: 0, y: 0, colors: []};
             if (data.args.x == null || data.args.y == null)
                 xy = ctr.fromID(Func.BigNumberToNumber(data.args.property));
@@ -88,16 +83,8 @@ class PixelDescriptionBox extends Component {
         });
     }
 
-    calculateEarnings(last = this.state.lastUpdate, max = this.state.maxEarnings) {
-        let now = new Date().getTime();
-        let maxTime = (last + (max * 60)) * 1000;
-        let current = Math.min(now, maxTime);
-        return Math.floor((current - (last * 1000)) / 60000);
-    }
-
     componentWillUnmount() {
-        GFD.closeAll('pixelBrowse');
-        this.stopTokenEarnedInterval();
+        GFD.closeAll('propertyBids');
     }
 
     setCanvas(rgbArr) {
@@ -107,30 +94,12 @@ class PixelDescriptionBox extends Component {
         }
         this.state.dataCtx.putImageData(ctxID, 0, 0);
         this.state.ctx.drawImage(this.dataCanvas, 0, 0);
+        this.forceUpdate();
     }
 
     loadProperty(x, y, data = null) {
-        if (x === '' || y === '')
+        if (!this.validBounds(x, y))
             return;
-        ctr.getPropertyData(x, y, (data) => {  
-            let ethp = Func.BigNumberToNumber(data[1]);
-            let ppcp = Func.BigNumberToNumber(data[2]);
-            let reserved = Func.BigNumberToNumber(data[5]);
-            let lastUpdate = Func.BigNumberToNumber(data[3]);
-            let maxEarnings = Math.pow((reserved - lastUpdate) / 30, 2);
-            this.setState({
-                owner: data[0],
-                isForSale: ppcp != 0,
-                ETHPrice: ethp,
-                PPCPrice: ppcp,
-                lastUpdate,
-                isInPrivate: data[4],
-                reserved,
-                latestBid: Func.BigNumberToNumber(data[6]),
-                maxEarnings,
-                earnings: this.calculateEarnings(lastUpdate, maxEarnings),
-            });
-        });
         if (data === null) {
             ctr.getPropertyColors(x, y, (x, y, data) => {
                 this.setCanvas(data);
@@ -138,21 +107,6 @@ class PixelDescriptionBox extends Component {
         } else {
             this.setCanvas(data);
         }
-        this.startTokenEarnedInterval();
-    }
-
-    startTokenEarnedInterval() {
-        this.setState({
-            tokenEarnedInterval: setInterval(() => {
-                let newEarned = this.calculateEarnings(this.state.lastUpdate, this.state.maxEarnings);
-                if (this.state.earnings != newEarned)
-                    this.setState({earnings: newEarned});
-            }, 1000)
-        })
-    }
-
-    stopTokenEarnedInterval() {
-        clearInterval(this.state.tokenEarnedInterval);
     }
 
     placeBid() {
@@ -161,9 +115,30 @@ class PixelDescriptionBox extends Component {
                 alert("You must have at least 1 PXL to place a bid.");
                 return;
             }
-            let bid = window.prompt("Please enter an amount of PXL from 1 to " + balance + ". Bids cost 1 PXL each.");
-            ctr.makeBid(this.state.x - 1, this.state.y - 1, parseInt(bid));
+            let bid = parseInt(window.prompt("Please enter an amount of PXL from 1 to " + (balance - 1) + ". Bids cost 1 PXL each."));
+            if (bid < 1 || bid >= balance) {
+                alert("Incorrect bid amount.");
+                return;
+            }
+            ctr.makeBid(this.state.x - 1, this.state.y - 1, bid);
         });
+    }
+
+    loadBids(x, y) {
+        if (!this.validBounds(x, y)) {
+            this.setState({bids: null});
+            return;
+        }
+
+        if (SDM.bids[x] != null && SDM.bids[x][y] != null) {
+            this.setState({bids: SDM.bids[x][y]});
+        } else {
+            this.setState({bids: null});
+        }
+    }
+
+    validBounds(x = this.state.x, y = this.state.y) {
+        return x !== '' && y !== '' && x >= 0 && x <= 99 && y >= 0 && y <= 99;
     }
 
     render() {
@@ -194,29 +169,7 @@ class PixelDescriptionBox extends Component {
                                 ></input></td>
                         </tr>
                         <tr>
-                            <th>Owner</th>
-                            <td>{this.state.owner}</td>
-                        </tr>
-                        <tr>
-                            <th>For Sale</th>
-                            <td>{this.state.isForSale ? 'Yes' : 'No'}</td>
-                        </tr>
-                        {this.state.isForSale ? (
-                            <tr>
-                                <th>Price</th>
-                                <td>
-                                    {this.state.ETHPrice == 0 ? '' : this.state.ETHPrice + ' ETH'}
-                                    {this.state.ETHPrice != 0 && this.state.PPCPrice != 0 ? ' - ' : ''}
-                                    {this.state.PPCPrice == 0 ? '' : this.state.PPCPrice + ' PPC'}
-                                </td>
-                            </tr>
-                        ) : null}
-                        <tr>
-                            <th>Latest Bid</th>
-                            <td>{this.state.latestBid == 0 ? "None" : this.state.latestBid}</td>
-                        </tr>
-                        <tr colSpan={2}>
-                            <td>
+                            <td colSpan={2}>
                                 <input 
                                     type='button' 
                                     onClick={() => this.placeBid()} 
@@ -225,52 +178,28 @@ class PixelDescriptionBox extends Component {
                             </td>
                         </tr>
                         <tr>
-                            <th>Last Color Change</th>
-                            <td>{this.state.lastUpdate == 0 ? 'Never' : <Timestamp time={this.state.lastUpdate} precision={2} autoUpdate/>}</td>
+                            <th colSpan={2}>Bids</th>
                         </tr>
-                        <tr>
-                            <th>Current Payout</th>
-                            <td>
-                                {this.state.lastUpdate == 0 ? "None" :
-                                    <div>
-                                        {this.state.earnings}
-                                        /
-                                        {this.state.maxEarnings}
-                                    </div>
-                                }
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Reserved</th>
-                            <td>{this.state.reserved == 0 || this.state.reserved * 1000 <= new Date().getTime() ? 
-                                'No' 
-                            : 
-                                <Moment 
-                                    onChange={
-                                        (val) => {
-                                            if (this.state.reserved * 1000 <= new Date().getTime())
-                                                this.forceUpdate();
-                                        }
-                                    } 
-                                    interval={1000} 
-                                    fromNow 
-                                    ago>
-                                    {this.state.reserved * 1000}
-                                </Moment>
-                            }</td>
-                        </tr>
-                        <tr>
-                            <th>Is Private</th>
-                            <td>{this.state.isInPrivate ? 'Yes' : 'No'}</td>
-                        </tr>
-                        <tr>
-                            <th>Comment</th>
-                            <td>IMPLEMENT</td>
-                        </tr>
-                        <tr>
-                            <th>Link</th>
-                            <td>IMPLEMENT</td>
-                        </tr>
+                        {this.state.bids != null ?
+                            <tr>
+                                <th colSpan={2}>
+                                    <table className='bidsTable'>
+                                        <tbody>
+                                            {Object.keys(this.state.bids).map((key) => (
+                                                <tr key={key}>
+                                                    <td>
+                                                        <Timestamp time={key} precision={2} />
+                                                    </td>
+                                                    <td>
+                                                        {this.state.bids[key]}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </th>
+                            </tr>
+                        : null}
                     </tbody>
                 </table>
             </div>
@@ -278,4 +207,4 @@ class PixelDescriptionBox extends Component {
     }
 }
 
-export default PixelDescriptionBox
+export default PropertyBids

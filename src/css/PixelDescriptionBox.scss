@@ -8,6 +8,17 @@
     }
 }
 
+.bidsTable {
+    text-align: center;
+    tr {
+        width: 100%;
+        td {
+            width: 50%;
+            text-align: center;
+        }
+    }
+}
+
 table {
     border-collapse: separate;
     border-spacing: 0px 10px;

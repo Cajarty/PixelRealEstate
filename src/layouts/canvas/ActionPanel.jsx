@@ -7,7 +7,7 @@ import PulloutTab from '../ui/PulloutTab';
 import * as Assets from '../../const/assets.jsx';
 import SetHoverText from '../forms/SetHoverText';
 import SetLink from '../forms/SetLink';
-import GiftProperty from '../forms/GiftProperty';
+import TransferProperty from '../forms/TransferProperty';
 import ChangePropertyMode from '../forms/ChangePropertyMode';
 
 class ActionPanel extends Component {
@@ -27,7 +27,7 @@ class ActionPanel extends Component {
                     </PulloutTab>
                     <PulloutTab icon={Assets.ICON_MONEY} tabName='Sell Property'>
                         <SellPixelForm/>
-                        <GiftProperty/>
+                        <TransferProperty/>
                     </PulloutTab>
                     <PulloutTab icon={Assets.ICON_MONEY} tabName='Update Property'>
                         <SetPixelColorForm/>

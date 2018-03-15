@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>PixelProperty</title>
+        <meta name="description" content="Evolving Digital Canvas" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!--Bootstrap 4-->
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+        <!--icons-->
+        <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" />
+        <link rel="stylesheet" href="css/font-awesome.min.css" />
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="css/custom.css" />
+    </head>
+
+    <body>
+        <!--header-->
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top sticky-navigation">
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="ion-grid icon-sm"></span>
+                </button>
+            <span class="white font-pixel">PIXEL PROPERTY</span>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav ml-auto font-roboto">
+                    <li class="nav-item mr-3">
+                        <a class="nav-link page-scroll font-roboto" href="index.html">CANVAS<span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item mr-3">
+                        <a class="nav-link page-scroll" href="features.html">DETAILS</a>
+                    </li>
+                    <li class="nav-item mr-3">
+                        <a class="nav-link page-scroll" href="team.html">ABOUT US</a>
+                    </li>
+                    <li class="nav-item mr-3">
+                        <a class="nav-link page-scroll active" href="whitepaper.html">WHITE PAPER</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!--about us-->
+        <section class="bg-light" id="features" style="padding-top:120px; height:100vh">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="center">
+                            <input class="btn btn-primary" value="Download Full Whitepaper" onclick="window.location = 'docs/PPWhitePaper.pdf';" type="button">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-10 offset-md-1 col-sm-12 mt-5">
+                        <h3 class="font-pixel">Abstract</h3>
+                        <p>
+                            Blockchain technology has become an increasingly popular term in the last few years, with various use cases emerging as the technology matures. A use case we explore in PixelProperty is creating an evolving digital canvas using cryptocollectables. Each 10x10 region on the digital canvas is a digital property that can be treated as a cryptocollectable, or and can situationally have its display changed to a particular users preference. Digital property owners can allow the community to update the pixels on their property, allowing an evolving changing canvas. In order to incentivise users to change the canvas, as well as incentivise owners to let their properties be used freely, a cryptocurrency known as PixelPropertyCoin (PPC) is created and distributed based on ownership and usage. These cryptocollectable properties create a decentralized evolving canvas of digital real estate, following their own supply and demand market for trading between users via the PPC cryptocurrency.
+                        </p>
+                    </div>
+                    <div class="col-md-10 offset-md-1 col-sm-12 mt-5">
+                        <h3 class="font-pixel">Introduction</h3>
+                        <p>
+                           Blockchain technology has become an increasingly popular term in the last few years, with various use cases emerging as the technology matures. Despite the most popular use case being creating digital currencies known as cryptocurrencies, another use case with growing interests is the creation of digital collectable items, also known as cryptocollectables. Cryptocollectables are unique, non-fungible, tradable assets powered by blockchain technology. Where traditional cryptocurrencies are similar to the US Dollar or game machine tokens, cryptocollectables are more similar to trading cards or stamps. Cryptocollectables can be bought, sold or traded, each being unique and non-fungible.
+                        </p>
+                        <p>
+                            One use case for cryptocollectables that has not been explored as much is property, or more specifically, digital property. Cryptocollectables can be used to represent digital assets of ownership. For example, the deed to a house could be digitized into a cryptocollectable-like item, where transacting the token represents transacting the deed that is paired to the property.
+                        </p>
+                        <p>
+                            The concept can be explore further into digital properties, where the ownership is something purely digital, for example, pixels on a canvas. This canvas then becomes a sort of digital billboard where pixel real estate on the shared billboard can have its properties, such as color, determined by a differing users. In theory, such a digital canvas could turn into an artistic battle between users, it could turn into an evolving canvas of agreed upon beauty, or potentially a powerful advertising tool for businesses. This is the path PixelProperty chose to explore.
+                        </p>
+                        <p>
+                            Another interesting aspect of creating a digital canvas becomes incentivizing users. Why would a property owner want other users to change their canvas’ display? Why would users want to change the display in the first place? To create an incentive system to tie it all together, we chose to explore treating properties as a token generating machine which consistently rewards users of a system, which pays out its generated currency to both the property owner, as well as to users who change the colors. This is similar to a proof-of-stake system, where a property’s owner determines their use for their stake and, if choosing to share publicly, is can be rewarded in tokens. We believe this incentive will be sufficient to keep the canvas always changing, never stagnating.
+                        </p>
+                    </div>
+                    <div class="col-md-10 offset-md-1 col-sm-12 mt-5">
+                        <h3 class="font-pixel">Technical Details</h3>
+                        <h5 class="font-pixel">Technology</h5>
+                        <p>
+                            The digital property tokens and cryptocurrency are both powered by Ethereum. Ethereum is a blockchain technology which allows for the creation of Smart Contracts and decentralized applications. The cryptocurrency, PPC, is an ERC20 token. This means the digital property and cryptocurrency is being run on blockchain technology, unable to be destroyed or removed in the future. Once you purchase a digital property or start earning PPCs, you can own them forever, in your own wallet. We have no control, possession nor mediation of transactions on the blockchain.
+                        </p>
+                        <p>
+                            PixelProperty.io the website is a user interface created to interact with the Smart Contract. Users can communicate with it directly if they choose, our website simply acts as a convenience layer for user experience. A web server acts as an intermediary to cache data from the Smart Contract, allowing for a more seamless user experience.
+                        </p>
+                        <h5 class="font-pixel">Interactable Commands</h5>
+                        <h6 class="font-pixel">Change a Property’s Mode</h6>
+                        <p>
+                            A properties owner can change what mode the property is in at any time. When the property is in “Private” mode, only the owner of the property can change the colour. When a property is in “Free Use” mode, anyone can change the display picture.
+                        </p>
+                        <p>
+                            Unowned properties always default to Free Use mode.
+                        </p>
+                        <h6 class="font-pixel">Change Property Display Image</h6>
+                        <p>
+                            If a property is in Free Use mode, the property’s display image can be changed by any user. For every hour since the last display change on that property, two PPC tokens are generated. Half of the generated coins go to the last user who updated the display image, and the other half go to the owner of a property. If a property does not have an owner, both go to the last person who updated the display image.
+                        </p>
+                        <p>
+                            Changing the display image costs a fee of PPC. Changing the image of an unowned property costs two PPC tokens, while already owned properties costs one PPC to change.
+                        </p>
+                        <p>
+                            If a property is in Private mode, only the owner of the property can change the display image. In this mode, however, properties forfeit the right to generate two coins. Despite being free keep the properties in Private Mode, they effectively lose money by forfeiting their payouts. These coins are never generated and never added to the market cap.
+                        </p>
+                        <h6 class="font-pixel">Change User URL Link</h6>
+                        <p>
+                            Each property has a hyperlink attached to it which determines the website each browser will link to if a user clicks on that particular property on the canvas.
+                        </p>
+                        <p>
+                            When a user clicks on a property, they are redirected to the URL link associated with that properties owner.
+                        </p>
+                        <h6 class="font-pixel">Change User Hove Text</h6>
+                        <p>
+                            Each property has hover text attached to it which determines the text that displays under the cursor should a user hover their mouse over that particular property on the canvas.
+                        </p>
+                        <p>
+                            When a user hovers their mouse over a property, they are shown the hover text associated with that properties owner.
+                        </p>
+                        <h6 class="font-pixel">Buy Property</h6>
+                        <p>
+                            Users can buy property through the Smart Contract, with initial release properties being for same in ETH or PPC, while user-traded properties being for sale solely in PPC. Initially, purchasing in ETH raises the future ETH price, and purchasing in PPC raises the PPC price. Users can also initially do a split purchase with some percent in ETH and some percent in PPC. After the initial selling of a property, they can be sold amongst users in PPC and their price is solely dictated by the free market.
+                        </p>
+                        <h6 class="font-pixel">List Property For Sale</h6>
+                        <p>
+                            As an owner of property, you can list it for sale in the market at your chosen price in terms of PPC.
+                        </p>
+                        <h6 class="font-pixel">List a ETH to PPC or PPC to ETH Trade Offer</h6>
+                        <p>
+                            Users can trade between ETH and PPC among each other freely, allowing for convenient conversions between currencies.
+                        </p>
+                        <h6 class="font-pixel">Transfer Property Ownership</h6>
+                        <p>
+                            Users can transfer ownership of their property to another user should they choose.
+                        </p>
+                        <h6 class="font-pixel">Fee Free First Day</h6>
+                        <p>
+                            On release of the PixelProperty Smart Contract, changing the display image of a property will cost nothing. This is to allow the initial distribution of coins over the community for the first twenty-four hours.
+                        </p>
+                        <h6 class="font-pixel">Scarcity</h6>
+                        <p>
+                            The digital canvas will be created with 10,000 unique 10x10 pixel properties. No more will ever be created, and no property can ever truly be destroyed. Due to the nature of cryptocollectables, each property is unique, can never be replicated, as well as can never be divisible. Ten thousand properties will be all the properties that ever exists.
+                        </p>
+                        <p>
+                            For PPC, there will be an infinite amount of tokens released. Assuming every property is set to public for maximum inflation, 20,000 PPC will be distributed every hour. This is a constant rate which does not change. It costs PPC to use the canvas, therefore the deflation in the system comes from the system usage itself.
+                        </p>
+                        <h6 class="font-pixel">Property Distribution</h6>
+                        <p>
+                            On contract launch, none of the properties will have any owners, other than a select few that will be reserved to the development team of PixelProperty primarily for advertisement and giveaways. All properties will default to Free Use mode, allowing everyone to change every pixel of the canvas. Every property is for sale at the start, being purchasable in both ETH and PPC as currencies. It will have two seperate starting prices, one in ETH, and one in PPC. After every set amount of purchases done in ETH occur, the going ETH price for distribution will increase slightly. The same occurs with PPC. Users can also choose to pay a set percent of the ETH price and a set percent of the PPC price, which will raise both prices accordingly.
+                        </p>
+                        <p>
+                            This pricing method is to accomplish a few goals. The first is to allow the initial property offerings in both ETH and PPC. We at PixelProperty.io really wanted to accept our own token, however the pricing of it would be impossible, not knowing what its fluctuating market rate would be before it was even created. We decided a method which takes advantage of the free market would be the most appropriate way to dictate the price.
+                        </p>
+                        <h6 class="font-pixel">Free Market Between New & Used Properties</h6>
+                        <p>
+                            Despite the price of the initial properties increasing over time, that does not necessarily mean properties cannot be bought for less. Users who own properties already can sell to other users on the open market within the smart contract. Logically, if it was cheaper to buy a used property off the open market, rather than buying a new vacant property, a user would buy the cheaper one on the open market. This gives users the freedom to pay what they want, and means us as developers only receive more sales as the free market grows in price, allowing new properties to be sold as the market naturally grows. This is partially done in order to prevent the abuse of whales purchasing up all the properties at the start, and allow for a slowly distribution of properties to the users.
+                        </p>
+                        <h6 class="font-pixel">Free Market Between ETH & PPC Pricing</h6>
+                        <p>
+                            All properties can initially be purchased in either ETH or PPC. In order to have the prices for ETH and PPC both be fair relative to each other, while also desiring a pricing model that pushes for sustained growth, we opted to have two seperate prices for each product that increases with usage. As more users choose to purchase with the ETH pricing, it naturally raises the price in ETH. The same goes for sales in PPC.
+                        </p>
+                        <p>
+                            What this accomplishes is it naturally pushes the lower priced one upwards to math the more expensive alternative over time. If, initially, the price in terms of ETH was 0.1 ETH, and in terms of PPC was 1000 PPCs, but the going market rate for PPCS was 1 ETH == 1,000 PPCs, the current price between ETH and PPC is ten times cheaper in terms of PPC. For a few properties, users would obviously choose the PPC option over the ETH option. However, the price in terms of PPC would increase with sustained usage until it was relatively equal between the two, at which point people would begin purchasing in ETH. If either price falls behind the other, they will eventually equalize.
+                        </p>
+                        <p>
+                            This system incentivizes each price catching up with each other, raising the price with usage. This natural raise in selling price pushes the ceiling up, allowing for, theoretically, sustained growth. This is not guaranteed, as the “Free Market Between New & Used Properties” discussion explains, the initial sales are in competition with the free market of existing properties. If the free market dictates it is cheaper than the release price, users will simply not buy it at the release price and instead purchase it off eachother in the free market.
+                        </p>
+                        <h6 class="font-pixel">Cryptocurrency Distribution</h6>
+                        <p>
+                            Properties generate the cryptocurrency PPC over time. Every hour, two PPC are generated for each property on the canvas that is in Free Use mode. This sets the maximum inflation at 20,000 coins an hour, up to 175,200,000 coins a year in theory. However, every hour that a property is in Private mode, they forfeit their generation of coin, reducing the number of coins generated in practice.
+                        </p>
+                        <p>
+                            Setting the colours or the display image of a property on the canvas costs a small fee of up to two PPC. This fee is removed from circulation, reducing the total amount of coins.
+                        </p>
+                        <h6 class="font-pixel">Analysis On Inflation vs Deflation</h6>
+                        <p>
+                            Every year, 175,200,000 coins are released. This makes the inflation from year one to two a 100% increase, from years two to three a 66% inflation rate,  down to roughly 20% by year five, and 1% around year ten.
+                        </p>
+                        <p>
+                            The model is also deflationary in the sinks available. First and foremost, should a user set their property to Private mode in order to maintain full control of the visuals & advertisement space available within the property, they must forfeit their properties right to generate coins during such times. If we assume that even ten percent of the properties end up being used as advertising space at any given moment, the inflation rate is reduced during such times by that ten percent.
+                        </p>
+                        <p>
+                            The other sink is in the cost to use the digital canvas. It costs between one to two PPC to change the colours of the canvas. Considering coins are produced every hour, if everyone were to attempt to simply game the system against each other, stealing each others colours once per hour perfectly, this would mean we can predict around 10,000 coins could be spent per hour, while 20,000 coins enter the market. The number could be higher if people choose to utilize the canvas outside of simply attempting to game it once per hour, not to mention multiple users may try to change the colour at once. In such scenarios, we may approach all 20,000 coins being generated equaling out the coins being spent.
+                        </p>
+                        <p>
+                            However, if people do not change the property colours once every hour, inflation can take part properly. If a user spends two coins to set a colour, and they maintain hold of that property for five hours before being dethroned, that user earn a net positive of either PPC.
+                        </p>
+                        <h6 class="font-pixel">Sustainable Income Model</h6>
+                        <p>
+                            As a company, income is required to pay for development, contract deployment, advertisements, as well as upkeeping the websites services. Rather than aim for an ICO, which gives the developers a large lump sum of ETH set to an artificial value on day one, we opted to combine selling the properties with a more sustainable income model.
+                        </p>
+                        <p>
+                            First, we make income on the initial sale of a property. Early on, the default property price is low in order to incentivize early investors. During such time, we will earn money through the sales of unsold properties. There is only a fixed number of properties for sale, meaning these sales are one-time initial ways for us to kickstart our company. There are a set 10,000 properties for sale initially, with the going rate increasing in PPC or ETH with every purchase. The system does not require properties be purchased in order to function, as it is designed in order to, as it is designed to slowly sell out as the market rate naturally increases to meet the ceiling placed by the unsold properties. Effectively, this model offers us a large source of sustained income that will run out eventually.
+                        </p>
+                        <p>
+                            Next, we make the sustainable long-term income through a 2% fee on all property sales between users. This small fee is taken from the owner’s cut, meaning if a property is sold for 0.01 ETH, the new owner would pay 0.01 ETH and the previous owner would receive 0.0098 ETH in payment. There is no fee for converting between ETH and PPC when trading with other users through the Smart Contract, only for the buying and selling of properties.
+                        </p>
+                        <p>
+                            This paired income model with a short-term gains from sales and long-term residual income through transactions allows for two large benefits. First and foremost, it funds both immediately development, as well as allows funding for future plans on the road map. Secondly, it aligns our profit gains with the profit gains of investors. Where traditional cryptocurrencies or cryptocollectables have early ICO investors give all the money to development before the product is ready for release, our profit is not earned unless new sales come in, raising the default going rate of properties, which therefore raise the equity gained on existing properties through our default price increasion model. It also aligns our financial gains in harmony with the financial gains of early investors by taking a percent fee rather than a flat fee, as we earn more when trading occurs with properties at a higher evaluation.
+                        </p>
+                    </div>
+                    <div class="col-md-10 offset-md-1 col-sm-12 mt-5">
+                        <h3 class="font-pixel">Digital Advertisement Service</h3>
+                        <p>
+                            The digital canvas will be viewable on any browser, live updating, through an offered service. A web server will be run to act as a intermediary on the websites behalf, caching the last updated state of the PixelProperty canvas. This caching is done in order to make the user experience more seamless and minimize loading, however there is nothing stopping users from directly communicating with the smart contract through Ethereum on their own.
+                        </p>
+                        <h6 class="font-pixel">Reusable Canvas Widget</h6>
+                        <p>
+                            A HTML and JavaScript widget will be available for use by any website which allows the viewing of the digital canvas live. This widget can be used for websites, blogs, banners, anything which can render HTML and JavaScript can show the canvas. This feature, which will be showcased directly on the website, allows for the PixelProperty to be easily viewed, bringing value through viewership to the canvas and tokens.
+                        </p>
+                        <h6 class="font-pixel">Interactable Website</h6>
+                        <p>
+                            PixelProperty.io will showcase the reusable canvas and also allow users to interact with the canvas smart contract. The website will require MetaMask be used for such interactions. Through the website, user can change property visuals, their text, links, generate coins, as well as purchase or sell properties or coins in a simple user-friendly way.
+                        </p>
+                    </div>
+                    <div class="col-md-10 offset-md-1 col-sm-12 mt-5">
+                        <h3 class="font-pixel">Physical Advertisement</h3>
+                        <p>
+                            PixelProperty.io has one physical service planned for the PixelProperty ecosystem upon adequate funding. As a long-term plan item, we plan to build a roughly one hundred square meter live updating billboard in a location with a population of at least 1,000,000 citizens. This is a very expensive project that will not begin until adequate funding is accomplished, however it is on the roadmap as a planned way to bring the digital canvas to the real world and give more value to the visual real estate of the canvas.
+                        </p>
+                    </div>
+                    <div class="col-md-10 offset-md-1 col-sm-12 mt-5">
+                        <h3 class="font-pixel">Conclusion</h3>
+                        <p>
+                            With blockchain technology growing and cryptocollectables becoming a more popular use case, PixelProperty looks to explore a more specific use case of digital properties. PixelProperty attempts to create an evolving digital canvas of digital properties using tradable cryptocollectables, which can be used for artistic, or advertisement purposes. The system is powered by the cryptocurrency generated by the cryptocollectables of digital canvas. Through scarcity and a unique initial pricing model, the initial release of properties is at different prices in PPC or ETH, however after the initial sales nothing can be guaranteed as the entire price is driven by free market supply and demand. Users will be incentivized to participate by earning a unique cryptocurrency PPC for their efforts, as well as users will earn the same PPC for being a property owner, incentivizing property ownership.
+                        </p>
+                        <p>
+                            We believe the canvas service will allow for PixelProperty properties to gain real world value by being prime internet real estate, possibly being showcased on multiple websites, with anyone being able to host their own canvas with little to no hassle.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <style>
+            .center {
+                position: absolute;
+                left: 50%;
+                -webkit-transform: translate(-50%, -50%);
+                transform: translate(-50%, -50%);
+            }
+            h6 {
+                margin-top: 5px;
+            }
+            h3,h6 {
+                text-align: center;
+                margin-top: 5px;
+            }
+        </style>
+
+         <!--footer-->
+
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.js"></script>
+        <script src="js/ScrollMagic.min.js"></script>
+        <script src="js/jquery.svg.min.js"></script>
+        <script src="js/jquery.svganim.min.js"></script>
+        <script src="js/debug.addIndicators.min.js"></script>
+        <script src="js/scripts.js"></script>
+        <!-- <script src="js/pixel.js"></script> -->
+        <script src="js/press.js"></script>
+    </body>
+
+</html>

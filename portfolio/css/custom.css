@@ -16,13 +16,28 @@
     font-family: 'Roboto-Regular';
     src: url('../fonts/Roboto-Regular.ttf');
 }
+.bg-texture {
+    /*background: #89cff0;*/
+}
+.list-default > li::before,
+.card .card-body .icon-box,
+.text-primary {
+    /*color: #89cff0 !important;*/
+}
+.btn-primary {
+    /*background-color: orange !important;*/
+    /*border-color: orange !important;*/
+}
 .btn-white,
 .btn-primary {
     /*color: black !important;*/
 }
-.btn-primary:hover,
+.btn-primary:hover, 
 .btn-white:hover {
     color: black !important;
+}
+.card-body:hover {
+    cursor: pointer;
 }
 .font-pixel {
     font-family: 'Unibody8Pro-Bold';
@@ -114,6 +129,13 @@
 
 .icon-links-dark > a > i:hover {
     color: black;
+    /*color: orange;*/
+}
+a {
+    /*color: orange !important;*/
+}
+.btn-white {
+    /*color: orange !important;*/
 }
 .img-fadeIn {
     -webkit-filter: blur(7px);

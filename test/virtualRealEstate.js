@@ -268,8 +268,6 @@ contract('VirtualRealEstate', function(accounts) {
      assert.equal(coloursReturned[0], 5, "Should return 5 from the array of 5's" );
      return pixelPropertyInstance.balanceOf(accounts[4], { from: accounts[0] });
    }).then(function(balance) {
-     console.log("HERE");
-     console.log(balance);
      assert.equal(balance, 4, "Should have earned four coins from setting it and having it set for four seconds");
      return pixelPropertyInstance.balanceOf(accounts[3], { from: accounts[0] });
    }).then(function(balance) {
@@ -375,17 +373,60 @@ contract('VirtualRealEstate', function(accounts) {
  it("Owners of properties can change the property mode", function() {
    return VirtualRealEstate.deployed().then(function(instance) {
      pixelPropertyInstance = instance;
+     return pixelPropertyInstance.balanceOf(accounts[0], { from: accounts[0] });
+   }).then(function(balance)  {
+     privPubBeforeSet = balance;
+     return new Promise((resolve, reject) => { //Wait a second for the setColors to wear off
+      let wait = setTimeout(() => {
+        resolve("Delay Finished");
+      }, 1000);
+    });
+  }).then(function() {
      return pixelPropertyInstance.setPropertyMode(0, true, 1, { from: accounts[0] }); //Set to private
    }).then(function(s) {
+    return pixelPropertyInstance.balanceOf(accounts[0], { from: accounts[0] });
+  }).then(function(balance)  {
+     privPubAfterSet = balance;
      return pixelPropertyInstance.getPropertyData(0, { from: accounts[0] });
    }).then(function(propertyData) {
      assert.equal(propertyData[4], true, "Should be in private mode");
      return pixelPropertyInstance.setPropertyMode(0, false, 0, { from: accounts[0] }); //Set to public
    }).then(function(s) {
+    return pixelPropertyInstance.balanceOf(accounts[0], { from: accounts[0] });
+  }).then(function(balanceAfter)  {
+    privPubAfterSet++;
+    balanceAfter++;
+     assert.equal(privPubBeforeSet, privPubAfterSet, "Should have spent one coin setting it to public");
+     assert.equal(privPubBeforeSet, balanceAfter, "Should have not gotten that one returned as it should truncate");
      return pixelPropertyInstance.getPropertyData(0, { from: accounts[0] });
    }).then(function(propertyData) {
      assert.equal(propertyData[4], false, "Should be in public mode");
    });
+ });
+ it("Owners can make it public, wait a bit, then cancel and be refunded appropriately", function() {
+  return VirtualRealEstate.deployed().then(function(instance) {
+    pixelPropertyInstance = instance;
+    return pixelPropertyInstance.setPropertyMode(0, true, 5, { from: accounts[0] }); //Set to private for 10 seconds
+  }).then(function(s) {
+    return pixelPropertyInstance.getPropertyData(0, { from: accounts[0] });
+  }).then(function(propertyData) {
+    assert.equal(propertyData[4], true, "Should be in private mode");
+    return pixelPropertyInstance.balanceOf(accounts[0], { from: accounts[0] });
+  }).then(function(balance) {
+    privPubRefundBefore = parseInt(balance);
+    return new Promise((resolve, reject) => {
+      let wait = setTimeout(() => {
+        resolve("Delay Finished");
+      }, 2000);
+    });
+  }).then(function() {
+    return pixelPropertyInstance.setPropertyMode(0, false, 0, { from: accounts[0] }); //Set to private for 10 seconds
+  }).then(function() {
+    return pixelPropertyInstance.balanceOf(accounts[0], { from: accounts[0] });
+  }).then(function(balance) {
+    privPubRefundBefore += 2;
+    assert.equal(privPubRefundBefore, balance, "Should have refunded 2 coins");
+  });
  });
  it("SetColor on PrivateMode property that's expired changes it to Free-use mode", function() {
    return VirtualRealEstate.deployed().then(function(instance) {

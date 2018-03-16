@@ -85,6 +85,7 @@ contract VirtualRealEstate is StandardToken {
     event SetPropertyPublic(uint24 indexed property);
     event SetPropertyPrivate(uint24 indexed property, uint32 numMinutesPrivate);
     event Bid(uint24 indexed property, uint256 bid, uint256 timestamp);
+    event Debug(uint256 num);
     
     struct Property {
         uint8 flag; //0 == none, 1 == nsfw, 2 == ban
@@ -246,6 +247,7 @@ contract VirtualRealEstate is StandardToken {
         }
         return false;
     }
+    //0, 1, 1
     function setPropertyMode(uint24 propertyID, bool setPrivateMode, uint32 numMinutesPrivate) public validPropertyID(propertyID) {
         Property storage property = map[propertyID];
         require(msg.sender == property.owner);
@@ -257,6 +259,17 @@ contract VirtualRealEstate is StandardToken {
             totalSupply -= numMinutesPrivate;
             property.becomePublic = now + payoutInterval * numMinutesPrivate;
         } else {
+            if (property.isInPrivateMode && property.becomePublic > now) { //becomePublic has to be bigger than now
+                uint256 refundedAmount = (property.becomePublic - now) / payoutInterval;
+                Debug(property.becomePublic);
+                Debug(now);
+                Debug(payoutInterval);
+                Debug(refundedAmount);
+                balances[msg.sender] += refundedAmount - 1;
+                totalSupply += refundedAmount - 1;
+            } else {
+                Debug(5000);
+            }
             property.becomePublic = 0;
         }
         property.isInPrivateMode = setPrivateMode;

@@ -13,7 +13,7 @@ export const StringToBigInts = (string) => {
     let result = [];
     let innerResult = new bigInt("0", 10);
     for(let i = 0; i < 32; i++) {
-      let binary = 0;
+      let binary = 32;
       if (i < string.length) {
         binary = string.charCodeAt(i);
       }
@@ -23,7 +23,7 @@ export const StringToBigInts = (string) => {
     result.push(new BigNumber(innerResult.toString(), 10));
     innerResult = new bigInt("0", 10);
     for(let i = 32; i < 64; i++) {
-      let binary = 0;
+      let binary = 32;
       if (i < string.length) {
         binary = string.charCodeAt(i);
       }

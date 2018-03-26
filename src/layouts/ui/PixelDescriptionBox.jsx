@@ -228,7 +228,7 @@ class PixelDescriptionBox extends Component {
     render() {
         let actions = [];
         return (
-            <SegmentGroup>
+            <SegmentGroup className='pixelDescriptionBox'>
                 <Segment className='colorPreview'>
                     <Item className='colorPreivewCanvasContainer'>
                         <canvas id='colorPreviewCanvas' width={100} height={100} ref={(canvas) => { this.canvas = canvas; }} ></canvas>
@@ -236,7 +236,7 @@ class PixelDescriptionBox extends Component {
                     <canvas className='hidden' width={10} height={10} ref={(dataCanvas) => { this.dataCanvas = dataCanvas; }} ></canvas>
                 </Segment>
                 <Segment>
-                    <div className='twoColumn w50'>
+                    <div className='twoColumn w50 left'>
                         <Input
                             placeholder="1 - 100"
                             type="number"
@@ -252,7 +252,7 @@ class PixelDescriptionBox extends Component {
                             onChange={(e) => this.setX(e.target.value)}
                         />
                     </div>
-                    <div className='twoColumn w50'>
+                    <div className='twoColumn w50 right'>
                         <Input
                             placeholder="1 - 100"
                             type="number"
@@ -295,7 +295,7 @@ class PixelDescriptionBox extends Component {
                             className='Popup'
                             size='tiny'
                         />
-                        <input />
+                        <input className='bid'/>
                         <Label
                             onClick={() => this.placeBid()} 
                         >Bid</Label>

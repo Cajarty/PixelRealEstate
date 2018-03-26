@@ -1,6 +1,31 @@
+body {
+    background-color: $color1;
+    color: rgba(0, 0, 0, .6);
+    font-family: Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    text-transform: none;
+    text-shadow: none;
+    font-weight: 700;
+    line-height: 1em;
+    font-style: normal;
+    text-decoration: none;
+}
+
 .ui.label>.icon {
     margin: 0px;
     &.uniform {
         width: 14px;
+    }
+}
+
+.ui.segment,
+.ui.segments {
+    background-color: $color3 !important;
+}
+
+.ui.items {
+    margin: 1em 0px;
+    .content {
+        font-size: 1.3em !important;
+        padding-left: .5em !important;
     }
 }

@@ -7,6 +7,7 @@ import Axios from '../../network/Axios.jsx';
 import * as Compress from 'lzwcompress';
 import Zoom from './Zoom';
 import {GFD, GlobalState} from '../../functions/GlobalState';
+import {Label, LabelDetail} from 'semantic-ui-react';
 
 
 class ZoomCanvas extends Component {
@@ -121,7 +122,7 @@ class ZoomCanvas extends Component {
 
     render() {
         return (
-            <div className={'zoomCanvasContainer ' + (this.state.hideCanvas ? 'hide' : 'show')}>
+            <div className={'zoomCanvasContainer'/* + (this.state.hideCanvas ? 'hide' : 'show')*/}>
                 <canvas className='dataCanvas hidden'
                     width={1000}
                     height={1000}
@@ -133,7 +134,8 @@ class ZoomCanvas extends Component {
                     width={100}
                     height={100}
                 ></canvas>
-                <div className={'location ' + (this.state.hoverX == -1 || this.state.hoverY == -1 ? '' : '')}>{'x: ' + (this.state.hoverX + 1) + ' y: ' + (this.state.hoverY + 1)}</div>
+                  <Label>X<LabelDetail>{this.state.hoverX + 1}</LabelDetail></Label>
+                  <Label>Y<LabelDetail>{this.state.hoverY + 1}</LabelDetail></Label>
             </div>
         );
     }

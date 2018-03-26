@@ -337,25 +337,34 @@
     
     .twoColumn {
         display: inline-block;
-        margin: 0px 2.5% 6px 2.5% !important;
+        margin: 0px 0px 6px 0px !important;
         &.w50 {
-            width: 45% !important;
-            min-width: 45% !important;
+            width: 47.5% !important;
+            min-width: 47.5% !important;
         }
         &.w75 {
-            width: 70% !important;
-            min-width: 70% !important;
+            width: 72.5% !important;
+            min-width: 72.5% !important;
         }
         &.w25 {
-            width: 20% !important;
-            min-width: 20% !important;
+            width: 22.5% !important;
+            min-width: 22.5% !important;
+        }
+        &.left {
+            margin-right: 2.5% !important;
+        }
+        &.right {
+            margin-left: 2.5% !important;
         }
     }
     
     .oneColumn {
         display: inline-block;
-        width: 95% !important;
-        margin: 0px 2.5% 6px 2.5% !important;
+        width: 100% !important;
+        margin: 0px 0px 6px 0px !important;
+        .bid {
+            max-width: calc(100% - 96px) !important;
+        }
     }
     
     .oneColumnFull {
@@ -365,6 +374,7 @@
     
     .twoColumnFull {
         display: inline-block;
+        margin: 0px 0px 6px 0px !important;
         width: 50% !important;
     }
     

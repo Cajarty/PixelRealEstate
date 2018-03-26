@@ -15,6 +15,8 @@ import * as Strings from '../../const/strings';
 import HoverBox from './HoverBox';
 import * as Assets from '../../const/assets';
 import ClickLoader from '../ui/ClickLoader';
+import PixelDescriptionBox from '../ui/PixelDescriptionBox';
+import {Segment, SegmentGroup} from 'semantic-ui-react';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -85,47 +87,12 @@ class CanvasPage extends Component {
 
     render() {
         return (
-            <div>
-                <a 
-                    href='https://pixelproperty.io/' 
-                    target='_blank' 
-                    className='hideElement' 
-                    ref={(portfolioLink) => { this.portfolioLink = portfolioLink; }} 
-                />
-                <div className='banner'>
-
-                    <div className='headerButtons'>
-                        <input 
-                            type='button' 
-                            className='headerButton left' 
-                            value='Homepage' 
-                            onClick={() => this.visitPortfolio()}
-                        ></input>
-                        {this.state.advancedMode ? 
-                            <div className='ppcLabel'>
-                                <img className='token icon' src={Assets.TOKEN} draggable={false}></img>
-                                <div className='text'>
-                                    {this.state.PPCOwned}
-                                    {this.state.loadingPPC ? <img className='loading icon' src={Assets.LOADING} draggable={false}></img> : ''}
-                                </div>
-                            </div>
-                        : null}
-                        <input 
-                            type='button' 
-                            className='headerButton right' 
-                            value={this.state.advancedMode ? 'Viewing Mode' : 'Interactive Mode'}
-                            onClick={() => this.changeMode()}
-                        ></input>
-                    </div>
-                </div>
+            <SegmentGroup>
+               
                 <div className='top'>
-                    <div className={this.state.advancedMode ? '' : ' hideElement'}>
-                        <ManagePanel />
-                    </div>
-                    <div className={this.state.advancedMode ? 'leftMain' : 'leftMain full'}>
+                    <div className='leftMain full'>
                         <ZoomCanvas/>
                         <div className='infoBox'>
-                            Some nice info
                         </div>
                     </div>
                     <div className='centerMain'>
@@ -133,12 +100,12 @@ class CanvasPage extends Component {
                         <HoverBox/>
                         <Canvas/>
                     </div>
-                    <div className={this.state.advancedMode ? 'rightMain' : 'rightMain full'}>
+                    <div className='rightMain full'>
                         <ErrorBox/>
                         <div className='infoBox'>
                             {this.state.advancedMode ? 
                                 <div>
-                                    {Strings.ADVANCED_MODE_INTRO_RIGHT}
+                                    <PixelDescriptionBox/>
                                 </div> 
                             : 
                                 <div>
@@ -149,9 +116,6 @@ class CanvasPage extends Component {
                             }
                         </div>
                     </div>
-                    <div className={this.state.advancedMode ? '' : ' hideElement'}>
-                        <ActionPanel/>
-                    </div>
                 </div>
                 <div className='middle-top'>
                 </div>
@@ -160,7 +124,7 @@ class CanvasPage extends Component {
                 </div>
                 <div className='bottom'>
                 </div>
-            </div>
+            </SegmentGroup>
         );
     }
 }

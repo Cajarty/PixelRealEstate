@@ -5,6 +5,32 @@ var bigInt = require("big-integer");
 var BigNumber = require('bignumber.js');
 var utf8 = require("utf8");
 
+export const TimeSince = (date) => {
+    let seconds = Math.floor((new Date() - date) / 1000);
+    let interval = Math.floor(seconds / 31536000);
+
+    if (interval > 1) {
+        return interval + " years";
+    }
+    interval = Math.floor(seconds / 2592000);
+    if (interval > 1) {
+        return interval + " months";
+    }
+    interval = Math.floor(seconds / 86400);
+    if (interval > 1) {
+        return interval + " days";
+    }
+    interval = Math.floor(seconds / 3600);
+    if (interval > 1) {
+        return interval + " hours";
+    }
+    interval = Math.floor(seconds / 60);
+    if (interval > 1) {
+        return interval + " minutes";
+    }
+    return Math.floor(seconds) + " seconds";
+}
+
 export const Clamp = (min, max, value) => {
     return Math.max(min, Math.min(max, value));
 }

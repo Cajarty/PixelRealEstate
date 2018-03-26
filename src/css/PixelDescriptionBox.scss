@@ -1,10 +1,14 @@
 .colorPreview {
     text-align: center;
     margin: 10px 0px;
+    .colorPreivewCanvasContainer {
+        margin: auto;
+        width: 100px;
+        height: 100px;
+    }
     #colorPreviewCanvas {
         width: 100px;
         height: 100px;
-        border: 1px solid $color5;
     }
 }
 

@@ -15,10 +15,7 @@ body {
     height: 100vh;
     .infoBox {
         display: inline-block;
-        width: calc(100% - 12px);
-        background-color: $color2;
-        border-radius: 8px;
-        padding: 6px;
+        width: 100%
     }
     .leftMain {
         width: $panelWidth;

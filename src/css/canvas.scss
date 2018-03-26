@@ -38,10 +38,10 @@
         opacity: 1;
     }
     .zoomCanvas {
-        width: $panelWidth;
-        height: $panelWidth;
+        width: $panelWidthSimple;
+        height: $panelWidthSimple;
         max-height: calc(50vh - 12px);
-        max-width: calc(50vh - 12px);
+        max-width: 100%;
         display: block;
         float: right;
         &.full {

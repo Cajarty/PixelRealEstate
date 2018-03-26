@@ -133,7 +133,7 @@ class ZoomCanvas extends Component {
                     width={100}
                     height={100}
                 ></canvas>
-                <div className={'location ' + (this.state.hoverX == -1 || this.state.hoverY == -1 ? 'hideElement' : '')}>{'x: ' + (this.state.hoverX + 1) + ' y: ' + (this.state.hoverY + 1)}</div>
+                <div className={'location ' + (this.state.hoverX == -1 || this.state.hoverY == -1 ? '' : '')}>{'x: ' + (this.state.hoverX + 1) + ' y: ' + (this.state.hoverY + 1)}</div>
             </div>
         );
     }

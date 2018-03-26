@@ -12,7 +12,7 @@ export class GlobalState {
             pressTime: null,
             canvasTopOffset: null,
             canvasLeftOffset: null,
-            advancedMode: false,
+            advancedMode: true,
         };
         this.limiters = {
             
@@ -20,8 +20,14 @@ export class GlobalState {
         this.listeners = {
 
         };
-        this.setLimiter('x', (x) => {return Func.Clamp(1, 100, x)});
-        this.setLimiter('y', (y) => {return Func.Clamp(1, 100, y)});
+        this.setLimiter('x', (x) => {
+            if (x === '') return x;
+            return Func.Clamp(1, 100, x);
+        });
+        this.setLimiter('y', (y) => {
+            if (y === '') return y;
+            return Func.Clamp(1, 100, y);
+        });
     }
 
     setLimiter(key, limiterFunction) {

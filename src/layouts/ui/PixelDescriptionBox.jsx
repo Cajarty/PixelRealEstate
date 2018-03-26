@@ -5,6 +5,9 @@ import Timestamp from 'react-timestamp';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import Hours from '../ui/Hours';
 import Moment from 'react-moment';
+import {Label, Input, Item, Button, Popup, Icon, Grid, Segment, SegmentGroup} from 'semantic-ui-react';
+
+const NOBODY = '0x0000000000000000000000000000000000000000';
 
 class PixelDescriptionBox extends Component {
     constructor(props) {
@@ -27,6 +30,7 @@ class PixelDescriptionBox extends Component {
             earnings: 0,
             hoverText: '',
             link: '',
+            PPCOwned: 0,
         }
     }
 
@@ -140,6 +144,9 @@ class PixelDescriptionBox extends Component {
                 if (data != null && data.length > 0)
                     this.setState({link: data});
             });
+            ctr.getBalance((balance) => {
+                this.setState({PPCOwned: balance});
+            });
         });
         if (canvasData === null) {
             ctr.getPropertyColors(x, y, (x, y, canvasData) => {
@@ -176,120 +183,242 @@ class PixelDescriptionBox extends Component {
         });
     }
 
+    getPriceFormat() {
+        if (this.state.ETHPrice == 0 && this.state.PPCPrice == 0) 
+            return "Not for sale"
+        let s = this.state.ETHPrice == 0 ? '' : this.state.ETHPrice + ' ETH';
+        s += this.state.ETHPrice != 0 && this.state.PPCPrice != 0 ? ' - ' : '';
+        s += this.state.PPCPrice == 0 ? '' : this.state.PPCPrice + ' PXL';
+        return s;
+    }
+
+    getActionsList() {
+        let actions = [];
+        let Action = (label, action) => {return {
+            label: label,
+            action: action,
+        }};
+        if (this.state.isForSale)
+            actions.push(new Action("Buy", null));
+        if (!this.state.isForSale && this.state.owner == ctr.account)
+            actions.push(new Action("Sell", null));
+        if (this.state.isForSale && this.state.owner == ctr.account)
+            actions.push(new Action("Cancel Sale", null));
+        actions.push(new Action("Update Image", null));
+        actions.push(new Action("Place Offer", null));
+        if (this.state.owner == ctr.account) {
+            if (this.state.isInPrivate) {
+                actions.push(new Action("Make Public", null));
+            } else {
+                actions.push(new Action("Make Private", null));
+            }
+            actions.push(new Action("Transfer", null));
+        }
+        //blank one, remember to disable it.
+        if (actions.length % 2 == 1) {
+            actions.push(null);
+        }
+        let packed = [];
+        for (let i = 0; i < actions.length; i += 2) {
+            packed.push({a1: actions[i], a2: actions[i + 1]});
+        }
+        return packed;
+    }
+
     render() {
+        let actions = [];
         return (
-            <div>
-                <div className='colorPreview'>
-                    <canvas id='colorPreviewCanvas' width={100} height={100} ref={(canvas) => { this.canvas = canvas; }} ></canvas>
+            <SegmentGroup>
+                <Segment className='colorPreview'>
+                    <Item className='colorPreivewCanvasContainer'>
+                        <canvas id='colorPreviewCanvas' width={100} height={100} ref={(canvas) => { this.canvas = canvas; }} ></canvas>
+                    </Item>
                     <canvas className='hidden' width={10} height={10} ref={(dataCanvas) => { this.dataCanvas = dataCanvas; }} ></canvas>
-                </div>
-                <table cellSpacing={0} cellPadding={0} className='data'>
-                    <tbody>
-                        <tr>
-                            <th>X</th>
-                            <td><input 
-                                    type='number' 
-                                    placeholder='1-100'
-                                    value={this.state.x} 
-                                    onChange={(e) => this.setX(e.target.value)}
-                                ></input></td>
-                        </tr>
-                        <tr>
-                            <th>Y</th>
-                            <td><input 
-                                    type='number' 
-                                    placeholder='1-100'
-                                    value={this.state.y} 
-                                    onChange={(e) => this.setY(e.target.value)}
-                                ></input></td>
-                        </tr>
-                        <tr>
-                            <th>Owner</th>
-                            <td>{this.state.owner}</td>
-                        </tr>
-                        <tr>
-                            <th>For Sale</th>
-                            <td>{this.state.isForSale ? 'Yes' : 'No'}</td>
-                        </tr>
-                        {this.state.isForSale ? (
-                            <tr>
-                                <th>Price</th>
-                                <td>
-                                    {this.state.ETHPrice == 0 ? '' : this.state.ETHPrice + ' ETH'}
-                                    {this.state.ETHPrice != 0 && this.state.PPCPrice != 0 ? ' - ' : ''}
-                                    {this.state.PPCPrice == 0 ? '' : this.state.PPCPrice + ' PPC'}
-                                </td>
-                            </tr>
-                        ) : null}
-                        <tr>
-                            <th>Latest Bid</th>
-                            <td>{this.state.latestBid == 0 ? "None" : this.state.latestBid}</td>
-                        </tr>
-                        <tr colSpan={2}>
-                            <td>
-                                <input 
-                                    type='button' 
-                                    onClick={() => this.placeBid()} 
-                                    value='Place Bid (reword)'
-                                ></input>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Last Color Change</th>
-                            <td>{this.state.lastUpdate == 0 ? 'Never' : <Timestamp time={this.state.lastUpdate} precision={2} autoUpdate/>}</td>
-                        </tr>
-                        <tr>
-                            <th>Current Payout</th>
-                            <td>
-                                {this.state.lastUpdate == 0 ? "None" :
-                                    <div>
-                                        {this.state.earnings}
-                                        /
-                                        {this.state.maxEarnings}
-                                    </div>
-                                }
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Reserved</th>
-                            <td>{this.state.reserved == 0 || this.state.reserved * 1000 <= new Date().getTime() ? 
-                                'No' 
-                            : 
-                                <Moment 
-                                    onChange={
-                                        (val) => {
-                                            if (this.state.reserved * 1000 <= new Date().getTime())
-                                                this.forceUpdate();
-                                        }
-                                    } 
-                                    interval={1000} 
-                                    fromNow 
-                                    ago>
-                                    {this.state.reserved * 1000}
-                                </Moment>
-                            }</td>
-                        </tr>
-                        <tr>
-                            <th>Is Private</th>
-                            <td>{this.state.isInPrivate ? 'Yes' : 'No'}</td>
-                        </tr>
-                        {this.state.hoverText != '' ? 
-                            <tr>
-                                <th>Comment</th>
-                                <td>{this.state.hoverText}</td>
-                            </tr>
-                        : null}
-                        {this.state.link != '' ? 
-                            <tr>
-                                <th>Link</th>
-                                <td><a target="_blank" href={this.state.link}>{this.state.link}</a></td>
-                            </tr>
-                        : null}
-                    </tbody>
-                </table>
-            </div>
+                </Segment>
+                <Segment>
+                    <div className='twoColumn w50'>
+                        <Input
+                            placeholder="1 - 100"
+                            type="number"
+                            className='oneColumnFull'
+                            fluid
+                            label={<Popup
+                                trigger={<Label className='uniform'>X</Label>}
+                                content='X Position'
+                                className='Popup'
+                                size='tiny'
+                            />}
+                            value={this.state.x} 
+                            onChange={(e) => this.setX(e.target.value)}
+                        />
+                    </div>
+                    <div className='twoColumn w50'>
+                        <Input
+                            placeholder="1 - 100"
+                            type="number"
+                            label={<Popup
+                                trigger={<Label className='uniform'>Y</Label>}
+                                content='Y Position'
+                                className='Popup'
+                                size='tiny'
+                            />}
+                            className='oneColumnFull'
+                            fluid
+                            value={this.state.y} 
+                            onChange={(e) => this.setY(e.target.value)}
+                        />
+                    </div>
+                    <Input
+                        placeholder="Address"
+                        fluid
+                        className='oneColumn'
+                        value={(this.state.owner === ctr.account ? "You" : (this.state.owner === NOBODY ? "Unowned" : this.state.owner))} 
+                        label={<Popup
+                            trigger={<Label><Icon className='uniform' name='user'/></Label>}
+                            content='Owner Address'
+                            className='Popup'
+                            size='tiny'
+                        />}
+                    />
+                    <Input 
+                        fluid
+                        labelPosition='right' 
+                        type={this.state.latestBid == 0 ? "text" : "number"}
+                        placeholder={"Enter PXL"}
+                        className='oneColumn'
+                        value={this.state.latestBid == 0 ? "None" : this.state.latestBid}
+                        onChange={(e) => this.setState({latestBid: e.target.value})}
+                    >
+                        <Popup
+                            trigger={<Label><Icon name='legal'/></Label>}
+                            content='Lastest Bid'
+                            className='Popup'
+                            size='tiny'
+                        />
+                        <input />
+                        <Label
+                            onClick={() => this.placeBid()} 
+                        >Bid</Label>
+                    </Input>
+                    <Input
+                        label={<Popup
+                            trigger={<Label><Icon className='uniform' name='dollar'/></Label>}
+                            content='Price'
+                            className='Popup'
+                            size='tiny'
+                        />}
+                        className='oneColumn'
+                        value={this.getPriceFormat()} 
+                    />
+                    <Input
+                        fluid
+                        label={<Popup
+                            trigger={<Label><Icon className='uniform' name='time'/></Label>}
+                            content='Last Update'
+                            className='Popup'
+                            size='tiny'
+                        />}
+                        className='oneColumn'
+                        value={this.state.lastUpdate == 0 ? 'Never' : Func.TimeSince(Date.now() - new Date(Date.now() - (this.state.lastUpdate * 1000))) + " ago"}
+                    />
+                    <Input
+                        fluid
+                        label={<Popup
+                            trigger={<Label><Icon className='uniform' name='money'/></Label>}
+                            content='Current/Maximum Payout'
+                            className='Popup'
+                            size='tiny'
+                        />}
+                        className='oneColumn'
+                        value={this.state.lastUpdate == 0 ? "None" : (this.state.earnings + '/' + this.state.maxEarnings) + " PXL"}
+                    />
+                    <Input
+                        label="Reserved"
+                        fluid
+                        className='oneColumn'
+                        label={<Popup
+                            trigger={<Label><Icon className='uniform' name='ban'/></Label>}
+                            content='Is Reserved'
+                            className='Popup'
+                            size='tiny'
+                        />}
+                        value={this.state.reserved == 0 || this.state.reserved * 1000 <= new Date().getTime() ? 
+                            'No' 
+                        : 
+                            <Moment 
+                                onChange={
+                                    (val) => {
+                                        if (this.state.reserved * 1000 <= new Date().getTime())
+                                            this.forceUpdate();
+                                    }
+                                } 
+                                interval={1000} 
+                                fromNow 
+                                ago>
+                                {this.state.reserved * 1000}
+                            </Moment>
+                        }
+                    />
+                    <Input
+                        label="Private"
+                        fluid
+                        className='oneColumn'
+                        label={<Popup
+                            trigger={<Label><Icon className='uniform' name='hide'/></Label>}
+                            content='Is Private'
+                            className='Popup'
+                            size='tiny'
+                        />}
+                        value={this.state.isInPrivate ? 'Yes' : 'No'}
+                    />
+                    <Input
+                        label={<Popup
+                            trigger={<Label><Icon className='uniform' name='comment'/></Label>}
+                            content='Comment'
+                            className='Popup'
+                            size='tiny'
+                        />}
+                        fluid
+                        className='oneColumn'
+                        value={this.state.hoverText != '' ? this.state.hoverText : "None Set"}
+                    />
+                    <Input
+                        label={<Popup
+                            trigger={<Label><Icon className='uniform' name='linkify'/></Label>}
+                            content='Link'
+                            className='Popup'
+                            size='tiny'
+                        />}
+                        fluid
+                        className='oneColumn'
+                        value={this.state.link != '' ? <a target="_blank" href={this.state.link}>{this.state.link}</a> : "None Set"}
+                    />
+                </Segment>
+                <Segment>
+                    <Grid columns='two' divided>
+                        {actions = this.getActionsList().map((action, i) => (
+                            <Grid.Row>
+                                <Grid.Column>
+                                    <Button fluid >{action.a1.label}</Button>
+                                </Grid.Column>
+                                <Grid.Column>
+                                    {action.a2 === null ? 
+                                        null 
+                                    : 
+                                        <Button fluid>{action.a2.label}</Button>
+                                    }
+                                </Grid.Column>
+                            </Grid.Row>
+                        ))}
+                    </Grid>
+                </Segment>
+            </SegmentGroup>
         );
     }
 }
+
+/*
+Addd actions to the grid
+*/
 
 export default PixelDescriptionBox

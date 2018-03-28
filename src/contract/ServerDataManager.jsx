@@ -2,6 +2,7 @@ import {ctr, Contract, EVENTS, LISTENERS} from './contract.jsx';
 import Axios from '../network/Axios.jsx';
 import * as Func from '../functions/functions.jsx';
 import * as Assets from '../const/assets';
+import * as Struct from '../const/structs';
 
 export const Compares = {
     xAsc: { 
@@ -248,6 +249,23 @@ export class ServerDataManager {
         }
         this.allProperties[x][y] = Object.assign({}, this.allProperties[x][y] || {}, update);
         this.organizeProperty(x, y);
+    }
+
+    /*
+    returns a property at a location.
+    */
+    getPropertyData(x, y) {
+        if (this.allProperties[x] == null || this.allProperties[x][y] == null) {
+            return Struct.PropertyData();
+        }
+        return this.allProperties[x][y];
+    }
+
+    /*
+    returns a property at a location.
+    */
+    isPropertyLoaded(x, y) {
+        return (this.allProperties[x] != null && this.allProperties[x][y] != null);
     }
 
     /*

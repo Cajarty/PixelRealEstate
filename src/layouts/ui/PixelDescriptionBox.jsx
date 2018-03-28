@@ -312,7 +312,7 @@ class PixelDescriptionBox extends Component {
                         labelPosition='right' 
                         type={this.state.latestBid == 0 ? "text" : "number"}
                         placeholder={"Enter PXL"}
-                        className='oneColumn'
+                        className='oneColumn bidInput'
                         value={this.state.latestBid == 0 ? "None" : this.state.latestBid}
                         onChange={(e) => this.setState({latestBid: e.target.value})}
                     >
@@ -421,8 +421,8 @@ class PixelDescriptionBox extends Component {
                         value={this.state.link != '' ? <a target="_blank" href={this.state.link}>{this.state.link}</a> : "None Set"}
                     />
                 </Segment>
-                {this.state.x != '' && this.state.y != '' &&
                 <Segment>
+                {this.state.x != '' && this.state.y != '' &&
                     <Grid columns='two' divided>
                         {this.getActionsList().map((action, i) => (
                             <Grid.Row key={i}>
@@ -435,8 +435,8 @@ class PixelDescriptionBox extends Component {
                             </Grid.Row>
                         ))}
                     </Grid>
-                </Segment>
                 }
+                </Segment>
                 <BuyPixelForm isOpen={this.state.isOpen.BUY} close={this.toggleAction.bind(this)}/>
                 <SellPixelForm isOpen={this.state.isOpen.SELL} close={this.toggleAction.bind(this)}/>
                 <SetPixelColorForm isOpen={this.state.isOpen.SET_IMAGE} close={this.toggleAction.bind(this)}/>

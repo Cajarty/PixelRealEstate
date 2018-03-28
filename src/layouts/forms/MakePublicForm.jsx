@@ -36,8 +36,8 @@ class MakePublicForm extends Component {
         GFD.listen('y', 'ChangePropertyMode', (y) => {
             this.setState({y});
             this.setState({
-                isPrivate: SDM.allProperties[GFD.getData('x') - 1][y - 1].isPrivate,
-                becomePublic: SDM.allProperties[GFD.getData('x') - 1][y - 1].becomePublic 
+                isPrivate: SDM.getPropertyData(GFD.getData('x') - 1, y - 1).isPrivate,
+                becomePublic: SDM.getPropertyData(GFD.getData('x') - 1, y - 1).becomePublic 
             });
             ctr.getPropertyData(GFD.getData('x') - 1, y - 1, (data) => {
                 console.info(data);
@@ -64,11 +64,11 @@ class MakePublicForm extends Component {
     setPropertyMode() {
         let x = GFD.getData('x') - 1;
         let y = GFD.getData('y') - 1;
-        if (SDM.allProperties[x][y].becomePublic) {
+        if (SDM.getPropertyData(x, y).becomePublic) {
             ctr.sendResults(LISTENERS.Alert, {result: false, message: "Property is temorarily reserved by a user."});
             return;
         }
-        if (SDM.allProperties[x][y].becomePublic) {
+        if (SDM.getPropertyData(x,y).becomePublic) {
             ctr.sendResults(LISTENERS.Alert, {result: false, message: "Property is already in private mode."});
             return;
         }

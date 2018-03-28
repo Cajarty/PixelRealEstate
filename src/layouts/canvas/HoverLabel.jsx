@@ -73,8 +73,8 @@ class HoverLabel extends Component {
         if (x < 0 || y < 0) {
             this.setState({show: false})
         } else {
-            if (SDM.allProperties[x] != null && SDM.allProperties[x][y] != null)
-            ctr.getHoverText(SDM.allProperties[x][y].owner, (data) => {
+            if (SDM.isPropertyLoaded(x, y))
+            ctr.getHoverText(SDM.getPropertyData(x, y).owner, (data) => {
                 if (data != null && data.length > 0)
                     this.setState({show: true, labelText: data});
                 else

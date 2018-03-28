@@ -67,14 +67,6 @@ class HoverLabel extends Component {
     }
 
     render() {
-        console.info({  
-            width:  this.state.canvasWidth,
-            height:  this.state.canvasHeight,
-            left: this.state.offsetX + Math.floor(this.state.hoverX / 10) * (this.state.canvasWidth / 100) + 'px',
-            top: this.state.offsetY + Math.floor(this.state.hoverY / 10) * (this.state.canvasHeight / 100) + 'px',
-            minWidth: (this.state.canvasWidth / 100) + 'px',
-            minHeight: (this.state.canvasHeight / 100) + 'px'
-    });
         return (
             <div 
                 className={'hoverBox ' + (this.state.show ? '' : 'hidden')}

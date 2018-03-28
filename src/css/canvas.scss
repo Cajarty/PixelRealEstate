@@ -131,6 +131,7 @@
         width: calc(((100vw - (100vh - 30px) - 120px) / 2) - 50px) !important;
         max-width: calc((100vw - 460px) / 2) !important;
         overflow-y: auto;
+        overflow-x: hidden;
     }
     .center {
         width: calc(100vh - 75px) !important;
@@ -140,5 +141,6 @@
         width: calc(((100vw - (100vh - 30px) - 120px) / 2) + 50px) !important;
         max-width: calc((100vw - 460px) / 2) !important;
         overflow-y: auto;
+        overflow-x: hidden;
     }
 }

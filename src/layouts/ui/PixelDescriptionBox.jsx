@@ -6,6 +6,9 @@ import {GFD, GlobalState} from '../../functions/GlobalState';
 import Hours from '../ui/Hours';
 import Moment from 'react-moment';
 import {Label, Input, Item, Button, Popup, Icon, Grid, Segment, SegmentGroup} from 'semantic-ui-react';
+import BuyPixelForm from '../forms/BuyPixelForm';
+import SellPixelForm from '../forms/SellPixelForm';
+import SetPixelColorForm from '../forms/SetPixelColorForm';
 
 const NOBODY = '0x0000000000000000000000000000000000000000';
 
@@ -31,6 +34,11 @@ class PixelDescriptionBox extends Component {
             hoverText: '',
             link: '',
             PPCOwned: 0,
+            isOpen: {
+                BUY: false,
+                SELL: false,
+                SET_IMAGE: false,
+            }
         }
     }
 
@@ -192,28 +200,30 @@ class PixelDescriptionBox extends Component {
         return s;
     }
 
+    toggleAction(key) {
+        let opens = this.state.isOpen;
+        opens[key] = !opens[key];
+        this.setState({opens});
+    }
+
     getActionsList() {
         let actions = [];
-        let Action = (label, action) => {return {
-            label: label,
-            action: action,
-        }};
         if (this.state.isForSale)
-            actions.push(new Action("Buy", null));
+            actions.push(<Button fluid onClick={() => this.toggleAction('BUY')}>Buy</Button>);
         if (!this.state.isForSale && this.state.owner == ctr.account)
-            actions.push(new Action("Sell", null));
-        if (this.state.isForSale && this.state.owner == ctr.account)
-            actions.push(new Action("Cancel Sale", null));
-        actions.push(new Action("Update Image", null));
-        actions.push(new Action("Place Offer", null));
-        if (this.state.owner == ctr.account) {
-            if (this.state.isInPrivate) {
-                actions.push(new Action("Make Public", null));
-            } else {
-                actions.push(new Action("Make Private", null));
-            }
-            actions.push(new Action("Transfer", null));
-        }
+             actions.push(<Button fluid onClick={() => this.toggleAction('SELL')}>Sell</Button>);
+        // if (this.state.isForSale && this.state.owner == ctr.account)
+        //     actions.push(new Action("Cancel Sale", null));
+        actions.push(<Button fluid onClick={() => this.toggleAction('SET_IMAGE')}>Update Image</Button>);
+        // actions.push(new Action("Place Offer", null));
+        // if (this.state.owner == ctr.account) {
+        //     if (this.state.isInPrivate) {
+        //         actions.push(new Action("Make Public", null));
+        //     } else {
+        //         actions.push(new Action("Make Private", null));
+        //     }
+        //     actions.push(new Action("Transfer", null));
+        // }
         //blank one, remember to disable it.
         if (actions.length % 2 == 1) {
             actions.push(null);
@@ -226,7 +236,6 @@ class PixelDescriptionBox extends Component {
     }
 
     render() {
-        let actions = [];
         return (
             <SegmentGroup className='pixelDescriptionBox'>
                 <Segment className='colorPreview'>
@@ -396,22 +405,22 @@ class PixelDescriptionBox extends Component {
                 </Segment>
                 <Segment>
                     <Grid columns='two' divided>
-                        {actions = this.getActionsList().map((action, i) => (
-                            <Grid.Row>
+                        {this.getActionsList().map((action, i) => (
+                            <Grid.Row key={i}>
                                 <Grid.Column>
-                                    <Button fluid >{action.a1.label}</Button>
+                                    {action.a1}
                                 </Grid.Column>
                                 <Grid.Column>
-                                    {action.a2 === null ? 
-                                        null 
-                                    : 
-                                        <Button fluid>{action.a2.label}</Button>
-                                    }
+                                    {action.a2}
                                 </Grid.Column>
                             </Grid.Row>
                         ))}
                     </Grid>
                 </Segment>
+                {console.info(this.state.isOpen)}
+                <BuyPixelForm isOpen={this.state.isOpen.BUY} close={this.toggleAction.bind(this)}/>
+                <SellPixelForm isOpen={this.state.isOpen.SELL} close={this.toggleAction.bind(this)}/>
+                <SetPixelColorForm isOpen={this.state.isOpen.SET_IMAGE} close={this.toggleAction.bind(this)}/>
             </SegmentGroup>
         );
     }

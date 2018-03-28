@@ -175,7 +175,7 @@ export class Contract {
         });
     }
 
-    buyProperty(x, y, eth, ppc) {
+    buyProperty(x, y, eth, ppc, callback) {
         console.info(x, y, eth, ppc);
         this.VRE.deployed().then((i) => {
             if (eth == 0)
@@ -185,8 +185,10 @@ export class Contract {
             else 
                 return i.buyProperty(this.toID(x, y), ppc, {value: eth, from: this.account});
         }).then(() => {
+            callback(true);
             this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " purchase complete."});
         }).catch((e) => {
+            callback(false);
             console.info(e);
             this.sendResults(LISTENERS.Error, {result: false, message: "Unable to purchase property " + x + "x" + y + "."});
         });

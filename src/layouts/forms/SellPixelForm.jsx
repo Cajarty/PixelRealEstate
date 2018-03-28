@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
+import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon } from 'semantic-ui-react';
 
 class SellPixelForm extends Component {
     constructor(props) {
@@ -10,6 +11,7 @@ class SellPixelForm extends Component {
             x: '',
             y: '',
             valuePrice: 0,
+            isOpen: false,
         };
     }
 
@@ -56,61 +58,79 @@ class SellPixelForm extends Component {
         this.setState(obj);
     }
 
+    toggleModal(set = null) {
+        let res = set != null ? set : !this.state.isOpen;
+        this.setState({isOpen: res});
+        this.props.close('SELL');
+    }
+
     render() {
         return (
-            <table cellSpacing={0} cellPadding={0} className='form'>
-                <tbody>
-                    <tr>
-                        <td colSpan={2}>
-                            <div className='title'>
-                                Sell Property:
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div className='inputTitle'> X: </div>
-                        </td>
-                        <td>
-                            <input 
-                                id='sellPixelX' 
-                                type='number' 
-                                placeholder='1-100'
-                                onChange={(e) => this.setX(e.target.value)} 
-                                value={this.state.x}
-                                ></input>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div className='inputTitle'> Y: </div>
-                        </td>
-                        <td>
-                            <input 
-                                id='sellPixelY' 
-                                type='number' 
-                                placeholder='1-100'
-                                onChange={(e) => this.setY(e.target.value)} 
-                                value={this.state.y}
-                            ></input>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div className='inputTitle'> Price: </div>
-                        </td>
-                        <td>
-                            <input id='sellPrice' type='number' onChange={(e) => this.handlePrice('valuePrice', e.target.value)} value={this.state.valuePrice}></input>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colSpan={2}>
-                            <input type='button' value='Sell Pixel' onClick={() => ctr.sellProperty(this.state.x - 1, this.state.y - 1, this.state.valuePrice)}></input>
-                        </td>
-                    </tr>
-                </tbody>
-                
-            </table>
+            <Modal size='tiny' 
+            open={this.state.isOpen} 
+            closeIcon 
+            onClose={() => this.toggleModal(false)}
+            >
+            <ModalHeader>Sell Property</ModalHeader>
+            <ModalContent>
+                <div className='twoColumn w50 left'>
+                    <Input
+                        placeholder="1 - 100"
+                        type="number"
+                        className='oneColumnFull'
+                        fluid
+                        label={<Popup
+                            trigger={<Label className='uniform'>X</Label>}
+                            content='X Position'
+                            className='Popup'
+                            size='tiny'
+                        />}
+                        value={this.state.x} 
+                        onChange={(e) => this.setX(e.target.value)}
+                    />
+                    </div>
+                    <div className='twoColumn w50 right'>
+                    <Input
+                        placeholder="1 - 100"
+                        type="number"
+                        label={<Popup
+                            trigger={<Label className='uniform'>Y</Label>}
+                            content='Y Position'
+                            className='Popup'
+                            size='tiny'
+                        />}
+                        className='oneColumnFull'
+                        fluid
+                        value={this.state.y} 
+                        onChange={(e) => this.setY(e.target.value)}
+                    />
+                    </div>
+                    <Divider horizontal>PXL Price</Divider>
+                    <Input 
+                        fluid
+                        labelPosition='right' 
+                        type={"number"}
+                        placeholder={"Enter PXL"}
+                        className='oneColumn'
+                        value={this.state.valuePrice}
+                    >
+                        <Popup
+                            trigger={<Label><Icon className='uniform' name='money'/></Label>}
+                            content='Price in PXL'
+                            className='Popup'
+                            size='tiny'
+                        />
+                        <input 
+                        className='bid'
+                        onChange={(e) => this.handlePrice('valuePrice', e.target.value)}
+                        />
+                        <Label>PXL</Label>
+                    </Input>
+            </ModalContent>
+            <ModalActions>
+                <Button primary onClick={() => ctr.sellProperty(this.state.x - 1, this.state.y - 1, this.state.valuePrice)}>Sell Property</Button>
+            </ModalActions>
+        </Modal>
         );
     }
 }

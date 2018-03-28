@@ -74,8 +74,13 @@ export class Contract {
         });
         
         this.setup();
-        this.test();
     }
+
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------       SETUP & MISC       ----------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
 
     setup() {
         // Checking if Web3 has been injected by the browser (Mist/MetaMask)
@@ -163,17 +168,19 @@ export class Contract {
         obj.y = Math.floor(id / 100);
         return obj;
     }
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------       SETUP & MISC       ----------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
 
-    getBalance(callback) {
-        this.VRE.deployed().then((i) => {
-            i.balanceOf(this.account, { from: this.account }).then((r) => {
-                callback(Func.BigNumberToNumber(r));
-            });
-        }).catch((e) => {
-            console.info(e);
-            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to retrieve PPC balance."});
-        });
-    }
+
+
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ----------------------------------         SETTERS         ----------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
 
     buyProperty(x, y, eth, ppc, callback) {
         console.info(x, y, eth, ppc);
@@ -201,6 +208,19 @@ export class Contract {
             this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " listed for sale."});
         }).catch((e) => {
             console.log(e);
+            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to put property " + x + "x" + y + " on market."});
+        });
+    }
+
+    delistProperty(x, y, callback) {
+        this.VRE.deployed().then((i) => {
+            return i.delist(this.toID(parseInt(x), parseInt(y)), {from: this.account });
+        }).then(() => {
+            callback(true);
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " listed for sale."});
+        }).catch((e) => {
+            console.log(e);
+            callback(false);
             this.sendResults(LISTENERS.Error, {result: false, message: "Unable to put property " + x + "x" + y + " on market."});
         });
     }
@@ -234,6 +254,67 @@ export class Contract {
             console.info("Property link updated!");
         }).catch((e) => {
             console.log(e);
+        });
+    }
+
+    transferProperty(x, y, newOwner, callback) { 
+        this.VRE.deployed().then((i) => {
+            return i.transferProperty(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account}).then((r) => {
+                return callback(r);
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
+    }
+
+    makeBid(x, y, bid) {
+        this.VRE.deployed().then((i) => {
+            return i.makeBid(this.toID(x, y), bid, {from: this.account });
+        }).then(() => {
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Bid for " + x + "x" + y + " sent to owner."});
+        }).catch((e) => {
+            console.info(e);
+            this.sendResults(LISTENERS.Error, {result: false, message: "Error placing bid."});
+        });
+    }
+
+    setColors(x, y, data, PPT) {
+        this.VRE.deployed().then((i) => {
+            return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), PPT, {from: this.account });
+        }).then(() => {
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " pixels changed."});
+        }).catch((e) => {
+            console.info(e);
+            this.sendResults(LISTENERS.Error, {result: false, message: "Error uploading pixels."});
+        });
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ----------------------------------         SETTERS         ----------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ----------------------------------         GETTERS         ----------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    getBalance(callback) {
+        this.VRE.deployed().then((i) => {
+            i.balanceOf(this.account, { from: this.account }).then((r) => {
+                callback(Func.BigNumberToNumber(r));
+            });
+        }).catch((e) => {
+            console.info(e);
+            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to retrieve PPC balance."});
         });
     }
 
@@ -287,16 +368,6 @@ export class Contract {
         });
     }
 
-    transferProperty(x, y, newOwner, callback) { 
-        this.VRE.deployed().then((i) => {
-            return i.transferProperty(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account}).then((r) => {
-                return callback(r);
-            });
-        }).catch((e) => {
-            console.log(e);
-        });
-    }
-
     getPropertyColorsOfRow(x, row, callback) {
         this.VRE.deployed().then((i) => {
             return i.getPropertyColorsOfRow.call(x, row).then((r) => {
@@ -328,47 +399,19 @@ export class Contract {
         });
     }
 
-    makeBid(x, y, bid) {
-        this.VRE.deployed().then((i) => {
-            return i.makeBid(this.toID(x, y), bid, {from: this.account });
-        }).then(() => {
-            this.sendResults(LISTENERS.Alert, {result: true, message: "Bid for " + x + "x" + y + " sent to owner."});
-        }).catch((e) => {
-            console.info(e);
-            this.sendResults(LISTENERS.Error, {result: false, message: "Error placing bid."});
-        });
-    }
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ----------------------------------         GETTERS         ----------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
 
-    setColors(x, y, data, PPT) {
-        this.VRE.deployed().then((i) => {
-            return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), PPT, {from: this.account });
-        }).then(() => {
-            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " pixels changed."});
-        }).catch((e) => {
-            console.info(e);
-            this.sendResults(LISTENERS.Error, {result: false, message: "Error uploading pixels."});
-        });
-    }
 
-    rentProperty(x, y, price) {
-        this.VRE.deployed().then((i) => {
-            return i.setLink(this.toID(x, y), {value: price, from: this.account });
-        }).then(function() {
-            console.info("Pixel " + x + "x" + y + " update complete.");
-        }).catch((e) => {
-            console.log(e);
-        });
-    }
 
-    stopRenting(x, y) {
-        this.VRE.deployed().then((i) => {
-            return i.setLink(this.toID(x, y), {from: this.account });
-        }).then(function() {
-            console.info("Pixel " + x + "x" + y + " update complete.");
-        }).catch((e) => {
-            console.log(e);
-        });
-    }
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ----------------------------------         EVENTS          ----------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
 
     /*
     duration == seconds
@@ -422,22 +465,11 @@ export class Contract {
         });
     }
 
-    test() {
-       // this.buyProperty(46, 20, 10000000000000000);
-    }
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ----------------------------------         EVENTS          ----------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
 }
-/*
-class Test {
-    constructor(test, expected) {
-        this.test = test;
-        this.expected = expected;
-    }
-
-    assert() {
-        if (this.test !== this.expected)
-            throw new Error('Test Failed!');
-        return this.test + ' === ' + this.expected;
-    }
-}*/
 
 export const ctr = new Contract();

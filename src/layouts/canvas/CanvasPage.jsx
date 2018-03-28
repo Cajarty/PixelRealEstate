@@ -1,7 +1,5 @@
 import React, { Component } from 'react'
 import Canvas from './Canvas.jsx'
-import ManagePanel from './ManagePanel.jsx'
-import ActionPanel from './ActionPanel.jsx'
 import {Contract, ctr, LISTENERS, EVENTS} from '../../contract/contract.jsx';
 import PropertySalesLog from '../ui/PropertySalesLog';
 import ErrorBox from '../ErrorBox';
@@ -17,6 +15,8 @@ import * as Assets from '../../const/assets';
 import ClickLoader from '../ui/ClickLoader';
 import PixelDescriptionBox from '../ui/PixelDescriptionBox';
 import { Segment, SegmentGroup, Button, Divider, Label, LabelDetail, Input, Icon, Item, ItemContent, ItemImage, ItemGroup} from 'semantic-ui-react';
+import SetHoverText from '../forms/SetHoverText';
+import SetLink from '../forms/SetLink';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -111,6 +111,13 @@ class CanvasPage extends Component {
                                 />
                                 <Divider/>
                                 <Button onClick={() => this.changeMode()} fluid>{this.state.advancedMode ? 'See Less...' : 'See More...'}</Button>
+                                {this.state.advancedMode &&
+                                <div>
+                                    <Divider/>
+                                    <SetHoverText/>
+                                    <SetLink/>
+                                </div>
+                                }
                             </Segment>
                             <Segment>
 

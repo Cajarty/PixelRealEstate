@@ -9,6 +9,10 @@ import {Label, Input, Item, Button, Popup, Icon, Grid, Segment, SegmentGroup} fr
 import BuyPixelForm from '../forms/BuyPixelForm';
 import SellPixelForm from '../forms/SellPixelForm';
 import SetPixelColorForm from '../forms/SetPixelColorForm';
+import TransferPropertyForm from '../forms/TransferPropertyForm';
+import CancelSaleForm from '../forms/CancelSaleForm';
+import MakePrivateForm from '../forms/MakePrivateForm';
+import MakePublicForm from '../forms/MakePublicForm';
 
 const NOBODY = '0x0000000000000000000000000000000000000000';
 
@@ -209,22 +213,36 @@ class PixelDescriptionBox extends Component {
     getActionsList() {
         let actions = [];
         if (this.state.isForSale)
-            actions.push(<Button fluid onClick={() => this.toggleAction('BUY')}>Buy</Button>);
+            actions.push(
+                <Button fluid onClick={() => this.toggleAction('BUY')}>Buy</Button>
+            );
         if (!this.state.isForSale && this.state.owner == ctr.account)
-             actions.push(<Button fluid onClick={() => this.toggleAction('SELL')}>Sell</Button>);
-        // if (this.state.isForSale && this.state.owner == ctr.account)
-        //     actions.push(new Action("Cancel Sale", null));
-        actions.push(<Button fluid onClick={() => this.toggleAction('SET_IMAGE')}>Update Image</Button>);
+            actions.push(
+                <Button fluid onClick={() => this.toggleAction('SELL')}>Sell</Button>
+            );
+        if (this.state.isForSale && this.state.owner == ctr.account)
+            actions.push(
+                <Button fluid onClick={() => this.toggleAction('CANCEL_SALE')}>Cancel Sale</Button>
+            );
+        actions.push(
+            <Button fluid onClick={() => this.toggleAction('SET_IMAGE')}>Update Image</Button>
+        );
         // actions.push(new Action("Place Offer", null));
-        // if (this.state.owner == ctr.account) {
-        //     if (this.state.isInPrivate) {
-        //         actions.push(new Action("Make Public", null));
-        //     } else {
-        //         actions.push(new Action("Make Private", null));
-        //     }
-        //     actions.push(new Action("Transfer", null));
-        // }
-        //blank one, remember to disable it.
+        if (this.state.owner == ctr.account) {
+            if (this.state.isInPrivate) { //for this switch, we need to check to make sure we are the setter
+                actions.push(
+                    <Button fluid onClick={() => this.toggleAction('SET_PUBLIC')}>Set Public</Button>
+                );
+            } else {
+                actions.push(
+                    <Button fluid onClick={() => this.toggleAction('SET_PRIVATE')}>Set Private</Button>
+                );
+            }
+            actions.push(
+                <Button fluid onClick={() => this.toggleAction('TRANSFER')}>Transfer</Button>
+            );
+        }
+        //blank one in case odd elements
         if (actions.length % 2 == 1) {
             actions.push(null);
         }
@@ -403,6 +421,7 @@ class PixelDescriptionBox extends Component {
                         value={this.state.link != '' ? <a target="_blank" href={this.state.link}>{this.state.link}</a> : "None Set"}
                     />
                 </Segment>
+                {this.state.x != '' && this.state.y != '' &&
                 <Segment>
                     <Grid columns='two' divided>
                         {this.getActionsList().map((action, i) => (
@@ -417,10 +436,14 @@ class PixelDescriptionBox extends Component {
                         ))}
                     </Grid>
                 </Segment>
-                {console.info(this.state.isOpen)}
+                }
                 <BuyPixelForm isOpen={this.state.isOpen.BUY} close={this.toggleAction.bind(this)}/>
                 <SellPixelForm isOpen={this.state.isOpen.SELL} close={this.toggleAction.bind(this)}/>
                 <SetPixelColorForm isOpen={this.state.isOpen.SET_IMAGE} close={this.toggleAction.bind(this)}/>
+                <CancelSaleForm/>
+                <MakePublicForm/>
+                <MakePrivateForm/>
+                <TransferPropertyForm/>
             </SegmentGroup>
         );
     }

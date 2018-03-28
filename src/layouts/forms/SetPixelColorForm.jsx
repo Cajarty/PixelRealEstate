@@ -51,8 +51,17 @@ class SetPixelColorForm extends Component {
         this.setState(update);
     }
 
-    componentWillUnmount() {
+    componentDidUnmountOpen() {
         GFD.closeAll('UpdatePixel');
+        this.state.canvasLrg.onmousedown = null;
+        this.state.canvasLrg.onmouseup = null;
+        this.state.canvasLrg.onmousemove = null;
+        this.setState({
+            ctxLrg: null,
+            ctxSml: null,
+            canvasLrg: null,
+            canvasSml: null,
+        })
     }
 
     setX(x) {
@@ -250,8 +259,10 @@ class SetPixelColorForm extends Component {
     }
 
     componentDidUpdate(pP, pS) {
-        if (this.state.ctxLrg == null || this.state.ctxSml == null)
+        if (this.state.isOpen && !pS.isOpen)
             this.componentDidMountOpen();
+        else if (!this.state.isOpen && pS.isOpen)
+            this.componentDidUnmountOpen();
     }
 
     render() {

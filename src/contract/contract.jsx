@@ -260,10 +260,10 @@ export class Contract {
     transferProperty(x, y, newOwner, callback) { 
         this.VRE.deployed().then((i) => {
             return i.transferProperty(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account}).then((r) => {
-                return callback(r);
+                return callback(true);
             });
         }).catch((e) => {
-            console.log(e);
+            return callback(false);
         });
     }
 

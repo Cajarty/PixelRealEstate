@@ -5,7 +5,7 @@ import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import { ChromePicker } from 'react-color';
 import * as Assets from '../../const/assets';
-import { Modal, ModalContent, ModalHeader, Button, Divider, Input, Popup, Label, ModalActions, Icon, Segment } from 'semantic-ui-react';
+import { Modal, ModalContent, ModalHeader, Button, Divider, Input, Popup, Label, ModalActions, Icon, Segment, Grid, GridColumn, GridRow, ButtonGroup } from 'semantic-ui-react';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
 
 const PREVIEW_WIDTH = 100;
@@ -145,8 +145,11 @@ class SetPixelColorForm extends Component {
             ctxID.data[i] = rgbArr[i];
         }
         ctxSml.putImageData(ctxID, 0, 0);
-        ctxLrg.scale(10, 10);
-        ctxLrg.drawImage(canvasSml, 0, 0);
+        ctxLrg.drawImage(canvasSml, 0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT);
+
+        this.setState({
+            imageData: ctxSml.getImageData(0, 0, Const.PROPERTY_LENGTH, Const.PROPERTY_LENGTH).data,
+        });
     }
 
     pickPixelColor(x, y) {
@@ -276,54 +279,121 @@ class SetPixelColorForm extends Component {
             <ModalHeader>Update Property Image</ModalHeader>
             <ModalContent>
                 <Segment>
-                    <canvas id='large' width={PREVIEW_WIDTH} height={PREVIEW_HEIGHT} ref={(canvasLrg) => { this.canvasLrg = canvasLrg; }}></canvas>
-                    <canvas id='normal' width={Const.PROPERTY_LENGTH} height={Const.PROPERTY_LENGTH} ref={(canvasSml) => { this.canvasSml = canvasSml; }}></canvas>
+                    <Grid>
+                        <GridRow columns='two' stretched>
+                            <GridColumn width={9}>
+                                <Segment>
+                                <Grid divided>
+                                    <GridRow columns='two'>
+                                        <GridColumn width={10}>
+                                            <canvas id='large' width={PREVIEW_WIDTH} height={PREVIEW_HEIGHT} ref={(canvasLrg) => { this.canvasLrg = canvasLrg; }}></canvas>
+                                        </GridColumn>
+                                        <GridColumn width={6}>
+                                            <canvas id='normal' width={Const.PROPERTY_LENGTH} height={Const.PROPERTY_LENGTH} ref={(canvasSml) => { this.canvasSml = canvasSml; }}></canvas>
+                                        </GridColumn>
+                                    </GridRow>
+                                    <GridRow columns='two'>
+                                        <GridColumn width={10}>
+                                            <ButtonGroup fluid>
+                                                <Popup 
+                                                trigger={
+                                                    <Button 
+                                                        icon 
+                                                        active={this.state.drawMode === DrawMode.PIXEL ? true : false}
+                                                        onClick={() => this.changeTool(DrawMode.PIXEL)}
+                                                    ><Icon name='pencil'/></Button>
+                                                }
+                                                content='Pencil Tool'
+                                                position='bottom left'
+                                                className='Popup'
+                                                size='tiny'
+                                                basic
+                                                />
+                                                <Popup 
+                                                trigger={
+                                                    <Button 
+                                                        icon
+                                                        active={this.state.drawMode === DrawMode.FILL ? true : false}
+                                                        onClick={() => this.changeTool(DrawMode.FILL)}
+                                                    ><Icon name='maximize'/></Button>
+                                                }
+                                                content='Fill Tool'
+                                                position='bottom left'
+                                                className='Popup'
+                                                size='tiny'
+                                                basic
+                                                />
+                                                <Popup 
+                                                trigger={
+                                                    <Button 
+                                                        icon name='eyedropper' 
+                                                        active={this.state.drawMode === DrawMode.PICK ? true : false}
+                                                        onClick={() => this.changeTool(DrawMode.PICK)}
+                                                    ><Icon name='eyedropper'/></Button>
+                                                }
+                                                content='Color Picker Tool'
+                                                position='bottom left'
+                                                className='Popup'
+                                                size='tiny'
+                                                basic
+                                                />
+                                                <Popup 
+                                                trigger={
+                                                    <Button 
+                                                        icon
+                                                        active={this.state.drawMode === DrawMode.ERASE ? true : false}
+                                                        onClick={() => this.changeTool(DrawMode.ERASE)}
+                                                    ><Icon name='erase'/></Button>
+                                                }
+                                                content='Eraser Tool'
+                                                position='bottom left'
+                                                className='Popup'
+                                                size='tiny'
+                                                basic
+                                                />
+                                                </ButtonGroup>
+                                            </GridColumn>
+                                            <GridColumn width={6}>
+                                            <input 
+                                                id='imageInput' 
+                                                type='file' 
+                                                onChange={(e) => this.uploadImage(e)} 
+                                                style={{display: 'none'}} 
+                                                ref={(input) => { this.input = input; }}
+                                            ></input>
+                                            <Popup 
+                                                trigger={
+                                                    <Button 
+                                                        fluid
+                                                        id='imageInputButton' 
+                                                        type='button' 
+                                                        onClick={(e) => {this.input.click()}}
+                                                    ><Icon name='upload'/></Button>
+                                                }
+                                                content='Upload from file...'
+                                                position='bottom left'
+                                                className='Popup'
+                                                size='tiny'
+                                                basic
+                                            />
+                                        </GridColumn>
+                                    </GridRow>
+                                </Grid>
+                                </Segment>
+                            </GridColumn>
+                            <GridColumn width={7}>
+                                <Segment>
+                                    <ChromePicker 
+                                        className='colorPicker' 
+                                        onChangeComplete={(color, event) => this.colorChange(color, event)}
+                                        color={this.state.drawColor}
+                                        disableAlpha={true}
+                                    />
+                                </Segment>
+                            </GridColumn>
+                        </GridRow>
+                    </Grid>
                 </Segment>
-                <Segment>
-                    <Button 
-                        icon 
-                        active={this.state.drawMode === DrawMode.PIXEL ? true : false}
-                        onClick={() => this.changeTool(DrawMode.PIXEL)}
-                    ><Icon name='pencil'/></Button>
-                    <Button 
-                        icon
-                        active={this.state.drawMode === DrawMode.FILL ? true : false}
-                        onClick={() => this.changeTool(DrawMode.FILL)}
-                    ><Icon name='maximize'/></Button>
-                    <Button 
-                        icon name='eyedropper' 
-                        active={this.state.drawMode === DrawMode.PICK ? true : false}
-                        onClick={() => this.changeTool(DrawMode.PICK)}
-                    ><Icon name='eyedropper'/></Button>
-                    <Button 
-                        icon
-                        active={this.state.drawMode === DrawMode.ERASE ? true : false}
-                        onClick={() => this.changeTool(DrawMode.ERASE)}
-                    ><Icon name='erase'/></Button>
-                </Segment>
-                <Segment>
-                    <input 
-                        id='imageInput' 
-                        type='file' 
-                        onChange={(e) => this.uploadImage(e)} 
-                        style={{display: 'none'}} 
-                        ref={(input) => { this.input = input; }}
-                    ></input>
-                    <Button 
-                        fluid
-                        id='imageInputButton' 
-                        value='Upload Image' 
-                        type='button' 
-                        onClick={(e) => {this.input.click()}}
-                    ></Button>
-                </Segment>
-                <Divider/>
-                <ChromePicker 
-                    className='colorPicker' 
-                    onChangeComplete={(color, event) => this.colorChange(color, event)}
-                    color={this.state.drawColor}
-                    disableAlpha={true}
-                />
                 <Divider/>
                 <div className='twoColumn w50 left'>
                     <Input

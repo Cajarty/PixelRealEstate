@@ -96,12 +96,12 @@ class MakePrivateForm extends Component {
     toggleModal(set = null) {
         let res = set != null ? set : !this.state.isOpen;
         this.setState({isOpen: res});
-        this.props.close("SET_IMAGE");
+        this.props.close("SET_PRIVATE");
     }
 
     render() {
         return (
-            <Modal size='small'
+            <Modal size='tiny'
                 open={this.state.isOpen} 
                 closeIcon 
                 onClose={() => this.toggleModal(false)}
@@ -153,7 +153,7 @@ class MakePrivateForm extends Component {
                             />
                         </Grid.Column>
                         <Grid.Column width={2}>
-                        <Container textAlign='center' fluid style={{lineHeight: '200%'}}>
+                        <Container textAlign='center' fluid style={{lineHeight: '250%'}}>
                         <Icon name='exchange'/>
                         </Container>
                         </Grid.Column>
@@ -170,7 +170,7 @@ class MakePrivateForm extends Component {
                 {this.state.isPrivate || this.state.becomePublic != 0 ?
                     <div>
                         <Divider/>
-                        <Segment>            
+                        <Segment inverted color='red' secondary>            
                             <div>{this.state.isPrivate ? "This Property is already in private mode." : ""}</div>
                             <div>{this.state.becomePublic != 0 ? "This Property is temporarily reserved by a user." : ""}</div>
                         </Segment>
@@ -180,7 +180,7 @@ class MakePrivateForm extends Component {
                 }
             </ModalContent>
             <ModalActions>
-                <Button primary onClick={() => ctr.setPropertyMode()}>Set Private</Button>
+                <Button primary disabled={this.state.isPrivate || this.state.becomePublic != 0} onClick={() => ctr.setPropertyMode()}>Set Private</Button>
             </ModalActions>
             </Modal>
         );

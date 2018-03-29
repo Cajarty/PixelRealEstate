@@ -12,6 +12,7 @@ class TransferPropertyForm extends Component {
             x: '',
             y: '',
             valueNewOwner: '',
+            isMetaMaskOpen: false,
         };
     }
 
@@ -48,6 +49,27 @@ class TransferPropertyForm extends Component {
 
     handleNewOwner(newOwner) {
         this.setState({valueNewOwner: newOwner});
+    }
+
+    toggleModal(set = null) {
+        if (this.state.isMetaMaskOpen)
+            return;
+        let res = set != null ? set : !this.state.isOpen;
+        this.setState({isOpen: res});
+        if (!res)
+            this.props.close("TRANSFER");
+    }
+
+    dialogResults(res) {
+        if (res) {
+            this.setState({isMetaMaskOpen: true})
+            ctr.transferProperty(this.state.x - 1, this.state.y - 1, this.state.valueNewOwner, (res) => {
+                this.setState({isOpen: !res, isMetaMaskOpen: false});
+            })
+        } else {
+            this.setState({isOpen: false, isMetaMaskOpen: false});
+            this.toggleModal(false);
+        }
     }
 
     render() {
@@ -111,10 +133,7 @@ class TransferPropertyForm extends Component {
                         title='Confirm Property Transfer'
                         description={'Are you sure you would like to give this property to ' + this.state.valueNewOwner + '?'}
                         activateName='Transfer Property' 
-                        result={(r) => {
-                            if (r)
-                                ctr.transferProperty(this.state.x - 1, this.state.y - 1, this.state.valueNewOwner, () => {})
-                        }}
+                        result={(result) => this.dialogResults(result)}
                     />
                 </ModalActions>
             </Modal>

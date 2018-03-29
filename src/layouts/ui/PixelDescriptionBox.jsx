@@ -13,6 +13,7 @@ import TransferPropertyForm from '../forms/TransferPropertyForm';
 import CancelSaleForm from '../forms/CancelSaleForm';
 import MakePrivateForm from '../forms/MakePrivateForm';
 import MakePublicForm from '../forms/MakePublicForm';
+import MessageModal from './MessageModal';
 
 const NOBODY = '0x0000000000000000000000000000000000000000';
 
@@ -42,7 +43,12 @@ class PixelDescriptionBox extends Component {
                 BUY: false,
                 SELL: false,
                 SET_IMAGE: false,
-            }
+                SET_CANCEL: false,
+                SET_PUBLIC: false,
+                SET_PRIVATE: false,
+                TRANSFER: false,
+            },
+            showMessage: false,
         }
     }
 
@@ -187,7 +193,7 @@ class PixelDescriptionBox extends Component {
     placeBid() {
         ctr.getBalance((balance) => {
             if (balance < 1) {
-                alert("You must have at least 1 PXL to place a bid.");
+                this.setState({showMessage: true});
                 return;
             }
             let bid = window.prompt("Please enter an amount of PXL from 1 to " + balance + ". Bids cost 1 PXL each.");
@@ -212,6 +218,10 @@ class PixelDescriptionBox extends Component {
 
     getActionsList() {
         let actions = [];
+        actions.push(
+            <Button fluid onClick={() => this.toggleAction('SET_IMAGE')}>Update Image</Button>
+        );
+        // actions.push(new Action("Place Offer", null));
         if (this.state.isForSale)
             actions.push(
                 <Button fluid onClick={() => this.toggleAction('BUY')}>Buy</Button>
@@ -224,10 +234,6 @@ class PixelDescriptionBox extends Component {
             actions.push(
                 <Button fluid onClick={() => this.toggleAction('CANCEL_SALE')}>Cancel Sale</Button>
             );
-        actions.push(
-            <Button fluid onClick={() => this.toggleAction('SET_IMAGE')}>Update Image</Button>
-        );
-        // actions.push(new Action("Place Offer", null));
         if (this.state.owner == ctr.account) {
             if (this.state.isInPrivate) { //for this switch, we need to check to make sure we are the setter
                 actions.push(
@@ -323,10 +329,17 @@ class PixelDescriptionBox extends Component {
                             size='tiny'
                         />
                         <input className='bid'/>
-                        <Label
+                        <Label as='a'
+                            className='bidButton'
                             onClick={() => this.placeBid()} 
                         >Bid</Label>
                     </Input>
+                    <MessageModal 
+                        title='Not Enough PXL!'
+                        description='You must have at least 1 PXL to place a bid.'
+                        isOpen={this.state.showMessage} 
+                        onClose={() => {this.setState({showMessage: false})}}
+                    />
                     <Input
                         label={<Popup
                             trigger={<Label><Icon className='uniform' name='dollar'/></Label>}
@@ -440,10 +453,10 @@ class PixelDescriptionBox extends Component {
                 <BuyPixelForm isOpen={this.state.isOpen.BUY} close={this.toggleAction.bind(this)}/>
                 <SellPixelForm isOpen={this.state.isOpen.SELL} close={this.toggleAction.bind(this)}/>
                 <SetPixelColorForm isOpen={this.state.isOpen.SET_IMAGE} close={this.toggleAction.bind(this)}/>
-                <CancelSaleForm/>
-                <MakePublicForm/>
-                <MakePrivateForm/>
-                <TransferPropertyForm/>
+                <CancelSaleForm isOpen={this.state.isOpen.CANCEL_SALE} close={this.toggleAction.bind(this)}/>
+                <MakePublicForm isOpen={this.state.isOpen.SET_PUBLIC} close={this.toggleAction.bind(this)}/>
+                <MakePrivateForm isOpen={this.state.isOpen.SET_PRIVATE} close={this.toggleAction.bind(this)}/>
+                <TransferPropertyForm isOpen={this.state.isOpen.TRANSFER} close={this.toggleAction.bind(this)}/>
             </SegmentGroup>
         );
     }

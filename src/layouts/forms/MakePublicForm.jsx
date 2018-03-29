@@ -95,7 +95,7 @@ class MakePublicForm extends Component {
     toggleModal(set = null) {
         let res = set != null ? set : !this.state.isOpen;
         this.setState({isOpen: res});
-        this.props.close("SET_IMAGE");
+        this.props.close("SET_PUBLIC");
     }
 
     render() {

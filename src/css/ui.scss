@@ -249,26 +249,43 @@
         outline: none;
     }
     
+    #large {
+        background-color: black;
+        padding: 0;
+        margin: auto;
+        display: block;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+    
+    #normal {
+        background-color: black;
+        padding: 0;
+        margin: auto;
+        display: block;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+    
+    .colorPicker {
+        width: 100% !important;
+        input {
+            background-color: unset;
+        }
+    }
+    
     .SetPixelColorForm {
-        #large {
-            background-color: black;
-        }
-        #normal {
-            background-color: black;
-        }
         canvas {
             border: 1px solid $color5;
             &#large {
                 margin: 4px;
                 height: 100%;
                 vertical-align: middle;
-            }
-        }
-        .colorPicker {
-            width: 200px !important;
-            margin: 10px auto;
-            input {
-                background-color: unset;
             }
         }
         .toolButton {

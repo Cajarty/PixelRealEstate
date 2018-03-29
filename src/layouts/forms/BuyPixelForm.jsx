@@ -3,7 +3,7 @@ import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import { Slider } from 'react-semantic-ui-range';
-import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail } from 'semantic-ui-react';
+import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon } from 'semantic-ui-react';
 
 class BuyPixelForm extends Component {
     constructor(props) {
@@ -151,6 +151,15 @@ class BuyPixelForm extends Component {
                             value={this.state.PPCSelected}
                             onChange={(e) => this.updatePriceSlider(e.target.value)}
                         />
+                        {null && <Button icon labelPosition='right' size='mini'>
+                            Pay Extra
+                            <Popup
+                                trigger={<Icon name='question'/>}
+                                content='If the Ethereum network is busy, the new Property price may not update in time. Adding to the base price will help ensure having sufficient funds for the purchase.'
+                                className='Popup'
+                                size='tiny'
+                            />
+                        </Button>}
                 </ModalContent>
                 <ModalActions>
                     <Button primary onClick={() => this.buyProperty()}>Buy Property</Button>

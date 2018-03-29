@@ -2,8 +2,12 @@ import React, { Component } from 'react'
 import {Modal, ModalActions, ModalHeader, ModalContent, Button} from 'semantic-ui-react';
 
 class ConfirmModal extends Component {
-    state = { open: false }
-  
+  constructor(props) {
+    super(props);
+    this.state = {
+      open: false,
+    };
+  }
     open = () => this.setState({ open: true })
 
     close(res = false) {
@@ -28,8 +32,8 @@ class ConfirmModal extends Component {
             <p>{this.props.description}</p>
           </ModalContent>
           <ModalActions>
-            <Button negative icon='close' content='No' onClick={this.close} />
-            <Button positive icon='check' content='Yes' onClick={this.close} />
+            <Button negative icon='close' content='No' onClick={() => this.close(false)} />
+            <Button positive icon='check' content='Yes' onClick={() => this.close(true)} />
           </ModalActions>
         </Modal>
       )

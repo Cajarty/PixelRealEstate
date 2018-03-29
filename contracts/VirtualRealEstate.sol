@@ -76,8 +76,8 @@ contract VirtualRealEstate is StandardToken {
     uint256 PROPERTY_GENERATES_PER_MINUTE = 1;
     uint256 EXTRA_COLOR_SPEND_UNTIL;
     
-    event PropertyColorUpdate(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address lastUpdaterPayee, uint256 becomePublic);
-    event PropertyBought(uint24 indexed property,  address newOwner, uint256 ethAmount, uint256 PPTAmount, uint256 timestamp);
+    event PropertyColorUpdate(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address indexed lastUpdaterPayee, uint256 becomePublic);
+    event PropertyBought(uint24 indexed property, address indexed newOwner, uint256 ethAmount, uint256 PPTAmount, uint256 timestamp);
     event SetUserHoverText(address indexed user, uint256[2] newHoverText);
     event SetUserSetLink(address indexed user, uint256[2] newLink);
     event PropertySetForSale(uint24 indexed property, uint256 forSalePrice);

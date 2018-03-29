@@ -1,7 +1,7 @@
 contract VirtualRealEstate:
     events:
-        event PropertyColorUpdate(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address lastUpdaterPayee, uint256 becomePublic);
-        event PropertyBought(uint24 indexed property,  address newOwner, uint256 ethAmount, uint256 pptAmount, uint256 timestamp);
+        event PropertyColorUpdate(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address indexed lastUpdaterPayee, uint256 becomePublic)
+        event PropertyBought(uint24 indexed property, address indexed newOwner, uint256 ethAmount, uint256 PPTAmount, uint256 timestamp)
         event SetUserHoverText(address indexed user, uint256[2] newHoverText);
         event SetUserSetLink(address indexed user, uint256[2] newLink);
         event PropertySetForSale(uint24 indexed property, uint256 forSalePrice);
@@ -61,4 +61,4 @@ ChangeLog:
 03/03/2018: Changed SetRowColors parameters to include pptSpent
 03/03/2018: Replaced "lastBid" from getPropertyData returns with "flag"
 08/03/2018: Added timestamp to Bid event
-28/03/2018: Added becomePublic timestamp to PropertyColorUpdate
+28/03/2018: Added becomePublic timestamp to PropertyColorUpdate, isInGravePeriod view and more indexes to PropertyColorUpdate & PropertyBought

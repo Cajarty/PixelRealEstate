@@ -134,17 +134,10 @@ export class Contract {
     setupEvents() {
         this.VRE.deployed().then((instance) => {
             this.events.event = instance.allEvents({fromBlock: 0, toBlock: 'latest'});
-            this.events.event.watch((error, result) => {
-                if (error) {
-                    console.info(result, error);
-                } else {
-                    this.sendEvent(result.event, result);
-                }
-            });
             SDM.init();
             this.listenForResults(LISTENERS.ServerDataManagerInit, 'contract', () => {
                 this.stopListeningForResults(LISTENERS.ServerDataManagerInit, 'contract');
-                this.events.event.get((error, result) => {
+                this.events.event.watch((error, result) => {
                     if (error) {
                         console.info(result, error);
                     } else {
@@ -155,6 +148,54 @@ export class Contract {
             });
         }).catch((c) => {
             console.info(c);
+        });
+    }
+
+    /*
+    Requests all events of event type EVENT.
+    */
+    getEventLogs(event, params = {}, callback) {
+        let responder = (err, evt) => {
+            return callback(evt, err);
+        };
+
+        let filter = {fromBlock: 0, toBlock: 'latest'};
+
+        this.VRE.deployed().then((i) => {
+            switch(event) {
+                case EVENTS.PropertyBought:
+                    return i.PropertyBought(params, filter).get(responder);
+                case EVENTS.PropertyColorUpdate:
+                    return i.PropertyColorUpdate(params, filter).get(responder);
+                case EVENTS.PropertyColorUpdatePixel:
+                    return i.PropertyColorUpdatePixel(params, filter).get(responder);
+                case EVENTS.SetUserHoverText:
+                    return i.SetUserHoverText(params, filter).get(responder);
+                case EVENTS.SetUserSetLink:
+                    return i.SetUserSetLink(params, filter).get(responder);
+                case EVENTS.PropertySetForSale:
+                    return i.PropertySetForSale(params, filter).get(responder);
+                case EVENTS.DelistProperty:
+                    return i.DelistProperty(params, filter).get(responder);
+                case EVENTS.ListTradeOffer:
+                    return i.ListTradeOffer(params, filter).get(responder);
+                case EVENTS.AcceptTradeOffer:
+                    return i.AcceptTradeOffer(params, filter).get(responder);
+                case EVENTS.CancelTradeOffer:
+                    return i.CancelTradeOffer(params, filter).get(responder);
+                case EVENTS.SetPropertyPublic:
+                    return i.SetPropertyPublic(params, filter).get(responder);
+                case EVENTS.SetPropertyPrivate:
+                    return i.SetPropertyPrivate(params, filter).get(responder);
+                case EVENTS.Bid:
+                    return i.Bid(params, filter).get(responder);
+                case EVENTS.AccountChange:
+                    return i.AccountChange(params, filter).get(responder);
+                case EVENTS.Transfer:
+                    return i.Transfer(params, filter).get(responder);
+                case EVENTS.Approval:
+                    return i.Approval(params, filter).get(responder);
+            }
         });
     }
 
@@ -338,16 +379,6 @@ export class Contract {
         });
     }
 
-    getForRentPrice(x, y) {
-        this.VRE.deployed().then((i) => {
-            return i.getForRentPrice.call(this.toID(x, y)).then((r) => {
-                return r;
-            });
-        }).catch((e) => {
-            console.log(e);
-        });
-    }
-
     getHoverText(address, callback) {
         this.VRE.deployed().then((i) => {
             return i.getHoverText.call(address).then((r) => {
@@ -459,7 +490,6 @@ export class Contract {
     }
 
     sendEvent(event, result) {
-        console.info(event, result)
         Object.keys(this.events[event]).map((i) => {
             this.events[event][i](result);
         });

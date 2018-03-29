@@ -2,7 +2,6 @@
 import React, { Component } from 'react'
 import Canvas from './Canvas.jsx'
 import {Contract, ctr} from '../../contract/contract.jsx';
-import PropertySalesLog from '../ui/PropertySalesLog';
 
 const zoomValues = [25, 50, 100, 100, 200, 400, 800];
 const labelValues = ['25%', '50%', '100%', 'Fit', '200%', '400%', '800%'];

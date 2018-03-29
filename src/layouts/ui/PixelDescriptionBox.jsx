@@ -112,13 +112,6 @@ class PixelDescriptionBox extends Component {
         });
     }
 
-    calculateEarnings(last = this.state.lastUpdate, max = this.state.maxEarnings) {
-        let now = new Date().getTime();
-        let maxTime = (last + (max * 60)) * 1000;
-        let current = Math.min(now, maxTime);
-        return Math.floor((current - (last * 1000)) / 60000);
-    }
-
     componentWillUnmount() {
         GFD.closeAll('pixelBrowse');
         this.stopTokenEarnedInterval();
@@ -152,7 +145,7 @@ class PixelDescriptionBox extends Component {
                 reserved,
                 latestBid: Func.BigNumberToNumber(data[6]),
                 maxEarnings,
-                earnings: this.calculateEarnings(lastUpdate, maxEarnings),
+                earnings: Func.calculateEarnings(lastUpdate, maxEarnings),
             });
             ctr.getHoverText(data[0], (data) => {
                 if (data != null && data.length > 0)
@@ -179,7 +172,7 @@ class PixelDescriptionBox extends Component {
     startTokenEarnedInterval() {
         this.setState({
             tokenEarnedInterval: setInterval(() => {
-                let newEarned = this.calculateEarnings(this.state.lastUpdate, this.state.maxEarnings);
+                let newEarned = Func.calculateEarnings(this.state.lastUpdate, this.state.maxEarnings);
                 if (this.state.earnings != newEarned)
                     this.setState({earnings: newEarned});
             }, 1000)

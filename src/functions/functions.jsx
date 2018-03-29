@@ -220,3 +220,10 @@ export const BinaryToRGB = (value) => {
     obj.r = (obj.r & value) >> 16;
     return obj;
 }
+
+export const calculateEarnings = (lastUpdate, maxEarnings) => {
+    let now = new Date().getTime();
+    let maxTime = (lastUpdate + (maxEarnings * 60)) * 1000;
+    let current = Math.min(now, maxTime);
+    return Math.floor((current - (lastUpdate * 1000)) / 60000);
+}

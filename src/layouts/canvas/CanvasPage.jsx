@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import Canvas from './Canvas.jsx'
 import {Contract, ctr, LISTENERS, EVENTS} from '../../contract/contract.jsx';
-import PropertySalesLog from '../ui/PropertySalesLog';
 import ErrorBox from '../ErrorBox';
 import ZoomCanvas from './ZoomCanvas';
 import Axios from '../../network/Axios.jsx';
@@ -14,7 +13,9 @@ import HoverBox from './HoverBox';
 import * as Assets from '../../const/assets';
 import ClickLoader from '../ui/ClickLoader';
 import PixelDescriptionBox from '../ui/PixelDescriptionBox';
-import { Segment, SegmentGroup, Button, Divider, Label, LabelDetail, Input, Icon, Item, ItemContent, ItemImage, ItemGroup} from 'semantic-ui-react';
+import PropertyChangeLogYou from '../logs/PropertyChangeLogYou';
+import PropertySalesLog from '../logs/PropertySalesLog';
+import { Segment, SegmentGroup, Button, Divider, Label, LabelDetail, Input, Icon, Item, ItemContent, ItemImage, ItemGroup, Tab, Header, Grid, Sidebar, MenuItem, TabPane, Menu} from 'semantic-ui-react';
 import SetHoverText from '../forms/SetHoverText';
 import SetLink from '../forms/SetLink';
 
@@ -86,6 +87,9 @@ class CanvasPage extends Component {
     }
 
     render() {
+        let payoutPanes = [{ menuItem: 'Top 10', render: () => <TabPane attached={false}>Tab 1 Content</TabPane> },
+        { menuItem: 'Recent', render: () => <TabPane attached={false}><PropertySalesLog/></TabPane> },
+        { menuItem: 'You', render: () => <TabPane attached={false}><PropertyChangeLogYou/></TabPane> }];
         return (
             <div>
                 <SegmentGroup horizontal className='mainSegmentGroup'> 
@@ -146,49 +150,29 @@ class CanvasPage extends Component {
                         </div>
                     </Segment>
                 </SegmentGroup>
-                <div className='middle-top'>
-                </div>
-                <div className={'middle' + (this.state.advancedMode ? '' : ' hideElement')}>
-                    <PropertySalesLog/>
-                </div>
-                <div className='bottom'>
-                </div>
+                <Segment className={(this.state.advancedMode ? 'lowerSegment' : 'lowerSegment hideElement')}>
+                    <div>
+                        <Header>Payout History</Header>
+                        <Tab menu={{ secondary: true, pointing: true }} panes={payoutPanes} />
+                    </div>
+                </Segment>
+                <Sidebar id='footer' className='footer' as={Menu} animation='push' direction='bottom' visible inverted>
+                    <MenuItem name='home'>
+                    <Icon name='home' />
+                    Home
+                    </MenuItem>
+                    <MenuItem name='gamepad'>
+                    <Icon name='gamepad' />
+                    Games
+                    </MenuItem>
+                    <MenuItem name='camera'>
+                    <Icon name='camera' />
+                    Channels
+                    </MenuItem>
+                </Sidebar>
             </div>
         );
     }
 }
 
 export default CanvasPage
-
-
-{/* <div className='banner'>
-<a 
-    href='https://pixelproperty.io/' 
-    target='_blank' 
-    className='hideElement' 
-    ref={(portfolioLink) => { this.portfolioLink = portfolioLink; }} 
-/>
-<div className='headerButtons'>
-    <input 
-        type='button' 
-        className='headerButton left' 
-        value='Homepage' 
-        onClick={() => this.visitPortfolio()}
-    ></input>
-    {this.state.advancedMode ? 
-        <div className='ppcLabel'>
-            <img className='token icon' src={Assets.TOKEN} draggable={false}></img>
-            <div className='text'>
-                {this.state.PPCOwned}
-                {this.state.loadingPPC ? <img className='loading icon' src={Assets.LOADING} draggable={false}></img> : ''}
-            </div>
-        </div>
-    : null}
-    <input 
-        type='button' 
-        className='headerButton right' 
-        value={this.state.advancedMode ? 'Viewing Mode' : 'Interactive Mode'}
-        onClick={() => this.changeMode()}
-    ></input>
-</div>
-</div> */}

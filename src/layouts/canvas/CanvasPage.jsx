@@ -18,6 +18,8 @@ import PropertySalesLog from '../logs/PropertySalesLog';
 import { Segment, SegmentGroup, Button, Divider, Label, LabelDetail, Input, Icon, Item, ItemContent, ItemImage, ItemGroup, Tab, Header, Grid, Sidebar, MenuItem, TabPane, Menu} from 'semantic-ui-react';
 import SetHoverText from '../forms/SetHoverText';
 import SetLink from '../forms/SetLink';
+import PropertiesOwned from '../ui/PropertiesOwned';
+import PropertiesForSale from '../ui/PropertiesForSale';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -27,7 +29,9 @@ class CanvasPage extends Component {
             pixelData: null,
             loadingPPC: true,
             PPCOwned: 0,
-            advancedMode: false
+            advancedMode: false,
+
+            tab2Loading: false,
         }
     }
 
@@ -68,6 +72,14 @@ class CanvasPage extends Component {
         GFD.listen('advancedMode', 'CanvasPage', (advancedMode) => {
             this.setState({advancedMode})
         });
+        this.updateScreen();
+        window.onresize = (ev) => this.updateScreen;
+    }
+
+    updateScreen() {
+        let width = document.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        GFD.setData('screenWidth', width);
+        GFD.setData('screenHeight', document.innerHeight || document.documentElement.clientHeight || document.body.clientHeight);
     }
 
     componentWillUnmount() {
@@ -87,8 +99,8 @@ class CanvasPage extends Component {
     }
 
     render() {
-        let browsePanes = [{ menuItem: 'Owned', render: () => <TabPane attached={false}>Tab 1 Content</TabPane> },
-        { menuItem: 'For Sale', render: () => <TabPane attached={false}><PropertySalesLog/></TabPane> }];
+        let browsePanes = [{ menuItem: 'Owned', render: () => <TabPane attached={false}><PropertiesForSale isLoading={() => {}}/></TabPane> },
+        { menuItem: 'For Sale', render: () => <TabPane attached={false} loading={this.state.tab2Loading}><PropertiesForSale isLoading={(r) => this.setState({tab2Loading: r})}/></TabPane> }];
 
         let payoutPanes = [{ menuItem: 'Top 10', render: () => <TabPane attached={false}>Tab 1 Content</TabPane> },
         { menuItem: 'Recent', render: () => <TabPane attached={false}>none yet</TabPane> },

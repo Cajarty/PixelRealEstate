@@ -8,7 +8,7 @@ import {GFD, GlobalState} from '../../functions/GlobalState';
 import Dropdown from 'react-dropdown';
 import PanelContainerForSale from './PanelContainerForSale';
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 8;
 
 class PropertiesForSale extends Component {
     constructor(props) {
@@ -19,11 +19,14 @@ class PropertiesForSale extends Component {
             compare: Compares.yAsc,
             page: 0, //on page #
             pages: 0, //total pages
+            isLoading: false//is it done ordering?
         };
         this.cancelSort = false;
     }
 
     componentDidMount() {
+        this.props.isLoading(true);
+        //fix updates to be better
         ctr.listenForEvent(EVENTS.PropertySetForSale, 'PropertiesForSale', (data) => {
             this.reorderItems(this.state.compare.func);
             this.forceUpdate();
@@ -31,9 +34,23 @@ class PropertiesForSale extends Component {
         this.reorderItems(this.state.compare.func);
     }
 
-    reorderItems(orderFunc) {
+    async reorderItems(orderFunc) {
+        //get my current market trade and populate fields
+        this.setState({isLoading: true});
+        let results = await SDM.orderPropertyList(SDM.forSaleProperties, orderFunc)
+        this.setState({
+            isLoading: false,
+            orderedItems: results, 
+            pages: Math.floor((results.length - 1) / PAGE_SIZE)
+        });
+        this.props.isLoading(false);
+    }
+
+    reorderItemsOld(orderFunc) {
         //get my current market trade and populate fields
         let promise = SDM.orderPropertyListAsync(SDM.forSaleProperties, orderFunc);
+        this.setState({isLoading: true});
+        this.props.isLoading(true);
 
         let relisten = (results) => {
             if (this.cancelSort)
@@ -44,6 +61,10 @@ class PropertiesForSale extends Component {
             });
             if (results.promise)
                 results.promise.then(relisten);
+            else {
+                this.setState({isLoading: false})
+                this.props.isLoading(false);
+            }
         }
 
         promise.then(relisten);
@@ -73,9 +94,9 @@ class PropertiesForSale extends Component {
     changePage(pageChange) {
         let page = this.state.page + pageChange;
         if (page < 0)
-            page = 0;
-        if (page > this.state.pages)
             page = this.state.pages;
+        if (page > this.state.pages)
+            page = 0;
         this.setState({page});        
     }
 
@@ -86,10 +107,8 @@ class PropertiesForSale extends Component {
 
     render() {
         return (
-            <div className='uiBase'>
-                <div className='header'>
-                    Properties For Sale
-                    <label className="switch">
+            <div>
+                {null&& <label className="switch">
                     Show
                     <input 
                         type="checkbox" 
@@ -97,8 +116,8 @@ class PropertiesForSale extends Component {
                         onChange={(e) => this.toggleCanvasProperties(e.target.checked)}
                     ></input>
                     <span className="slider"></span>
-                </label>
-                <div>
+                </label>}
+               {null&& <div>
                     <Dropdown 
                         className='dropdown'
                         value={this.state.compare}
@@ -107,17 +126,16 @@ class PropertiesForSale extends Component {
                         })} 
                         onChange={value => {this.reorderList(value)}}
                     />
-                </div>
-                </div>
-                <div className='containerParent'>
+                </div>}
                     <PanelContainerForSale
                         data={this.state.orderedItems}
+                        onChangeUp={() => this.changePage(1)}
+                        onChangeDown={() => this.changePage(-1)}
                         onClick={(x, y) => this.propertySelected(x, y)}
                         viewStart={this.state.page * PAGE_SIZE}
                         viewEnd={(this.state.page + 1) * PAGE_SIZE}
                     />
-                </div>
-                <div className='footer'>
+                {null&&<div className='footer'>
                     <div className='bottomNav' onClick={() => this.changePage(-1)}>
                         <img className='icon' src={Assets.ICON_LEFT_ARROW}></img>
                     </div>
@@ -127,7 +145,7 @@ class PropertiesForSale extends Component {
                     <div className='bottomNav' onClick={() => this.changePage(1)}>
                         <img className='icon' src={Assets.ICON_RIGHT_ARROW}></img>
                         </div>
-                </div>
+                </div>}
             </div>
         );
     }

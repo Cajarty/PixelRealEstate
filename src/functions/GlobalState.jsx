@@ -13,6 +13,8 @@ export class GlobalState {
             canvasTopOffset: null,
             canvasLeftOffset: null,
             advancedMode: true,
+            screenWidth: 100,
+            screenHeight: 100,
         };
         this.limiters = {
             

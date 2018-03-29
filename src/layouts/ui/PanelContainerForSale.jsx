@@ -3,6 +3,7 @@ import {Panel, PanelItem, PanelPropertyCanvas, PanelDivider} from './Panel';
 import PanelContainer from './PanelContainer';
 import Timestamp from 'react-timestamp';
 import Hours from '../ui/Hours';
+import {SegmentGroup, Segment, Label, LabelDetail, Divider, Grid, GridRow, GridColumn, List, ListItem, ListContent, ListHeader, Button } from 'semantic-ui-react';
 
 class PanelContainerForSale extends PanelContainer {
     constructor(props) {
@@ -14,23 +15,45 @@ class PanelContainerForSale extends PanelContainer {
 
     render() {
         return (
-            <div className='panelContainer'>
-                {this.state.dataView.map((child, i) => (
-                    <Panel onClick={() => {this.props.onClick(child.x + 1, child.y + 1)}} key={i}>
-                        <PanelPropertyCanvas x={child.x} y={child.y} width={20} imageData={child.imageData}/>
-                        <PanelItem width='10%'/>
-                        <PanelItem width='10%' title data='X:'/>
-                        <PanelItem width='35%' data={child.x + 1}/>
-                        <PanelItem width='10%' title data='Y:'/>
-                        <PanelItem width='15%' data={child.y + 1}/>
-                        <PanelDivider/>
-                        <PanelItem width='40%' title data='PPT Price:'/>
-                        <PanelItem width='60%' data={child.PPCPrice}/>
-                        {child.ETHPrice !== 0 ? <PanelItem width='40%' title data='ETH Price:'/> :null}
-                        {child.ETHPrice !== 0 ? <PanelItem width='60%' data={child.ETHPrice}/> :null}
-                    </Panel>
-                ))}
-            </div>
+            <Grid divided stretched>
+                <GridRow columns='equal' stretched>
+                    <GridColumn stretched key={100000}>
+                        <Button fluid onClick={() => {this.props.onChangeDown()}}>{'<'}</Button>
+                    </GridColumn>
+                    {this.state.dataView.map((child, i) => (
+                        <GridColumn key={i}>
+                            <Segment compact raised onClick={() => {this.props.onClick(child.x + 1, child.y + 1)}}>
+                                    <List celled divided selection={false} size='small'>
+                                        <ListItem>
+                                            <PanelPropertyCanvas x={child.x} y={child.y} width={50} imageData={child.imageData}/>
+                                        </ListItem>
+                                        <ListItem>
+                                            <ListHeader>X</ListHeader>
+                                            <ListContent>{child.x + 1}</ListContent>
+                                        </ListItem>
+                                        <ListItem>
+                                            <ListHeader>Y</ListHeader>
+                                            <ListContent>{child.y + 1}</ListContent>
+                                        </ListItem>
+                                        <ListItem>
+                                            <ListHeader>PXL</ListHeader>
+                                            <ListContent>{child.PPCPrice}</ListContent>
+                                        </ListItem>
+                                        {child.ETHPrice != 0 && 
+                                            <ListItem>
+                                            <ListHeader>ETH</ListHeader>
+                                            <ListContent>{child.ETHPrice}</ListContent>
+                                            </ListItem>
+                                        }
+                                    </List>
+                            </Segment>
+                        </GridColumn>
+                    ))}
+                    <GridColumn stretched key={200000}>
+                        <Button fluid onClick={() => {this.props.onChangeUp()}}>{'>'}</Button>
+                    </GridColumn>
+                </GridRow>
+            </Grid>
         );
     }
 }

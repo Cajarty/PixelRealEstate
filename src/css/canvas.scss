@@ -25,6 +25,16 @@
     }
 }
 
+.panelCanvas {
+    padding: 0;
+    margin: auto;
+    display: block;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
 .zoomCanvasContainer {
     //border: 2px solid $color5;
     &.hide {
@@ -158,4 +168,5 @@
     margin: 0px 1rem 0px 1rem !important;
     position: relative;
     width: calc(100vw - 38px) !important;
+    border-radius: .28571429rem 0px !important;
 }

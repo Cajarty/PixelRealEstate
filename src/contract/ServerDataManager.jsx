@@ -278,18 +278,30 @@ export class ServerDataManager {
     }
 
     orderPropertyList(objList, compFunc) {
-        let list = [];
-        Object.keys(objList).map(x => {
-            Object.keys(objList[x]).map(y => {
-                let i = 0;
-                for (; i < list.length; i++) {
-                    if (compFunc(objList[x][y], list[i]))
-                        break;
-                }
-                list.splice(i, 0, objList[x][y]);
-            });
+        return new Promise(resolve => {
+            let list = [];
+            if (objList == null || Object.keys(objList).length == 0) {
+                setTimeout(() => {
+                    resolve(this.orderPropertyList(objList, compFunc));
+                }, 1000);
+            } else {
+                let height = Object.keys(objList).length;
+                let width = Object.keys(objList[0]).length;
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        if (objList[x] != null && objList[x][y] != null) {
+                            let i = 0;
+                            for (; i < list.length; i++) {
+                                if (compFunc(objList[x][y], list[i]))
+                                    break;
+                            }
+                            list.splice(i, 0, objList[x][y]);
+                        }
+                    };
+                };
+                resolve(list);
+            }
         });
-        return list;
     }
 
     partialOrderPropertyListByIndex(sortedArray, objArr, startIndex, endIndex, compFunc) {
@@ -307,7 +319,7 @@ export class ServerDataManager {
 
     orderPropertyListAsync(objList, compFunc) {
         let index = 0;
-        let block = 100;
+        let block = 1000;
         let sortedArray = [];
 
         let objArr = [];
@@ -326,7 +338,7 @@ export class ServerDataManager {
                     res({promise: new Promise(repromise), data: sortedArray});
                 else 
                     res({promise: null, data: sortedArray});
-            }, 10);
+            }, 20);
         }
 
         return new Promise(repromise);

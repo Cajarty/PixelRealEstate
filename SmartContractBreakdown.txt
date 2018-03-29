@@ -1,6 +1,6 @@
 contract VirtualRealEstate:
     events:
-        event PropertyColorUpdate(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address lastUpdaterPayee);
+        event PropertyColorUpdate(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address lastUpdaterPayee, uint256 becomePublic);
         event PropertyBought(uint24 indexed property,  address newOwner, uint256 ethAmount, uint256 pptAmount, uint256 timestamp);
         event SetUserHoverText(address indexed user, uint256[2] newHoverText);
         event SetUserSetLink(address indexed user, uint256[2] newLink);
@@ -25,12 +25,12 @@ contract VirtualRealEstate:
         setLink(uint256[2] link)
             - SetUserSetLink(msg.sender, link)
         setColors(uint24 propertyID, uint256[10] newColors, pptToSpend)
-            - PropertyColorUpdate(propertyID, newColors, timeUpdate, lastUpdaterPayee)
+            - PropertyColorUpdate(propertyID, newColors, timeUpdate, lastUpdaterPayee, property.becomePublic)
         setPropertyMode(uint24 propertyID, bool isInPrivateMode, uint32 numHoursPrivate)
             - SetPropertyPrivate(propertyID, numHoursPrivate)
             - SetPropertyPublic(propertyID)
         setRowColors(uint24 propertyID, uint8 row, uint256 newColorData, uint256 pptToSpend)
-            - PropertyColorUpdatePixel(propertyID, row, newColorData)
+            - PropertyColorUpdatePixel(propertyID, row, newColorData, property.becomePublic)
         transferProperty(uint24 propertyID, address newOwner)
             - PropertyBought(propertyID, newOwner, 0, 0, now)
         buyProperty(uint24 propertyID, uint256 pptValue)
@@ -60,3 +60,4 @@ ChangeLog:
 03/03/2018: Changed SetRowColors parameters to include pptSpent
 03/03/2018: Replaced "lastBid" from getPropertyData returns with "flag"
 08/03/2018: Added timestamp to Bid event
+28/03/2018: Added becomePublic timestamp to PropertyColorUpdate

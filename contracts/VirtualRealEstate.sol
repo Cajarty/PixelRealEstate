@@ -76,7 +76,7 @@ contract VirtualRealEstate is StandardToken {
     uint256 PROPERTY_GENERATES_PER_MINUTE = 1;
     uint256 EXTA_COLOR_SPEND_UNTIL;
     
-    event PropertyColorUpdate(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address lastUpdaterPayee);
+    event PropertyColorUpdate(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address lastUpdaterPayee, uint256 becomePublic);
     event PropertyBought(uint24 indexed property,  address newOwner, uint256 ethAmount, uint256 PPTAmount, uint256 timestamp);
     event SetUserHoverText(address indexed user, uint256[2] newHoverText);
     event SetUserSetLink(address indexed user, uint256[2] newLink);
@@ -232,7 +232,7 @@ contract VirtualRealEstate is StandardToken {
         Property storage property = map[propertyID];
         if (_tryTriggerPayout(property, pptToSpend)) {
             property.colors = newColors;
-            PropertyColorUpdate(propertyID, newColors, now, property.lastUpdater);
+            PropertyColorUpdate(propertyID, newColors, now, property.lastUpdater, property.becomePublic);
             return true;
         }
         return false;
@@ -242,7 +242,7 @@ contract VirtualRealEstate is StandardToken {
         Property storage property = map[propertyID];
         if (_tryTriggerPayout(property, pptToSpend)) {
             property.colors[row] = newColorData;
-            PropertyColorUpdate(propertyID, property.colors, now, property.lastUpdater);
+            PropertyColorUpdate(propertyID, property.colors, now, property.lastUpdater, property.becomePublic);
             return true;
         }
         return false;

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
-import {ctr, Contract, EVENTS} from '../../contract/contract';
+import * as EVENTS from '../../const/events';
+import {ctr, Contract} from '../../contract/contract';
 import * as Func from '../../functions/functions';
 
 export class Panel extends Component {
@@ -48,22 +49,14 @@ export class PanelPropertyCanvas extends Component {
         ctx.scale(this.props.width / 10, this.props.width / 10);
         this.setState({ ctx, scale: this.props.width });
         this.setCanvas(SDM.getPropertyImage(this.props.x, this.props.y));
-        ctr.listenForEvent(EVENTS.PropertyColorUpdate, this.state.listenerToken, (data) => {
-            let xy = {x: 0, y: 0};
-            if (data.args.x == null || data.args.y == null)
-                xy = ctr.fromID(Func.BigNumberToNumber(data.args.property));
-            else {
-                xy.x = data.args.x;
-                xy.y = data.args.y;
-            }
-            console.info('DRAWING: ', xy, this.props)
-            if (xy.x !== this.props.x || xy.y !== this.props.y)
-                return;
+        
 
-            if (data.args.colorsRGB == null)
-                this.setCanvas(Func.ContractDataToRGBAArray(data.args.colors));
-            else
-                this.setCanvas(data.args.colorsRGB);
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {property: ctr.toID(this.props.x, this.props.y)}, (updateHandle) => {
+            this.setState({updateHandle})
+            updateHandle.watch((error, log) => {
+                let colors = Func.ContractDataToRGBAArray(log.args.colors);
+                this.setCanvas(colors);
+            });
         });
     }
 
@@ -73,7 +66,7 @@ export class PanelPropertyCanvas extends Component {
     }
 
     componentWillUnmount() {
-        ctr.stopListeningForEvent(EVENTS.PropertyColorUpdate, this.state.listenerToken);
+        this.state.updateHandle.stopWatching();
     }
 
     setCanvas(rgbArr) {

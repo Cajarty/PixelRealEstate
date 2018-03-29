@@ -33,15 +33,14 @@ class MakePrivateForm extends Component {
         GFD.listen('x', 'ChangePropertyMode', (x) => {
             this.setState({x});
         })
+        //restructure
         GFD.listen('y', 'ChangePropertyMode', (y) => {
-            console.info("all: ", SDM, GFD.getData('x') - 1, y - 1);
             this.setState({
                 y,
                 isPrivate: SDM.getPropertyData(GFD.getData('x') - 1, y - 1).isPrivate,
                 becomePublic: SDM.getPropertyData(GFD.getData('x') - 1, y - 1).becomePublic 
             });
             ctr.getPropertyData(GFD.getData('x') - 1, y - 1, (data) => {
-                console.info(data);
                 this.setState({
                     isPrivate: data[4],
                     becomePublic: data[5]

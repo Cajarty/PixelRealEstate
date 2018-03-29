@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import {Contract, ctr, EVENTS} from '../../contract/contract.jsx';
+import * as EVENTS from '../../const/events';
+import {Contract, ctr} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions.jsx';
 import Timestamp from 'react-timestamp';
 import {GFD, GlobalState} from '../../functions/GlobalState';
@@ -91,30 +92,48 @@ class PixelDescriptionBox extends Component {
             this.setState({y});
         })
 
-        ctr.listenForEvent(EVENTS.PropertyColorUpdate, 'PixelDescriptionBox', (data) => {
-            let xy = {x: 0, y: 0, colors: []};
-            if (data.args.x == null || data.args.y == null)
-                xy = ctr.fromID(Func.BigNumberToNumber(data.args.property));
-            else {
-                xy.x = data.args.x;
-                xy.y = data.args.y;
-            }
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (eventHandleUpdate) => {
+            this.setState({eventHandleUpdate});
+            eventHandleUpdate.watch((error, log) => {
+                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
+                let xx = GFD.getData('x') - 1
+                let yy = GFD.getData('y') - 1;
+                if (id.x == xx && id.y == yy) {
+                    let colors = Func.ContractDataToRGBAArray(log.args.colors);
+                    this.setCanvas(colors);
+                }
+            });
+        });
 
-            if (xy.x !== this.state.x - 1 || xy.y !== this.state.y - 1)
-                return;
+        ctr.watchEventLogs(EVENTS.PropertyBought, {}, (handle) => {
+            let eventHandleUpdate = handle;
+            this.setState({eventHandleUpdate});
+            eventHandleUpdate.watch((error, log) => {
+                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
+                let xx = GFD.getData('x') - 1
+                let yy = GFD.getData('y') - 1;
+                if (id.x == xx && id.y == yy)
+                    this.loadProperty(xx, yy);
+            });
+        });
 
-            if (data.args.colorsRGB == null)
-                xy.colors = Func.ContractDataToRGBAArray(data.args.colors);
-            else
-                xy.colors = data.args.colorsRGB;
-
-            this.loadProperty(xy.x, xy.y, xy.colors);
+        ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (handle) => {
+            let eventHandleUpdate = handle;
+            this.setState({eventHandleUpdate});
+            eventHandleUpdate.watch((error, log) => {
+                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
+                let xx = GFD.getData('x') - 1
+                let yy = GFD.getData('y') - 1;
+                if (id.x == xx && id.y == yy)
+                    this.loadProperty(xx, yy);
+            });
         });
     }
 
     componentWillUnmount() {
         GFD.closeAll('pixelBrowse');
         this.stopTokenEarnedInterval();
+        this.state.eventHandleUpdate.stopWatching();
     }
 
     setCanvas(rgbArr) {

@@ -112,7 +112,7 @@ class SetPixelColorForm extends Component {
         GFD.listen('y', 'UpdatePixel', (y) => {
             this.setState({y});
         })
-        this.setCanvas(SDM.getPropertyImage(GFD.getData('x'), GFD.getData('y')), ctxSml, ctxLrg, canvasSml);
+        this.setCanvas(SDM.getPropertyImage(GFD.getData('x') - 1, GFD.getData('y') - 1), ctxSml, ctxLrg, canvasSml);
         this.drawImages();
     }
 
@@ -261,6 +261,19 @@ class SetPixelColorForm extends Component {
         this.props.close("SET_IMAGE");
     }
 
+    clearCanvas() {
+        let ctxID = this.state.ctxLrg.createImageData(100, 100);
+        for (let i = 0; i < 40000; i++) {
+            ctxID.data[i] = 0;
+        }
+        this.state.ctxLrg.putImageData(ctxID, 0, 0);
+        this.state.ctxSml.putImageData(ctxID, 0, 0, 0, 0, 10, 10);
+
+        this.setState({
+            imageData: this.state.ctxSml.getImageData(0, 0, Const.PROPERTY_LENGTH, Const.PROPERTY_LENGTH).data,
+        });
+    }
+
     componentDidUpdate(pP, pS) {
         if (this.state.isOpen && !pS.isOpen)
             this.componentDidMountOpen();
@@ -371,6 +384,26 @@ class SetPixelColorForm extends Component {
                                                     ><Icon name='upload'/></Button>
                                                 }
                                                 content='Upload from file...'
+                                                position='bottom left'
+                                                className='Popup'
+                                                size='tiny'
+                                                basic
+                                            />
+                                        </GridColumn>
+                                    </GridRow>
+                                    <GridRow>
+                                        <GridColumn width={10}>
+                                        </GridColumn>
+                                        <GridColumn width={6}>
+                                            <Popup 
+                                                trigger={
+                                                    <Button 
+                                                        fluid
+                                                        type='button' 
+                                                        onClick={(e) => {this.clearCanvas()}}
+                                                    ><Icon name='trash outline'/></Button>
+                                                }
+                                                content='Clear drawing canvas'
                                                 position='bottom left'
                                                 className='Popup'
                                                 size='tiny'

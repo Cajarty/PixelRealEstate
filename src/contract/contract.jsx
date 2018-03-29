@@ -3,6 +3,7 @@
 import { default as Web3 } from 'web3';
 import * as Const from '../const/const.jsx';
 import * as Func from '../functions/functions.jsx';
+import * as EVENTS from '../const/events';
 import { default as contract } from 'truffle-contract';
 import {GFD, GlobalState} from '../functions/GlobalState';
 import {SDM, ServerDataManager} from '../contract/ServerDataManager';
@@ -22,32 +23,6 @@ export const LISTENERS = {
     ShowForSale: 'ShowForSale',
     ServerDataManagerInit: 'ServerDataManagerInit',
 }; 
-
-export const EVENTS = { 
-    PropertyColorUpdate: 'PropertyColorUpdate',                     //(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address lastUpdaterPayee);
-    PropertyColorUpdatePixel: 'PropertyColorUpdatePixel',           //(uint24 indexed property, uint8 row, uint24 rgb);
-
-    SetUserHoverText: 'SetUserHoverText',                           //(address indexed user, bytes32[2] newHoverText);
-    SetUserSetLink: 'SetUserSetLink',                               //(address indexed user, bytes32[2] newLink);
-
-    PropertyBought: 'PropertyBought',                               //(uint24 indexed property,  address newOwner);
-    PropertySetForSale: 'PropertySetForSale',                       //(uint24 indexed property, uint256 forSalePrice);
-    DelistProperty: 'DelistProperty',                               //(uint24 indexed property);
-
-    ListTradeOffer: 'ListTradeOffer',                               //(address indexed offerOwner, uint256 eth, uint256 pxl, bool isBuyingPxl);
-    AcceptTradeOffer: 'AcceptTradeOffer',                           //(address indexed accepter, address indexed offerOwner);
-    CancelTradeOffer: 'CancelTradeOffer',                           //(address indexed offerOwner);
-
-    SetPropertyPublic: 'SetPropertyPublic',                         //(uint24 indexed property);
-    SetPropertyPrivate: 'SetPropertyPrivate',                       //(uint24 indexed property, uint32 numHoursPrivate);
-
-    Bid: 'Bid',                                                     //(uint24 indexed property, uint256 bid);
-    AccountChange: 'AccountChange',                                 //(newaccount)  -  not a contract event.
-
-    //token events    
-    Transfer: 'Transfer',                                           //(address indexed _from, address indexed _to, uint256 _value);
-    Approval: 'Approval',                                           //(address indexed _owner, address indexed _spender, uint256 _value);
-};
 
 export class Contract {
     constructor() {
@@ -96,7 +71,11 @@ export class Contract {
         this.VRE.setProvider(window.web3.currentProvider);
 
         this.getAccounts();
-        this.setupEvents();
+        //this.setupEvents();
+
+        this.VRE.deployed().then((instance) => {
+            SDM.init();
+        });
         
         this.getAccountsInterval = setInterval(() => this.getAccounts(), 1000);
 
@@ -125,31 +104,31 @@ export class Contract {
 
             this.accounts = accs;
             if (this.account != this.accounts[0]) {
-                this.account = this.accounts[0];
+                this.account = this.accounts[0].toLowerCase();
                 this.sendEvent(EVENTS.AccountChange, this.accounts[0]);
             }
         });
     }
 
-    setupEvents() {
-        this.VRE.deployed().then((instance) => {
-            this.events.event = instance.allEvents({fromBlock: 0, toBlock: 'latest'});
-            SDM.init();
-            this.listenForResults(LISTENERS.ServerDataManagerInit, 'contract', () => {
-                this.stopListeningForResults(LISTENERS.ServerDataManagerInit, 'contract');
-                this.events.event.watch((error, result) => {
-                    if (error) {
-                        console.info(result, error);
-                    } else {
-                        for (let i = 0; i < result.length; i++)
-                            this.sendEvent(result[i].event, result[i]);
-                    }
-                });
-            });
-        }).catch((c) => {
-            console.info(c);
-        });
-    }
+    // setupEvents() {
+    //     this.VRE.deployed().then((instance) => {
+    //         this.events.event = instance.allEvents({fromBlock: 0, toBlock: 'latest'});
+    //         SDM.init();
+    //         this.listenForResults(LISTENERS.ServerDataManagerInit, 'contract', () => {
+    //             this.stopListeningForResults(LISTENERS.ServerDataManagerInit, 'contract');
+    //             this.events.event.watch((error, result) => {
+    //                 if (error) {
+    //                     console.info(result, error);
+    //                 } else {
+    //                     for (let i = 0; i < result.length; i++)
+    //                         this.sendEvent(result[i].event, result[i]);
+    //                 }
+    //             });
+    //         });
+    //     }).catch((c) => {
+    //         console.info(c);
+    //     });
+    // }
 
     /*
     Requests all events of event type EVENT.
@@ -167,8 +146,6 @@ export class Contract {
                     return i.PropertyBought(params, filter).get(responder);
                 case EVENTS.PropertyColorUpdate:
                     return i.PropertyColorUpdate(params, filter).get(responder);
-                case EVENTS.PropertyColorUpdatePixel:
-                    return i.PropertyColorUpdatePixel(params, filter).get(responder);
                 case EVENTS.SetUserHoverText:
                     return i.SetUserHoverText(params, filter).get(responder);
                 case EVENTS.SetUserSetLink:
@@ -177,20 +154,12 @@ export class Contract {
                     return i.PropertySetForSale(params, filter).get(responder);
                 case EVENTS.DelistProperty:
                     return i.DelistProperty(params, filter).get(responder);
-                case EVENTS.ListTradeOffer:
-                    return i.ListTradeOffer(params, filter).get(responder);
-                case EVENTS.AcceptTradeOffer:
-                    return i.AcceptTradeOffer(params, filter).get(responder);
-                case EVENTS.CancelTradeOffer:
-                    return i.CancelTradeOffer(params, filter).get(responder);
                 case EVENTS.SetPropertyPublic:
                     return i.SetPropertyPublic(params, filter).get(responder);
                 case EVENTS.SetPropertyPrivate:
                     return i.SetPropertyPrivate(params, filter).get(responder);
                 case EVENTS.Bid:
                     return i.Bid(params, filter).get(responder);
-                case EVENTS.AccountChange:
-                    return i.AccountChange(params, filter).get(responder);
                 case EVENTS.Transfer:
                     return i.Transfer(params, filter).get(responder);
                 case EVENTS.Approval:
@@ -211,8 +180,6 @@ export class Contract {
                     return callback(i.PropertyBought(params, filter));
                 case EVENTS.PropertyColorUpdate:
                     return callback( i.PropertyColorUpdate(params, filter));
-                case EVENTS.PropertyColorUpdatePixel:
-                    return callback( i.PropertyColorUpdatePixel(params, filter));
                 case EVENTS.SetUserHoverText:
                     return callback( i.SetUserHoverText(params, filter));
                 case EVENTS.SetUserSetLink:
@@ -221,20 +188,12 @@ export class Contract {
                     return callback( i.PropertySetForSale(params, filter));
                 case EVENTS.DelistProperty:
                     return callback( i.DelistProperty(params, filter));
-                case EVENTS.ListTradeOffer:
-                    return callback( i.ListTradeOffer(params, filter));
-                case EVENTS.AcceptTradeOffer:
-                    return callback( i.AcceptTradeOffer(params, filter));
-                case EVENTS.CancelTradeOffer:
-                    return callback( i.CancelTradeOffer(params, filter));
                 case EVENTS.SetPropertyPublic:
                     return callback( i.SetPropertyPublic(params, filter));
                 case EVENTS.SetPropertyPrivate:
                     return callback( i.SetPropertyPrivate(params, filter));
                 case EVENTS.Bid:
                     return callback( i.Bid(params, filter));
-                case EVENTS.AccountChange:
-                    return callback( i.AccountChange(params, filter));
                 case EVENTS.Transfer:
                     return callback( i.Transfer(params, filter));
                 case EVENTS.Approval:
@@ -489,20 +448,6 @@ export class Contract {
     // ---------------------------------------------------------------------------------------------------------
 
     /*
-    duration == seconds
-    */
-    listForRent(x, y, price, duration) {
-
-    }
-
-    /*
-    Stop renting/selling a pixel you own.
-    */
-    delist(x, y, delistFromSale, delistFromRent) {
-
-    }
-
-    /*
     Subscriber functions for gnereal updates.
     Events that are being used:
         Alerts
@@ -526,6 +471,8 @@ export class Contract {
     contract.
     */
     listenForEvent(event, key, callback) {
+        if (event !== EVENTS.AccountChange)
+            throw 'No longer using events for contract events. Use get/watchEventLogs';
         this.events[event][key] = callback;
     }
 

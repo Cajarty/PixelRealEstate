@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Canvas from './Canvas.jsx'
-import {Contract, ctr, LISTENERS, EVENTS} from '../../contract/contract.jsx';
+import * as EVENTS from '../../const/events';
+import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import ErrorBox from '../ErrorBox';
 import ZoomCanvas from './ZoomCanvas';
 import Axios from '../../network/Axios.jsx';
@@ -15,7 +16,9 @@ import ClickLoader from '../ui/ClickLoader';
 import PixelDescriptionBox from '../ui/PixelDescriptionBox';
 import PropertyChangeLogYou from '../logs/PropertyChangeLogYou';
 import PropertySalesLog from '../logs/PropertySalesLog';
-import { Segment, SegmentGroup, Button, Divider, Label, LabelDetail, Input, Icon, Item, ItemContent, ItemImage, ItemGroup, Tab, Header, Grid, Sidebar, MenuItem, TabPane, Menu} from 'semantic-ui-react';
+import { Segment, SegmentGroup, Button, Divider, Label, 
+    LabelDetail, Input, Icon, Item, ItemContent, ItemImage, 
+    ItemGroup, Tab, Header, Grid, Sidebar, MenuItem, TabPane, Menu} from 'semantic-ui-react';
 import SetHoverText from '../forms/SetHoverText';
 import SetLink from '../forms/SetLink';
 import PropertiesOwned from '../ui/PropertiesOwned';
@@ -39,35 +42,47 @@ class CanvasPage extends Component {
         ctr.getBalance((balance) => {
             this.setState({PPCOwned: balance, loadingPPC: false});
         });
-        ctr.listenForEvent(EVENTS.Transfer, 'CanvasPagePPCListener', (data) => {
-            if (data.args._from === ctr.account || data.args._to === ctr.account) {
-                this.setState({loadingPPC: true});
-                ctr.getBalance((balance) => {
-                    this.setState({PPCOwned: balance, loadingPPC: false});
-                });
-            }
+
+        ctr.watchEventLogs(EVENTS.Transfer, {}, (handle) => {
+            let eventHandleTransfer = handle;
+            this.setState({eventHandleTransfer});
+            eventHandleTransfer.watch((error, log) => {
+                if (log.args._from === ctr.account || log.args._to === ctr.account) {
+                    this.setState({loadingPPC: true});
+                    ctr.getBalance((balance) => {
+                        this.setState({PPCOwned: balance, loadingPPC: false});
+                    });
+                }
+            });
         });
+
         ctr.listenForEvent(EVENTS.AccountChange, 'CanvasPagePPCListener', (data) => {
             this.setState({loadingPPC: true});
             ctr.getBalance((balance) => {
                 this.setState({PPCOwned: balance, loadingPPC: false});
             });
         });
-        ctr.listenForEvent(EVENTS.PropertyBought, 'CanvasPagePPCListener', (data) => {
-            if (data.args.newOwner === ctr.account) {
+
+        ctr.watchEventLogs(EVENTS.PropertyBought, {newOwner: ctr.account}, (handle) => {
+            let eventHandleBought = handle;
+            this.setState({eventHandleBought});
+            eventHandleBought.watch((error, log) => {
                 this.setState({loadingPPC: true});
                 ctr.getBalance((balance) => {
                     this.setState({PPCOwned: balance, loadingPPC: false});
                 });
-            }
+            });
         });
-        ctr.listenForEvent(EVENTS.PropertyColorUpdate, 'CanvasPagePPCListener', (data) => {
-            if (data.args.lastUpdaterPayee != null && data.args.lastUpdaterPayee === ctr.account) {
+
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {lastUpdaterPayee: ctr.account}, (handle) => {
+            let eventHandleUpdate = handle;
+            this.setState({eventHandleUpdate});
+            eventHandleUpdate.watch((error, log) => {
                 this.setState({loadingPPC: true});
                 ctr.getBalance((balance) => {
                     this.setState({PPCOwned: balance, loadingPPC: false});
                 });
-            }
+            });
         });
         GFD.listen('advancedMode', 'CanvasPage', (advancedMode) => {
             this.setState({advancedMode})
@@ -83,9 +98,10 @@ class CanvasPage extends Component {
     }
 
     componentWillUnmount() {
-        ctr.stopListeningForEvent(EVENTS.Transfer, 'CanvasPagePPCListener');
-        ctr.stopListeningForEvent(EVENTS.PropertyColorUpdate, 'CanvasPagePPCListener');
-        ctr.stopListeningForEvent(EVENTS.PropertyBought, 'CanvasPagePPCListener');
+        this.state.eventHandleTransfer.stopWatching();
+        this.state.eventHandleBought.stopWatching();
+        this.state.eventHandleUpdate.stopWatching();
+        ctr.stopListeningForEvent(EVENTS.AccountChange, 'CanvasPagePPCListener');
     }
 
     visitPortfolio() {
@@ -99,16 +115,16 @@ class CanvasPage extends Component {
     }
 
     render() {
-        let browsePanes = [{ menuItem: 'Owned', render: () => <TabPane attached={false}><PropertiesForSale isLoading={() => {}}/></TabPane> },
-        { menuItem: 'For Sale', render: () => <TabPane attached={false} loading={this.state.tab2Loading}><PropertiesForSale isLoading={(r) => this.setState({tab2Loading: r})}/></TabPane> }];
+        let browsePanes = [{ menuItem: 'Owned', render: () => <TabPane className='topPane' attached={false}><PropertiesForSale isLoading={() => {}}/></TabPane> },
+        { menuItem: 'For Sale', render: () => <TabPane className='topPane' attached={false} loading={this.state.tab2Loading}><PropertiesForSale isLoading={(r) => this.setState({tab2Loading: r})}/></TabPane> }];
 
-        let payoutPanes = [{ menuItem: 'Top 10', render: () => <TabPane attached={false}>Tab 1 Content</TabPane> },
-        { menuItem: 'Recent', render: () => <TabPane attached={false}>none yet</TabPane> },
-        { menuItem: 'You', render: () => <TabPane attached={false}><PropertyChangeLogYou/></TabPane> }];
+        let payoutPanes = [{ menuItem: 'Top 10', render: () => <TabPane className='middlePane' attached={false}>Tab 1 Content</TabPane> },
+        { menuItem: 'Recent', render: () => <TabPane className='middlePane' attached={false}>none yet</TabPane> },
+        { menuItem: 'You', render: () => <TabPane className='middlePane' attached={false}><PropertyChangeLogYou/></TabPane> }];
 
-        let tradePanes = [{ menuItem: 'Top 10', render: () => <TabPane attached={false}>Tab 1 Content</TabPane> },
-        { menuItem: 'Recent', render: () => <TabPane attached={false}>none yet</TabPane> },
-        { menuItem: 'You', render: () => <TabPane attached={false}><PropertySalesLog/></TabPane> }];
+        let tradePanes = [{ menuItem: 'Top 10', render: () => <TabPane className='bottomPane' attached={false}>Tab 1 Content</TabPane> },
+        { menuItem: 'Recent', render: () => <TabPane className='bottomPane' attached={false}>none yet</TabPane> },
+        { menuItem: 'You', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLog/></TabPane> }];
         return (
             <div>
                 <SegmentGroup horizontal className='mainSegmentGroup'> 

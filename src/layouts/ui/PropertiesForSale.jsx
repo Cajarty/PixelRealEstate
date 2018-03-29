@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import {Contract, ctr, EVENTS, LISTENERS} from '../../contract/contract.jsx';
+import * as EVENTS from '../../const/events';
+import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import {SDM, ServerDataManager, Compares} from '../../contract/ServerDataManager.jsx';
 import TimeAgo from 'react-timeago';
 import PanelContainerOwned from './PanelContainerOwned';
@@ -26,10 +27,15 @@ class PropertiesForSale extends Component {
 
     componentDidMount() {
         this.props.isLoading(true);
+
         //fix updates to be better
-        ctr.listenForEvent(EVENTS.PropertySetForSale, 'PropertiesForSale', (data) => {
-            this.reorderItems(this.state.compare.func);
-            this.forceUpdate();
+        ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (handle) => {
+            let eventHandle = handle;
+            this.setState({eventHandle});
+            eventHandle.watch((error, log) => {
+                this.reorderItems(this.state.compare.func);
+                this.forceUpdate();
+            });
         });
         this.reorderItems(this.state.compare.func);
     }
@@ -72,7 +78,7 @@ class PropertiesForSale extends Component {
 
     componentWillUnmount() {
         this.cancelSort = true;
-        ctr.stopListeningForEvent(EVENTS.PropertySetForSale, 'PropertiesForSale');
+        this.state.eventHandle.stopWatching();
     }
 
     handleInput(key, value) {

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import * as Const from '../../const/const.jsx';
-import {EVENTS, LISTENERS, ctr, Contract} from '../../contract/contract.jsx';
+import {LISTENERS, ctr, Contract} from '../../contract/contract.jsx';
+import * as EVENTS from '../../const/events';
 import * as Func from '../../functions/functions.jsx';
 import * as Compress from 'lzwcompress';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
@@ -101,7 +102,6 @@ class Canvas extends Component {
             let eventHandle = handle;
             this.setState({eventHandle});
             eventHandle.watch((error, log) => {
-                console.info(log);
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
                 let colors = Func.ContractDataToRGBAArray(log.args.colors);
                 if (this.state.canvasLoaded) {
@@ -114,37 +114,16 @@ class Canvas extends Component {
             });
         });
 
-        //above is newer
-        // ctr.listenForEvent(EVENTS.PropertyColorUpdate, 'canvas', (data) => {
-        //     console.info(data);
-        //     let xy = {x: 0, y: 0, colors: []};
-        //     if (data.args.x == null || data.args.y == null)
-        //         xy = ctr.fromID(Func.BigNumberToNumber(data.args.property));
-        //     else {
-        //         xy.x = data.args.x;
-        //         xy.y = data.args.y;
-        //     }
-
-        //     if (data.args.colorsRGB == null)
-        //         xy.colors = Func.ContractDataToRGBAArray(data.args.colors);
-        //     else
-        //         xy.colors = data.args.colorsRGB;
-
-        //     if (this.state.canvasLoaded) {
-        //         this.setCanvasProperty(xy.x, xy.y, xy.colors);
-        //     } else {
-        //         let update = this.state.queuedUpdates;
-        //         update.push(xy);
-        //         this.setState({queuedUpdates: update});
-        //     }
-        // });
-
         ctr.listenForResults(LISTENERS.ShowForSale, 'Canvas', (data) => {
             if (data.show)
                 this.showPropertiesForSale();
             else
                 this.setCanvas(SDM.pixelData);
         })
+    }
+
+    componentWillUnmount() {
+        this.state.eventHandle.stopWatching();
     }
 
     showPropertiesForSale() {

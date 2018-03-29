@@ -8,7 +8,8 @@ import * as Assets from '../../const/assets.jsx';
 import SetHoverText from '../forms/SetHoverText';
 import SetLink from '../forms/SetLink';
 import {GFD, GlobalState} from '../../functions/GlobalState';
-import {Contract, ctr, EVENTS} from '../../contract/contract';
+import * as EVENTS from '../../const/events';
+import {Contract, ctr} from '../../contract/contract';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 
 class HoverLabel extends Component {

@@ -199,6 +199,50 @@ export class Contract {
         });
     }
 
+    /*
+    Requests all events of event type EVENT.
+    */
+    watchEventLogs(event, params = {}, callback) {
+        let filter = {fromBlock: 0, toBlock: 'latest'};
+
+        this.VRE.deployed().then((i) => {
+            switch(event) {
+                case EVENTS.PropertyBought:
+                    return callback(i.PropertyBought(params, filter));
+                case EVENTS.PropertyColorUpdate:
+                    return callback( i.PropertyColorUpdate(params, filter));
+                case EVENTS.PropertyColorUpdatePixel:
+                    return callback( i.PropertyColorUpdatePixel(params, filter));
+                case EVENTS.SetUserHoverText:
+                    return callback( i.SetUserHoverText(params, filter));
+                case EVENTS.SetUserSetLink:
+                    return callback( i.SetUserSetLink(params, filter));
+                case EVENTS.PropertySetForSale:
+                    return callback( i.PropertySetForSale(params, filter));
+                case EVENTS.DelistProperty:
+                    return callback( i.DelistProperty(params, filter));
+                case EVENTS.ListTradeOffer:
+                    return callback( i.ListTradeOffer(params, filter));
+                case EVENTS.AcceptTradeOffer:
+                    return callback( i.AcceptTradeOffer(params, filter));
+                case EVENTS.CancelTradeOffer:
+                    return callback( i.CancelTradeOffer(params, filter));
+                case EVENTS.SetPropertyPublic:
+                    return callback( i.SetPropertyPublic(params, filter));
+                case EVENTS.SetPropertyPrivate:
+                    return callback( i.SetPropertyPrivate(params, filter));
+                case EVENTS.Bid:
+                    return callback( i.Bid(params, filter));
+                case EVENTS.AccountChange:
+                    return callback( i.AccountChange(params, filter));
+                case EVENTS.Transfer:
+                    return callback( i.Transfer(params, filter));
+                case EVENTS.Approval:
+                    return callback( i.Approval(params, filter));
+            }
+        });
+    }
+
     toID(x, y) {
         return y * Const.PROPERTIES_WIDTH + x;
     }

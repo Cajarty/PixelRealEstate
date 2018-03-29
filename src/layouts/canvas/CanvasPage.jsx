@@ -87,9 +87,16 @@ class CanvasPage extends Component {
     }
 
     render() {
+        let browsePanes = [{ menuItem: 'Owned', render: () => <TabPane attached={false}>Tab 1 Content</TabPane> },
+        { menuItem: 'For Sale', render: () => <TabPane attached={false}><PropertySalesLog/></TabPane> }];
+
         let payoutPanes = [{ menuItem: 'Top 10', render: () => <TabPane attached={false}>Tab 1 Content</TabPane> },
-        { menuItem: 'Recent', render: () => <TabPane attached={false}><PropertySalesLog/></TabPane> },
+        { menuItem: 'Recent', render: () => <TabPane attached={false}>none yet</TabPane> },
         { menuItem: 'You', render: () => <TabPane attached={false}><PropertyChangeLogYou/></TabPane> }];
+
+        let tradePanes = [{ menuItem: 'Top 10', render: () => <TabPane attached={false}>Tab 1 Content</TabPane> },
+        { menuItem: 'Recent', render: () => <TabPane attached={false}>none yet</TabPane> },
+        { menuItem: 'You', render: () => <TabPane attached={false}><PropertySalesLog/></TabPane> }];
         return (
             <div>
                 <SegmentGroup horizontal className='mainSegmentGroup'> 
@@ -152,8 +159,20 @@ class CanvasPage extends Component {
                 </SegmentGroup>
                 <Segment className={(this.state.advancedMode ? 'lowerSegment' : 'lowerSegment hideElement')}>
                     <div>
+                        <Header>Property Browse</Header>
+                        <Tab menu={{ secondary: true, pointing: true }} panes={browsePanes} />
+                    </div>
+                </Segment>
+                <Segment className={(this.state.advancedMode ? 'lowerSegment' : 'lowerSegment hideElement')}>
+                    <div>
                         <Header>Payout History</Header>
                         <Tab menu={{ secondary: true, pointing: true }} panes={payoutPanes} />
+                    </div>
+                </Segment>
+                <Segment className={(this.state.advancedMode ? 'lowerSegment' : 'lowerSegment hideElement')}>
+                    <div>
+                        <Header>Trade History</Header>
+                        <Tab menu={{ secondary: true, pointing: true }} panes={tradePanes} />
                     </div>
                 </Segment>
                 <Sidebar id='footer' className='footer' as={Menu} animation='push' direction='bottom' visible inverted>

@@ -283,7 +283,7 @@ contract VirtualRealEstate is StandardToken {
             SetPropertyPublic(propertyID);
         }
     }
-    function _transferProperty(Property storage property, uint24 propertyID, address newOwner, uint256 pptAmount, uint256 ethAmount, uint8 flag) private {
+    function _transferProperty(Property storage property, uint24 propertyID, address newOwner, uint256 ethAmount, uint256 pptAmount, uint8 flag) private {
         require(newOwner != 0);
         property.owner = newOwner;
         property.salePrice = 0;

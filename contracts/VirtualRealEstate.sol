@@ -74,7 +74,7 @@ contract VirtualRealEstate is StandardToken {
     uint256 USER_BUY_CUT_PERCENT = 98; //%
     
     uint256 PROPERTY_GENERATES_PER_MINUTE = 1;
-    uint256 EXTA_COLOR_SPEND_UNTIL;
+    uint256 EXTRA_COLOR_SPEND_UNTIL;
     
     event PropertyColorUpdate(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address lastUpdaterPayee, uint256 becomePublic);
     event PropertyBought(uint24 indexed property,  address newOwner, uint256 ethAmount, uint256 PPTAmount, uint256 timestamp);
@@ -113,7 +113,7 @@ contract VirtualRealEstate is StandardToken {
     function VirtualRealEstate() public {
         owner = msg.sender;
         totalSupply = 0;
-        EXTA_COLOR_SPEND_UNTIL = now + 3 days;
+        EXTRA_COLOR_SPEND_UNTIL = now + 3 days;
         pricePPT = 100;
         priceETH = 10000;//1000000000000000000; //0.001 ETH
         moderators[msg.sender] = 3;
@@ -192,6 +192,9 @@ contract VirtualRealEstate is StandardToken {
         Property memory property = map[propertyID];
         return _getProjectedPayout(property);
     }
+    function isInGracePeriod() public view returns(bool) {
+        return now <= EXTRA_COLOR_SPEND_UNTIL;
+    }
     function _tryTriggerPayout(Property storage property, uint256 pptToSpend) private returns(bool) {
         if (property.isInPrivateMode && property.becomePublic < now) {//If its private when it shouldnt be
             property.isInPrivateMode = false;
@@ -201,7 +204,7 @@ contract VirtualRealEstate is StandardToken {
             require(property.flag != 2);
         } else if (property.becomePublic < now) {
             uint256 pptSpent = pptToSpend + 1; //All pptSpent math uses N+1, so built in for convenience
-            if (pptToSpend < 2 && now <= EXTA_COLOR_SPEND_UNTIL) { //If first 3 days and we spent <2 coins, treat it as if we spent 2
+            if (pptToSpend < 2 && isInGracePeriod()) { //If first 3 days and we spent <2 coins, treat it as if we spent 2
                 pptSpent = 3; //We're treating it like 2, but it's N+1 in the math using this
             }
             require(balances[msg.sender] >= pptToSpend);

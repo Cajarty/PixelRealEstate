@@ -18,6 +18,7 @@ contract VirtualRealEstate:
         getPropertyData(uint24 propertyID) view returns(address, uint256, uint256, uint256, bool, uint8 flag)
         getProjectedPayout(uint24 propertyID) view returns(uint256)
         getSystemSalePrices(uint24 propertyID) view returns(uint256, uint256)
+        isInGracePeriod() view returns(bool)
 
     functions:
         setHoverText(uint256[2] text)

@@ -62,7 +62,7 @@ contract('VirtualRealEstate', function(accounts) {
    }).then(function(propertyData) {
      assert.equal(propertyData[0], accounts[1], "Should be owned by account 1" );
    });
-   //User1 owns property [0] with 0 PPT
+   //User1 owns property [0] with 0 PXL
  });
  it("User0 can purchase multiple default properties (1-3) in ETH",  function() {
    return VirtualRealEstate.deployed().then(function(instance) {
@@ -83,7 +83,7 @@ contract('VirtualRealEstate', function(accounts) {
    }).then(function(propertyData){
      assert.equal(propertyData[0], accounts[1], "Should be owned by account 1" );
    });
-   //User1 owns property [0,1,2,3] with 0 PPT
+   //User1 owns property [0,1,2,3] with 0 PXL
  });
  it("After a sale, ownership changes", function() {
    return VirtualRealEstate.deployed().then(function(instance) {
@@ -95,7 +95,7 @@ contract('VirtualRealEstate', function(accounts) {
      return pixelPropertyInstance.getPropertyData(0, { from: accounts[1] });
    }).then(function(propertyData) {
      assert.equal(propertyData[2], 10000, "Should be listed for sale for 10000 wei" ); //For sale
-     return pixelPropertyInstance.buyPropertyInPPT(0, 10000, {from: accounts[2] });
+     return pixelPropertyInstance.buyPropertyInPXL(0, 10000, {from: accounts[2] });
    }).then(function() {
      return pixelPropertyInstance.getPropertyData(0, { from: accounts[0] });
    }).then(function(propertyData) {
@@ -105,11 +105,11 @@ contract('VirtualRealEstate', function(accounts) {
      assert.equal(balance, 9800, "Owner should be paid 98% of 10000"); //Ownership changed
      return pixelPropertyInstance.balanceOf(accounts[0], {from: accounts[0]})
    }).then(function(balance) {
-     assert.equal(balance, 200, "Contract owner gets a 2% cut of 10000 PPT"); //Ownership changed
+     assert.equal(balance, 200, "Contract owner gets a 2% cut of 10000 PXL"); //Ownership changed
    });
-   //User0 has 200 PPT
-   //User1 owns property [1,2,3] with 9800 PPT
-   //User2 owns property [0] with 0 PPT
+   //User0 has 200 PXL
+   //User1 owns property [1,2,3] with 9800 PXL
+   //User2 owns property [0] with 0 PXL
  });
  //?#Money from initial property sale goes to contract owner
  it("After a sale occurs, money goes to the old owner of a property", function() {
@@ -122,7 +122,7 @@ contract('VirtualRealEstate', function(accounts) {
      return pixelPropertyInstance.getPropertyData(1, { from: accounts[1] });
    }).then(function(propertyData) {
      assert.equal(propertyData[2], 10000, "Should be listed for sale for 10000 wei" ); //For sale
-     return pixelPropertyInstance.buyPropertyInPPT(1, 10000, {from: accounts[2] });
+     return pixelPropertyInstance.buyPropertyInPXL(1, 10000, {from: accounts[2] });
    }).then(function() {
      return pixelPropertyInstance.getPropertyData(1, { from: accounts[1] });
    }).then(function(propertyData) {
@@ -132,11 +132,11 @@ contract('VirtualRealEstate', function(accounts) {
      assert.equal(amount, 19600, "This should be the second test with a sale of 10k at 2% fee"); //Coin change
      return pixelPropertyInstance.balanceOf(accounts[0], {from: accounts[0]})
    }).then(function(balance) {
-     assert.equal(balance, 400, "Contract owner gets a second 2% cut of 10000 PPT"); //Ownership changed
+     assert.equal(balance, 400, "Contract owner gets a second 2% cut of 10000 PXL"); //Ownership changed
    });
-   //User0 has 400 PPT
-   //User1 owns property [2,3] with 19600 PPT
-   //User2 owns property [0,1] with 0 PPT
+   //User0 has 400 PXL
+   //User1 owns property [2,3] with 19600 PXL
+   //User2 owns property [0,1] with 0 PXL
  });
  //#Can delist sales that are still open
  it("After a property is listed, it can be delisted and set back to 0 price", function() {
@@ -177,7 +177,7 @@ contract('VirtualRealEstate', function(accounts) {
      return pixelPropertyInstance.getPropertyData(3, { from: accounts[1] });
    }).then(function(propertyData) {
      assert.equal(propertyData[2], 10000, "Should be listed for sale for 10000 wei" ); //For sale
-     return pixelPropertyInstance.buyPropertyInPPT(3, 10000, {from: accounts[2] });
+     return pixelPropertyInstance.buyPropertyInPXL(3, 10000, {from: accounts[2] });
    }).then(function() {
      return pixelPropertyInstance.getPropertyData(3, { from: accounts[1] });
    }).then(function(propertyData) {
@@ -186,9 +186,9 @@ contract('VirtualRealEstate', function(accounts) {
    }).then(function(amount) {
      assert.equal(amount, 29400, "This should be the third 10k test with a sale at 2% fee so 29400"); //Coin change
    });
-   //User0 has 600 PPT
-   //User1 owns property [2] with 29400 PPT
-   //User2 owns property [0,1,3] with 0 PPT
+   //User0 has 600 PXL
+   //User1 owns property [2] with 29400 PXL
+   //User2 owns property [0,1,3] with 0 PXL
  });
  it("User2 can transfer property 0 to User0 as a gift", function() {
    return VirtualRealEstate.deployed().then(function(instance) {
@@ -199,11 +199,11 @@ contract('VirtualRealEstate', function(accounts) {
    }).then(function(propertyData) {
      assert.equal(propertyData[0], accounts[0], "Should be owned by account 0" );
    });
-   //User0 owns property [0] with 600 PPT
-   //User1 owns property [2] with 29400 PPT
-   //User2 owns property [1,3] with 0 PPT
+   //User0 owns property [0] with 600 PXL
+   //User1 owns property [2] with 29400 PXL
+   //User2 owns property [1,3] with 0 PXL
  });
- it("User3 can buy a property with some PPT and some ETH", function() {
+ it("User3 can buy a property with some PXL and some ETH", function() {
    return VirtualRealEstate.deployed().then(function(instance) {
      pixelPropertyInstance = instance;
      return pixelPropertyInstance.balanceOf(accounts[3]);
@@ -212,22 +212,22 @@ contract('VirtualRealEstate', function(accounts) {
      return pixelPropertyInstance.getForSalePrices(75, {from: accounts[3]});
    }).then(function(prices) {
      assert.equal(prices[0] > 0, true, "ETH price should be set for default property purchase");
-     assert.equal(prices[1] > 0, true, "PPT price should be set for default property purchase");
-     initialPricesForPPTETHBuy = prices;
+     assert.equal(prices[1] > 0, true, "PXL price should be set for default property purchase");
+     initialPricesForPXLETHBuy = prices;
      return pixelPropertyInstance.addCoin(accounts[3], prices[1] / 2);
    }).then(function() {
-     return pixelPropertyInstance.buyProperty(75, initialPricesForPPTETHBuy[1] / 2, { from: accounts[3], value: initialPricesForPPTETHBuy[0] / 2})
+     return pixelPropertyInstance.buyProperty(75, initialPricesForPXLETHBuy[1] / 2, { from: accounts[3], value: initialPricesForPXLETHBuy[0] / 2})
    }).then(function() {
      return pixelPropertyInstance.balanceOf(accounts[3]);
    }).then(function(balance) {
      assert.equal(balance - user5InitialBalance, 0, "Should have spent the same amount earned");
    });
-   //User0 owns property [0] with 600 PPT
-   //User1 owns property [2] with 29400 PPT
-   //User2 owns property [1,3] with 0 PPT
-   //User3 owns property [75] with 0 PPT
+   //User0 owns property [0] with 600 PXL
+   //User1 owns property [2] with 29400 PXL
+   //User2 owns property [1,3] with 0 PXL
+   //User3 owns property [75] with 0 PXL
  });
- //it("Purchasing with ETH increases ETH price, PPT increases PPT, and partial buy (30% PPT 70% ETH) raises price appropriately (30% for PPT, 70% for ETH)", function() {
+ //it("Purchasing with ETH increases ETH price, PXL increases PXL, and partial buy (30% PXL 70% ETH) raises price appropriately (30% for PXL, 70% for ETH)", function() {
    
  //});
  
@@ -273,11 +273,11 @@ contract('VirtualRealEstate', function(accounts) {
    }).then(function(balance) {
      assert.equal(balance, 4, "User3 should have earned the same amount if coins as owner that the setter got");
    });
-   //User0 owns property [0] with 600 PPT
-   //User1 owns property [2] with 29400 PPT
-   //User2 owns property [1,3] with 0 PPT
-   //User3 owns property [75] with 4 PPT
-   //User4 owns property [] with 4 PPT
+   //User0 owns property [0] with 600 PXL
+   //User1 owns property [2] with 29400 PXL
+   //User2 owns property [1,3] with 0 PXL
+   //User3 owns property [75] with 4 PXL
+   //User4 owns property [] with 4 PXL
  });
  it("Users can choose to pay more more should they desire, which burns the coin and locks for longer/awards more", function() {
    return VirtualRealEstate.deployed().then(function(instance) {

@@ -13,21 +13,31 @@ class PanelContainer extends Component {
         let start = this.props.viewStart;
         let end = this.props.viewEnd;
         let len = this.props.data.length;
+        let maxLen = this.props.maxPageSize;
         let view1 = [];
         let view2 = [];
-        if (end >= len) {
+        let placeholder = [];
+        for (let i = Math.abs(end - start); i < maxLen; i++) {
+            placeholder.push({});
+        }
+        if (end > len) {
             end -= len;
         }
         if (end < 0) {
             end += len;
         }
-        console.info(this.props);
         if (start > end) {
             view1 = this.props.data.slice(start, len);
             view2 = this.props.data.slice(0, end);
-            this.setState({dataView: view1.concat(view2)});
+            this.setState({
+                dataView: view1.concat(view2),
+                placeholder
+            });
         } else {
-            this.setState({dataView: this.props.data.slice(start, end)});
+            this.setState({
+                dataView: this.props.data.slice(start, end),
+                placeholder
+            });
         }
     }
 
@@ -35,9 +45,14 @@ class PanelContainer extends Component {
         let start = newProps.viewStart;
         let len = newProps.data.length;
         let end = newProps.viewEnd;
+        let maxLen = newProps.maxPageSize;
         let view1 = [];
         let view2 = [];
-        if (end >= len) {
+        let placeholder = [];
+        for (let i = Math.abs(end - start); i < maxLen; i++) {
+            placeholder.push({});
+        }
+        if (end > len) {
             end -= len;
         }
         if (end < 0) {
@@ -46,9 +61,15 @@ class PanelContainer extends Component {
         if (start > end) {
             view1 = newProps.data.slice(start, len);
             view2 = newProps.data.slice(0, end);
-            this.setState({dataView: view1.concat(view2)});
+            this.setState({
+                dataView: view1.concat(view2),
+                placeholder
+            });
         } else {
-            this.setState({dataView: newProps.data.slice(start, end)});
+            this.setState({
+                dataView: newProps.data.slice(start, end),
+                placeholder
+            });
         }
     }
 

@@ -17,7 +17,7 @@ import PropertyChangeLogYou from '../logs/PropertyChangeLogYou';
 import PropertySalesLog from '../logs/PropertySalesLog';
 import { Segment, SegmentGroup, Button, Divider, Label, 
     LabelDetail, Input, Icon, Item, ItemContent, ItemImage, 
-    ItemGroup, Tab, Header, Grid, Sidebar, MenuItem, TabPane, Menu} from 'semantic-ui-react';
+    ItemGroup, Tab, Header, Grid, Sidebar, MenuItem, TabPane, Menu, Checkbox, Popup} from 'semantic-ui-react';
 import SetHoverText from '../forms/SetHoverText';
 import SetLink from '../forms/SetLink';
 import PropertiesOwned from '../ui/PropertiesOwned';
@@ -32,7 +32,9 @@ class CanvasPage extends Component {
             loadingPPC: true,
             PPCOwned: 0,
             advancedMode: false,
+            showPopertiesForSale: false,
 
+            tab1Loading: false,
             tab2Loading: false,
         }
     }
@@ -113,6 +115,11 @@ class CanvasPage extends Component {
         this.setState({advancedMode: newMode})
     }
 
+    toggleForSaleProperties(e, data) {
+        this.setState({showPopertiesForSale: data.checked});
+        ctr.sendResults(LISTENERS.ShowForSale, {show: data.checked});
+    }
+
     render() {
         let browsePanes = [
             { 
@@ -175,6 +182,12 @@ class CanvasPage extends Component {
                                     <SetLink/>
                                 </div>
                                 }
+                                <Divider/>
+                                <Checkbox 
+                                    label={'Show Properties for sale'} 
+                                    checked={this.state.showPopertiesForSale}
+                                    onChange={(e, data) => {this.toggleForSaleProperties(e, data)}}
+                                />
                             </Segment>
                             <Segment>
 

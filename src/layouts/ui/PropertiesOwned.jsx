@@ -19,6 +19,7 @@ class PropertiesOwned extends Component {
             itemIndex: 0, //on page #
             items: 0, //total pages
             pageSize: 0, //how many elements per page?
+            maxPageSize: 0, //page size if there wasnt a max on the list
         };
         this.cancelSort = false;
     }
@@ -43,7 +44,8 @@ class PropertiesOwned extends Component {
         let pageSize = Math.floor(containerWidth / ITEM_SIZE);
         let size = (e.size != null ? e.size : this.state.items);
         this.setState({
-            pageSize: (pageSize >= this.state.items ? this.state.items - 1 : pageSize),
+            maxPageSize: pageSize,
+            pageSize: (pageSize >= this.state.items ? this.state.items : pageSize),
         });
         this.forceUpdate();
     }
@@ -100,7 +102,9 @@ class PropertiesOwned extends Component {
                         onClick={(x, y) => this.propertySelected(x, y)}
                         viewStart={this.state.itemIndex}
                         viewEnd={this.state.itemIndex + this.state.pageSize}
+                        maxPageSize={this.state.maxPageSize}
                     />
+                    {console.info(this.state)}
                 </Segment>
                 <Button attached='bottom' onClick={() => {this.changePage(false)}}><Icon name='chevron down'></Icon></Button>
             </div>

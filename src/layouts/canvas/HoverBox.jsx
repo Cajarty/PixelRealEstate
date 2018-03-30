@@ -8,6 +8,7 @@ import * as Assets from '../../const/assets.jsx';
 import SetHoverText from '../forms/SetHoverText';
 import SetLink from '../forms/SetLink';
 import {GFD, GlobalState} from '../../functions/GlobalState';
+import {Popup, Icon} from 'semantic-ui-react';
 
 class HoverLabel extends Component {
     constructor(props) {
@@ -68,6 +69,14 @@ class HoverLabel extends Component {
 
     render() {
         return (
+            <div>
+            <Popup
+                compact
+                size='mini'
+                content='As expected this popup is way off to the right'
+                verticalOffset={10}
+                position='bottom left'
+            />
             <div 
                 className={'hoverBox ' + (this.state.show ? '' : 'hidden')}
                 style={{
@@ -77,6 +86,7 @@ class HoverLabel extends Component {
                     minHeight: (this.state.canvasHeight / 100) - .5 + 'px'
                 }}
                 >
+            </div>
             </div>
         );
     }

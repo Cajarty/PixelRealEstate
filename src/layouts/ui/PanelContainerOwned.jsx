@@ -10,7 +10,8 @@ class PanelContainerOwned extends PanelContainer {
     constructor(props) {
         super(props);
         this.state = {
-            dataView: []
+            dataView: [],
+            placeholder: [],
         }
     }
 
@@ -51,6 +52,10 @@ class PanelContainerOwned extends PanelContainer {
                                         </ListItem>
                                     </List>
                             </Segment>
+                        </GridColumn>
+                    ))}
+                    {this.state.placeholder.map((child, i) => (
+                        <GridColumn key={1000 + i}>
                         </GridColumn>
                     ))}
                 </GridRow>

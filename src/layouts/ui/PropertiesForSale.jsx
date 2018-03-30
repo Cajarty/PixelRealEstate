@@ -47,7 +47,7 @@ class PropertiesForSale extends Component {
         let pageSize = Math.floor(containerWidth / ITEM_SIZE);
         let size = (e.size != null ? e.size : this.state.items);
         this.setState({
-            pageSize: (pageSize >= this.state.items ? this.state.items - 1 : pageSize),
+            pageSize: (pageSize >= this.state.items ? this.state.items : pageSize),
         });
         this.forceUpdate();
     }
@@ -75,11 +75,6 @@ class PropertiesForSale extends Component {
         this.setState(obj);
     }
 
-    toggleCanvasProperties(value) {
-        this.setState({showPopertiesForSale: value});
-        ctr.sendResults(LISTENERS.ShowForSale, {show: value});
-    }
-
     propertySelected(x, y) {
         GFD.setData('x', x);
         GFD.setData('y', y);
@@ -103,15 +98,6 @@ class PropertiesForSale extends Component {
     render() {
         return (
             <div style={{height: '100%'}}>
-                {null&& <label className="switch">
-                    Show
-                    <input 
-                        type="checkbox" 
-                        checked={this.state.showPopertiesForSale} 
-                        onChange={(e) => this.toggleCanvasProperties(e.target.checked)}
-                    ></input>
-                    <span className="slider"></span>
-                </label>}
                {null&& <div>
                     <Dropdown 
                         className='dropdown'

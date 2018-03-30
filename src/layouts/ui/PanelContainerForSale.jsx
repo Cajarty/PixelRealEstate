@@ -15,15 +15,12 @@ class PanelContainerForSale extends PanelContainer {
 
     render() {
         return (
-            <Grid divided stretched>
+            <Grid divided stretched >
                 <GridRow columns='equal' stretched>
-                    <GridColumn stretched key={100000}>
-                        <Button fluid onClick={() => {this.props.onChangeDown()}}>{'<'}</Button>
-                    </GridColumn>
                     {this.state.dataView.map((child, i) => (
                         <GridColumn key={i}>
                             <Segment compact raised onClick={() => {this.props.onClick(child.x + 1, child.y + 1)}}>
-                                    <List celled divided selection={false} size='small'>
+                                    <List relaxed celled divided selection={false} size='small'>
                                         <ListItem>
                                             <PanelPropertyCanvas x={child.x} y={child.y} width={50} imageData={child.imageData}/>
                                         </ListItem>
@@ -49,9 +46,6 @@ class PanelContainerForSale extends PanelContainer {
                             </Segment>
                         </GridColumn>
                     ))}
-                    <GridColumn stretched key={200000}>
-                        <Button fluid onClick={() => {this.props.onChangeUp()}}>{'>'}</Button>
-                    </GridColumn>
                 </GridRow>
             </Grid>
         );

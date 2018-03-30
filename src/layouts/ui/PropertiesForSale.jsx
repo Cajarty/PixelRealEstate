@@ -8,8 +8,9 @@ import * as Assets from '../../const/assets.jsx';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import Dropdown from 'react-dropdown';
 import PanelContainerForSale from './PanelContainerForSale';
+import {Button, Segment, Icon} from 'semantic-ui-react';
 
-const PAGE_SIZE = 8;
+const ITEM_SIZE = 140;
 
 class PropertiesForSale extends Component {
     constructor(props) {
@@ -18,11 +19,12 @@ class PropertiesForSale extends Component {
             showPopertiesForSale: false,
             orderedItems: [],
             compare: Compares.yAsc,
-            page: 0, //on page #
-            pages: 0, //total pages
-            isLoading: false//is it done ordering?
+            itemIndex: 0, //on page #
+            items: 0, //total pages
+            pageSize: 2, //how many elements per page?
         };
         this.cancelSort = false;
+        this.itemContainer = null;
     }
 
     componentDidMount() {
@@ -38,42 +40,33 @@ class PropertiesForSale extends Component {
             });
         });
         this.reorderItems(this.state.compare.func);
+        window.addEventListener('resize', this.onResize);
+    }
+
+    onResize = (e) => {
+        let containerWidth = document.querySelector('.itemContainer').clientWidth;
+        let pageSize = Math.floor(containerWidth / ITEM_SIZE);
+        let size = (e.size != null ? e.size : this.state.items);
+        console.info((pageSize > this.state.items ? this.state.items : pageSize));
+        this.setState({
+            pageSize: (pageSize > this.state.items ? this.state.items : pageSize),
+        });
+        this.forceUpdate();
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.onResize);
     }
 
     async reorderItems(orderFunc) {
         //get my current market trade and populate fields
-        this.setState({isLoading: true});
         let results = await SDM.orderPropertyList(SDM.forSaleProperties, orderFunc)
         this.setState({
-            isLoading: false,
             orderedItems: results, 
-            pages: Math.floor((results.length - 1) / PAGE_SIZE)
+            items: results.length,
         });
         this.props.isLoading(false);
-    }
-
-    reorderItemsOld(orderFunc) {
-        //get my current market trade and populate fields
-        let promise = SDM.orderPropertyListAsync(SDM.forSaleProperties, orderFunc);
-        this.setState({isLoading: true});
-        this.props.isLoading(true);
-
-        let relisten = (results) => {
-            if (this.cancelSort)
-                return;
-            this.setState({
-                orderedItems: results.data, 
-                pages: Math.floor((results.data.length - 1) / PAGE_SIZE)
-            });
-            if (results.promise)
-                results.promise.then(relisten);
-            else {
-                this.setState({isLoading: false})
-                this.props.isLoading(false);
-            }
-        }
-
-        promise.then(relisten);
+        this.onResize({size: results.length});
     }
 
     componentWillUnmount() {
@@ -97,13 +90,13 @@ class PropertiesForSale extends Component {
         GFD.setData('y', y);
     }
 
-    changePage(pageChange) {
-        let page = this.state.page + pageChange;
-        if (page < 0)
-            page = this.state.pages;
-        if (page > this.state.pages)
-            page = 0;
-        this.setState({page});        
+    changePage(up = true) {
+        let item = this.state.itemIndex + (up ? this.state.pageSize : -this.state.pageSize);
+        if (item < 0)
+            item += this.state.items;
+        if (item >= this.state.items)
+            item -= this.state.items;
+        this.setState({itemIndex: item});        
     }
 
     reorderList(value) {
@@ -113,7 +106,7 @@ class PropertiesForSale extends Component {
 
     render() {
         return (
-            <div>
+            <div style={{height: '100%'}}>
                 {null&& <label className="switch">
                     Show
                     <input 
@@ -133,25 +126,16 @@ class PropertiesForSale extends Component {
                         onChange={value => {this.reorderList(value)}}
                     />
                 </div>}
+                <Button attached='top' onClick={() => {this.changePage(true)}}><Icon name='chevron up'></Icon></Button>
+                <Segment attached style={{height: 'calc(100% - 74px)'}} className='itemContainer'>
                     <PanelContainerForSale
                         data={this.state.orderedItems}
-                        onChangeUp={() => this.changePage(1)}
-                        onChangeDown={() => this.changePage(-1)}
                         onClick={(x, y) => this.propertySelected(x, y)}
-                        viewStart={this.state.page * PAGE_SIZE}
-                        viewEnd={(this.state.page + 1) * PAGE_SIZE}
+                        viewStart={this.state.itemIndex}
+                        viewEnd={this.state.itemIndex + this.state.pageSize}
                     />
-                {null&&<div className='footer'>
-                    <div className='bottomNav' onClick={() => this.changePage(-1)}>
-                        <img className='icon' src={Assets.ICON_LEFT_ARROW}></img>
-                    </div>
-                    <div className='bottomNav'>
-                        {(this.state.page + 1) + ' / ' + (this.state.pages + 1)}
-                    </div>
-                    <div className='bottomNav' onClick={() => this.changePage(1)}>
-                        <img className='icon' src={Assets.ICON_RIGHT_ARROW}></img>
-                        </div>
-                </div>}
+                </Segment>
+                <Button attached='bottom' onClick={() => {this.changePage(false)}}><Icon name='chevron down'></Icon></Button>
             </div>
         );
     }

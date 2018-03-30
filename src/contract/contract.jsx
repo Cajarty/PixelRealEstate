@@ -103,7 +103,7 @@ export class Contract {
             this.sendResults(LISTENERS.Error, {removeErrors: [0, 1], message: ''});
 
             this.accounts = accs;
-            if (this.account != this.accounts[0]) {
+            if (this.account !== this.accounts[0].toLowerCase()) {
                 this.account = this.accounts[0].toLowerCase();
                 this.sendEvent(EVENTS.AccountChange, this.accounts[0]);
             }

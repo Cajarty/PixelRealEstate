@@ -20,6 +20,32 @@ body {
 .ui.segment,
 .ui.segments {
     background-color: $color3 !important;
+    &.attached {
+        border-left: 1px solid darken($color3, 10%);
+        border-right: 1px solid darken($color3, 10%);
+        border-top: 0;
+        border-bottom: 0;
+    }
+}
+
+.ui.attached {
+    &.button {
+        background-color: darken($color3, 5%);
+        border-right: 1px solid darken($color3, 10%);
+        border-left: 1px solid darken($color3, 10%);
+        box-shadow: none !important;
+        width: calc(100% + 2px);
+        margin-left: -1px !important;
+        &.top {
+            border-top: 1px solid darken($color3, 10%);
+        }
+        &.bottom {
+            border-bottom: 1px solid darken($color3, 10%);
+        }
+    }
+    &.button:hover {
+        background-color: darken($color3, 10%);
+    }
 }
 
 .ui.items {
@@ -42,8 +68,32 @@ body {
     }
 }
 
+.ui.stretched.divided.grid {
+    height: calc(100% + 2rem);
+    .row {
+        height: 100%;
+    }
+    .column {
+        height: 100%;
+        .segment {
+            height: 100%;
+        }
+    }
+}
+
+.ui.segment.active.loading.tab.topPane {
+    &::before {
+        top: 50%;
+    }
+    &::after {
+        top: 50%;
+    }
+}
+
 .ui.segment.tab {
-    &.topPane {}
+    &.topPane {
+        height: 400px;
+    }
     &.middlePane {
         height: 400px;
         max-height: 400px;

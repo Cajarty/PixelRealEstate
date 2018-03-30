@@ -6,7 +6,6 @@ import ErrorBox from '../ErrorBox';
 import ZoomCanvas from './ZoomCanvas';
 import Axios from '../../network/Axios.jsx';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
-import TimeAgo from 'react-timeago';
 import HoverLabel from './HoverLabel';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import * as Strings from '../../const/strings';
@@ -115,8 +114,19 @@ class CanvasPage extends Component {
     }
 
     render() {
-        let browsePanes = [{ menuItem: 'Owned', render: () => <TabPane className='topPane' attached={false}><PropertiesForSale isLoading={() => {}}/></TabPane> },
-        { menuItem: 'For Sale', render: () => <TabPane className='topPane' attached={false} loading={this.state.tab2Loading}><PropertiesForSale isLoading={(r) => this.setState({tab2Loading: r})}/></TabPane> }];
+        let browsePanes = [
+            { 
+                menuItem: 'Owned', 
+                render: () => <TabPane 
+                    className='topPane' 
+                    attached={false}
+                    loading={this.state.tab1Loading}
+                    ><PropertiesForSale 
+                        isLoading={(r) => this.setState({tab1Loading: r})}
+                /></TabPane> 
+            },
+        { menuItem: 'For Sale', 
+            render: () => <TabPane className='topPane' attached={false} loading={this.state.tab2Loading}><PropertiesForSale isLoading={(r) => this.setState({tab2Loading: r})}/></TabPane> }];
 
         let payoutPanes = [{ menuItem: 'Top 10', render: () => <TabPane className='middlePane' attached={false}>Tab 1 Content</TabPane> },
         { menuItem: 'Recent', render: () => <TabPane className='middlePane' attached={false}>none yet</TabPane> },

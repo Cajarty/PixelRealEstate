@@ -5,6 +5,7 @@ import PanelContainerOwned from './PanelContainerOwned';
 import * as Assets from '../../const/assets.jsx';
 import Dropdown from 'react-dropdown';
 import {GFD, GlobalState} from '../../functions/GlobalState';
+import {Segment, Button} from 'semantic-ui-react';
 
 const PAGE_SIZE = 10;
 
@@ -92,14 +93,16 @@ class PropertiesOwned extends Component {
                         />
                     </div>
                 </div>
-                <div className='containerParent'>
-                    <PanelContainerOwned
-                        data={this.state.orderedItems}
-                        onClick={(x, y) => this.propertySelected(x, y)}
-                        viewStart={this.state.page * PAGE_SIZE}
-                        viewEnd={(this.state.page + 1) * PAGE_SIZE}
-                    />
-                </div>
+                <Segment>
+                    <Button fluid onClick={() => {this.props.onChangeDown()}}>{'<'}</Button>
+                        <PanelContainerOwned
+                            data={this.state.orderedItems}
+                            onClick={(x, y) => this.propertySelected(x, y)}
+                            viewStart={this.state.page * PAGE_SIZE}
+                            viewEnd={(this.state.page + 1) * PAGE_SIZE}
+                        />
+                    <Button fluid onClick={() => {this.props.onChangeUp()}}>{'>'}</Button>
+                </Segment>
                 <div className='footer'>
                     <div className='bottomNav' onClick={() => this.changePage(-1)}>
                         <img className='icon' src={Assets.ICON_LEFT_ARROW}></img>

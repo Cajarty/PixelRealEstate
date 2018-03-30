@@ -68,6 +68,16 @@ body {
     }
 }
 
+.ui.raised.segment.segmentButton {
+    &:hover {
+        background-color: darken($color3, 4%) !important;
+        cursor: pointer;
+    }
+    &:active {
+        background-color: darken($color3, 7%) !important;
+    }
+}
+
 .ui.stretched.divided.grid {
     height: calc(100% + 2rem);
     .row {

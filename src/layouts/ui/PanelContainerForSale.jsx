@@ -19,7 +19,7 @@ class PanelContainerForSale extends PanelContainer {
                 <GridRow columns='equal' stretched>
                     {this.state.dataView.map((child, i) => (
                         <GridColumn key={i}>
-                            <Segment compact raised onClick={() => {this.props.onClick(child.x + 1, child.y + 1)}}>
+                            <Segment className='segmentButton' compact raised onClick={() => {this.props.onClick(child.x + 1, child.y + 1)}}>
                                     <List relaxed celled divided selection={false} size='small'>
                                         <ListItem>
                                             <PanelPropertyCanvas x={child.x} y={child.y} width={50} imageData={child.imageData}/>

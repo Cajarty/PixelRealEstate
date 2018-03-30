@@ -104,7 +104,6 @@ class PropertiesOwned extends Component {
                         viewEnd={this.state.itemIndex + this.state.pageSize}
                         maxPageSize={this.state.maxPageSize}
                     />
-                    {console.info(this.state)}
                 </Segment>
                 <Button attached='bottom' onClick={() => {this.changePage(false)}}><Icon name='chevron down'></Icon></Button>
             </div>

@@ -207,7 +207,7 @@ export class ServerDataManager {
                     this.pixelData[y][x * 4 + i] = RGBArray[counter++];
     }
 
-    forceUpdatePropertyData(x, y) {
+    forceUpdatePropertyData(x, y, callback = () => {}) {
         ctr.getPropertyData(x, y, (data) => {
             let ethp = Func.BigNumberToNumber(data[1]);
             let ppcp = Func.BigNumberToNumber(data[2]);
@@ -220,6 +220,7 @@ export class ServerDataManager {
                 isInPrivate: data[4],
             };
             this.updateProperty(x, y, update);
+            callback(update);
         });
     }
 

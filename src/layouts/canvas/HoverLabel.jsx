@@ -11,13 +11,14 @@ import {GFD, GlobalState} from '../../functions/GlobalState';
 import * as EVENTS from '../../const/events';
 import {Contract, ctr} from '../../contract/contract';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
+import {LabelDetail, Label} from 'semantic-ui-react';
 
 class HoverLabel extends Component {
     constructor(props) {
         super(props);
         this.state = {
             show: false,
-            labelText: '',
+            labelContent: null,
             hoverX: -1,
             hoverY: -1,
             labelX: -1,
@@ -32,20 +33,22 @@ class HoverLabel extends Component {
     componentDidMount() {
         GFD.listen('hoverX', 'hoverLabel', (x) => {
             let hoverX = Math.floor(x / 10);
-            if (hoverX != this.state.hoverX)
+            if (hoverX != this.state.hoverX) {
                 this.updateLabel(hoverX, this.state.hoverY);
+            }
             this.setState({
                 hoverX: hoverX,
-                labelX: this.state.offsetX + (x * (this.state.canvasWidth / 1000)) + 10
+                labelX: (x * (this.state.canvasWidth / 1000)) + 30
             });
         })
         GFD.listen('hoverY', 'hoverLabel', (y) => {
             let hoverY = Math.floor(y / 10);
-            if (hoverY != this.state.hoverY)
+            if (hoverY != this.state.hoverY) {
                 this.updateLabel(this.state.hoverX, hoverY);
+            }
             this.setState({
                 hoverY: hoverY,
-                labelY: this.state.offsetY + (y * (this.state.canvasHeight / 1000)) + 10
+                labelY: (y * (this.state.canvasHeight / 1000)) + 30
             });
         })
         GFD.listen('canvasTopOffset', 'hoverLabel', (top) => {
@@ -71,13 +74,29 @@ class HoverLabel extends Component {
     }
 
     updateLabel(x, y) {
+        console.info(x, y)
         if (x < 0 || y < 0) {
-            this.setState({show: false})
-        } else {
-            if (SDM.isPropertyLoaded(x, y))
+            this.setState({show: false});
+            this.forceUpdate();
+        } else if (this.props.showPrices) {
+            if (SDM.isPropertyLoaded(x, y)) {
+                let data = SDM.forceUpdatePropertyData(x, y, (data) => {
+                    if (data.isForSale) {
+                        this.setState({show: true, labelContent: 
+                            <div>
+                                <Label>PXL<LabelDetail>{data.PPCPrice}</LabelDetail></Label>
+                                <Label>ETH<LabelDetail>{data.ETHPrice}</LabelDetail></Label>
+                            </div>
+                        });
+                    } else {
+                        this.setState({show: false});
+                    }
+                });
+            }
+        } else if (SDM.isPropertyLoaded(x, y)) {
             ctr.getHoverText(SDM.getPropertyData(x, y).owner, (data) => {
                 if (data != null && data.length > 0)
-                    this.setState({show: true, labelText: data});
+                    this.setState({show: true, labelContent: data});
                 else
                     this.setState({show: false});
             })
@@ -87,16 +106,19 @@ class HoverLabel extends Component {
     render() {
         return (
             <div 
-                className={'hoverLabel ' + (this.state.show ? '' : 'hidden')}
+                className={'hoverLabel ui bottom left popup transition visible compact mini ' + ((this.state.show && this.state.hoverX != -1 && this.state.hoverY != -1) ? '' : 'hidden')}
                 style={{
                     left: this.state.labelX,
                     top: this.state.labelY,
                 }}
                 >
-                {this.state.labelText}
+                <div className='content'>
+                    {this.state.labelContent}
+                </div>
             </div>
         );
     }
 }
 
 export default HoverLabel
+

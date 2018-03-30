@@ -195,7 +195,7 @@ class CanvasPage extends Component {
                         </SegmentGroup>
                     </Segment>
                     <Segment className='center'>
-                        <HoverLabel/>
+                        <HoverLabel showPrices={this.state.showPopertiesForSale}/>
                         <HoverBox/>
                         <Canvas/>
                     </Segment>

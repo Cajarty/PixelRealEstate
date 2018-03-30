@@ -66,7 +66,8 @@ export class PanelPropertyCanvas extends Component {
     }
 
     componentWillUnmount() {
-        this.state.updateHandle.stopWatching();
+        if (this.state.updateHandle != null)
+            this.state.updateHandle.stopWatching();
     }
 
     setCanvas(rgbArr) {

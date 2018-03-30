@@ -100,7 +100,7 @@ class PixelDescriptionBox extends Component {
                 let yy = GFD.getData('y') - 1;
                 if (id.x == xx && id.y == yy) {
                     let colors = Func.ContractDataToRGBAArray(log.args.colors);
-                    this.setCanvas(colors);
+                    this.loadProperty(id.x, id.y, colors);
                 }
             });
         });
@@ -128,12 +128,24 @@ class PixelDescriptionBox extends Component {
                     this.loadProperty(xx, yy);
             });
         });
+
+        this.setState({timerUpdater: setInterval(() => this.timerUpdate(), 1000)});
+    }
+
+    timerUpdate(lastUpdate = this.state.lastUpdate, reserved = this.state.reserved) {
+        let lastUpdateFormatted = Func.TimeSince(lastUpdate * 1000) + " ago";
+        let reservedFormatted = Func.TimeSince(reserved * 1000, true);
+        this.setState({
+            lastUpdateFormatted,
+            reservedFormatted,
+        })
     }
 
     componentWillUnmount() {
         GFD.closeAll('pixelBrowse');
         this.stopTokenEarnedInterval();
         this.state.eventHandleUpdate.stopWatching();
+        clearTimeout(this.state.timerUpdate);
     }
 
     setCanvas(rgbArr) {
@@ -177,6 +189,7 @@ class PixelDescriptionBox extends Component {
             ctr.getBalance((balance) => {
                 this.setState({PPCOwned: balance});
             });
+            this.timerUpdate(lastUpdate, reserved);
         });
         if (canvasData === null) {
             ctr.getPropertyColors(x, y, (x, y, canvasData) => {
@@ -371,7 +384,7 @@ class PixelDescriptionBox extends Component {
                             size='tiny'
                         />}
                         className='oneColumn'
-                        value={this.state.lastUpdate == 0 ? 'Never' : Func.TimeSince(Date.now() - new Date(Date.now() - (this.state.lastUpdate * 1000))) + " ago"}
+                        value={this.state.lastUpdate == 0 ? 'Never' : this.state.lastUpdateFormatted}
                     />
                     <Input
                         fluid
@@ -394,22 +407,7 @@ class PixelDescriptionBox extends Component {
                             className='Popup'
                             size='tiny'
                         />}
-                        value={this.state.reserved == 0 || this.state.reserved * 1000 <= new Date().getTime() ? 
-                            'No' 
-                        : 
-                            <Moment 
-                                onChange={
-                                    (val) => {
-                                        if (this.state.reserved * 1000 <= new Date().getTime())
-                                            this.forceUpdate();
-                                    }
-                                } 
-                                interval={1000} 
-                                fromNow 
-                                ago>
-                                {this.state.reserved * 1000}
-                            </Moment>
-                        }
+                        value={this.state.reserved == 0 || this.state.reserved * 1000 <= new Date().getTime() ? 'No'  : this.state.reservedFormatted}
                     />
                     <Input
                         label="Private"

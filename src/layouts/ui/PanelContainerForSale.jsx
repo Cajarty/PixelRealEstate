@@ -20,29 +20,29 @@ class PanelContainerForSale extends PanelContainer {
                     {this.state.dataView.map((child, i) => (
                         <GridColumn key={i}>
                             <Segment className='segmentButton' compact raised onClick={() => {this.props.onClick(child.x + 1, child.y + 1)}}>
-                                    <List relaxed celled divided selection={false} size='small'>
+                                <List relaxed celled divided selection={false} size='small'>
+                                    <ListItem>
+                                        <PanelPropertyCanvas x={child.x} y={child.y} width={50} imageData={child.imageData}/>
+                                    </ListItem>
+                                    <ListItem>
+                                        <ListHeader>X</ListHeader>
+                                        <ListContent>{child.x + 1}</ListContent>
+                                    </ListItem>
+                                    <ListItem>
+                                        <ListHeader>Y</ListHeader>
+                                        <ListContent>{child.y + 1}</ListContent>
+                                    </ListItem>
+                                    <ListItem>
+                                        <ListHeader>PXL</ListHeader>
+                                        <ListContent>{child.PPCPrice}</ListContent>
+                                    </ListItem>
+                                    {child.ETHPrice != 0 && 
                                         <ListItem>
-                                            <PanelPropertyCanvas x={child.x} y={child.y} width={50} imageData={child.imageData}/>
+                                        <ListHeader>ETH</ListHeader>
+                                        <ListContent>{child.ETHPrice}</ListContent>
                                         </ListItem>
-                                        <ListItem>
-                                            <ListHeader>X</ListHeader>
-                                            <ListContent>{child.x + 1}</ListContent>
-                                        </ListItem>
-                                        <ListItem>
-                                            <ListHeader>Y</ListHeader>
-                                            <ListContent>{child.y + 1}</ListContent>
-                                        </ListItem>
-                                        <ListItem>
-                                            <ListHeader>PXL</ListHeader>
-                                            <ListContent>{child.PPCPrice}</ListContent>
-                                        </ListItem>
-                                        {child.ETHPrice != 0 && 
-                                            <ListItem>
-                                            <ListHeader>ETH</ListHeader>
-                                            <ListContent>{child.ETHPrice}</ListContent>
-                                            </ListItem>
-                                        }
-                                    </List>
+                                    }
+                                </List>
                             </Segment>
                         </GridColumn>
                     ))}

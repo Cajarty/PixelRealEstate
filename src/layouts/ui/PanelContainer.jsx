@@ -21,6 +21,7 @@ class PanelContainer extends Component {
         if (end < 0) {
             end += len;
         }
+        console.info(this.props);
         if (start > end) {
             view1 = this.props.data.slice(start, len);
             view2 = this.props.data.slice(0, end);
@@ -31,9 +32,9 @@ class PanelContainer extends Component {
     }
 
     componentWillReceiveProps(newProps) {
-        let start = this.props.viewStart;
-        let len = this.props.data.length;
-        let end = this.props.viewEnd;
+        let start = newProps.viewStart;
+        let len = newProps.data.length;
+        let end = newProps.viewEnd;
         let view1 = [];
         let view2 = [];
         if (end >= len) {
@@ -43,11 +44,11 @@ class PanelContainer extends Component {
             end += len;
         }
         if (start > end) {
-            view1 = this.props.data.slice(start, len);
-            view2 = this.props.data.slice(0, end);
+            view1 = newProps.data.slice(start, len);
+            view2 = newProps.data.slice(0, end);
             this.setState({dataView: view1.concat(view2)});
         } else {
-            this.setState({dataView: this.props.data.slice(start, end)});
+            this.setState({dataView: newProps.data.slice(start, end)});
         }
     }
 

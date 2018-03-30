@@ -5,9 +5,12 @@ var bigInt = require("big-integer");
 var BigNumber = require('bignumber.js');
 var utf8 = require("utf8");
 
-export const TimeSince = (date) => {
+export const TimeSince = (date, to = false) => {
     let seconds = Math.floor((new Date() - date) / 1000);
     let interval = Math.floor(seconds / 31536000);
+
+    if (to)
+        seconds = Math.abs(seconds);
 
     if (interval > 1) {
         return interval + " years";

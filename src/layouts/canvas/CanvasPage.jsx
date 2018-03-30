@@ -121,12 +121,20 @@ class CanvasPage extends Component {
                     className='topPane' 
                     attached={false}
                     loading={this.state.tab1Loading}
-                    ><PropertiesForSale 
+                    ><PropertiesOwned 
                         isLoading={(r) => this.setState({tab1Loading: r})}
                 /></TabPane> 
             },
-        { menuItem: 'For Sale', 
-            render: () => <TabPane className='topPane' attached={false} loading={this.state.tab2Loading}><PropertiesForSale isLoading={(r) => this.setState({tab2Loading: r})}/></TabPane> }];
+            { 
+                menuItem: 'For Sale', 
+                render: () => <TabPane 
+                    className='topPane' 
+                    attached={false}
+                    loading={this.state.tab2Loading}
+                    ><PropertiesForSale 
+                        isLoading={(r) => this.setState({tab2Loading: r})}
+                /></TabPane> 
+            }];
 
         let payoutPanes = [{ menuItem: 'Top 10', render: () => <TabPane className='middlePane' attached={false}>Tab 1 Content</TabPane> },
         { menuItem: 'Recent', render: () => <TabPane className='middlePane' attached={false}>none yet</TabPane> },

@@ -313,7 +313,7 @@ export class ServerDataManager {
                 }, 1000);
             } else {
                 let height = Object.keys(objList).length;
-                let width = Object.keys(objList[0]).length;
+                let width = Object.keys(objList).length;
                 for (let y = 0; y < height; y++) {
                     for (let x = 0; x < width; x++) {
                         if (objList[x] != null && objList[x][y] != null) {

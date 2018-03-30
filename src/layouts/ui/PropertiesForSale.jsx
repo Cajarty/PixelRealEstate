@@ -21,16 +21,15 @@ class PropertiesForSale extends Component {
             compare: Compares.yAsc,
             itemIndex: 0, //on page #
             items: 0, //total pages
-            pageSize: 2, //how many elements per page?
+            pageSize: 0, //how many elements per page?
         };
         this.cancelSort = false;
-        this.itemContainer = null;
     }
 
     componentDidMount() {
         this.props.isLoading(true);
 
-        //fix updates to be better
+        //fix updates to be better, add params
         ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (handle) => {
             let eventHandle = handle;
             this.setState({eventHandle});
@@ -47,15 +46,10 @@ class PropertiesForSale extends Component {
         let containerWidth = document.querySelector('.itemContainer').clientWidth;
         let pageSize = Math.floor(containerWidth / ITEM_SIZE);
         let size = (e.size != null ? e.size : this.state.items);
-        console.info((pageSize > this.state.items ? this.state.items : pageSize));
         this.setState({
-            pageSize: (pageSize > this.state.items ? this.state.items : pageSize),
+            pageSize: (pageSize >= this.state.items ? this.state.items - 1 : pageSize),
         });
         this.forceUpdate();
-    }
-
-    componentWillUnmount() {
-        window.removeEventListener('resize', this.onResize);
     }
 
     async reorderItems(orderFunc) {
@@ -71,6 +65,7 @@ class PropertiesForSale extends Component {
 
     componentWillUnmount() {
         this.cancelSort = true;
+        window.removeEventListener('resize', this.onResize);
         this.state.eventHandle.stopWatching();
     }
 
@@ -96,7 +91,8 @@ class PropertiesForSale extends Component {
             item += this.state.items;
         if (item >= this.state.items)
             item -= this.state.items;
-        this.setState({itemIndex: item});        
+        this.setState({itemIndex: item});       
+        this.forceUpdate();
     }
 
     reorderList(value) {

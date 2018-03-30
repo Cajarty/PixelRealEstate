@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
-import {Contract, ctr, EVENTS, LISTENERS} from '../../contract/contract.jsx';
+import * as EVENTS from '../../const/events';
+import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import {SDM, ServerDataManager, Compares} from '../../contract/ServerDataManager.jsx';
 import PanelContainerOwned from './PanelContainerOwned';
 import * as Assets from '../../const/assets.jsx';
 import Dropdown from 'react-dropdown';
 import {GFD, GlobalState} from '../../functions/GlobalState';
-import {Segment, Button} from 'semantic-ui-react';
+import {Segment, Button, Icon} from 'semantic-ui-react';
 
-const PAGE_SIZE = 10;
+const ITEM_SIZE = 140;
 
 class PropertiesOwned extends Component {
     constructor(props) {
@@ -15,41 +16,53 @@ class PropertiesOwned extends Component {
         this.state = {
             orderedItems: [],
             compare: Compares.xDesc,
-            page: 0, //on page #
-            pages: 0, //total pages
+            itemIndex: 0, //on page #
+            items: 0, //total pages
+            pageSize: 0, //how many elements per page?
         };
         this.cancelSort = false;
     }
 
     componentDidMount() {
-        ctr.listenForEvent(EVENTS.PropertyBought, 'PropertiesOwned', (data) => {
-            this.reorderItems();
-            this.forceUpdate();
+        this.props.isLoading(true);
+
+        //add right owner
+        ctr.watchEventLogs(EVENTS.PropertyBought, {}, (eventHandle) => {
+            this.setState({eventHandle});
+            eventHandle.watch((error, log) => {
+                this.reorderItems();
+                this.forceUpdate();
+            });
         });
         this.reorderItems();
+        window.addEventListener('resize', this.onResize);
     }
 
-    reorderItems() {
+    onResize = (e) => {
+        let containerWidth = document.querySelector('.itemContainer').clientWidth;
+        let pageSize = Math.floor(containerWidth / ITEM_SIZE);
+        let size = (e.size != null ? e.size : this.state.items);
+        this.setState({
+            pageSize: (pageSize >= this.state.items ? this.state.items - 1 : pageSize),
+        });
+        this.forceUpdate();
+    }
+
+    async reorderItems() {
         //get my current market trade and populate fields
-        let promise = SDM.orderPropertyListAsync(SDM.ownedProperties, this.state.compare.func);
-
-        let relisten = (results) => {
-            if (this.cancelSort)
-                return;
-            this.setState({
-                orderedItems: results.data, 
-                pages: Math.floor((results.data.length - 1) / PAGE_SIZE)
-            });
-            if (results.promise)
-                results.promise.then(relisten);
-        }
-
-        promise.then(relisten);
+        let results = await SDM.orderPropertyList(SDM.ownedProperties, this.state.compare.func);
+        this.setState({
+            orderedItems: results, 
+            items: results.length,
+        });
+        this.props.isLoading(false);
+        this.onResize({size: results.length});
     }
 
     componentWillUnmount() {
         this.cancelSort = true;
-        ctr.stopListeningForEvent(EVENTS.PropertyBought, 'PropertiesOwned');
+        window.removeEventListener('resize', this.onResize);
+        this.state.eventHandle.stopWatching();
     }
 
     handleInput(key, value) {
@@ -63,13 +76,13 @@ class PropertiesOwned extends Component {
         GFD.setData('y', y);
     }
 
-    changePage(pageChange) {
-        let page = this.state.page + pageChange;
-        if (page < 0)
-            page = 0;
-        if (page > this.state.pages)
-            page = this.state.pages;
-        this.setState({page});        
+    changePage(up = true) {
+        let item = this.state.itemIndex + (up ? this.state.pageSize : -this.state.pageSize);
+        if (item < 0)
+            item += this.state.items;
+        if (item >= this.state.items)
+            item -= this.state.items;
+        this.setState({itemIndex: item});        
     }
 
     reorderList(value) {
@@ -79,41 +92,17 @@ class PropertiesOwned extends Component {
 
     render() {
         return (
-            <div className='uiBase'>
-                <div className='header'>
-                    Your Owned Properties
-                    <div>
-                        <Dropdown 
-                            className='dropdown'
-                            value={this.state.compare}
-                            options={Object.keys(Compares).map((i) => {
-                                return Compares[i];
-                            })} 
-                            onChange={value => {this.reorderList(value)}}
-                        />
-                    </div>
-                </div>
-                <Segment>
-                    <Button fluid onClick={() => {this.props.onChangeDown()}}>{'<'}</Button>
-                        <PanelContainerOwned
-                            data={this.state.orderedItems}
-                            onClick={(x, y) => this.propertySelected(x, y)}
-                            viewStart={this.state.page * PAGE_SIZE}
-                            viewEnd={(this.state.page + 1) * PAGE_SIZE}
-                        />
-                    <Button fluid onClick={() => {this.props.onChangeUp()}}>{'>'}</Button>
+            <div style={{height: '100%'}}>
+                <Button attached='top' onClick={() => {this.changePage(true)}}><Icon name='chevron up'></Icon></Button>
+                <Segment attached style={{height: 'calc(100% - 74px)'}} className='itemContainer'>
+                    <PanelContainerOwned
+                        data={this.state.orderedItems}
+                        onClick={(x, y) => this.propertySelected(x, y)}
+                        viewStart={this.state.itemIndex}
+                        viewEnd={this.state.itemIndex + this.state.pageSize}
+                    />
                 </Segment>
-                <div className='footer'>
-                    <div className='bottomNav' onClick={() => this.changePage(-1)}>
-                        <img className='icon' src={Assets.ICON_LEFT_ARROW}></img>
-                    </div>
-                    <div className='bottomNav'>
-                        {(this.state.page + 1) + ' / ' + Math.max(this.state.pages + 1, 1)}
-                    </div>
-                    <div className='bottomNav' onClick={() => this.changePage(1)}>
-                        <img className='icon' src={Assets.ICON_RIGHT_ARROW}></img>
-                        </div>
-                </div>
+                <Button attached='bottom' onClick={() => {this.changePage(false)}}><Icon name='chevron down'></Icon></Button>
             </div>
         );
     }

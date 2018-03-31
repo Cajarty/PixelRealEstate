@@ -398,6 +398,15 @@ div.hoverLabel.ui {
     }
 }
 
+.oneColumn.combined {
+    display: inline-block;
+    width: 100% !important;
+    margin: 0px 0px 6px 0px !important;
+    .bid {
+        max-width: calc(100% - 96px) !important;
+    }
+}
+
 .oneColumnFull {
     display: inline-block;
     width: 100% !important;

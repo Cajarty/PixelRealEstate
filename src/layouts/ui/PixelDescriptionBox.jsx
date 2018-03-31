@@ -284,6 +284,11 @@ class PixelDescriptionBox extends Component {
         return packed;
     }
 
+    visitLink() {
+        let win = window.open(this.state.link, '_blank');
+        win.focus();
+    }
+
     render() {
         return (
             <SegmentGroup className='pixelDescriptionBox'>
@@ -326,140 +331,160 @@ class PixelDescriptionBox extends Component {
                             onChange={(e) => this.setY(e.target.value)}
                         />
                     </div>
-                    <Input
-                        placeholder="Address"
-                        fluid
-                        className='oneColumn'
-                        value={(this.state.owner === ctr.account ? "You" : (this.state.owner === NOBODY ? "Unowned" : this.state.owner))} 
-                        label={<Popup
-                            trigger={<Label><Icon className='uniform' name='user'/></Label>}
-                            content='Owner Address'
-                            className='Popup'
-                            size='tiny'
-                        />}
-                    />
-                    <Input 
-                        fluid
-                        labelPosition='right' 
-                        type={this.state.latestBid == 0 ? "text" : "number"}
-                        placeholder={"Enter PXL"}
-                        className='oneColumn bidInput'
-                        value={this.state.latestBid == 0 ? "None" : this.state.latestBid}
-                        onChange={(e) => this.setState({latestBid: e.target.value})}
-                    >
-                        <Popup
-                            trigger={<Label><Icon name='legal'/></Label>}
-                            content='Lastest Bid'
-                            className='Popup'
-                            size='tiny'
+                </Segment>
+                {this.state.owner != '' ? 
+                    <Segment>
+                        <Input
+                            placeholder="Address"
+                            fluid disabled
+                            className='oneColumn'
+                            value={(this.state.owner === ctr.account ? "You" : (this.state.owner === NOBODY ? "Unowned" : this.state.owner))} 
+                            label={<Popup
+                                trigger={<Label><Icon className='uniform' name='user'/></Label>}
+                                content='Owner Address'
+                                className='Popup'
+                                size='tiny'
+                            />}
                         />
-                        <input className='bid'/>
-                        <Label as='a'
-                            className='bidButton'
-                            onClick={() => this.placeBid()} 
-                        >Bid</Label>
-                    </Input>
-                    <MessageModal 
-                        title='Not Enough PXL!'
-                        description='You must have at least 1 PXL to place a bid.'
-                        isOpen={this.state.showMessage} 
-                        onClose={() => {this.setState({showMessage: false})}}
-                    />
-                    <Input
-                        label={<Popup
-                            trigger={<Label><Icon className='uniform' name='dollar'/></Label>}
-                            content='Price'
-                            className='Popup'
-                            size='tiny'
-                        />}
-                        className='oneColumn'
-                        value={this.getPriceFormat()} 
-                    />
-                    <Input
-                        fluid
-                        label={<Popup
-                            trigger={<Label><Icon className='uniform' name='time'/></Label>}
-                            content='Last Update'
-                            className='Popup'
-                            size='tiny'
-                        />}
-                        className='oneColumn'
-                        value={this.state.lastUpdate == 0 ? 'Never' : this.state.lastUpdateFormatted}
-                    />
-                    <Input
-                        fluid
-                        label={<Popup
-                            trigger={<Label><Icon className='uniform' name='money'/></Label>}
-                            content='Current/Maximum Payout'
-                            className='Popup'
-                            size='tiny'
-                        />}
-                        className='oneColumn'
-                        value={this.state.lastUpdate == 0 ? "None" : (this.state.earnings + '/' + this.state.maxEarnings) + " PXL"}
-                    />
-                    <Input
-                        label="Reserved"
-                        fluid
-                        className='oneColumn'
-                        label={<Popup
-                            trigger={<Label><Icon className='uniform' name='ban'/></Label>}
-                            content='Is Reserved'
-                            className='Popup'
-                            size='tiny'
-                        />}
-                        value={this.state.reserved == 0 || this.state.reserved * 1000 <= new Date().getTime() ? 'No'  : this.state.reservedFormatted}
-                    />
-                    <Input
-                        label="Private"
-                        fluid
-                        className='oneColumn'
-                        label={<Popup
-                            trigger={<Label><Icon className='uniform' name='hide'/></Label>}
-                            content='Is Private'
-                            className='Popup'
-                            size='tiny'
-                        />}
-                        value={this.state.isInPrivate ? 'Yes' : 'No'}
-                    />
-                    <Input
-                        label={<Popup
-                            trigger={<Label><Icon className='uniform' name='comment'/></Label>}
-                            content='Comment'
-                            className='Popup'
-                            size='tiny'
-                        />}
-                        fluid
-                        className='oneColumn'
-                        value={this.state.hoverText != '' ? this.state.hoverText : "None Set"}
-                    />
-                    <Input
-                        label={<Popup
-                            trigger={<Label><Icon className='uniform' name='linkify'/></Label>}
-                            content='Link'
-                            className='Popup'
-                            size='tiny'
-                        />}
-                        fluid
-                        className='oneColumn'
-                        value={this.state.link != '' ? <a target="_blank" href={this.state.link}>{this.state.link}</a> : "None Set"}
-                    />
-                </Segment>
-                <Segment>
+                        <Input 
+                            fluid disabled
+                            labelPosition='right' 
+                            type={this.state.latestBid == 0 ? "text" : "number"}
+                            placeholder={"Enter PXL"}
+                            className='oneColumn bidInput'
+                            value={this.state.latestBid == 0 ? "None" : this.state.latestBid}
+                            onChange={(e) => this.setState({latestBid: e.target.value})}
+                        >
+                            <Popup
+                                trigger={<Label><Icon name='legal'/></Label>}
+                                content='Lastest Bid'
+                                className='Popup'
+                                size='tiny'
+                            />
+                            <input className='bid'/>
+                            <Label as='a'
+                                className='bidButton'
+                                onClick={() => this.placeBid()} 
+                            >Bid</Label>
+                        </Input>
+                        <MessageModal 
+                            title='Not Enough PXL!'
+                            description='You must have at least 1 PXL to place a bid.'
+                            isOpen={this.state.showMessage} 
+                            onClose={() => {this.setState({showMessage: false})}}
+                        />
+                        <Input
+                            label={<Popup
+                                trigger={<Label><Icon className='uniform' name='dollar'/></Label>}
+                                content='Price'
+                                className='Popup'
+                                size='tiny'
+                            />} 
+                            disabled
+                            className='oneColumn'
+                            value={this.getPriceFormat()} 
+                        />
+                        <Input
+                            fluid disabled
+                            label={<Popup
+                                trigger={<Label><Icon className='uniform' name='time'/></Label>}
+                                content='Last Update'
+                                className='Popup'
+                                size='tiny'
+                            />}
+                            className='oneColumn'
+                            value={this.state.lastUpdate == 0 ? 'Never' : this.state.lastUpdateFormatted}
+                        />
+                        <Input
+                            fluid disabled
+                            label={<Popup
+                                trigger={<Label><Icon className='uniform' name='money'/></Label>}
+                                content='Current/Maximum Payout'
+                                className='Popup'
+                                size='tiny'
+                            />}
+                            className='oneColumn'
+                            value={this.state.lastUpdate == 0 ? "None" : (this.state.earnings + '/' + this.state.maxEarnings) + " PXL"}
+                        />
+                        <Input
+                            label="Reserved"
+                            fluid disabled
+                            className='oneColumn'
+                            label={<Popup
+                                trigger={<Label><Icon className='uniform' name='ban'/></Label>}
+                                content='Is Reserved'
+                                className='Popup'
+                                size='tiny'
+                            />}
+                            value={this.state.reserved == 0 || this.state.reserved * 1000 <= new Date().getTime() ? 'No'  : this.state.reservedFormatted}
+                        />
+                        <Input
+                            label="Private"
+                            fluid disabled
+                            className='oneColumn'
+                            label={<Popup
+                                trigger={<Label><Icon className='uniform' name='hide'/></Label>}
+                                content='Is Private'
+                                className='Popup'
+                                size='tiny'
+                            />}
+                            value={this.state.isInPrivate ? 'Yes' : 'No'}
+                        />
+                        <Input
+                            label={<Popup
+                                trigger={<Label><Icon className='uniform' name='comment'/></Label>}
+                                content='Comment'
+                                className='Popup'
+                                size='tiny'
+                            />}
+                            fluid disabled
+                            className='oneColumn'
+                            value={this.state.hoverText != '' ? this.state.hoverText : "None Set"}
+                        />
+                        <Input
+                            className='oneColumn combined'
+                            fluid disabled
+                            action={(this.state.link != '' ? 
+                                <Popup
+                                    trigger={<Button onClick={() => this.visitLink()}><Icon className='uniform' name='linkify'/>Visit</Button>}
+                                    content='Link'
+                                    className='Popup'
+                                    size='tiny'
+                                /> : null
+                            )}
+                            label={(this.state.link == '' ? 
+                                <Popup
+                                    trigger={<Label><Icon className='uniform' name='linkify'/></Label>}
+                                    content='Link'
+                                    className='Popup'
+                                    size='tiny'
+                                /> : null
+                            )}
+                            actionPosition='left'
+                            value={this.state.link != '' ? this.state.link : "None Set"}
+                        />
+                    </Segment>
+                : <Segment>
+                    <p>
+                        Click a Property on the canvas or enter the coordinates here to see more about a property.
+                    </p>
+                </Segment>}
                 {this.state.x != '' && this.state.y != '' &&
-                    <Grid columns='two' divided>
-                        {this.getActionsList().map((action, i) => (
-                            <Grid.Row key={i}>
-                                <Grid.Column>
-                                    {action.a1}
-                                </Grid.Column>
-                                <Grid.Column>
-                                    {action.a2}
-                                </Grid.Column>
-                            </Grid.Row>
-                        ))}
-                    </Grid>
-                }
-                </Segment>
+                    <Segment>
+                        <Grid columns='two' divided>
+                            {this.getActionsList().map((action, i) => (
+                                <Grid.Row key={i}>
+                                    <Grid.Column>
+                                        {action.a1}
+                                    </Grid.Column>
+                                    <Grid.Column>
+                                        {action.a2}
+                                    </Grid.Column>
+                                </Grid.Row>
+                            ))}
+                        </Grid>
+                    </Segment>
+                } 
                 <BuyPixelForm isOpen={this.state.isOpen.BUY} close={this.toggleAction.bind(this)}/>
                 <SellPixelForm isOpen={this.state.isOpen.SELL} close={this.toggleAction.bind(this)}/>
                 <SetPixelColorForm isOpen={this.state.isOpen.SET_IMAGE} close={this.toggleAction.bind(this)}/>

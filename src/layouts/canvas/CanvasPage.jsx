@@ -180,14 +180,14 @@ class CanvasPage extends Component {
                                     <Divider/>
                                     <SetHoverText/>
                                     <SetLink/>
+                                    <Divider/>
+                                    <Checkbox 
+                                        label={'Show Properties for sale'} 
+                                        checked={this.state.showPopertiesForSale}
+                                        onChange={(e, data) => {this.toggleForSaleProperties(e, data)}}
+                                    />
                                 </div>
                                 }
-                                <Divider/>
-                                <Checkbox 
-                                    label={'Show Properties for sale'} 
-                                    checked={this.state.showPopertiesForSale}
-                                    onChange={(e, data) => {this.toggleForSaleProperties(e, data)}}
-                                />
                             </Segment>
                             <Segment>
 

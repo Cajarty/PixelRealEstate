@@ -276,7 +276,7 @@ contract VirtualRealEstate is StandardToken {
 
         ownerEth += msg.value;
         minPercent = priceETH * PRICE_ETH_MIN_PERCENT / 100;
-        priceETH += ((minPercent < PRICE_ETH_MIN_INCREASE) ? minPercent : PRICE_ETH_MIN_INCREASE) * pxlLeft / pxlValue;
+        priceETH += ((minPercent < PRICE_ETH_MIN_INCREASE) ? minPercent : PRICE_ETH_MIN_INCREASE) * pxlLeft / pricePXL;
         
         _transferProperty(property, propertyID, msg.sender, msg.value, pxlValue, 0);
         

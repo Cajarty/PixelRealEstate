@@ -70,11 +70,12 @@ class HoverLabel extends Component {
     render() {
         return (
             <div>
+                {console.info(this.state)}
                 <div 
                     className={'hoverBox ' + (this.state.show ? '' : 'hidden')}
                     style={{
-                        left: Math.floor(Math.floor((this.state.hoverX / 10) + 2) * (this.state.canvasWidth / 100) - 1.5) + 'px',
-                        top: Math.floor(Math.floor((this.state.hoverY / 10) + 2) * (this.state.canvasHeight / 100) - 1.5) + 'px',
+                        left: (this.state.offsetY + Math.floor(Math.floor(this.state.hoverX / 10) * (this.state.canvasWidth / 100)) - 2) + 'px',
+                        top: (this.state.offsetY + Math.floor(Math.floor(this.state.hoverY / 10) * (this.state.canvasHeight / 100)) - 2) + 'px',
                         minWidth: (this.state.canvasWidth / 100) + 1.9 + 'px',
                         minHeight: (this.state.canvasWidth / 100) + 1.9 + 'px'
                     }}

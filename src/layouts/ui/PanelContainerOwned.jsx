@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import {Panel, PanelItem, PanelPropertyCanvas, PanelDivider} from './Panel';
 import PanelContainer from './PanelContainer';
 import Timestamp from 'react-timestamp';
+import * as Func from '../../functions/functions';
 import Hours from '../ui/Hours';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 import {SegmentGroup, Segment, Label, LabelDetail, Divider, Grid, GridRow, GridColumn, List, ListItem, ListContent, ListHeader, Button } from 'semantic-ui-react';
@@ -15,8 +16,9 @@ class PanelContainerOwned extends PanelContainer {
         }
     }
 
-    cancelSale() {
-        console.info("hellode")
+    cancelSale(e) {
+        e.stopPropagation();
+        window.alert("hellode")
     }
 
     render() {
@@ -30,17 +32,21 @@ class PanelContainerOwned extends PanelContainer {
                                         <ListItem>
                                             <PanelPropertyCanvas x={child.x} y={child.y} width={50}/>
                                         </ListItem>
-                                        <ListItem>
+                                        <ListItem className='xLabel'>
                                             <ListHeader>X</ListHeader>
                                             <ListContent>{child.x + 1}</ListContent>
                                         </ListItem>
-                                        <ListItem>
+                                        <ListItem className='yLabel'>
                                             <ListHeader>Y</ListHeader>
                                             <ListContent>{child.y + 1}</ListContent>
                                         </ListItem>
                                         <ListItem>
                                             <ListHeader>For Sale</ListHeader>
-                                            <ListContent>{child.isForSale ? 'Yes' : 'No'}</ListContent>
+                                            <ListContent>{!child.isForSale ? 'No' : 
+                                                <div>
+                                                    {child.PPCPrice ? child.PPCPrice : null}
+                                                </div>
+                                        }</ListContent>
                                         </ListItem>
                                         <ListItem>
                                             <ListHeader>Private</ListHeader>
@@ -51,6 +57,9 @@ class PanelContainerOwned extends PanelContainer {
                                             <ListContent>{child.lastUpdate != null && child.lastUpdate > 0 ? <Hours time={child.lastUpdate} /> : 'Never'}</ListContent>
                                         </ListItem>
                                     </List>
+                                    {child.isForSale ? 
+                                        <Button className='delistButton' fluid size='mini' onClick={(e) => this.cancelSale(e)}>Delist</Button>
+                                    : null}
                             </Segment>
                         </GridColumn>
                     ))}

@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../contract/contract.jsx';
+import {Message} from 'semantic-ui-react';
 
 class Alerts extends Component {
     constructor(props) {
@@ -27,7 +28,7 @@ class Alerts extends Component {
                 let update = this.state.alerts;
                 delete update[now];
                 this.setState({alerts: update});
-            }, 985);
+            }, 950);
             let update = this.state.alerts;
             update[now] = {className: 'alert fadeOut', message: data.message};
             this.setState({alerts: update});
@@ -39,7 +40,7 @@ class Alerts extends Component {
         return (
             <div className='alertContainer'>
                {Object.keys(this.state.alerts).map((i) => 
-                   <div key={i} className={this.state.alerts[i].className}>{this.state.alerts[i].message}</div>
+                   <Message compact key={i} className={this.state.alerts[i].className}>{this.state.alerts[i].message}</Message>
                )}
             </div>
         );
@@ -47,3 +48,13 @@ class Alerts extends Component {
 }
 
 export default Alerts
+
+
+{/*
+
+            <div className='alertContainer'>
+               {Object.keys(this.state.alerts).map((i) => 
+                   <div key={i} className={this.state.alerts[i].className}>{this.state.alerts[i].message}</div>
+               )}
+            </div>
+*/}

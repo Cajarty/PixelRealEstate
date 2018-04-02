@@ -119,3 +119,15 @@ body {
 .ui.disabled.input {
     opacity: 1;
 }
+
+.item.xLabel {
+    float: left;
+}
+
+.item.yLabel {
+    text-align: right
+}
+
+.ui.fluid.button.delistButton {
+    margin-top: -6px !important;
+}

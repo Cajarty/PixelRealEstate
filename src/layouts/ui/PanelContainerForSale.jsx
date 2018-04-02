@@ -25,11 +25,11 @@ class PanelContainerForSale extends PanelContainer {
                                     <ListItem>
                                         <PanelPropertyCanvas x={child.x} y={child.y} width={50} imageData={child.imageData}/>
                                     </ListItem>
-                                    <ListItem>
+                                    <ListItem className='xLabel'>
                                         <ListHeader>X</ListHeader>
                                         <ListContent>{child.x + 1}</ListContent>
                                     </ListItem>
-                                    <ListItem>
+                                    <ListItem className='yLabel'>
                                         <ListHeader>Y</ListHeader>
                                         <ListContent>{child.y + 1}</ListContent>
                                     </ListItem>

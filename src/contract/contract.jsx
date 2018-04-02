@@ -13,9 +13,9 @@ import VirtualRealEstate from '../../build/contracts/VirtualRealEstate.json'
 
 
 export const ERROR_TYPE = {
-    Success: 'success',
-    Warning: 'warning',
-    Error: 'error',
+    Success: 'green',
+    Warning: 'orange',
+    Error: 'red',
 }
 export const LISTENERS = {
     Error: 'Error',
@@ -96,10 +96,12 @@ export class Contract {
             if (accs.length == 0) {
                 if (GFD.getData('advancedMode')) {
                     this.sendResults(LISTENERS.Error, {errorId: 0, errorType: ERROR_TYPE.Error, message: "Couldn't get any accounts! Make sure you're logged into Metamask."});
+                    GFD.setData('noAccount', true);
                 }
                 return;
             }
 
+            GFD.setData('noAccount', false);
             this.sendResults(LISTENERS.Error, {removeErrors: [0, 1], message: ''});
 
             this.accounts = accs;
@@ -237,11 +239,11 @@ export class Contract {
                 return i.buyProperty(this.toID(x, y), ppc, {value: eth, from: this.account});
         }).then(() => {
             callback(true);
-            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " purchase complete."});
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " purchase complete."});
         }).catch((e) => {
             callback(false);
             console.info(e);
-            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to purchase property " + x + "x" + y + "."});
+            this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to purchase property " + (x + 1) + "x" + (y + 1) + "."});
         });
     }
 
@@ -249,10 +251,10 @@ export class Contract {
         this.VRE.deployed().then((i) => {
             return i.listForSale(this.toID(parseInt(x), parseInt(y)), price, {from: this.account });
         }).then(() => {
-            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " listed for sale."});
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " listed for sale."});
         }).catch((e) => {
             console.log(e);
-            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to put property " + x + "x" + y + " on market."});
+            this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to put property " + (x + 1) + "x" + (y + 1) + " on market."});
         });
     }
 
@@ -261,11 +263,11 @@ export class Contract {
             return i.delist(this.toID(parseInt(x), parseInt(y)), {from: this.account });
         }).then(() => {
             callback(true);
-            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " listed for sale."});
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " listed for sale."});
         }).catch((e) => {
             console.log(e);
             callback(false);
-            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to put property " + x + "x" + y + " on market."});
+            this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to put property " + (x + 1) + "x" + (y + 1) + " on market."});
         });
     }
 
@@ -311,25 +313,27 @@ export class Contract {
         });
     }
 
-    makeBid(x, y, bid) {
+    makeBid(x, y, bid, callback) {
         this.VRE.deployed().then((i) => {
             return i.makeBid(this.toID(x, y), bid, {from: this.account });
         }).then(() => {
-            this.sendResults(LISTENERS.Alert, {result: true, message: "Bid for " + x + "x" + y + " sent to owner."});
+            callback(true);
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Bid for " + (x + 1) + "x" + (y + 1) + " sent to owner."});
         }).catch((e) => {
-            console.info(e);
-            this.sendResults(LISTENERS.Error, {result: false, message: "Error placing bid."});
+            callback(false);
+            this.sendResults(LISTENERS.Alert, {result: false, message: "Error placing bid."});
         });
     }
 
-    setColors(x, y, data, PPT) {
+    setColors(x, y, data, PPT, callback) {
         this.VRE.deployed().then((i) => {
             return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), PPT, {from: this.account });
         }).then(() => {
-            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " pixels changed."});
+            callback(true);
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " pixels changed."});
         }).catch((e) => {
-            console.info(e);
-            this.sendResults(LISTENERS.Error, {result: false, message: "Error uploading pixels."});
+            callback(false);
+            this.sendResults(LISTENERS.Alert, {result: false, message: "Error uploading pixels."});
         });
     }
 

@@ -8,22 +8,22 @@ class ConfirmModal extends Component {
       open: false,
     };
   }
-    open = () => this.setState({ open: true })
+    open() {
+      this.setState({ open: true })
+    }
 
     close(res = false) {
         this.props.result(res);
-        this.setState({ open: false });
+        this.setState({ open: res });
     }
   
     render() {
-      const { open } = this.state
-  
       return (
         <Modal
           dimmer={false}
-          open={open}
-          onOpen={this.open}
-          onClose={this.close}
+          open={this.state.open}
+          onOpen={() => this.open()}
+          onClose={() => this.close()}
           size='tiny'
           trigger={<Button primary>{this.props.activateName}</Button>}
         >

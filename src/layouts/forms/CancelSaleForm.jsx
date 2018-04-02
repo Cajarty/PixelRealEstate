@@ -26,10 +26,10 @@ class CancelSaleForm extends Component {
     }
 
     componentDidMount() {
-        GFD.listen('x', 'sellPixel', (x) => {
+        GFD.listen('x', 'cancelSale', (x) => {
             this.setState({x});
         })
-        GFD.listen('y', 'sellPixel', (y) => {
+        GFD.listen('y', 'cancelSale', (y) => {
             this.setState({y});
         })
         ctr.getSystemSalePrices((data) => {
@@ -41,7 +41,7 @@ class CancelSaleForm extends Component {
     }
 
     componentWillUnmount() {
-        GFD.closeAll('sellPixel');
+        GFD.closeAll('cancelSale');
     }
 
     setX(x) {
@@ -58,6 +58,12 @@ class CancelSaleForm extends Component {
         this.props.close('CANCEL_SALE');
     }
 
+    delistProperty() {
+        ctr.delistProperty(this.state.x - 1, this.state.y - 1, (result) => {
+            this.toggleModal(!result);
+        });
+    }
+
     render() {
         return (
             <Modal size='tiny' 
@@ -65,63 +71,13 @@ class CancelSaleForm extends Component {
             closeIcon 
             onClose={() => this.toggleModal(false)}
             >
-            <ModalHeader>Sell Property</ModalHeader>
+            <ModalHeader>Delist Property</ModalHeader>
             <ModalContent>
-                <div className='twoColumn w50 left'>
-                    <Input
-                        placeholder="1 - 100"
-                        type="number"
-                        className='oneColumnFull'
-                        fluid
-                        label={<Popup
-                            trigger={<Label className='uniform'>X</Label>}
-                            content='X Position'
-                            className='Popup'
-                            size='tiny'
-                        />}
-                        value={this.state.x} 
-                        onChange={(e) => this.setX(e.target.value)}
-                    />
-                    </div>
-                    <div className='twoColumn w50 right'>
-                    <Input
-                        placeholder="1 - 100"
-                        type="number"
-                        label={<Popup
-                            trigger={<Label className='uniform'>Y</Label>}
-                            content='Y Position'
-                            className='Popup'
-                            size='tiny'
-                        />}
-                        className='oneColumnFull'
-                        fluid
-                        value={this.state.y} 
-                        onChange={(e) => this.setY(e.target.value)}
-                    />
-                    </div>
-                    <Input 
-                        fluid
-                        labelPosition='right' 
-                        type={"number"}
-                        placeholder={"Current PXL Price"}
-                        className='oneColumn'
-                        disabled
-                        value={this.state.valuePrice}
-                    >
-                        <Popup
-                            trigger={<Label><Icon className='uniform' name='money'/></Label>}
-                            content='Price in PXL'
-                            className='Popup'
-                            size='tiny'
-                        />
-                        <input 
-                        className='bid'
-                        />
-                        <Label>PXL</Label>
-                    </Input>
+                <p>Are you sure you want stop offering Property ({this.state.x}, {this.state.y}) for Sale?</p>
             </ModalContent>
             <ModalActions>
-                <Button primary onClick={() => ctr.delistProperty(this.state.x - 1, this.state.y - 1)}>Delist Property</Button>
+                <Button onClick={() => this.toggleModal(false)}>Cancel</Button>
+                <Button primary onClick={() => this.delistProperty()}>Delist Property</Button>
             </ModalActions>
         </Modal>
         );

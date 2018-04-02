@@ -140,26 +140,33 @@ class BuyPixelForm extends Component {
                         />
                         </div>
                         <Divider horizontal>Price</Divider>
-                        <Label>PXL<LabelDetail>{this.state.PPCToPay}</LabelDetail></Label>
-                        <Label style={{float: 'right'}}>ETH<LabelDetail>{this.state.ETHToPay}</LabelDetail></Label>
-                        <FormInput
-                            className='buySlider'
-                            min={0}
-                            max={this.state.PPCPrice}
-                            type='range'
-                            step={1}
-                            value={this.state.PPCSelected}
-                            onChange={(e) => this.updatePriceSlider(e.target.value)}
-                        />
-                        {null && <Button icon labelPosition='right' size='mini'>
-                            Pay Extra
-                            <Popup
-                                trigger={<Icon name='question'/>}
-                                content='If the Ethereum network is busy, the new Property price may not update in time. Adding to the base price will help ensure having sufficient funds for the purchase.'
-                                className='Popup'
-                                size='tiny'
+                        {this.state.ETHToPay == 0 ?
+                        <div style={{textAlign: 'center'}}>
+                            <Label >PXL<LabelDetail>{this.state.PPCToPay}</LabelDetail></Label>
+                        </div>
+                        :
+                        <div>
+                            <Label>PXL<LabelDetail>{this.state.PPCToPay}</LabelDetail></Label>
+                            <Label style={{float: 'right'}}>ETH<LabelDetail>{this.state.ETHToPay}</LabelDetail></Label>
+                            <FormInput
+                                className='buySlider'
+                                min={0}
+                                max={this.state.PPCPrice}
+                                type='range'
+                                step={1}
+                                value={this.state.PPCSelected}
+                                onChange={(e) => this.updatePriceSlider(e.target.value)}
                             />
-                        </Button>}
+                            {null && <Button icon labelPosition='right' size='mini'>
+                                Pay Extra
+                                <Popup
+                                    trigger={<Icon name='question'/>}
+                                    content='If the Ethereum network is busy, the new Property price may not update in time. Adding to the base price will help ensure having sufficient funds for the purchase.'
+                                    className='Popup'
+                                    size='tiny'
+                                />
+                            </Button>}
+                        </div>}
                 </ModalContent>
                 <ModalActions>
                     <Button primary onClick={() => this.buyProperty()}>Buy Property</Button>

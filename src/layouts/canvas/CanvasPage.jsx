@@ -41,6 +41,7 @@ class CanvasPage extends Component {
 
     componentDidMount() {
         ctr.getBalance((balance) => {
+            GFD.setData('balance', balance);
             this.setState({PPCOwned: balance, loadingPPC: false});
         });
 
@@ -200,7 +201,7 @@ class CanvasPage extends Component {
                         <Canvas/>
                     </Segment>
                     <Segment className='right'>
-                        <ErrorBox/>
+                        <ErrorBox containerStyle={{marginBottom: '12px'}}/>
                         <div className='infoBox'>
                             {this.state.advancedMode ? 
                                 <div>

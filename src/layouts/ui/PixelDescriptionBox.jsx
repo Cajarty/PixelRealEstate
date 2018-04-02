@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import * as EVENTS from '../../const/events';
-import {Contract, ctr} from '../../contract/contract.jsx';
+import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions.jsx';
 import Timestamp from 'react-timestamp';
 import {GFD, GlobalState} from '../../functions/GlobalState';
@@ -14,6 +14,7 @@ import TransferPropertyForm from '../forms/TransferPropertyForm';
 import CancelSaleForm from '../forms/CancelSaleForm';
 import MakePrivateForm from '../forms/MakePrivateForm';
 import MakePublicForm from '../forms/MakePublicForm';
+import PlaceBidForm from '../forms/PlaceBidForm';
 import MessageModal from './MessageModal';
 
 const NOBODY = '0x0000000000000000000000000000000000000000';
@@ -48,6 +49,7 @@ class PixelDescriptionBox extends Component {
                 SET_PUBLIC: false,
                 SET_PRIVATE: false,
                 TRANSFER: false,
+                PLACCE_BID: false,
             },
             showMessage: false,
         }
@@ -83,6 +85,10 @@ class PixelDescriptionBox extends Component {
             ctx, 
             dataCtx,
         });
+
+        GFD.listen('noAccount', 'pixelBrowse', (noAccount) => {
+            this.setState({noAccount});
+        })
 
         GFD.listen('x', 'pixelBrowse', (x) => {
             this.setState({x});
@@ -221,8 +227,7 @@ class PixelDescriptionBox extends Component {
                 this.setState({showMessage: true});
                 return;
             }
-            let bid = window.prompt("Please enter an amount of PXL from 1 to " + balance + ". Bids cost 1 PXL each.");
-            ctr.makeBid(this.state.x - 1, this.state.y - 1, parseInt(bid));
+            this.toggleAction('PLACE_BID');
         });
     }
 
@@ -257,7 +262,7 @@ class PixelDescriptionBox extends Component {
             );
         if (this.state.isForSale && this.state.owner == ctr.account)
             actions.push(
-                <Button fluid onClick={() => this.toggleAction('CANCEL_SALE')}>Cancel Sale</Button>
+                <Button fluid onClick={() => this.toggleAction('CANCEL_SALE')}>Delist</Button>
             );
         if (this.state.owner == ctr.account) {
             if (this.state.isInPrivate) { //for this switch, we need to check to make sure we are the setter
@@ -269,9 +274,9 @@ class PixelDescriptionBox extends Component {
                     <Button fluid onClick={() => this.toggleAction('SET_PRIVATE')}>Set Private</Button>
                 );
             }
-            actions.push(
-                <Button fluid onClick={() => this.toggleAction('TRANSFER')}>Transfer</Button>
-            );
+            // actions.push(
+            //     <Button fluid onClick={() => this.toggleAction('TRANSFER')}>Transfer</Button>
+            // );
         }
         //blank one in case odd elements
         if (actions.length % 2 == 1) {
@@ -469,7 +474,7 @@ class PixelDescriptionBox extends Component {
                         Click a Property on the canvas or enter the coordinates here to see more about a property.
                     </p>
                 </Segment>}
-                {this.state.x != '' && this.state.y != '' &&
+                {this.state.x != '' && this.state.y != '' && !this.state.noAccount &&
                     <Segment>
                         <Grid columns='two' divided>
                             {this.getActionsList().map((action, i) => (
@@ -485,13 +490,15 @@ class PixelDescriptionBox extends Component {
                         </Grid>
                     </Segment>
                 } 
+            
                 <BuyPixelForm isOpen={this.state.isOpen.BUY} close={this.toggleAction.bind(this)}/>
                 <SellPixelForm isOpen={this.state.isOpen.SELL} close={this.toggleAction.bind(this)}/>
                 <SetPixelColorForm isOpen={this.state.isOpen.SET_IMAGE} close={this.toggleAction.bind(this)}/>
                 <CancelSaleForm isOpen={this.state.isOpen.CANCEL_SALE} close={this.toggleAction.bind(this)}/>
                 <MakePublicForm isOpen={this.state.isOpen.SET_PUBLIC} close={this.toggleAction.bind(this)}/>
                 <MakePrivateForm isOpen={this.state.isOpen.SET_PRIVATE} close={this.toggleAction.bind(this)}/>
-                <TransferPropertyForm isOpen={this.state.isOpen.TRANSFER} close={this.toggleAction.bind(this)}/>
+                {/*<TransferPropertyForm isOpen={this.state.isOpen.TRANSFER} close={this.toggleAction.bind(this)}/>*/}
+                <PlaceBidForm isOpen={this.state.isOpen.PLACE_BID} close={this.toggleAction.bind(this)}/>
             </SegmentGroup>
         );
     }

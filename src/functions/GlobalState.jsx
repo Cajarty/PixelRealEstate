@@ -13,8 +13,10 @@ export class GlobalState {
             canvasTopOffset: null,
             canvasLeftOffset: null,
             advancedMode: true,
+            noAccount: false,
             screenWidth: 100,
             screenHeight: 100,
+            balance: 0, //total amount of PXL owned.
         };
         this.limiters = {
             

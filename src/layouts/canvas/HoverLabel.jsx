@@ -74,7 +74,6 @@ class HoverLabel extends Component {
     }
 
     updateLabel(x, y) {
-        console.info(x, y)
         if (x < 0 || y < 0) {
             this.setState({show: false});
             this.forceUpdate();

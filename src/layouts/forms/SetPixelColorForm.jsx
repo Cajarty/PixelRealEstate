@@ -252,7 +252,9 @@ class SetPixelColorForm extends Component {
     }
 
     setPixels() {
-        ctr.setColors(this.state.x - 1, this.state.y - 1, this.state.imageData, this.state.ppt);
+        ctr.setColors(this.state.x - 1, this.state.y - 1, this.state.imageData, this.state.ppt, (result) => {
+            this.toggleModal(!result);
+        });
     }
 
     toggleModal(set = null) {

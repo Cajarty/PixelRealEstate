@@ -12,7 +12,6 @@ class TransferPropertyForm extends Component {
             x: '',
             y: '',
             valueNewOwner: '',
-            isMetaMaskOpen: false,
         };
     }
 
@@ -51,9 +50,8 @@ class TransferPropertyForm extends Component {
         this.setState({valueNewOwner: newOwner});
     }
 
-    toggleModal(set = null) {
-        if (this.state.isMetaMaskOpen)
-            return;
+    toggleModal(set = null, a) {
+        console.info(set, a);
         let res = set != null ? set : !this.state.isOpen;
         this.setState({isOpen: res});
         if (!res)
@@ -62,13 +60,9 @@ class TransferPropertyForm extends Component {
 
     dialogResults(res) {
         if (res) {
-            this.setState({isMetaMaskOpen: true})
             ctr.transferProperty(this.state.x - 1, this.state.y - 1, this.state.valueNewOwner, (res) => {
-                this.setState({isOpen: !res, isMetaMaskOpen: false});
+                this.toggleModal(!res);
             })
-        } else {
-            this.setState({isOpen: false, isMetaMaskOpen: false});
-            this.toggleModal(false);
         }
     }
 
@@ -77,42 +71,12 @@ class TransferPropertyForm extends Component {
             <Modal size='mini' 
                 open={this.state.isOpen} 
                 closeIcon 
+                closeOnRootNodeClick={true}
+                closeOnDocumentClick={false}
                 onClose={() => this.toggleModal(false)}
                 >
                 <ModalHeader>Transfer Property</ModalHeader>
                 <ModalContent>
-                    <div className='twoColumn w50 left'>
-                        <Input
-                            placeholder="1 - 100"
-                            type="number"
-                            className='oneColumnFull'
-                            fluid
-                            label={<Popup
-                                trigger={<Label className='uniform'>X</Label>}
-                                content='X Position'
-                                className='Popup'
-                                size='tiny'
-                            />}
-                            value={this.state.x} 
-                            onChange={(e) => this.setX(e.target.value)}
-                        />
-                        </div>
-                        <div className='twoColumn w50 right'>
-                        <Input
-                            placeholder="1 - 100"
-                            type="number"
-                            label={<Popup
-                                trigger={<Label className='uniform'>Y</Label>}
-                                content='Y Position'
-                                className='Popup'
-                                size='tiny'
-                            />}
-                            className='oneColumnFull'
-                            fluid
-                            value={this.state.y} 
-                            onChange={(e) => this.setY(e.target.value)}
-                        />
-                    </div>
                 <Divider horizontal>New Owner</Divider>
                 <Input
                     placeholder="Address"

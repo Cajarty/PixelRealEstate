@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
 import {Contract, ctr} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions.jsx';
+import {Modal, ModalActions, ModalHeader, ModalContent, Input, Button} from 'semantic-ui-react';
 
 class SetHoverText extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            linkText: 'http://',
+            linkText: '',
         };
     }
 
@@ -18,43 +19,32 @@ class SetHoverText extends Component {
 
     handleInput(key, value) {
         let obj = {};
-        if (!/^https?:\/\//i.test(value)) {
-            value = 'http://' + value;
-        }
         obj[key] = value;
         this.setState(obj);
     }
 
     render() {
         return (
-            <table cellSpacing={0} cellPadding={0} className='form'>
-                <tbody>
-                    <tr>
-                        <td>
-                            <div className='title'>
-                                Set Property Link:
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div className='inputTitle'>Link</div>
-                            <input 
-                                id='linkText' 
-                                type='text' 
-                                maxLength={64} 
-                                onChange={(e) => this.handleInput('linkText', e.target.value)} 
-                                value={this.state.linkText}
-                            ></input>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input type='button' value='Set Link' onClick={() => ctr.setLink(this.state.linkText)}></input>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <Modal
+                closeIcon
+                size='tiny'
+                trigger={<Button style={{marginTop: '16px'}} fluid>Set Link</Button>}
+            >
+                <ModalHeader>Set Property Links</ModalHeader>
+                <ModalContent>
+                    <Input 
+                        fluid
+                        label='http://' 
+                        placeholder='website.com'
+                        maxLength={64} 
+                        onChange={(e) => this.handleInput('linkText', e.target.value)} 
+                        value={this.state.linkText}
+                    />
+                </ModalContent>
+                <ModalActions>
+                    <Button primary onClick={() => ctr.setLink('http://' + this.state.linkText)}>Set Link</Button>
+                </ModalActions>
+            </Modal>
         );
     }
 }

@@ -1,0 +1,133 @@
+body {
+    background-color: $color1;
+    color: rgba(0, 0, 0, .6);
+    font-family: Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    text-transform: none;
+    text-shadow: none;
+    font-weight: 700;
+    line-height: 1em;
+    font-style: normal;
+    text-decoration: none;
+}
+
+.ui.label>.icon {
+    margin: 0px;
+    &.uniform {
+        width: 14px;
+    }
+}
+
+.ui.segment,
+.ui.segments {
+    background-color: $color3 !important;
+    &.attached {
+        border-left: 1px solid darken($color3, 10%);
+        border-right: 1px solid darken($color3, 10%);
+        border-top: 0;
+        border-bottom: 0;
+    }
+}
+
+.ui.attached {
+    &.button {
+        background-color: darken($color3, 5%);
+        border-right: 1px solid darken($color3, 10%);
+        border-left: 1px solid darken($color3, 10%);
+        box-shadow: none !important;
+        width: calc(100% + 2px);
+        margin-left: -1px !important;
+        &.top {
+            border-top: 1px solid darken($color3, 10%);
+        }
+        &.bottom {
+            border-bottom: 1px solid darken($color3, 10%);
+        }
+    }
+    &.button:hover {
+        background-color: darken($color3, 10%);
+    }
+}
+
+.ui.items {
+    margin: 1em 0px;
+    .content {
+        font-size: 1.3em !important;
+        padding-left: .5em !important;
+    }
+}
+
+.buySlider {
+    width: 100%;
+    div {
+        width: 97%;
+    }
+    input {
+        padding: 0px !important;
+        margin: 8px !important;
+        width: 100%;
+    }
+}
+
+.ui.raised.segment.segmentButton {
+    &:hover {
+        background-color: darken($color3, 4%) !important;
+        cursor: pointer;
+    }
+    &:active {
+        background-color: darken($color3, 7%) !important;
+    }
+}
+
+.ui.stretched.divided.grid {
+    height: calc(100% + 2rem);
+    .row {
+        height: 100%;
+    }
+    .column {
+        height: 100%;
+        .segment {
+            height: 100%;
+        }
+    }
+}
+
+.ui.segment.active.loading.tab.topPane {
+    &::before {
+        top: 50%;
+    }
+    &::after {
+        top: 50%;
+    }
+}
+
+.ui.segment.tab {
+    &.topPane {
+        height: 420px;
+    }
+    &.middlePane {
+        height: 400px;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    &.bottomPane {
+        height: 400px;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+}
+
+.ui.disabled.input {
+    opacity: 1;
+}
+
+.item.xLabel {
+    float: left;
+}
+
+.item.yLabel {
+    text-align: right
+}
+
+.ui.fluid.button.delistButton {
+    margin-top: -6px !important;
+}

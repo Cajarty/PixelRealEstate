@@ -1,7 +1,10 @@
-import {ctr, Contract, EVENTS, LISTENERS} from './contract.jsx';
+
+import * as EVENTS from '../const/events';
+import {ctr, Contract, LISTENERS} from './contract.jsx';
 import Axios from '../network/Axios.jsx';
 import * as Func from '../functions/functions.jsx';
 import * as Assets from '../const/assets';
+import * as Struct from '../const/structs';
 
 export const Compares = {
     xAsc: { 
@@ -50,89 +53,114 @@ export class ServerDataManager {
         //for network requests
         this.cancelDataRequestToken = null;
         this.cancelImageRequestToken = null;
+
+        this.evHndl = {
+            [EVENTS.PropertyColorUpdate]: null,
+            [EVENTS.PropertyBought]: null,
+            [EVENTS.SetUserHoverText]: null,
+            [EVENTS.SetUserSetLink]: null,
+            [EVENTS.PropertySetForSale]: null,
+            [EVENTS.DelistProperty]: null,
+            [EVENTS.SetPropertyPublic]: null,
+            [EVENTS.SetPropertyPrivate]: null,
+            [EVENTS.Bid]: null,
+        };
     }
 
     destructor() {
-        ctr.stopListeningForEvent(EVENTS.PropertyColorUpdate, 'SDM-PropertyColorUpdate');
-        ctr.stopListeningForEvent(EVENTS.PropertyColorUpdatePixel, 'SDM-PropertyColorUpdatePixel');
-        ctr.stopListeningForEvent(EVENTS.PropertyBought, 'SDM-PropertyBought');
-        ctr.stopListeningForEvent(EVENTS.SetUserHoverText, 'SDM-SetUserHoverText');
-        ctr.stopListeningForEvent(EVENTS.SetUserSetLink, 'SDM-SetUserSetLink');
-        ctr.stopListeningForEvent(EVENTS.PropertySetForSale, 'SDM-PropertySetForSale');
-        ctr.stopListeningForEvent(EVENTS.DelistProperty, 'SDM-DelistProperty');
-        ctr.stopListeningForEvent(EVENTS.ListTradeOffer, 'SDM-ListTradeOffer');
-        ctr.stopListeningForEvent(EVENTS.AcceptTradeOffer, 'SDM-AcceptTradeOffer');
-        ctr.stopListeningForEvent(EVENTS.CancelTradeOffer, 'SDM-CancelTradeOffer');
-        ctr.stopListeningForEvent(EVENTS.SetPropertyPublic, 'SDM-SetPropertyPublic');
-        ctr.stopListeningForEvent(EVENTS.SetPropertyPrivate, 'SDM-SetPropertyPrivate');
-        ctr.stopListeningForEvent(EVENTS.Bid, 'SDM-Bid');
+        Object.keys(this.evHndl).map((key, i) => {
+            this.evHndl[key].stopWatching();
+        });
     }
 
     setupEvents() {
-        ctr.listenForEvent(EVENTS.PropertyColorUpdate, 'SDM-PropertyColorUpdate', (data) => {
-            let xy = {x: 0, y: 0};
-            if (data.args.x == null || data.args.y == null)
-                xy = ctr.fromID(Func.BigNumberToNumber(data.args.property));
-            else {
-                xy.x = data.args.x;
-                xy.y = data.args.y;
-            }
 
-            this.forceUpdatePropertyData(xy.x, xy.y);
-
-            if (data.args.colorsRGB == null)
-                this.insertPropertyImage(xy.x, xy.y, Func.ContractDataToRGBAArray(data.args.colors));
-            else
-                this.insertPropertyImage(xy.x, xy.y, data.args.colorsRGB);
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (handle) => {
+            this.evHndl[EVENTS.PropertyColorUpdate] = handle;
+            this.evHndl[EVENTS.PropertyColorUpdate].watch((error, log) => {
+                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
+                let colors = Func.ContractDataToRGBAArray(log.args.colors);
+                this.forceUpdatePropertyData(id.x, id.y);
+                this.insertPropertyImage(id.x, id.y, colors);
+            });
         });
 
-        ctr.listenForEvent(EVENTS.PropertyColorUpdatePixel, 'SDM-PropertyColorUpdatePixel', (data) => {
-            this.insertProperty(data.args);
-            this.organizeProperty(data.args);
+        ctr.watchEventLogs(EVENTS.PropertyBought, {}, (handle) => {
+            this.evHndl[EVENTS.PropertyBought] = handle;
+            this.evHndl[EVENTS.PropertyBought].watch((error, log) => {
+                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
+                this.updateProperty(id.x, id.y, {owner: log.args.newOwner});
+                this.organizeProperty(id.x, id.y);
+            });
         });
-        ctr.listenForEvent(EVENTS.PropertyBought, 'SDM-PropertyBought', (data) => {
-            let pos = ctr.fromID(Func.BigNumberToNumber(data.args.property));
-            this.updateProperty(pos.x, pos.y, {owner: data.args.newOwner});
-            this.organizeProperty(pos.x, pos.y);
+
+        ctr.watchEventLogs(EVENTS.SetUserHoverText, {}, (handle) => {
+            this.evHndl[EVENTS.SetUserHoverText] = handle;
+            this.evHndl[EVENTS.SetUserHoverText].watch((error, log) => {
+                console.error('No Event handler for ', Event.SetUserHoverText);
+            });
         });
-        ctr.listenForEvent(EVENTS.SetUserHoverText, 'SDM-SetUserHoverText', (data) => {
+
+        ctr.watchEventLogs(EVENTS.SetUserSetLink, {}, (handle) => {
+            this.evHndl[EVENTS.SetUserSetLink] = handle;
+            this.evHndl[EVENTS.SetUserSetLink].watch((error, log) => {
+                console.error('No Event handler for ', Event.SetUserSetLink);
+            });
         });
-        ctr.listenForEvent(EVENTS.SetUserSetLink, 'SDM-SetUserSetLink', (data) => {
+
+        ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (handle) => {
+            this.evHndl[EVENTS.PropertySetForSale] = handle;
+            this.evHndl[EVENTS.PropertySetForSale].watch((error, log) => {
+                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
+                this.updateProperty(id.x, id.y, {isForSale: true});
+                this.organizeProperty(id.x, id.y);
+            });
         });
-        ctr.listenForEvent(EVENTS.PropertySetForSale, 'SDM-PropertySetForSale', (data) => {
-            let pos = ctr.fromID(Func.BigNumberToNumber(data.args.property));
-            this.updateProperty(pos.x, pos.y, {isForSale: true});
-            this.organizeProperty(pos.x, pos.y);
+
+        ctr.watchEventLogs(EVENTS.DelistProperty, {}, (handle) => {
+            this.evHndl[EVENTS.DelistProperty] = handle;
+            this.evHndl[EVENTS.DelistProperty].watch((error, log) => {
+                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
+                this.updateProperty(id.x, id.y, {isForSale: false});
+                this.organizeProperty(id.x, id.y);
+            });
         });
-        ctr.listenForEvent(EVENTS.DelistProperty, 'SDM-DelistProperty', (data) => {
-            let pos = ctr.fromID(Func.BigNumberToNumber(data.args.property));
-            this.updateProperty(pos.x, pos.y, {isForSale: false});
-            this.organizeProperty(pos.x, pos.y);
+
+        ctr.watchEventLogs(EVENTS.SetPropertyPublic, {}, (handle) => {
+            this.evHndl[EVENTS.SetPropertyPublic] = handle;
+            this.evHndl[EVENTS.SetPropertyPublic].watch((error, log) => {
+                console.info(log);
+                throw 'Need to update the correct data here.';
+                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
+                this.updateProperty(id.x, id.y, {isForSale: false});
+                this.organizeProperty(id.x, id.y);
+            });
         });
-        ctr.listenForEvent(EVENTS.ListTradeOffer, 'SDM-ListTradeOffer', (data) => {
+
+        ctr.watchEventLogs(EVENTS.SetPropertyPrivate, {}, (handle) => {
+            this.evHndl[EVENTS.SetPropertyPrivate] = handle;
+            this.evHndl[EVENTS.SetPropertyPrivate].watch((error, log) => {
+                console.info(log);
+                throw 'Need to update the correct data here.';
+                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
+                this.updateProperty(id.x, id.y, {isForSale: false});
+                this.organizeProperty(id.x, id.y);
+            });
         });
-        ctr.listenForEvent(EVENTS.AcceptTradeOffer, 'SDM-AcceptTradeOffer', (data) => {
-        });
-        ctr.listenForEvent(EVENTS.CancelTradeOffer, 'SDM-CancelTradeOffer', (data) => {
-        });
-        ctr.listenForEvent(EVENTS.SetPropertyPublic, 'SDM-SetPropertyPublic', (data) => {
-            this.insertProperty(data.args);
-            this.organizeProperty(data.args);
-        });
-        ctr.listenForEvent(EVENTS.SetPropertyPrivate, 'SDM-SetPropertyPrivate', (data) => {
-            this.insertProperty(data.args);
-            this.organizeProperty(data.args);
-        });
-        ctr.listenForEvent(EVENTS.Bid, 'SDM-Bid', (data) => {
-            let bid = Func.BigNumberToNumber(data.args.bid);
-            let xy = ctr.fromID(Func.BigNumberToNumber(data.args.property));
-            let timestamp = Func.BigNumberToNumber(data.args.timestamp);
-            let x = xy.x, y = xy.y;
-            if (this.bids[x] == null) 
-                this.bids[x] = {};
-            if (this.bids[x][y] == null)
-                this.bids[x][y] = {};
-            this.bids[x][y][timestamp] = bid;
+
+        ctr.watchEventLogs(EVENTS.Bid, {}, (handle) => {
+            this.evHndl[EVENTS.Bid] = handle;
+            this.evHndl[EVENTS.Bid].watch((error, log) => {
+                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
+                let bid = Func.BigNumberToNumber(log.args.bid);
+                let timestamp = Func.BigNumberToNumber(log.args.timestamp);
+                let x = id.x, y = id.y;
+                if (this.bids[x] == null) 
+                    this.bids[x] = {};
+                if (this.bids[x][y] == null)
+                    this.bids[x][y] = {};
+                this.bids[x][y][timestamp] = bid;
+            });
         });
     }
 
@@ -179,7 +207,7 @@ export class ServerDataManager {
                     this.pixelData[y][x * 4 + i] = RGBArray[counter++];
     }
 
-    forceUpdatePropertyData(x, y) {
+    forceUpdatePropertyData(x, y, callback = () => {}) {
         ctr.getPropertyData(x, y, (data) => {
             let ethp = Func.BigNumberToNumber(data[1]);
             let ppcp = Func.BigNumberToNumber(data[2]);
@@ -192,6 +220,7 @@ export class ServerDataManager {
                 isInPrivate: data[4],
             };
             this.updateProperty(x, y, update);
+            callback(update);
         });
     }
 
@@ -251,6 +280,23 @@ export class ServerDataManager {
     }
 
     /*
+    returns a property at a location.
+    */
+    getPropertyData(x, y) {
+        if (this.allProperties[x] == null || this.allProperties[x][y] == null) {
+            return Struct.PropertyData();
+        }
+        return this.allProperties[x][y];
+    }
+
+    /*
+    returns a property at a location.
+    */
+    isPropertyLoaded(x, y) {
+        return (this.allProperties[x] != null && this.allProperties[x][y] != null);
+    }
+
+    /*
     Puts a new property or update on the main list into it.
     */
     insertProperty(x, y, property) {
@@ -260,18 +306,30 @@ export class ServerDataManager {
     }
 
     orderPropertyList(objList, compFunc) {
-        let list = [];
-        Object.keys(objList).map(x => {
-            Object.keys(objList[x]).map(y => {
-                let i = 0;
-                for (; i < list.length; i++) {
-                    if (compFunc(objList[x][y], list[i]))
-                        break;
-                }
-                list.splice(i, 0, objList[x][y]);
-            });
+        return new Promise(resolve => {
+            let list = [];
+            if (objList == null || Object.keys(objList).length == 0) {
+                setTimeout(() => {
+                    resolve(this.orderPropertyList(objList, compFunc));
+                }, 1000);
+            } else {
+                let height = Object.keys(objList).length;
+                let width = Object.keys(objList).length;
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        if (objList[x] != null && objList[x][y] != null) {
+                            let i = 0;
+                            for (; i < list.length; i++) {
+                                if (compFunc(objList[x][y], list[i]))
+                                    break;
+                            }
+                            list.splice(i, 0, objList[x][y]);
+                        }
+                    };
+                };
+                resolve(list);
+            }
         });
-        return list;
     }
 
     partialOrderPropertyListByIndex(sortedArray, objArr, startIndex, endIndex, compFunc) {
@@ -289,7 +347,7 @@ export class ServerDataManager {
 
     orderPropertyListAsync(objList, compFunc) {
         let index = 0;
-        let block = 100;
+        let block = 1000;
         let sortedArray = [];
 
         let objArr = [];
@@ -308,7 +366,7 @@ export class ServerDataManager {
                     res({promise: new Promise(repromise), data: sortedArray});
                 else 
                     res({promise: null, data: sortedArray});
-            }, 10);
+            }, 20);
         }
 
         return new Promise(repromise);

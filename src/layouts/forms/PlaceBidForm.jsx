@@ -4,13 +4,13 @@ import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon } from 'semantic-ui-react';
 
-class SellPixelForm extends Component {
+class PlaceBidForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
             x: '',
             y: '',
-            valuePrice: 0,
+            valueBid: 0,
             isOpen: false,
         };
     }
@@ -26,18 +26,13 @@ class SellPixelForm extends Component {
     }
 
     componentDidMount() {
-        GFD.listen('x', 'sellPixel', (x) => {
+        GFD.listen('x', 'placeBid', (x) => {
             this.setState({x});
-        })
-        GFD.listen('y', 'sellPixel', (y) => {
-            this.setState({y});
-        })
-        ctr.getSystemSalePrices((data) => {
-            let ppc = Func.BigNumberToNumber(data[1]);
-            this.setState({
-                valuePrice: ppc, 
-            });
         });
+        GFD.listen('y', 'placeBid', (y) => {
+            this.setState({y});
+        });
+        
     }
 
     componentWillUnmount() {
@@ -52,26 +47,29 @@ class SellPixelForm extends Component {
         GFD.setData('y', y);
     }
 
-    handlePrice(key, value) {
-        let obj = {};
-        obj[key] = parseInt(value);
-        this.setState(obj);
+    handlePrice(value) {
+        if (value < 0)
+            value = 0;
+        if (value >= GFD.getData('balance')) {
+            value = GFD.getData('balance') - 1;
+        }
+        this.setState({valueBid: value});
     }
 
     toggleModal(set = null) {
         let res = set != null ? set : !this.state.isOpen;
         this.setState({isOpen: res});
-        this.props.close('SELL');
+        this.props.close('PLACE_BID');
     }
 
     render() {
         return (
-            <Modal size='tiny' 
-            open={this.state.isOpen} 
-            closeIcon 
-            onClose={() => this.toggleModal(false)}
+            <Modal size='mini' 
+                open={this.state.isOpen} 
+                closeIcon 
+                onClose={() => this.toggleModal(false)}
             >
-            <ModalHeader>Sell Property</ModalHeader>
+            <ModalHeader>Place Property Bid</ModalHeader>
             <ModalContent>
                 <div className='twoColumn w50 left'>
                     <Input
@@ -105,34 +103,44 @@ class SellPixelForm extends Component {
                         onChange={(e) => this.setY(e.target.value)}
                     />
                     </div>
-                    <Divider horizontal>PXL Price</Divider>
+                    <Divider horizontal>PXL Bid</Divider>
                     <Input 
-                        fluid
-                        labelPosition='right' 
-                        type={"number"}
-                        placeholder={"Enter PXL"}
-                        className='oneColumn'
-                        value={this.state.valuePrice}
-                    >
-                        <Popup
-                            trigger={<Label><Icon className='uniform' name='money'/></Label>}
-                            content='Price in PXL'
-                            className='Popup'
-                            size='tiny'
-                        />
-                        <input 
-                        className='bid'
-                        onChange={(e) => this.handlePrice('valuePrice', e.target.value)}
-                        />
-                        <Label>PXL</Label>
-                    </Input>
+                    fluid
+                    labelPosition='right' 
+                    type={"number"}
+                    placeholder={"Enter Bid"}
+                    className='oneColumn'
+                    value={this.state.valueBid}
+                >
+                    <Popup
+                        trigger={<Label><Icon className='uniform' name='money'/></Label>}
+                        content='PXL to Bid'
+                        className='Popup'
+                        size='tiny'
+                    />
+                    <input 
+                    className='bid'
+                    onChange={(e) => this.handlePrice(e.target.value)}
+                    />
+                    <Label>PXL</Label>
+                </Input>
+                    <FormInput
+                        className='buySlider'
+                        min={0}
+                        max={GFD.getData('balance') - 1}
+                        type='range'
+                        step={1}
+                        value={this.state.valueBid}
+                        onChange={(e) => this.handlePrice(e.target.value)}
+                    />
+                   
             </ModalContent>
             <ModalActions>
-                <Button primary onClick={() => ctr.sellProperty(this.state.x - 1, this.state.y - 1, this.state.valuePrice)}>Sell Property</Button>
+                <Button primary onClick={() => ctr.makeBid(this.state.x - 1, this.state.y - 1, parseInt(this.state.valueBid))}>Place Bid</Button>
             </ModalActions>
         </Modal>
         );
     }
 }
 
-export default SellPixelForm
+export default PlaceBidForm

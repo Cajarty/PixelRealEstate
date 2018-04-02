@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import {Contract, ctr} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions.jsx';
 import * as web3 from 'web3';
+import {Modal, ModalActions, ModalHeader, ModalContent, Input, Button, Popup, Label, Icon} from 'semantic-ui-react';
 
 class SetHoverText extends Component {
     constructor(props) {
@@ -25,34 +26,31 @@ class SetHoverText extends Component {
 
     render() {
         return (
-            <table cellSpacing={0} cellPadding={0} className='form'>
-                <tbody>
-                    <tr>
-                        <td>
-                            <div className='title'>
-                                Set Hover Text:
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div className='inputTitle'> Y: </div>
-                            <input 
-                                id='hoverText' 
-                                maxLength={64} 
-                                type='text' 
-                                onChange={(e) => this.handleInput('hoverText', e.target.value)} 
-                                value={this.state.hoverText}
-                            ></input>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input type='button' value='Set Hover Text' onClick={() => ctr.setHoverText(this.state.hoverText)}></input>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <Modal
+                closeIcon
+                size='tiny'
+                trigger={<Button fluid>Set Hover Text</Button>}
+            >
+                <ModalHeader>Set Property Hover Texts</ModalHeader>
+                <ModalContent>
+                    <Input 
+                        fluid
+                        label={<Popup
+                            trigger={<Label><Icon className='uniform' name='comment'/></Label>}
+                            content='Hover Text'
+                            className='Popup'
+                            size='tiny'
+                        />}
+                        placeholder='Max 64 Characters'
+                        maxLength={64} 
+                        onChange={(e) => this.handleInput('hoverText', e.target.value)} 
+                        value={this.state.hoverText}
+                    />
+                </ModalContent>
+                <ModalActions>
+                    <Button primary onClick={() => ctr.setHoverText(this.state.hoverText)}>Set Hover Text</Button>
+                </ModalActions>
+            </Modal>
         );
     }
 }

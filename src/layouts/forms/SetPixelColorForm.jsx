@@ -5,6 +5,8 @@ import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import { ChromePicker } from 'react-color';
 import * as Assets from '../../const/assets';
+import { Modal, ModalContent, ModalHeader, Button, Divider, Input, Popup, Label, ModalActions, Icon, Segment, Grid, GridColumn, GridRow, ButtonGroup } from 'semantic-ui-react';
+import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
 
 const PREVIEW_WIDTH = 100;
 const PREVIEW_HEIGHT = 100;
@@ -25,6 +27,8 @@ class SetPixelColorForm extends Component {
             ppt: '0',
             ctxLrg: null,
             ctxSml: null,
+            canvasLrg: null,
+            canvasSml: null,
             imageData: null,
             drawColor: {
                     r: 255,
@@ -33,6 +37,7 @@ class SetPixelColorForm extends Component {
                     a: 255,
                   },
             drawMode: DrawMode.PIXEL,
+            isOpen: false,
         };
     }
     
@@ -46,8 +51,17 @@ class SetPixelColorForm extends Component {
         this.setState(update);
     }
 
-    componentWillUnmount() {
+    componentDidUnmountOpen() {
         GFD.closeAll('UpdatePixel');
+        this.state.canvasLrg.onmousedown = null;
+        this.state.canvasLrg.onmouseup = null;
+        this.state.canvasLrg.onmousemove = null;
+        this.setState({
+            ctxLrg: null,
+            ctxSml: null,
+            canvasLrg: null,
+            canvasSml: null,
+        })
     }
 
     setX(x) {
@@ -64,9 +78,13 @@ class SetPixelColorForm extends Component {
         this.setState(obj);
     }
 
-    componentDidMount() {
-        let ctxLrg = this.canvasLrg.getContext("2d");
-        let ctxSml = this.canvasSml.getContext("2d");
+    componentDidMountOpen() {
+        let canvasLrg = document.querySelector('canvas#large');
+        let canvasSml = document.querySelector('canvas#normal');
+        if (canvasLrg == null || canvasSml == null)
+            return;
+        let ctxLrg = canvasLrg.getContext("2d");
+        let ctxSml = canvasSml.getContext("2d");
         ctxLrg.imageSmoothingEnabled = false;
         ctxSml.imageSmoothingEnabled = false;
         this.canvasLrg.onmousedown = this.canvasLrg.onmouseenter = (ev) => {
@@ -85,6 +103,8 @@ class SetPixelColorForm extends Component {
         this.setState({
             ctxLrg, 
             ctxSml,
+            canvasLrg,
+            canvasSml
         });
         GFD.listen('x', 'UpdatePixel', (x) => {
             this.setState({x});
@@ -92,6 +112,7 @@ class SetPixelColorForm extends Component {
         GFD.listen('y', 'UpdatePixel', (y) => {
             this.setState({y});
         })
+        this.setCanvas(SDM.getPropertyImage(GFD.getData('x') - 1, GFD.getData('y') - 1), ctxSml, ctxLrg, canvasSml);
         this.drawImages();
     }
 
@@ -116,6 +137,19 @@ class SetPixelColorForm extends Component {
             default:
                 return;
         }
+    }
+
+    setCanvas(rgbArr, ctxSml = this.state.ctxSml, ctxLrg = this.state.ctxLrg, canvasSml = this.state.canvasSml) {
+        let ctxID = ctxSml.createImageData(10, 10);
+        for (let i = 0; i < rgbArr.length; i++) {
+            ctxID.data[i] = rgbArr[i];
+        }
+        ctxSml.putImageData(ctxID, 0, 0);
+        ctxLrg.drawImage(canvasSml, 0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT);
+
+        this.setState({
+            imageData: ctxSml.getImageData(0, 0, Const.PROPERTY_LENGTH, Const.PROPERTY_LENGTH).data,
+        });
     }
 
     pickPixelColor(x, y) {
@@ -218,114 +252,258 @@ class SetPixelColorForm extends Component {
     }
 
     setPixels() {
-        ctr.setColors(this.state.x - 1, this.state.y - 1, this.state.imageData, this.state.ppt);
+        ctr.setColors(this.state.x - 1, this.state.y - 1, this.state.imageData, this.state.ppt, (result) => {
+            this.toggleModal(!result);
+        });
+    }
+
+    toggleModal(set = null) {
+        let res = set != null ? set : !this.state.isOpen;
+        this.setState({isOpen: res});
+        this.props.close("SET_IMAGE");
+    }
+
+    clearCanvas() {
+        let ctxID = this.state.ctxLrg.createImageData(100, 100);
+        for (let i = 0; i < 40000; i++) {
+            ctxID.data[i] = 0;
+        }
+        this.state.ctxLrg.putImageData(ctxID, 0, 0);
+        this.state.ctxSml.putImageData(ctxID, 0, 0, 0, 0, 10, 10);
+
+        this.setState({
+            imageData: this.state.ctxSml.getImageData(0, 0, Const.PROPERTY_LENGTH, Const.PROPERTY_LENGTH).data,
+        });
+    }
+
+    loadCanvas() {
+        this.setCanvas(SDM.getPropertyImage(this.state.x - 1, this.state.y - 1), this.state.ctxSml, this.state.ctxLrg, this.state.canvasSml);
+    }
+
+    componentDidUpdate(pP, pS) {
+        if (this.state.isOpen && !pS.isOpen)
+            this.componentDidMountOpen();
+        else if (!this.state.isOpen && pS.isOpen)
+            this.componentDidUnmountOpen();
     }
 
     render() {
+        
         return (
-            <table cellSpacing={0} cellPadding={0} className='SetPixelColorForm form'>
-                <tbody>
-                    <tr>
-                        <td colSpan={2}>
-                            <div className='title'>
-                                Change Property Image:
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <canvas id='large' width={PREVIEW_WIDTH} height={PREVIEW_HEIGHT} ref={(canvasLrg) => { this.canvasLrg = canvasLrg; }}></canvas>
-                        </td>
-                        <td>
-                            <canvas id='normal' width={Const.PROPERTY_LENGTH} height={Const.PROPERTY_LENGTH} ref={(canvasSml) => { this.canvasSml = canvasSml; }}></canvas>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colSpan={2}>
-                            <div className={'toolButton ' + (this.state.drawMode === DrawMode.PIXEL ? 'active' : '')} onClick={() => this.changeTool(DrawMode.PIXEL)} >
-                                <img className='icon' src={Assets.PENCIL} draggable={false}></img>
-                            </div>
-                            <div className={'toolButton ' + (this.state.drawMode === DrawMode.FILL ? 'active' : '')} onClick={() => this.changeTool(DrawMode.FILL)} >
-                                <img className='icon' src={Assets.BUCKET} draggable={false}></img>
-                            </div>
-                            <div className={'toolButton ' + (this.state.drawMode === DrawMode.PICK ? 'active' : '')} onClick={() => this.changeTool(DrawMode.PICK)} >
-                                <img className='icon' src={Assets.DROPPER} draggable={false}></img>
-                            </div>
-                            <div className={'toolButton ' + (this.state.drawMode === DrawMode.ERASE ? 'active' : '')} onClick={() => this.changeTool(DrawMode.ERASE)} >
-                                <img className='icon' src={Assets.ERASE} draggable={false}></img>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colSpan={2}>
-                            <ChromePicker 
-                                className='colorPicker' 
-                                onChangeComplete={(color, event) => this.colorChange(color, event)}
-                                color={this.state.drawColor}
-                                disableAlpha={true}
-                            />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div className='inputTitle'> X: </div>
-                        </td>
-                        <td>
-                            <input 
-                                id='xInput' 
-                                type='number' 
-                                placeholder='1-100'
-                                onChange={(e) => this.setX(e.target.value)} 
-                                value={this.state.x}
-                            ></input>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div className='inputTitle'> Y: </div>
-                        </td>
-                        <td>
-                            <input 
-                                id='yInput' 
-                                type='number'
-                                placeholder='1-100'
-                                onChange={(e) => this.setY(e.target.value)} 
-                                value={this.state.y}
-                            ></input>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div className='inputTitle'> Tokens: </div>
-                        </td>
-                        <td>
-                            <input id='tokens' type='number' onChange={(e) => this.handlePrice('ppt', e.target.value)} value={this.state.ppt}></input>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colSpan={2}>
-                            <input 
-                                id='imageInput' 
-                                type='file' 
-                                onChange={(e) => this.uploadImage(e)} 
-                                style={{display: 'none'}} 
-                                ref={(input) => { this.input = input; }}
-                            ></input>
-                            <input 
-                                id='imageInputButton' 
-                                value='Upload Image' 
-                                type='button' 
-                                onClick={(e) => {this.input.click()}}
-                            ></input>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colSpan={2}>
-                            <input type='button' value='Change Image' onClick={() => this.setPixels()}></input>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <Modal size='small'
+                open={this.state.isOpen} 
+                closeIcon 
+                onClose={() => this.toggleModal(false)}
+            >
+            <ModalHeader>Update Property Image</ModalHeader>
+            <ModalContent>
+                <Segment>
+                    <Grid>
+                        <GridRow columns='two' stretched>
+                            <GridColumn width={9}>
+                                <Segment>
+                                <Grid divided>
+                                    <GridRow columns='two'>
+                                        <GridColumn width={10}>
+                                            <canvas id='large' width={PREVIEW_WIDTH} height={PREVIEW_HEIGHT} ref={(canvasLrg) => { this.canvasLrg = canvasLrg; }}></canvas>
+                                        </GridColumn>
+                                        <GridColumn width={6}>
+                                            <canvas id='normal' width={Const.PROPERTY_LENGTH} height={Const.PROPERTY_LENGTH} ref={(canvasSml) => { this.canvasSml = canvasSml; }}></canvas>
+                                        </GridColumn>
+                                    </GridRow>
+                                    <GridRow>
+                                        <GridColumn width={10}>
+                                            <ButtonGroup fluid>
+                                                <Popup 
+                                                trigger={
+                                                    <Button 
+                                                        icon 
+                                                        active={this.state.drawMode === DrawMode.PIXEL ? true : false}
+                                                        onClick={() => this.changeTool(DrawMode.PIXEL)}
+                                                    ><Icon name='pencil'/></Button>
+                                                }
+                                                content='Pencil Tool'
+                                                position='bottom left'
+                                                className='Popup'
+                                                size='tiny'
+                                                basic
+                                                />
+                                                <Popup 
+                                                trigger={
+                                                    <Button 
+                                                        icon
+                                                        active={this.state.drawMode === DrawMode.FILL ? true : false}
+                                                        onClick={() => this.changeTool(DrawMode.FILL)}
+                                                    ><Icon name='maximize'/></Button>
+                                                }
+                                                content='Fill Tool'
+                                                position='bottom left'
+                                                className='Popup'
+                                                size='tiny'
+                                                basic
+                                                />
+                                                <Popup 
+                                                trigger={
+                                                    <Button 
+                                                        icon name='eyedropper' 
+                                                        active={this.state.drawMode === DrawMode.PICK ? true : false}
+                                                        onClick={() => this.changeTool(DrawMode.PICK)}
+                                                    ><Icon name='eyedropper'/></Button>
+                                                }
+                                                content='Color Picker Tool'
+                                                position='bottom left'
+                                                className='Popup'
+                                                size='tiny'
+                                                basic
+                                                />
+                                                <Popup 
+                                                trigger={
+                                                    <Button 
+                                                        icon
+                                                        active={this.state.drawMode === DrawMode.ERASE ? true : false}
+                                                        onClick={() => this.changeTool(DrawMode.ERASE)}
+                                                    ><Icon name='erase'/></Button>
+                                                }
+                                                content='Eraser Tool'
+                                                position='bottom left'
+                                                className='Popup'
+                                                size='tiny'
+                                                basic
+                                                />
+                                                </ButtonGroup>
+                                            </GridColumn>
+                                            <GridColumn width={6}>
+                                            <ButtonGroup fluid>
+                                                <Popup 
+                                                    trigger={
+                                                        <Button icon
+                                                            onClick={(e) => {this.clearCanvas()}}
+                                                        ><Icon name='trash outline'/></Button>
+                                                    }
+                                                    content='Clear drawing canvas'
+                                                    position='bottom left'
+                                                    className='Popup'
+                                                    size='tiny'
+                                                    basic
+                                                />
+                                                <Popup 
+                                                    trigger={
+                                                        <Button icon
+                                                            onClick={(e) => {this.loadCanvas()}}
+                                                        ><Icon name='cloud upload'/></Button>
+                                                    }
+                                                    content='Load current image'
+                                                    position='bottom left'
+                                                    className='Popup'
+                                                    size='tiny'
+                                                    basic
+                                                />
+                                            </ButtonGroup>
+                                        </GridColumn>
+                                    </GridRow>
+                                    <GridRow>
+                                        <GridColumn width={10}>
+                                        </GridColumn>
+                                        <GridColumn width={6}>
+                                            <input 
+                                                id='imageInput' 
+                                                type='file' 
+                                                onChange={(e) => this.uploadImage(e)} 
+                                                style={{display: 'none'}} 
+                                                ref={(input) => { this.input = input; }}
+                                            ></input>
+                                            <Popup 
+                                                trigger={
+                                                    <Button 
+                                                        fluid
+                                                        id='imageInputButton' 
+                                                        type='button' 
+                                                        onClick={(e) => {this.input.click()}}
+                                                    ><Icon name='upload'/></Button>
+                                                }
+                                                content='Upload from file...'
+                                                position='bottom left'
+                                                className='Popup'
+                                                size='tiny'
+                                                basic
+                                            />
+                                        </GridColumn>
+                                    </GridRow>
+                                </Grid>
+                                </Segment>
+                            </GridColumn>
+                            <GridColumn width={7}>
+                                <Segment>
+                                    <ChromePicker 
+                                        className='colorPicker' 
+                                        onChangeComplete={(color, event) => this.colorChange(color, event)}
+                                        color={this.state.drawColor}
+                                        disableAlpha={true}
+                                    />
+                                </Segment>
+                            </GridColumn>
+                        </GridRow>
+                    </Grid>
+                </Segment>
+                <Divider/>
+                <div className='twoColumn w50 left'>
+                    <Input
+                        placeholder="1 - 100"
+                        type="number"
+                        className='oneColumnFull'
+                        fluid
+                        label={<Popup
+                            trigger={<Label className='uniform'>X</Label>}
+                            content='X Position'
+                            className='Popup'
+                            size='tiny'
+                        />}
+                        value={this.state.x} 
+                        onChange={(e) => this.setX(e.target.value)}
+                    />
+                    </div>
+                    <div className='twoColumn w50 right'>
+                    <Input
+                        placeholder="1 - 100"
+                        type="number"
+                        label={<Popup
+                            trigger={<Label className='uniform'>Y</Label>}
+                            content='Y Position'
+                            className='Popup'
+                            size='tiny'
+                        />}
+                        className='oneColumnFull'
+                        fluid
+                        value={this.state.y} 
+                        onChange={(e) => this.setY(e.target.value)}
+                    />
+                </div>
+                <Divider/>
+                <Input 
+                    fluid
+                    labelPosition='right' 
+                    type={"number"}
+                    placeholder={"Enter Optional PXL"}
+                    className='oneColumn'
+                    value={this.state.ppt}
+                >
+                    <Popup
+                        trigger={<Label><Icon className='uniform' name='money'/></Label>}
+                        content='PXL to Spend'
+                        className='Popup'
+                        size='tiny'
+                    />
+                    <input 
+                    className='bid'
+                    onChange={(e) => this.handlePrice('ppt', e.target.value)}
+                    />
+                    <Label>PXL</Label>
+                </Input>
+                </ModalContent>
+                <ModalActions>
+                    <Button primary onClick={() => this.setPixels()}>Change Image</Button>
+                </ModalActions>
+            </Modal>
         );
     }
 }

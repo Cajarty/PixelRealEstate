@@ -1,12 +1,15 @@
 import React, { Component } from 'react'
 import * as Const from '../../const/const.jsx';
-import {EVENTS, ctr, Contract, LISTENERS} from '../../contract/contract.jsx';
+import * as EVENTS from '../../const/events';
+import {ctr, Contract, LISTENERS} from '../../contract/contract.jsx';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 import * as Func from '../../functions/functions.jsx';
 import Axios from '../../network/Axios.jsx';
 import * as Compress from 'lzwcompress';
 import Zoom from './Zoom';
 import {GFD, GlobalState} from '../../functions/GlobalState';
+import {Label, LabelDetail} from 'semantic-ui-react';
+import * as Struct from '../../const/structs';
 
 
 class ZoomCanvas extends Component {
@@ -67,27 +70,20 @@ class ZoomCanvas extends Component {
             }
         });
 
-        ctr.listenForEvent(EVENTS.PropertyColorUpdate, 'canvasZoom', (data) => {
-            let xy = {x: 0, y: 0, colors: []};
-            if (data.args.x == null || data.args.y == null)
-                xy = ctr.fromID(Func.BigNumberToNumber(data.args.property));
-            else {
-                xy.x = data.args.x;
-                xy.y = data.args.y;
-            }
-
-            if (data.args.colorsRGB == null)
-                xy.colors = Func.ContractDataToRGBAArray(data.args.colors);
-            else
-                xy.colors = data.args.colorsRGB;
-
-            if (this.state.canvasLoaded) 
-                this.setCanvasProperty(xy.x, xy.y, xy.colors);
-            else {
-                let update = this.state.queuedUpdates;
-                update.push(xy);
-                this.setState({queuedUpdates: update});
-            }
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (handle) => {
+            let eventHandle = handle;
+            this.setState({eventHandle});
+            eventHandle.watch((error, log) => {
+                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
+                let colors = Func.ContractDataToRGBAArray(log.args.colors);
+                if (this.state.canvasLoaded) {
+                    this.setCanvasProperty(id.x, id.y, colors);
+                } else {
+                    let update = this.state.queuedUpdates;
+                    update.push(Struct.CondensedColorUpdate(id.x, id.y, colors));
+                    this.setState({queuedUpdates: update});
+                }
+            });
         });
 
         GFD.listen('hoverX', 'zoomCanvas', (hoverX) => {
@@ -98,6 +94,10 @@ class ZoomCanvas extends Component {
             this.setState({hoverY});
             this.drawWindow(GFD.getData('hoverX'), hoverY);
         })
+    }
+
+    componentWillUnmount() {
+        this.state.eventHandle.stopWatching();
     }
 
     setCanvasProperty(x, y, rgbArr) {
@@ -121,7 +121,7 @@ class ZoomCanvas extends Component {
 
     render() {
         return (
-            <div className={'zoomCanvasContainer ' + (this.state.hideCanvas ? 'hide' : 'show')}>
+            <div className={'zoomCanvasContainer'/* + (this.state.hideCanvas ? 'hide' : 'show')*/}>
                 <canvas className='dataCanvas hidden'
                     width={1000}
                     height={1000}
@@ -133,7 +133,8 @@ class ZoomCanvas extends Component {
                     width={100}
                     height={100}
                 ></canvas>
-                <div className={'location ' + (this.state.hoverX == -1 || this.state.hoverY == -1 ? 'hideElement' : '')}>{'x: ' + (this.state.hoverX + 1) + ' y: ' + (this.state.hoverY + 1)}</div>
+                  <Label>X<LabelDetail>{this.state.hoverX + 1}</LabelDetail></Label>
+                  <Label>Y<LabelDetail>{this.state.hoverY + 1}</LabelDetail></Label>
             </div>
         );
     }

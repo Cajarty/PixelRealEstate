@@ -11,6 +11,7 @@
 @import './Panel.scss';
 @import './container.scss';
 @import './Loader.scss';
+@import './semantic-override.scss';
 body {
     margin: 0;
     padding: 0;
@@ -19,4 +20,22 @@ body {
 
 .hideElement {
     display: none;
+}
+
+* ::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 10px;
+}
+
+* ::-webkit-scrollbar-thumb {
+    cursor: pointer;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, .25);
+    -webkit-transition: color .2s ease;
+    transition: color .2s ease;
+}
+
+* ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, .1);
+    border-radius: 0;
 }

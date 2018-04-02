@@ -1,6 +1,5 @@
 body {
     margin: 0px;
-    background-color: $color1;
 }
 
 .page {
@@ -11,14 +10,12 @@ body {
     background-color: $color2;
 }
 
-.top {
+
+/*.top {
     height: 100vh;
     .infoBox {
         display: inline-block;
-        width: calc(100% - 12px);
-        background-color: $color2;
-        border-radius: 8px;
-        padding: 6px;
+        width: 100%
     }
     .leftMain {
         width: $panelWidth;
@@ -52,14 +49,14 @@ body {
             width: $panelWidthSimple;
         }
     }
-}
+}*/
 
 .contractAction {
     border-radius: 4px;
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 ::placeholder {

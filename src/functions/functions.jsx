@@ -5,6 +5,35 @@ var bigInt = require("big-integer");
 var BigNumber = require('bignumber.js');
 var utf8 = require("utf8");
 
+export const TimeSince = (date, to = false) => {
+    let seconds = Math.floor((new Date() - date) / 1000);
+    let interval = Math.floor(seconds / 31536000);
+
+    if (to)
+        seconds = Math.abs(seconds);
+
+    if (interval > 1) {
+        return interval + " years";
+    }
+    interval = Math.floor(seconds / 2592000);
+    if (interval > 1) {
+        return interval + " months";
+    }
+    interval = Math.floor(seconds / 86400);
+    if (interval > 1) {
+        return interval + " days";
+    }
+    interval = Math.floor(seconds / 3600);
+    if (interval > 1) {
+        return interval + " hours";
+    }
+    interval = Math.floor(seconds / 60);
+    if (interval > 1) {
+        return interval + " minutes";
+    }
+    return Math.floor(seconds) + " seconds";
+}
+
 export const Clamp = (min, max, value) => {
     return Math.max(min, Math.min(max, value));
 }
@@ -193,4 +222,11 @@ export const BinaryToRGB = (value) => {
     obj.g = (obj.g & value) >> 8;
     obj.r = (obj.r & value) >> 16;
     return obj;
+}
+
+export const calculateEarnings = (lastUpdate, maxEarnings) => {
+    let now = new Date().getTime();
+    let maxTime = (lastUpdate + (maxEarnings * 60)) * 1000;
+    let current = Math.min(now, maxTime);
+    return Math.floor((current - (lastUpdate * 1000)) / 60000);
 }

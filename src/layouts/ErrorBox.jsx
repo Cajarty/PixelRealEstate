@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../contract/contract.jsx';
 import * as Assets from '../const/assets';
+import {Message} from 'semantic-ui-react';
 
 class ErrorBox extends Component {
     constructor(props) {
@@ -29,7 +30,7 @@ class ErrorBox extends Component {
         let hideErrors = this.state.hideErrors;
         let errors = this.state.errors;
         delete errors[errorId];
-        hideErrors[errorId] = setTimeout(() => this.removeHideError(errorId), 60000);
+        hideErrors[errorId] = setTimeout(() => this.removeHideError(errorId), 6000);
         this.setState({hideErrors, errors});
     }
 
@@ -45,12 +46,16 @@ class ErrorBox extends Component {
 
     render() {
         return (
-            <div className='errorBox'>
+            <div style={this.props.containerStyle}>
                {Object.keys(this.state.errors).map((i) => 
-                    <div key={i} className={'error ' + (this.state.errors[i].errorType)}>
+                    <Message 
+                        onDismiss={() => this.hideError(i)}
+                        key={i} 
+                        floating 
+                        color={this.state.errors[i].errorType}
+                    >
                         <div className='message'>{this.state.errors[i].message}</div>
-                        <img className='close icon' src={Assets.CLOSE} draggable={false} onClick={() => this.hideError(i)}></img>
-                    </div>
+                    </Message>
                )}
             </div>
         );

@@ -3,6 +3,7 @@
 import { default as Web3 } from 'web3';
 import * as Const from '../const/const.jsx';
 import * as Func from '../functions/functions.jsx';
+import * as EVENTS from '../const/events';
 import { default as contract } from 'truffle-contract';
 import {GFD, GlobalState} from '../functions/GlobalState';
 import {SDM, ServerDataManager} from '../contract/ServerDataManager';
@@ -12,9 +13,9 @@ import VirtualRealEstate from '../../build/contracts/VirtualRealEstate.json'
 
 
 export const ERROR_TYPE = {
-    Success: 'success',
-    Warning: 'warning',
-    Error: 'error',
+    Success: 'green',
+    Warning: 'orange',
+    Error: 'red',
 }
 export const LISTENERS = {
     Error: 'Error',
@@ -22,32 +23,6 @@ export const LISTENERS = {
     ShowForSale: 'ShowForSale',
     ServerDataManagerInit: 'ServerDataManagerInit',
 }; 
-
-export const EVENTS = { 
-    PropertyColorUpdate: 'PropertyColorUpdate',                     //(uint24 indexed property, uint256[10] colors, uint256 lastUpdate, address lastUpdaterPayee);
-    PropertyColorUpdatePixel: 'PropertyColorUpdatePixel',           //(uint24 indexed property, uint8 row, uint24 rgb);
-
-    SetUserHoverText: 'SetUserHoverText',                           //(address indexed user, bytes32[2] newHoverText);
-    SetUserSetLink: 'SetUserSetLink',                               //(address indexed user, bytes32[2] newLink);
-
-    PropertyBought: 'PropertyBought',                               //(uint24 indexed property,  address newOwner);
-    PropertySetForSale: 'PropertySetForSale',                       //(uint24 indexed property, uint256 forSalePrice);
-    DelistProperty: 'DelistProperty',                               //(uint24 indexed property);
-
-    ListTradeOffer: 'ListTradeOffer',                               //(address indexed offerOwner, uint256 eth, uint256 pxl, bool isBuyingPxl);
-    AcceptTradeOffer: 'AcceptTradeOffer',                           //(address indexed accepter, address indexed offerOwner);
-    CancelTradeOffer: 'CancelTradeOffer',                           //(address indexed offerOwner);
-
-    SetPropertyPublic: 'SetPropertyPublic',                         //(uint24 indexed property);
-    SetPropertyPrivate: 'SetPropertyPrivate',                       //(uint24 indexed property, uint32 numHoursPrivate);
-
-    Bid: 'Bid',                                                     //(uint24 indexed property, uint256 bid);
-    AccountChange: 'AccountChange',                                 //(newaccount)  -  not a contract event.
-
-    //token events    
-    Transfer: 'Transfer',                                           //(address indexed _from, address indexed _to, uint256 _value);
-    Approval: 'Approval',                                           //(address indexed _owner, address indexed _spender, uint256 _value);
-};
 
 export class Contract {
     constructor() {
@@ -74,8 +49,13 @@ export class Contract {
         });
         
         this.setup();
-        this.test();
     }
+
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------       SETUP & MISC       ----------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
 
     setup() {
         // Checking if Web3 has been injected by the browser (Mist/MetaMask)
@@ -91,7 +71,11 @@ export class Contract {
         this.VRE.setProvider(window.web3.currentProvider);
 
         this.getAccounts();
-        this.setupEvents();
+        //this.setupEvents();
+
+        this.VRE.deployed().then((instance) => {
+            SDM.init();
+        });
         
         this.getAccountsInterval = setInterval(() => this.getAccounts(), 1000);
 
@@ -112,44 +96,111 @@ export class Contract {
             if (accs.length == 0) {
                 if (GFD.getData('advancedMode')) {
                     this.sendResults(LISTENERS.Error, {errorId: 0, errorType: ERROR_TYPE.Error, message: "Couldn't get any accounts! Make sure you're logged into Metamask."});
+                    GFD.setData('noAccount', true);
                 }
                 return;
             }
 
+            GFD.setData('noAccount', false);
             this.sendResults(LISTENERS.Error, {removeErrors: [0, 1], message: ''});
 
             this.accounts = accs;
-            if (this.account != this.accounts[0]) {
-                this.account = this.accounts[0];
+            if (this.account !== this.accounts[0].toLowerCase()) {
+                this.account = this.accounts[0].toLowerCase();
                 this.sendEvent(EVENTS.AccountChange, this.accounts[0]);
             }
         });
     }
 
-    setupEvents() {
-        this.VRE.deployed().then((instance) => {
-            this.events.event = instance.allEvents({fromBlock: 0, toBlock: 'latest'});
-            this.events.event.watch((error, result) => {
-                if (error) {
-                    console.info(result, error);
-                } else {
-                    this.sendEvent(result.event, result);
-                }
-            });
-            SDM.init();
-            this.listenForResults(LISTENERS.ServerDataManagerInit, 'contract', () => {
-                this.stopListeningForResults(LISTENERS.ServerDataManagerInit, 'contract');
-                this.events.event.get((error, result) => {
-                    if (error) {
-                        console.info(result, error);
-                    } else {
-                        for (let i = 0; i < result.length; i++)
-                            this.sendEvent(result[i].event, result[i]);
-                    }
-                });
-            });
-        }).catch((c) => {
-            console.info(c);
+    // setupEvents() {
+    //     this.VRE.deployed().then((instance) => {
+    //         this.events.event = instance.allEvents({fromBlock: 0, toBlock: 'latest'});
+    //         SDM.init();
+    //         this.listenForResults(LISTENERS.ServerDataManagerInit, 'contract', () => {
+    //             this.stopListeningForResults(LISTENERS.ServerDataManagerInit, 'contract');
+    //             this.events.event.watch((error, result) => {
+    //                 if (error) {
+    //                     console.info(result, error);
+    //                 } else {
+    //                     for (let i = 0; i < result.length; i++)
+    //                         this.sendEvent(result[i].event, result[i]);
+    //                 }
+    //             });
+    //         });
+    //     }).catch((c) => {
+    //         console.info(c);
+    //     });
+    // }
+
+    /*
+    Requests all events of event type EVENT.
+    */
+    getEventLogs(event, params = {}, callback) {
+        let responder = (err, evt) => {
+            return callback(evt, err);
+        };
+
+        let filter = {fromBlock: 0, toBlock: 'latest'};
+
+        this.VRE.deployed().then((i) => {
+            switch(event) {
+                case EVENTS.PropertyBought:
+                    return i.PropertyBought(params, filter).get(responder);
+                case EVENTS.PropertyColorUpdate:
+                    return i.PropertyColorUpdate(params, filter).get(responder);
+                case EVENTS.SetUserHoverText:
+                    return i.SetUserHoverText(params, filter).get(responder);
+                case EVENTS.SetUserSetLink:
+                    return i.SetUserSetLink(params, filter).get(responder);
+                case EVENTS.PropertySetForSale:
+                    return i.PropertySetForSale(params, filter).get(responder);
+                case EVENTS.DelistProperty:
+                    return i.DelistProperty(params, filter).get(responder);
+                case EVENTS.SetPropertyPublic:
+                    return i.SetPropertyPublic(params, filter).get(responder);
+                case EVENTS.SetPropertyPrivate:
+                    return i.SetPropertyPrivate(params, filter).get(responder);
+                case EVENTS.Bid:
+                    return i.Bid(params, filter).get(responder);
+                case EVENTS.Transfer:
+                    return i.Transfer(params, filter).get(responder);
+                case EVENTS.Approval:
+                    return i.Approval(params, filter).get(responder);
+            }
+        });
+    }
+
+    /*
+    Requests all events of event type EVENT.
+    */
+    watchEventLogs(event, params = {}, callback) {
+        let filter = {fromBlock: 0, toBlock: 'latest'};
+
+        this.VRE.deployed().then((i) => {
+            switch(event) {
+                case EVENTS.PropertyBought:
+                    return callback(i.PropertyBought(params, filter));
+                case EVENTS.PropertyColorUpdate:
+                    return callback( i.PropertyColorUpdate(params, filter));
+                case EVENTS.SetUserHoverText:
+                    return callback( i.SetUserHoverText(params, filter));
+                case EVENTS.SetUserSetLink:
+                    return callback( i.SetUserSetLink(params, filter));
+                case EVENTS.PropertySetForSale:
+                    return callback( i.PropertySetForSale(params, filter));
+                case EVENTS.DelistProperty:
+                    return callback( i.DelistProperty(params, filter));
+                case EVENTS.SetPropertyPublic:
+                    return callback( i.SetPropertyPublic(params, filter));
+                case EVENTS.SetPropertyPrivate:
+                    return callback( i.SetPropertyPrivate(params, filter));
+                case EVENTS.Bid:
+                    return callback( i.Bid(params, filter));
+                case EVENTS.Transfer:
+                    return callback( i.Transfer(params, filter));
+                case EVENTS.Approval:
+                    return callback( i.Approval(params, filter));
+            }
         });
     }
 
@@ -163,19 +214,21 @@ export class Contract {
         obj.y = Math.floor(id / 100);
         return obj;
     }
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------       SETUP & MISC       ----------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
 
-    getBalance(callback) {
-        this.VRE.deployed().then((i) => {
-            i.balanceOf(this.account, { from: this.account }).then((r) => {
-                callback(Func.BigNumberToNumber(r));
-            });
-        }).catch((e) => {
-            console.info(e);
-            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to retrieve PPC balance."});
-        });
-    }
 
-    buyProperty(x, y, eth, ppc) {
+
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ----------------------------------         SETTERS         ----------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+
+    buyProperty(x, y, eth, ppc, callback) {
         console.info(x, y, eth, ppc);
         this.VRE.deployed().then((i) => {
             if (eth == 0)
@@ -185,10 +238,12 @@ export class Contract {
             else 
                 return i.buyProperty(this.toID(x, y), ppc, {value: eth, from: this.account});
         }).then(() => {
-            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " purchase complete."});
+            callback(true);
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " purchase complete."});
         }).catch((e) => {
+            callback(false);
             console.info(e);
-            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to purchase property " + x + "x" + y + "."});
+            this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to purchase property " + (x + 1) + "x" + (y + 1) + "."});
         });
     }
 
@@ -196,10 +251,23 @@ export class Contract {
         this.VRE.deployed().then((i) => {
             return i.listForSale(this.toID(parseInt(x), parseInt(y)), price, {from: this.account });
         }).then(() => {
-            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " listed for sale."});
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " listed for sale."});
         }).catch((e) => {
             console.log(e);
-            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to put property " + x + "x" + y + " on market."});
+            this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to put property " + (x + 1) + "x" + (y + 1) + " on market."});
+        });
+    }
+
+    delistProperty(x, y, callback) {
+        this.VRE.deployed().then((i) => {
+            return i.delist(this.toID(parseInt(x), parseInt(y)), {from: this.account });
+        }).then(() => {
+            callback(true);
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " listed for sale."});
+        }).catch((e) => {
+            console.log(e);
+            callback(false);
+            this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to put property " + (x + 1) + "x" + (y + 1) + " on market."});
         });
     }
 
@@ -235,6 +303,69 @@ export class Contract {
         });
     }
 
+    transferProperty(x, y, newOwner, callback) { 
+        this.VRE.deployed().then((i) => {
+            return i.transferProperty(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account}).then((r) => {
+                return callback(true);
+            });
+        }).catch((e) => {
+            return callback(false);
+        });
+    }
+
+    makeBid(x, y, bid, callback) {
+        this.VRE.deployed().then((i) => {
+            return i.makeBid(this.toID(x, y), bid, {from: this.account });
+        }).then(() => {
+            callback(true);
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Bid for " + (x + 1) + "x" + (y + 1) + " sent to owner."});
+        }).catch((e) => {
+            callback(false);
+            this.sendResults(LISTENERS.Alert, {result: false, message: "Error placing bid."});
+        });
+    }
+
+    setColors(x, y, data, PPT, callback) {
+        this.VRE.deployed().then((i) => {
+            return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), PPT, {from: this.account });
+        }).then(() => {
+            callback(true);
+            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " pixels changed."});
+        }).catch((e) => {
+            callback(false);
+            this.sendResults(LISTENERS.Alert, {result: false, message: "Error uploading pixels."});
+        });
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ----------------------------------         SETTERS         ----------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ----------------------------------         GETTERS         ----------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    getBalance(callback) {
+        this.VRE.deployed().then((i) => {
+            i.balanceOf(this.account, { from: this.account }).then((r) => {
+                callback(Func.BigNumberToNumber(r));
+            });
+        }).catch((e) => {
+            console.info(e);
+            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to retrieve PPC balance."});
+        });
+    }
+
     getSystemSalePrices(callback) {
         this.VRE.deployed().then((i) => {
             return i.getSystemSalePrices.call().then((r) => {
@@ -255,16 +386,6 @@ export class Contract {
         });
     }
 
-    getForRentPrice(x, y) {
-        this.VRE.deployed().then((i) => {
-            return i.getForRentPrice.call(this.toID(x, y)).then((r) => {
-                return r;
-            });
-        }).catch((e) => {
-            console.log(e);
-        });
-    }
-
     getHoverText(address, callback) {
         this.VRE.deployed().then((i) => {
             return i.getHoverText.call(address).then((r) => {
@@ -279,16 +400,6 @@ export class Contract {
         this.VRE.deployed().then((i) => {
             return i.getLink.call(address).then((r) => {
                 return callback(Func.BigIntsToString(r));
-            });
-        }).catch((e) => {
-            console.log(e);
-        });
-    }
-
-    transferProperty(x, y, newOwner, callback) { 
-        this.VRE.deployed().then((i) => {
-            return i.transferProperty(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account}).then((r) => {
-                return callback(r);
             });
         }).catch((e) => {
             console.log(e);
@@ -326,61 +437,19 @@ export class Contract {
         });
     }
 
-    makeBid(x, y, bid) {
-        this.VRE.deployed().then((i) => {
-            return i.makeBid(this.toID(x, y), bid, {from: this.account });
-        }).then(() => {
-            this.sendResults(LISTENERS.Alert, {result: true, message: "Bid for " + x + "x" + y + " sent to owner."});
-        }).catch((e) => {
-            console.info(e);
-            this.sendResults(LISTENERS.Error, {result: false, message: "Error placing bid."});
-        });
-    }
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ----------------------------------         GETTERS         ----------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
 
-    setColors(x, y, data, PPT) {
-        this.VRE.deployed().then((i) => {
-            return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), PPT, {from: this.account });
-        }).then(() => {
-            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + x + "x" + y + " pixels changed."});
-        }).catch((e) => {
-            console.info(e);
-            this.sendResults(LISTENERS.Error, {result: false, message: "Error uploading pixels."});
-        });
-    }
 
-    rentProperty(x, y, price) {
-        this.VRE.deployed().then((i) => {
-            return i.setLink(this.toID(x, y), {value: price, from: this.account });
-        }).then(function() {
-            console.info("Pixel " + x + "x" + y + " update complete.");
-        }).catch((e) => {
-            console.log(e);
-        });
-    }
 
-    stopRenting(x, y) {
-        this.VRE.deployed().then((i) => {
-            return i.setLink(this.toID(x, y), {from: this.account });
-        }).then(function() {
-            console.info("Pixel " + x + "x" + y + " update complete.");
-        }).catch((e) => {
-            console.log(e);
-        });
-    }
-
-    /*
-    duration == seconds
-    */
-    listForRent(x, y, price, duration) {
-
-    }
-
-    /*
-    Stop renting/selling a pixel you own.
-    */
-    delist(x, y, delistFromSale, delistFromRent) {
-
-    }
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ----------------------------------         EVENTS          ----------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
 
     /*
     Subscriber functions for gnereal updates.
@@ -406,6 +475,8 @@ export class Contract {
     contract.
     */
     listenForEvent(event, key, callback) {
+        if (event !== EVENTS.AccountChange)
+            throw 'No longer using events for contract events. Use get/watchEventLogs';
         this.events[event][key] = callback;
     }
 
@@ -414,28 +485,16 @@ export class Contract {
     }
 
     sendEvent(event, result) {
-        console.info(event, result)
         Object.keys(this.events[event]).map((i) => {
             this.events[event][i](result);
         });
     }
 
-    test() {
-       // this.buyProperty(46, 20, 10000000000000000);
-    }
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ----------------------------------         EVENTS          ----------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------
 }
-/*
-class Test {
-    constructor(test, expected) {
-        this.test = test;
-        this.expected = expected;
-    }
-
-    assert() {
-        if (this.test !== this.expected)
-            throw new Error('Test Failed!');
-        return this.test + ' === ' + this.expected;
-    }
-}*/
 
 export const ctr = new Contract();

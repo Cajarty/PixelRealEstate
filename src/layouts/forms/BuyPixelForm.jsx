@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
+import { Slider } from 'react-semantic-ui-range';
+import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon } from 'semantic-ui-react';
 
 class BuyPixelForm extends Component {
     constructor(props) {
@@ -14,6 +16,7 @@ class BuyPixelForm extends Component {
             PPCSelected: 0,
             ETHToPay: 0,
             PPCToPay: 0,
+            isOpen: false,
         };
     }
 
@@ -61,8 +64,16 @@ class BuyPixelForm extends Component {
 
     buyProperty() {
         if (this.state.x >= 1 && this.state.x <= 100 && this.state.y >= 1 && this.state.y <= 100) {
-            ctr.buyProperty(this.state.x - 1, this.state.y - 1, this.state.ETHToPay, this.state.PPCToPay);
+            ctr.buyProperty(this.state.x - 1, this.state.y - 1, this.state.ETHToPay, this.state.PPCToPay, (result) => {
+                this.toggleModal(!result);
+            });
         }
+    }
+
+    toggleModal(set = null) {
+        let res = set != null ? set : !this.state.isOpen;
+        this.setState({isOpen: res});
+        this.props.close('BUY');
     }
     
     updatePriceSlider(value) {
@@ -89,73 +100,78 @@ class BuyPixelForm extends Component {
 
     render() {
         return (
-            <table cellSpacing={0} cellPadding={0} className='form'>
-                <tbody>
-                    <tr>
-                        <td>
-                            <div className='title'>
-                                Buy Property:
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div className='inputTitle'> X: </div>
-                            <input 
-                                id='buyPixelX' 
-                                type='number' 
-                                onChange={(e) => this.setX(e.target.value)} 
-                                value={this.state.x} 
-                                placeholder='1-100'
-                            ></input>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div className='inputTitle'> Y: </div>
-                            <input 
-                                id='buyPixelY' 
-                                type='number' 
-                                onChange={(e) => this.setY(e.target.value)} 
-                                value={this.state.y} 
-                                placeholder='1-100'
-                            ></input>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div className='inputTitle'> Price: </div>
-                            {this.state.ETHPrice != 0 &&
-                                <div className='priceSliderBase'>
-                                    <div className='ETH'>
-                                        ETH {this.state.ETHPrice}
-                                    </div>
-                                    <input 
-                                        type="range" 
-                                        min={0} 
-                                        max={this.state.PPCPrice} 
-                                        value={this.state.PPCSelected} 
-                                        onChange={(e) => this.updatePriceSlider(e.target.value)}
-                                    ></input>
-                                    <div className='PPC'>
-                                        PPC {this.state.PPCPrice}
-                                    </div>
-                                </div>
-                            }
-                            <div className='total'>
-                                {this.state.ETHToPay == 0 ? '' : this.state.ETHToPay + ' ETH'}
-                                {this.state.ETHToPay != 0 && this.state.PPCToPay != 0 ? ', ' : ''}
-                                {this.state.PPCToPay == 0 ? '' : this.state.PPCToPay + ' PPC'}
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input type='button' value='Buy Pixel' onClick={() => this.buyProperty()}></input>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <Modal size='mini' 
+                open={this.state.isOpen} 
+                closeIcon 
+                onClose={() => this.toggleModal(false)}
+                >
+                <ModalHeader>Buy Property</ModalHeader>
+                <ModalContent>
+                    <div className='twoColumn w50 left'>
+                        <Input
+                            placeholder="1 - 100"
+                            type="number"
+                            className='oneColumnFull'
+                            fluid
+                            label={<Popup
+                                trigger={<Label className='uniform'>X</Label>}
+                                content='X Position'
+                                className='Popup'
+                                size='tiny'
+                            />}
+                            value={this.state.x} 
+                            onChange={(e) => this.setX(e.target.value)}
+                        />
+                        </div>
+                        <div className='twoColumn w50 right'>
+                        <Input
+                            placeholder="1 - 100"
+                            type="number"
+                            label={<Popup
+                                trigger={<Label className='uniform'>Y</Label>}
+                                content='Y Position'
+                                className='Popup'
+                                size='tiny'
+                            />}
+                            className='oneColumnFull'
+                            fluid
+                            value={this.state.y} 
+                            onChange={(e) => this.setY(e.target.value)}
+                        />
+                        </div>
+                        <Divider horizontal>Price</Divider>
+                        {this.state.ETHToPay == 0 ?
+                        <div style={{textAlign: 'center'}}>
+                            <Label >PXL<LabelDetail>{this.state.PPCToPay}</LabelDetail></Label>
+                        </div>
+                        :
+                        <div>
+                            <Label>PXL<LabelDetail>{this.state.PPCToPay}</LabelDetail></Label>
+                            <Label style={{float: 'right'}}>ETH<LabelDetail>{this.state.ETHToPay}</LabelDetail></Label>
+                            <FormInput
+                                className='buySlider'
+                                min={0}
+                                max={this.state.PPCPrice}
+                                type='range'
+                                step={1}
+                                value={this.state.PPCSelected}
+                                onChange={(e) => this.updatePriceSlider(e.target.value)}
+                            />
+                            {null && <Button icon labelPosition='right' size='mini'>
+                                Pay Extra
+                                <Popup
+                                    trigger={<Icon name='question'/>}
+                                    content='If the Ethereum network is busy, the new Property price may not update in time. Adding to the base price will help ensure having sufficient funds for the purchase.'
+                                    className='Popup'
+                                    size='tiny'
+                                />
+                            </Button>}
+                        </div>}
+                </ModalContent>
+                <ModalActions>
+                    <Button primary onClick={() => this.buyProperty()}>Buy Property</Button>
+                </ModalActions>
+            </Modal>
         );
     }
 }

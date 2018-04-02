@@ -276,6 +276,10 @@ class SetPixelColorForm extends Component {
         });
     }
 
+    loadCanvas() {
+        this.setCanvas(SDM.getPropertyImage(this.state.x - 1, this.state.y - 1), this.state.ctxSml, this.state.ctxLrg, this.state.canvasSml);
+    }
+
     componentDidUpdate(pP, pS) {
         if (this.state.isOpen && !pS.isOpen)
             this.componentDidMountOpen();
@@ -307,7 +311,7 @@ class SetPixelColorForm extends Component {
                                             <canvas id='normal' width={Const.PROPERTY_LENGTH} height={Const.PROPERTY_LENGTH} ref={(canvasSml) => { this.canvasSml = canvasSml; }}></canvas>
                                         </GridColumn>
                                     </GridRow>
-                                    <GridRow columns='two'>
+                                    <GridRow>
                                         <GridColumn width={10}>
                                             <ButtonGroup fluid>
                                                 <Popup 
@@ -369,6 +373,38 @@ class SetPixelColorForm extends Component {
                                                 </ButtonGroup>
                                             </GridColumn>
                                             <GridColumn width={6}>
+                                            <ButtonGroup fluid>
+                                                <Popup 
+                                                    trigger={
+                                                        <Button icon
+                                                            onClick={(e) => {this.clearCanvas()}}
+                                                        ><Icon name='trash outline'/></Button>
+                                                    }
+                                                    content='Clear drawing canvas'
+                                                    position='bottom left'
+                                                    className='Popup'
+                                                    size='tiny'
+                                                    basic
+                                                />
+                                                <Popup 
+                                                    trigger={
+                                                        <Button icon
+                                                            onClick={(e) => {this.loadCanvas()}}
+                                                        ><Icon name='cloud upload'/></Button>
+                                                    }
+                                                    content='Load current image'
+                                                    position='bottom left'
+                                                    className='Popup'
+                                                    size='tiny'
+                                                    basic
+                                                />
+                                            </ButtonGroup>
+                                        </GridColumn>
+                                    </GridRow>
+                                    <GridRow>
+                                        <GridColumn width={10}>
+                                        </GridColumn>
+                                        <GridColumn width={6}>
                                             <input 
                                                 id='imageInput' 
                                                 type='file' 
@@ -386,26 +422,6 @@ class SetPixelColorForm extends Component {
                                                     ><Icon name='upload'/></Button>
                                                 }
                                                 content='Upload from file...'
-                                                position='bottom left'
-                                                className='Popup'
-                                                size='tiny'
-                                                basic
-                                            />
-                                        </GridColumn>
-                                    </GridRow>
-                                    <GridRow>
-                                        <GridColumn width={10}>
-                                        </GridColumn>
-                                        <GridColumn width={6}>
-                                            <Popup 
-                                                trigger={
-                                                    <Button 
-                                                        fluid
-                                                        type='button' 
-                                                        onClick={(e) => {this.clearCanvas()}}
-                                                    ><Icon name='trash outline'/></Button>
-                                                }
-                                                content='Clear drawing canvas'
                                                 position='bottom left'
                                                 className='Popup'
                                                 size='tiny'

@@ -236,6 +236,8 @@ contract VirtualRealEstate is StandardToken {
             property.becomePublic = 0;
         }
         property.isInPrivateMode = setPrivateMode;
+        property.earnUntil = 0;
+        property.lastUpdate = 0;
         
         if (setPrivateMode) {
             SetPropertyPrivate(propertyID, numMinutesPrivate);
@@ -276,7 +278,7 @@ contract VirtualRealEstate is StandardToken {
 
         ownerEth += msg.value;
         minPercent = priceETH * PRICE_ETH_MIN_PERCENT / 100;
-        priceETH += ((minPercent < PRICE_ETH_MIN_INCREASE) ? minPercent : PRICE_ETH_MIN_INCREASE) * pxlLeft / pxlValue;
+        priceETH += ((minPercent < PRICE_ETH_MIN_INCREASE) ? minPercent : PRICE_ETH_MIN_INCREASE) * pxlLeft / pricePXL;
         
         _transferProperty(property, propertyID, msg.sender, msg.value, pxlValue, 0);
         
@@ -454,10 +456,15 @@ contract VirtualRealEstate is StandardToken {
     // Gets the (owners address, Ethereum sale price, PXL sale price, last update timestamp, whether its in private mode or not, when it becomes public timestamp, flag) for a Property
     function getPropertyData(uint16 propertyID) public validPropertyID(propertyID) view returns(address, uint256, uint256, uint256, bool, uint256, uint32) {
         Property memory property = properties[propertyID];
+        bool isInPrivateMode = property.isInPrivateMode;
+        //If it's in private, but it has expired and should be public, set our bool to be public
+        if (isInPrivateMode && property.becomePublic <= now) { 
+            isInPrivateMode = false;
+        }
         if (property.owner == 0) {
-            return (property.owner, priceETH, pricePXL, property.lastUpdate, property.isInPrivateMode, property.becomePublic, property.flag);
+            return (property.owner, priceETH, pricePXL, property.lastUpdate, isInPrivateMode, property.becomePublic, property.flag);
         } else {
-            return (property.owner, 0, property.salePrice, property.lastUpdate, property.isInPrivateMode, property.becomePublic, property.flag);
+            return (property.owner, 0, property.salePrice, property.lastUpdate, isInPrivateMode, property.becomePublic, property.flag);
         }
     }
     

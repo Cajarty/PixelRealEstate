@@ -236,6 +236,8 @@ contract VirtualRealEstate is StandardToken {
             property.becomePublic = 0;
         }
         property.isInPrivateMode = setPrivateMode;
+        property.earnUntil = 0;
+        property.lastUpdate = 0;
         
         if (setPrivateMode) {
             SetPropertyPrivate(propertyID, numMinutesPrivate);

@@ -140,7 +140,7 @@ class BuyPixelForm extends Component {
                         />
                         </div>
                         <Divider horizontal>Price</Divider>
-                        {this.state.ETHToPay == 0 ?
+                        {this.state.ETHPrice == 0 ?
                         <div style={{textAlign: 'center'}}>
                             <Label >PXL<LabelDetail>{this.state.PPCToPay}</LabelDetail></Label>
                         </div>

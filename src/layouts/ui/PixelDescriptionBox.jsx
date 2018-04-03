@@ -252,7 +252,7 @@ class PixelDescriptionBox extends Component {
             <Button fluid onClick={() => this.toggleAction('SET_IMAGE')}>Update Image</Button>
         );
         // actions.push(new Action("Place Offer", null));
-        if (this.state.isForSale)
+        if (this.state.isForSale && this.state.owner != ctr.account)
             actions.push(
                 <Button fluid onClick={() => this.toggleAction('BUY')}>Buy</Button>
             );
@@ -292,6 +292,16 @@ class PixelDescriptionBox extends Component {
     visitLink() {
         let win = window.open(this.state.link, '_blank');
         win.focus();
+    }
+
+    getCurrentPayout() {
+        if (this.state.isInPrivate) {
+            return "N/A";
+        } else if (this.state.lastUpdate == 0) {
+            return "None";
+        } else {
+            return (this.state.earnings + '/' + this.state.maxEarnings) + " PXL";
+        }
     }
 
     render() {
@@ -409,7 +419,7 @@ class PixelDescriptionBox extends Component {
                                 size='tiny'
                             />}
                             className='oneColumn'
-                            value={this.state.lastUpdate == 0 ? "None" : (this.state.earnings + '/' + this.state.maxEarnings) + " PXL"}
+                            value={this.getCurrentPayout()}
                         />
                         <Input
                             label="Reserved"

@@ -155,7 +155,7 @@ class CanvasPage extends Component {
             <div>
                 <SegmentGroup horizontal className='mainSegmentGroup'> 
                     <Segment className='left'>
-                        <SegmentGroup className='pixelDescriptionBox'>
+                        <SegmentGroup>
                             <Segment>
                                 <ZoomCanvas/>
                             </Segment>
@@ -190,9 +190,6 @@ class CanvasPage extends Component {
                                 </div>
                                 }
                             </Segment>
-                            <Segment>
-
-                            </Segment>
                         </SegmentGroup>
                     </Segment>
                     <Segment className='center'>
@@ -201,7 +198,7 @@ class CanvasPage extends Component {
                         <Canvas/>
                     </Segment>
                     <Segment className='right'>
-                        <ErrorBox containerStyle={{marginBottom: '12px'}}/>
+                        <ErrorBox/>
                         <div className='infoBox'>
                             {this.state.advancedMode ? 
                                 <div>

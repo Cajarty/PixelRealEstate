@@ -271,11 +271,11 @@ export class Contract {
         });
     }
 
-    setPropertyMode(x, y, isPrivate, callback, minutesPrivate = 0) {
+    setPropertyMode(x, y, isPrivate, minutesPrivate, callback) {
         this.VRE.deployed().then((i) => {
-            return i.setPropertyMode(this.toID(x, y), isPrivate, minutesPrivate, {from: this.account }).then((r) => {
-                return callback(r);
-            });
+            return i.setPropertyMode(this.toID(parseInt(x), parseInt(y)), isPrivate, minutesPrivate, {from: this.account });
+        }).then((r) => {
+            return callback(r);
         }).catch((e) => {
             console.log(e);
         });

@@ -132,6 +132,10 @@ export const BigNumberToNumber = (big) => {
     return big.toNumber();
 }
 
+export const NumberToBigNumber = (num) => {
+    return BigNumber(num);
+}
+
 export const VisitPage = (path) => {
     browserHistory.push('/' + path);
 }

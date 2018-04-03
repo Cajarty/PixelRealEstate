@@ -14,6 +14,8 @@ class MakePrivateForm extends Component {
             x: '',
             y: '',
             isPrivate: false,
+            becomePublic: 0, //a timestamp of when goes public
+            becomePublicYet: false, //has public timestamp run out?
             minutesPrivate: 0,
             tokenCost: 0,
         };
@@ -41,9 +43,11 @@ class MakePrivateForm extends Component {
                 becomePublic: SDM.getPropertyData(GFD.getData('x') - 1, y - 1).becomePublic 
             });
             ctr.getPropertyData(GFD.getData('x') - 1, y - 1, (data) => {
+                let isPrivate = data[4];
+                let becomePublic = Func.BigNumberToNumber(data[5]);
+                let becomePublicYet = (becomePublic * 1000 > new Date().getTime());
                 this.setState({
-                    isPrivate: data[4],
-                    becomePublic: data[5]
+                    isPrivate, becomePublic, becomePublicYet
                 });
             });
         })
@@ -64,12 +68,12 @@ class MakePrivateForm extends Component {
     setPropertyMode() {
         let x = GFD.getData('x') - 1;
         let y = GFD.getData('y') - 1;
-        if (SDM.getPropertyData(x, y).becomePublic) {
-            ctr.sendResults(LISTENERS.Alert, {result: false, message: "Property is temorarily reserved by a user."});
+        if (SDM.getPropertyData(x, y).isPrivate) {
+            ctr.sendResults(LISTENERS.Alert, {result: false, message: "Property is already in private mode."});
             return;
         }
-        if (SDM.getPropertyData(x, y).becomePublic) {
-            ctr.sendResults(LISTENERS.Alert, {result: false, message: "Property is already in private mode."});
+        if (SDM.getPropertyData(x, y).becomePublic * 1000 > new Date().getTime()) {
+            ctr.sendResults(LISTENERS.Alert, {result: false, message: "Property is temorarily reserved by a user."});
             return;
         }
         ctr.setPropertyMode(x, y, true, this.state.minutesPrivate, () => {
@@ -169,17 +173,19 @@ class MakePrivateForm extends Component {
                 {this.state.isPrivate || this.state.becomePublic != 0 ?
                     <div>
                         <Divider/>
+                        {this.state.isPrivate || this.state.becomePublicYet ? 
                         <Segment inverted color='red' secondary>            
                             <div>{this.state.isPrivate ? "This Property is already in private mode." : ""}</div>
-                            <div>{this.state.becomePublic != 0 ? "This Property is temporarily reserved by a user." : ""}</div>
+                            <div>{this.state.becomePublicYet ? "This Property is temporarily reserved by a user." : ""}</div>
                         </Segment>
+                        : null}
                     </div>
                     :
                     null
                 }
             </ModalContent>
             <ModalActions>
-                <Button primary disabled={this.state.isPrivate || this.state.becomePublic != 0} onClick={() => ctr.setPropertyMode()}>Set Private</Button>
+                <Button primary disabled={this.state.isPrivate || this.state.becomePublicYet} onClick={() => this.setPropertyMode()}>Set Private</Button>
             </ModalActions>
             </Modal>
         );

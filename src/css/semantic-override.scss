@@ -17,10 +17,16 @@ body {
     }
 }
 
+.ui.divider {
+    border-top-color: $color5 !important;
+}
+
 .ui.segment,
 .ui.segments {
+    border-color: $color5 !important;
     background-color: $color3 !important;
     &.attached {
+        border-color: $color5 !important;
         border-left: 1px solid darken($color3, 10%);
         border-right: 1px solid darken($color3, 10%);
         border-top: 0;
@@ -30,6 +36,7 @@ body {
 
 .ui.attached {
     &.button {
+        border-color: $color5 !important;
         background-color: darken($color3, 5%);
         border-right: 1px solid darken($color3, 10%);
         border-left: 1px solid darken($color3, 10%);
@@ -130,4 +137,15 @@ body {
 
 .ui.fluid.button.delistButton {
     margin-top: -6px !important;
+}
+
+.ui.button {
+    background-color: $color4;
+}
+
+.ui.label,
+.ui.popup,
+.ui.popup::before {
+    background-color: $color4;
+    border-color: $color4;
 }

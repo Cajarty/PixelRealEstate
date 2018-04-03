@@ -70,7 +70,6 @@ class HoverLabel extends Component {
     render() {
         return (
             <div>
-                {console.info(this.state)}
                 <div 
                     className={'hoverBox ' + (this.state.show ? '' : 'hidden')}
                     style={{

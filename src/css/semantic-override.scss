@@ -1,3 +1,4 @@
+@import './animation.scss';
 body {
     background-color: $color1;
     color: rgba(0, 0, 0, .6);
@@ -23,6 +24,7 @@ body {
 
 .ui.segment,
 .ui.segments {
+    @include animation(fadein, .8s);
     border-color: $color5 !important;
     background-color: $color3 !important;
     &.attached {
@@ -36,6 +38,7 @@ body {
 
 .ui.attached {
     &.button {
+        @include animation(fadein, .8s);
         border-color: $color5 !important;
         background-color: darken($color3, 5%);
         border-right: 1px solid darken($color3, 10%);
@@ -123,8 +126,13 @@ body {
     }
 }
 
+.ui.modal {
+    @include animation(fadein, .8s);
+}
+
 .ui.disabled.input {
     opacity: 1;
+    @include animation(fadein, .8s);
 }
 
 .item.xLabel {
@@ -155,4 +163,8 @@ body {
 .ui.popup::before {
     background-color: $color4;
     border-color: $color4;
+}
+
+.pixelsOwnedItem {
+    height: 42px;
 }

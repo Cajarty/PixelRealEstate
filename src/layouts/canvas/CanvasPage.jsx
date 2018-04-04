@@ -15,6 +15,7 @@ import ClickLoader from '../ui/ClickLoader';
 import PixelDescriptionBox from '../ui/PixelDescriptionBox';
 import PropertyChangeLogYou from '../logs/PropertyChangeLogYou';
 import PropertyChangeLog from '../logs/PropertyChangeLog';
+import PropertySalesLogYou from '../logs/PropertySalesLogYou';
 import PropertySalesLog from '../logs/PropertySalesLog';
 import { Segment, SegmentGroup, Button, Divider, Label, 
     LabelDetail, Input, Icon, Item, ItemContent, ItemImage, 
@@ -151,8 +152,8 @@ class CanvasPage extends Component {
         { menuItem: 'You', render: () => <TabPane className='middlePane' attached={false}><PropertyChangeLogYou/></TabPane> }];
 
         let tradePanes = [{ menuItem: 'Top 10', render: () => <TabPane className='bottomPane' attached={false}>Tab 1 Content</TabPane> },
-        { menuItem: 'Recent', render: () => <TabPane className='bottomPane' attached={false}>none yet</TabPane> },
-        { menuItem: 'You', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLog/></TabPane> }];
+        { menuItem: 'Recent', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLog/></TabPane> },
+        { menuItem: 'You', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLogYou/></TabPane> }];
         return (
             <div>
                 <SegmentGroup horizontal className='mainSegmentGroup'> 
@@ -163,7 +164,7 @@ class CanvasPage extends Component {
                             </Segment>
                             <Segment>
                                 <ItemGroup>
-                                    <Item>
+                                    <Item className='pixelsOwnedItem'>
                                         <ItemImage size='mini' src={this.state.loadingPPC ? Assets.LOADING : Assets.TOKEN}  />
                                         <ItemContent verticalAlign='middle'>{this.state.PPCOwned} </ItemContent>
                                     </Item>

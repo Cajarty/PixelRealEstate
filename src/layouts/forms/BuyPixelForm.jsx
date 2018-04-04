@@ -30,7 +30,7 @@ class BuyPixelForm extends Component {
         this.setState(update);
     }
 
-    componentDidMount() {
+    componentDidMountOpen() {
         GFD.listen('x', 'buyPixel', (x) => {
             this.setState({x});
         })
@@ -50,8 +50,15 @@ class BuyPixelForm extends Component {
         })
     }
 
-    componentWillUnmount() {
+    componentDidUnmountOpen() {
         GFD.closeAll('buyPixel');
+    }
+
+    componentDidUpdate(pP, pS) {
+        if (this.state.isOpen && !pS.isOpen)
+            this.componentDidMountOpen();
+        else if (!this.state.isOpen && pS.isOpen)
+            this.componentDidUnmountOpen();
     }
 
     setX(x) {

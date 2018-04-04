@@ -163,6 +163,7 @@ class Canvas extends Component {
         }
         this.state.ctx.putImageData(ctxID, 0, 0);
         this.setState({loaded: true});
+        
     }
 
     render() {
@@ -182,7 +183,7 @@ class Canvas extends Component {
                 <div className={!this.state.loaded ? 'loading' : 'hidden'}>
                     <img className='icon' src={Assets.LOADING} draggable={false}></img>
                 </div>
-                <a target='_blank' ref={(linkTag) => {this.linkTag = linkTag}} style={{display: 'hidden'}}></a>
+                {/*<a target='_blank' ref={(linkTag) => {this.linkTag = linkTag}} style={{display: 'hidden'}}></a>*/}
             </div>
         );
     }

@@ -229,7 +229,7 @@ export class Contract {
         console.info(x, y, eth, ppc);
         this.VRE.deployed().then((i) => {
             if (eth == 0)
-                return i.buyPropertyInPPC(this.toID(x, y), ppc, {from: this.account });
+                return i.buyPropertyInPXL(this.toID(x, y), ppc, {from: this.account });
             else if (ppc == 0)
                 return i.buyPropertyInETH(this.toID(x, y), { value: eth, from: this.account });
             else 

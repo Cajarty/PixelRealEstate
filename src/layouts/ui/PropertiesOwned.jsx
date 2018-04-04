@@ -40,7 +40,10 @@ class PropertiesOwned extends Component {
     }
 
     onResize = (e) => {
-        let containerWidth = document.querySelector('.itemContainer').clientWidth;
+        let container = document.querySelector('.itemContainer');
+        if (!container)
+            return;
+        let containerWidth = container.clientWidth;
         let pageSize = Math.floor(containerWidth / ITEM_SIZE);
         let size = (e.size != null ? e.size : this.state.items);
         this.setState({
@@ -51,6 +54,7 @@ class PropertiesOwned extends Component {
     }
 
     async reorderItems() {
+        console.info(SDM.ownedProperties);
         //get my current market trade and populate fields
         let results = await SDM.orderPropertyList(SDM.ownedProperties, this.state.compare.func);
         this.setState({
@@ -93,21 +97,24 @@ class PropertiesOwned extends Component {
     }
 
     render() {
-        return (
-            <div style={{height: '100%'}}>
-                <Button attached='top' onClick={() => {this.changePage(true)}}><Icon name='chevron up'></Icon></Button>
-                <Segment attached style={{height: 'calc(100% - 74px)'}} className='itemContainer'>
-                    <PanelContainerOwned
-                        data={this.state.orderedItems}
-                        onClick={(x, y) => this.propertySelected(x, y)}
-                        viewStart={this.state.itemIndex}
-                        viewEnd={this.state.itemIndex + this.state.pageSize}
-                        maxPageSize={this.state.maxPageSize}
-                    />
-                </Segment>
-                <Button attached='bottom' onClick={() => {this.changePage(false)}}><Icon name='chevron down'></Icon></Button>
-            </div>
-        );
+        if (this.state.orderedItems.length == 0)
+            return (<h3 className='noContent'>None Yet!</h3>);
+        else 
+            return (
+                <div style={{height: '100%'}}>
+                    <Button attached='top' onClick={() => {this.changePage(true)}}><Icon name='chevron up'></Icon></Button>
+                    <Segment attached style={{height: 'calc(100% - 74px)'}} className='itemContainer'>
+                        <PanelContainerOwned
+                            data={this.state.orderedItems}
+                            onClick={(x, y) => this.propertySelected(x, y)}
+                            viewStart={this.state.itemIndex}
+                            viewEnd={this.state.itemIndex + this.state.pageSize}
+                            maxPageSize={this.state.maxPageSize}
+                        />
+                    </Segment>
+                    <Button attached='bottom' onClick={() => {this.changePage(false)}}><Icon name='chevron down'></Icon></Button>
+                </div>
+            );
     }
 }
 

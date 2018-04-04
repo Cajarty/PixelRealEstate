@@ -12,8 +12,8 @@ export const PENCIL = BASE_PATH + 'icons/pencil.svg';
 export const REDO = BASE_PATH + 'icons/redo.svg';
 export const UNDO = BASE_PATH + 'icons/undo.svg';
 export const CLOSE = BASE_PATH + 'icons/close.svg';
-export const LOADING = BASE_PATH + 'icons/loading.svg';
-export const TOKEN = BASE_PATH + 'icons/token.ico';
+export const LOADING = BASE_PATH + 'icons/loading.gif';
+export const TOKEN = BASE_PATH + 'icons/token.png';
 
 
 export const CANVAS_IMAGE = BASE_PATH + 'canvas/canvas.png';

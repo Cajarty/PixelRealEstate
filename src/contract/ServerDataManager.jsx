@@ -5,6 +5,7 @@ import Axios from '../network/Axios.jsx';
 import * as Func from '../functions/functions.jsx';
 import * as Assets from '../const/assets';
 import * as Struct from '../const/structs';
+import {GFD, GlobalState} from '../functions/GlobalState';
 
 export const Compares = {
     xAsc: { 
@@ -169,6 +170,7 @@ export class ServerDataManager {
             this.requestServerData((dataResult) => {
                 this.setupEvents();
                 ctr.sendResults(LISTENERS.ServerDataManagerInit, {imageLoaded: imageResult, dataLoaded: dataResult});
+                GFD.setData('ServerDataManagerInit', true);
             });
         });
     }

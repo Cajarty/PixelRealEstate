@@ -139,8 +139,15 @@ body {
     margin-top: -6px !important;
 }
 
-.ui.button {
-    background-color: $color4;
+.ui.button,
+.bidButton {
+    background-color: $color4 !important;
+    &:hover {
+        background-color: lighten($color4, 10%) !important;
+    }
+    &.active {
+        background-color: lighten($color4, 15%) !important;
+    }
 }
 
 .ui.label,

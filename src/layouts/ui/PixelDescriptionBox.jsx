@@ -481,7 +481,7 @@ class PixelDescriptionBox extends Component {
                     </Segment>
                 : <Segment>
                     <p>
-                        Click a Property on the canvas or enter the coordinates here to see more about a property.
+                        Click a Property on the canvas or enter the coordinates above to see more about a property.
                     </p>
                 </Segment>}
                 {this.state.x != '' && this.state.y != '' && !this.state.noAccount &&

@@ -14,6 +14,7 @@ import * as Assets from '../../const/assets';
 import ClickLoader from '../ui/ClickLoader';
 import PixelDescriptionBox from '../ui/PixelDescriptionBox';
 import PropertyChangeLogYou from '../logs/PropertyChangeLogYou';
+import PropertyChangeLog from '../logs/PropertyChangeLog';
 import PropertySalesLog from '../logs/PropertySalesLog';
 import { Segment, SegmentGroup, Button, Divider, Label, 
     LabelDetail, Input, Icon, Item, ItemContent, ItemImage, 
@@ -22,6 +23,7 @@ import SetHoverText from '../forms/SetHoverText';
 import SetLink from '../forms/SetLink';
 import PropertiesOwned from '../ui/PropertiesOwned';
 import PropertiesForSale from '../ui/PropertiesForSale';
+import PropertyChangeLogTop from '../logs/PropertyChangeLogTop';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -144,8 +146,8 @@ class CanvasPage extends Component {
                 /></TabPane> 
             }];
 
-        let payoutPanes = [{ menuItem: 'Top 10', render: () => <TabPane className='middlePane' attached={false}>Tab 1 Content</TabPane> },
-        { menuItem: 'Recent', render: () => <TabPane className='middlePane' attached={false}>none yet</TabPane> },
+        let payoutPanes = [{ menuItem: 'Top 10', render: () => <TabPane className='middlePane' attached={false}><PropertyChangeLogTop/></TabPane> },
+        { menuItem: 'Recent', render: () => <TabPane className='middlePane' attached={false}><PropertyChangeLog/></TabPane> },
         { menuItem: 'You', render: () => <TabPane className='middlePane' attached={false}><PropertyChangeLogYou/></TabPane> }];
 
         let tradePanes = [{ menuItem: 'Top 10', render: () => <TabPane className='bottomPane' attached={false}>Tab 1 Content</TabPane> },
@@ -166,7 +168,8 @@ class CanvasPage extends Component {
                                         <ItemContent verticalAlign='middle'>{this.state.PPCOwned} </ItemContent>
                                     </Item>
                                 </ItemGroup>
-                                <Divider/>
+                            </Segment>
+                            <Segment>
                                 <Button onClick={() => this.visitPortfolio()} fluid>Visit PixelProperty.io</Button>
                                 <a 
                                     href='https://pixelproperty.io/' 

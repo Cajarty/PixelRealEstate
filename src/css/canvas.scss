@@ -1,5 +1,6 @@
 .canvas {
     display: block;
+    margin-left: -2px;
     image-rendering: optimizeSpeed;
     image-rendering: crisp-edges;
     image-rendering: -moz-crisp-edges;
@@ -150,6 +151,8 @@
         max-width: calc((100vw - 460px) / 2) !important;
         overflow-y: auto;
         overflow-x: hidden;
+        border-top-left-radius: 5px !important;
+        border-bottom-left-radius: 5px !important;
     }
     .center {
         width: calc(100vh - 75px) !important;
@@ -160,6 +163,8 @@
         max-width: calc((100vw - 460px) / 2) !important;
         overflow-y: auto;
         overflow-x: hidden;
+        border-top-right-radius: 5px !important;
+        border-bottom-right-radius: 5px !important;
     }
     .bidInput {
         width: calc(100% + 14px) !important;

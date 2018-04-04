@@ -136,36 +136,33 @@ export class Contract {
     Requests all events of event type EVENT.
     */
     getEventLogs(event, params = {}, callback) {
-        let responder = (err, evt) => {
-            return callback(evt, err);
-        };
 
         let filter = {fromBlock: 0, toBlock: 'latest'};
 
         this.VRE.deployed().then((i) => {
             switch(event) {
                 case EVENTS.PropertyBought:
-                    return i.PropertyBought(params, filter).get(responder);
+                    return i.PropertyBought(params, filter).get(callback);
                 case EVENTS.PropertyColorUpdate:
-                    return i.PropertyColorUpdate(params, filter).get(responder);
+                    return i.PropertyColorUpdate(params, filter).get(callback);
                 case EVENTS.SetUserHoverText:
-                    return i.SetUserHoverText(params, filter).get(responder);
+                    return i.SetUserHoverText(params, filter).get(callback);
                 case EVENTS.SetUserSetLink:
-                    return i.SetUserSetLink(params, filter).get(responder);
+                    return i.SetUserSetLink(params, filter).get(callback);
                 case EVENTS.PropertySetForSale:
-                    return i.PropertySetForSale(params, filter).get(responder);
+                    return i.PropertySetForSale(params, filter).get(callback);
                 case EVENTS.DelistProperty:
-                    return i.DelistProperty(params, filter).get(responder);
+                    return i.DelistProperty(params, filter).get(callback);
                 case EVENTS.SetPropertyPublic:
-                    return i.SetPropertyPublic(params, filter).get(responder);
+                    return i.SetPropertyPublic(params, filter).get(callback);
                 case EVENTS.SetPropertyPrivate:
-                    return i.SetPropertyPrivate(params, filter).get(responder);
+                    return i.SetPropertyPrivate(params, filter).get(callback);
                 case EVENTS.Bid:
-                    return i.Bid(params, filter).get(responder);
+                    return i.Bid(params, filter).get(callback);
                 case EVENTS.Transfer:
-                    return i.Transfer(params, filter).get(responder);
+                    return i.Transfer(params, filter).get(callback);
                 case EVENTS.Approval:
-                    return i.Approval(params, filter).get(responder);
+                    return i.Approval(params, filter).get(callback);
             }
         });
     }
@@ -173,7 +170,7 @@ export class Contract {
     /*
     Requests all events of event type EVENT.
     */
-    watchEventLogs(event, params = {}, callback) {
+    watchEventLogs(event, params, callback) {
         let filter = {fromBlock: 0, toBlock: 'latest'};
 
         this.VRE.deployed().then((i) => {

@@ -88,14 +88,14 @@ contract VirtualRealEstate is StandardToken {
     uint256 PROPERTY_GENERATION_PAYOUT_INTERVAL = (1 minutes); //Generation amount
 
     /* ### Events ### */
-    event PropertyColorUpdate(uint16 indexed property, uint256[10] colors, uint256 lastUpdate, address indexed lastUpdaterPayee, uint256 becomePublic);
-    event PropertyBought(uint16 indexed property, address indexed newOwner, uint256 ethAmount, uint256 PXLAmount, uint256 timestamp);
+    event PropertyColorUpdate(uint16 indexed property, uint256[10] colors, uint256 lastUpdate, address indexed lastUpdaterPayee, uint256 becomePublic, uint256 indexed rewardedCoins);
+    event PropertyBought(uint16 indexed property, address indexed newOwner, uint256 ethAmount, uint256 PXLAmount, uint256 timestamp, address indexed oldOwner);
     event SetUserHoverText(address indexed user, uint256[2] newHoverText);
     event SetUserSetLink(address indexed user, uint256[2] newLink);
     event PropertySetForSale(uint16 indexed property, uint256 forSalePrice);
     event DelistProperty(uint16 indexed property);
     event SetPropertyPublic(uint16 indexed property);
-    event SetPropertyPrivate(uint16 indexed property, uint32 numMinutesPrivate);
+    event SetPropertyPrivate(uint16 indexed property, uint32 numMinutesPrivate, address indexed rewardedUser, uint256 indexed rewardedCoins);
     event Bid(uint16 indexed property, uint256 bid, uint256 timestamp);
     
     /* ### Ownable Property Structure ### */
@@ -185,14 +185,17 @@ contract VirtualRealEstate is StandardToken {
             property.isInPrivateMode = false;
         }
     }
+
+    
     
     // Update the 10x10 image data for a Property, triggering potential payouts if it succeeds
     function setColors(uint16 propertyID, uint256[10] newColors, uint256 PXLToSpend) public validPropertyID(propertyID) returns(bool) {
         Property storage property = properties[propertyID];
         bool firstSet = property.lastUpdater == 0;
+        uint256 projectedPayout = _getProjectedPayout(property);
         if (_tryTriggerPayout(property, PXLToSpend)) {
             property.colors = newColors;
-            PropertyColorUpdate(propertyID, newColors, now, property.lastUpdater, property.becomePublic);
+            PropertyColorUpdate(propertyID, newColors, now, property.lastUpdater, property.becomePublic, projectedPayout);
             // The first user to set a Properties color ever is awarded extra PXL due to eating the extra GAS cost of creating the uint256[10]
             if (firstSet) {
                 //totalSupply += 25;
@@ -206,9 +209,10 @@ contract VirtualRealEstate is StandardToken {
     function setRowColors(uint16 propertyID, uint8 row, uint256 newColorData, uint256 PXLToSpend) public validPropertyID(propertyID) returns(bool) {
         require(row < 10);
         Property storage property = properties[propertyID];
+        uint256 projectedPayout = _getProjectedPayout(property);
         if (_tryTriggerPayout(property, PXLToSpend)) {
             property.colors[row] = newColorData;
-            PropertyColorUpdate(propertyID, property.colors, now, property.lastUpdater, property.becomePublic);
+            PropertyColorUpdate(propertyID, property.colors, now, property.lastUpdater, property.becomePublic, projectedPayout);
             return true;
         }
         return false;
@@ -240,7 +244,8 @@ contract VirtualRealEstate is StandardToken {
         property.lastUpdate = 0;
         
         if (setPrivateMode) {
-            SetPropertyPrivate(propertyID, numMinutesPrivate);
+            address rewardedUser = property.owner; //Will be rewarded user
+            SetPropertyPrivate(propertyID, numMinutesPrivate, rewardedUser, 99999);
         } else {
             SetPropertyPublic(propertyID);
         }
@@ -249,7 +254,7 @@ contract VirtualRealEstate is StandardToken {
     function transferProperty(uint16 propertyID, address newOwner) public validPropertyID(propertyID) returns(bool) {
         Property storage property = properties[propertyID];
         require(property.owner == msg.sender);
-        _transferProperty(property, propertyID, newOwner, 0, 0, property.flag);
+        _transferProperty(property, propertyID, newOwner, 0, 0, property.flag, property.owner);
         return true;
     }
     // Purchase a unowned system-Property in a combination of PXL and ETH
@@ -280,7 +285,7 @@ contract VirtualRealEstate is StandardToken {
         minPercent = priceETH * PRICE_ETH_MIN_PERCENT / 100;
         priceETH += ((minPercent < PRICE_ETH_MIN_INCREASE) ? minPercent : PRICE_ETH_MIN_INCREASE) * pxlLeft / pricePXL;
         
-        _transferProperty(property, propertyID, msg.sender, msg.value, pxlValue, 0);
+        _transferProperty(property, propertyID, msg.sender, msg.value, pxlValue, 0, property.owner);
         
         return true;
     }
@@ -308,7 +313,7 @@ contract VirtualRealEstate is StandardToken {
         balances[property.owner] += amountTransfered;
         balances[owner] += PXLValue - amountTransfered;
 
-        _transferProperty(property, propertyID, msg.sender, 0, property.salePrice, 0);
+        _transferProperty(property, propertyID, msg.sender, 0, property.salePrice, 0, property.owner);
         
         return true;
     }
@@ -324,7 +329,7 @@ contract VirtualRealEstate is StandardToken {
         uint256 minPercent = priceETH * PRICE_ETH_MIN_PERCENT / 100;
         priceETH += (minPercent < PRICE_ETH_MIN_INCREASE) ? minPercent : PRICE_ETH_MIN_INCREASE;
         
-        _transferProperty(property, propertyID, msg.sender, msg.value, 0, 0);
+        _transferProperty(property, propertyID, msg.sender, msg.value, 0, 0, property.owner);
         return true;
     }
     
@@ -428,13 +433,13 @@ contract VirtualRealEstate is StandardToken {
         return true;
     }
     // Transfer ownership of a Property and reset their info
-    function _transferProperty(Property storage property, uint16 propertyID, address newOwner, uint256 ethAmount, uint256 PXLAmount, uint8 flag) private {
+    function _transferProperty(Property storage property, uint16 propertyID, address newOwner, uint256 ethAmount, uint256 PXLAmount, uint8 flag, address oldOwner) private {
         require(newOwner != 0);
         property.owner = newOwner;
         property.salePrice = 0;
         property.isInPrivateMode = false;
         property.flag = flag;
-        PropertyBought(propertyID, newOwner, ethAmount, PXLAmount, now);
+        PropertyBought(propertyID, newOwner, ethAmount, PXLAmount, now, oldOwner);
     }
     
     /* ## VIEWS ## */

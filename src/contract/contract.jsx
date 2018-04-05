@@ -34,6 +34,7 @@ export class Contract {
         this.propertyTradeLog = [];
 
         this.getAccountsInterval = null;
+        this.setupRetryInterval = null;
 
         this.events = {
             event: null,
@@ -49,6 +50,7 @@ export class Contract {
         });
         
         this.setup();
+
     }
 
     // ---------------------------------------------------------------------------------------------------------
@@ -58,33 +60,38 @@ export class Contract {
     // ---------------------------------------------------------------------------------------------------------
 
     setup() {
-        // Checking if Web3 has been injected by the browser (Mist/MetaMask)
-        if (typeof web3 !== 'undefined') {
-            console.warn("Using web3 detected from external source. If you find that your accounts don't appear or you have 0 VRE, ensure you've configured that source properly. If using MetaMask, see the following link. Feel free to delete this warning. :) http://truffleframework.com/tutorials/truffle-and-metamask")
-                // Use Mist/MetaMask's provider
-            window.web3 = new Web3(window.web3.currentProvider);
-        } else {
-            console.warn("No web3 detected. Falling back to http://127.0.0.1:9545. You should remove this fallback when you deploy live, as it's inherently insecure. Consider switching to Metamask for development. More info here: http://truffleframework.com/tutorials/truffle-and-metamask");
-            // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-            window.web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:9545"));
+        let success = () => {
+            if (typeof web3 !== 'undefined') {
+                window.web3 = new Web3(window.web3.currentProvider);
+                this.VRE.setProvider(window.web3.currentProvider);
+
+                this.getAccounts();
+    
+                this.VRE.deployed().then((instance) => {
+                    SDM.init();
+                });
+                
+                if (this.setupRetryInterval != null) {
+                    clearInterval(this.setupRetryInterval);
+                }
+                this.getAccountsInterval = setInterval(() => this.getAccounts(), 1000);
+                GFD.setData('noMetaMask', false);
+            }
         }
-        this.VRE.setProvider(window.web3.currentProvider);
 
-        this.getAccounts();
-        //this.setupEvents();
-
-        this.VRE.deployed().then((instance) => {
-            SDM.init();
-        });
-        
-        this.getAccountsInterval = setInterval(() => this.getAccounts(), 1000);
-
-        
+        if (typeof web3 !== 'undefined') {
+            success();
+        } else {
+            GFD.setData('noMetaMask', true);
+            SDM.initNoMetaMask();
+            this.setupRetryInterval = setInterval(() => success(), 15000);
+        }
     }
 
     getAccounts() {
+        if (GFD.getData('noMetaMask'))
+            return;
         window.web3.eth.getAccounts((err, accs) => {
-            console.info(err, accs)
             if (err != null) {
                 if (GFD.getData('advancedMode')) {
                     this.sendResults(LISTENERS.Error, {errorId: 1, errorType: ERROR_TYPE.Error, message: "In order to fully interact with the client, it is required to have the MetaMask.io web-plugin installed. MetaMask allows you to store your earnings securely in your own Ethereum lite-wallet. "});
@@ -137,6 +144,8 @@ export class Contract {
     Requests all events of event type EVENT.
     */
     getEventLogs(event, params = {}, callback) {
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+            return;
 
         let filter = {fromBlock: 0, toBlock: 'latest'};
 
@@ -172,6 +181,9 @@ export class Contract {
     Requests all events of event type EVENT.
     */
     watchEventLogs(event, params, callback) {
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+            return;
+
         let filter = {fromBlock: 0, toBlock: 'latest'};
 
         this.VRE.deployed().then((i) => {
@@ -227,7 +239,8 @@ export class Contract {
     // ---------------------------------------------------------------------------------------------------------
 
     buyProperty(x, y, eth, ppc, callback) {
-        console.info(x, y, eth, ppc);
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+            return callback(false);
         this.VRE.deployed().then((i) => {
             if (eth == 0)
                 return i.buyPropertyInPXL(this.toID(x, y), ppc, {from: this.account });
@@ -246,6 +259,8 @@ export class Contract {
     }
 
     sellProperty(x, y, price) {
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+            return;
         this.VRE.deployed().then((i) => {
             return i.listForSale(this.toID(parseInt(x), parseInt(y)), price, {from: this.account });
         }).then(() => {
@@ -257,6 +272,8 @@ export class Contract {
     }
 
     delistProperty(x, y, callback) {
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+            return callback(false);
         this.VRE.deployed().then((i) => {
             return i.delist(this.toID(parseInt(x), parseInt(y)), {from: this.account });
         }).then(() => {
@@ -270,6 +287,8 @@ export class Contract {
     }
 
     setPropertyMode(x, y, isPrivate, minutesPrivate, callback) {
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+            return callback(false);
         this.VRE.deployed().then((i) => {
             return i.setPropertyMode(this.toID(parseInt(x), parseInt(y)), isPrivate, minutesPrivate, {from: this.account });
         }).then((r) => {
@@ -281,6 +300,8 @@ export class Contract {
 
     //array of 2 32 bytes of string
     setHoverText(text) {
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+            return;
         this.VRE.deployed().then((i) => {
             return i.setHoverText(Func.StringToBigInts(text), {from: this.account});
         }).then(function() {
@@ -292,6 +313,8 @@ export class Contract {
 
     //array of 2 32 bytes
     setLink(text) {
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+            return;
         this.VRE.deployed().then((i) => {
             return i.setLink(Func.StringToBigInts(text), {from: this.account });
         }).then(function() {
@@ -302,6 +325,8 @@ export class Contract {
     }
 
     transferProperty(x, y, newOwner, callback) { 
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+            return callback(false);
         this.VRE.deployed().then((i) => {
             return i.transferProperty(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account}).then((r) => {
                 return callback(true);
@@ -312,6 +337,8 @@ export class Contract {
     }
 
     makeBid(x, y, bid, callback) {
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+            return callback(false);
         this.VRE.deployed().then((i) => {
             return i.makeBid(this.toID(x, y), bid, {from: this.account });
         }).then(() => {
@@ -324,6 +351,8 @@ export class Contract {
     }
 
     setColors(x, y, data, PPT, callback) {
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+            return callback(false);
         this.VRE.deployed().then((i) => {
             return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), PPT, {from: this.account });
         }).then(() => {
@@ -354,6 +383,8 @@ export class Contract {
     // ---------------------------------------------------------------------------------------------------------
     // ---------------------------------------------------------------------------------------------------------
     getBalance(callback) {
+        if (GFD.getData('noMetaMask'))
+            return callback(false);
         this.VRE.deployed().then((i) => {
             i.balanceOf(this.account, { from: this.account }).then((r) => {
                 callback(Func.BigNumberToNumber(r));
@@ -365,6 +396,8 @@ export class Contract {
     }
 
     getSystemSalePrices(callback) {
+        if (GFD.getData('noMetaMask'))
+            return callback(null);
         this.VRE.deployed().then((i) => {
             return i.getSystemSalePrices.call().then((r) => {
                 return callback(r);
@@ -375,6 +408,8 @@ export class Contract {
     }
 
     getForSalePrices(x, y, callback) {
+        if (GFD.getData('noMetaMask'))
+            return callback(false);
         this.VRE.deployed().then((i) => {
             return i.getForSalePrices.call(this.toID(x, y)).then((r) => {
                 return callback(r);
@@ -385,6 +420,8 @@ export class Contract {
     }
 
     getHoverText(address, callback) {
+        if (GFD.getData('noMetaMask'))
+            return callback(false);
         this.VRE.deployed().then((i) => {
             return i.getHoverText.call(address).then((r) => {
                 return callback(Func.BigIntsToString(r));
@@ -395,6 +432,8 @@ export class Contract {
     }
 
     getLink(address, callback) {
+        if (GFD.getData('noMetaMask'))
+            return callback(false);
         this.VRE.deployed().then((i) => {
             return i.getLink.call(address).then((r) => {
                 return callback(Func.BigIntsToString(r));
@@ -405,6 +444,8 @@ export class Contract {
     }
 
     getPropertyColorsOfRow(x, row, callback) {
+        if (GFD.getData('noMetaMask'))
+            return callback(false);
         this.VRE.deployed().then((i) => {
             return i.getPropertyColorsOfRow.call(x, row).then((r) => {
                 callback(x, row, Func.ContractDataToRGBAArray(r));
@@ -415,6 +456,8 @@ export class Contract {
     }
 
     getPropertyColors(x, y, callback) {
+        if (GFD.getData('noMetaMask'))
+            return callback(false);
         this.VRE.deployed().then((i) => {
             return i.getPropertyColors.call(this.toID(x, y)).then((r) => {
                 callback(x, y, Func.ContractDataToRGBAArray(r));
@@ -425,6 +468,8 @@ export class Contract {
     }
 
     getPropertyData(x, y, callback) {
+        if (GFD.getData('noMetaMask'))
+            return callback(false);
         //returns address, price, renter, rent length, rentedUntil, rentPrice
         this.VRE.deployed().then((i) => {
             i.getPropertyData.call(this.toID(x, y)).then((r) => {

@@ -8,12 +8,10 @@ Includes default setup and globally accessable singleton instance.
 Authentication is handled by this wrapper as well, including listener for
 when the auth state changes.
 */
-export default class Axios {
+export class Axios {
     constructor() {
         if (Axios.instance != null)
             throw new Error('Axios instance exists, request usage through "Axios.instace".');
-
-        console.info(process);
 
         Axios.instance = this;
         Axios.instance.axios = axios.create({
@@ -25,15 +23,6 @@ export default class Axios {
             }
         });
 
-    }
-
-    static getInstance() {
-        if (Axios.instance == null) {
-            Axios.instance = new Axios();
-        } else {
-            return Axios.instance;
-        }
-           
     }
 
     /*
@@ -93,3 +82,5 @@ export default class Axios {
         });
     }
 }
+
+export const ax = new Axios();

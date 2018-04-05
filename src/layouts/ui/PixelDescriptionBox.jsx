@@ -4,6 +4,7 @@ import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions.jsx';
 import Timestamp from 'react-timestamp';
 import {GFD, GlobalState} from '../../functions/GlobalState';
+import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
 import Hours from '../ui/Hours';
 import Moment from 'react-moment';
 import Message, { Label, Input, Item, Button, Popup, Icon, Grid, Segment, SegmentGroup, Divider } from 'semantic-ui-react';
@@ -54,6 +55,9 @@ class PixelDescriptionBox extends Component {
                 PLACCE_BID: false,
             },
             showMessage: false,
+            evH1: null, 
+            evH2: null, 
+            evH3: null,
         }
     }
 
@@ -96,13 +100,63 @@ class PixelDescriptionBox extends Component {
             this.setState({x});
         })
         GFD.listen('y', 'pixelBrowse', (y) => {
-            this.loadProperty(GFD.getData('x') - 1, y - 1);
+            if (!GFD.getData('noMetaMask'))
+                this.loadProperty(GFD.getData('x') - 1, y - 1);
             this.setState({y});
         })
 
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (eventHandleUpdate) => {
-            this.setState({eventHandleUpdate});
-            eventHandleUpdate.watch((error, log) => {
+        this.setState({timerUpdater: setInterval(() => this.timerUpdate(), 1000)});
+
+        ctr.listenForResults(LISTENERS.ServerDataManagerInit, 'PixelBox', (results) => {
+            if (results.imageLoaded && GFD.getData('ServerDataManagerInit') == 1) {
+                let data = SDM.getPropertyData(this.state.x - 1, this.state.y - 1);
+    
+                let ethp = data.ETHPrice;
+                let ppcp = data.PPCPrice;
+                let reserved = data.becomePublic;
+                let lastUpdate = data.lastUpdate;
+                let maxEarnings = Math.pow((reserved - lastUpdate) / 30, 2);
+                this.setState({
+                    owner: data.owner,
+                    isForSale: ppcp != 0,
+                    ETHPrice: ethp,
+                    PPCPrice: ppcp,
+                    lastUpdate,
+                    isInPrivate: data.isInPrivate,
+                    reserved,
+                    latestBid: data.lastestBid,
+                    maxEarnings,
+                    earnings: Func.calculateEarnings(lastUpdate, maxEarnings),
+                });
+    
+                this.timerUpdate(lastUpdate, reserved);
+
+                console.info(this.state, data)
+                
+                let canvasData = SDM.getPropertyImage(this.state.x - 1, this.state.y - 1);
+                
+                this.setCanvas(canvasData);
+    
+                this.startTokenEarnedInterval();
+            } else if (!GFD.getData('noMetaMask')) {
+                ctr.stopListeningForResults(LISTENERS.ServerDataManagerInit, 'PixelBox');
+            }
+        });
+
+        if (GFD.getData('noMetaMask')) {
+            GFD.listen('noMetaMask', 'DescBox', this.setup);
+            return;
+        }
+        this.setup(false);
+    }
+
+    setup(noMetaMask) {            
+        if (noMetaMask)
+            return;
+        GFD.close('noMetaMask', 'DescBox');
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (evH1) => {
+            this.setState({evH1});
+            evH1.watch((error, log) => {
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
                 let xx = GFD.getData('x') - 1
                 let yy = GFD.getData('y') - 1;
@@ -113,10 +167,9 @@ class PixelDescriptionBox extends Component {
             });
         });
 
-        ctr.watchEventLogs(EVENTS.PropertyBought, {}, (handle) => {
-            let eventHandleUpdate = handle;
-            this.setState({eventHandleUpdate});
-            eventHandleUpdate.watch((error, log) => {
+        ctr.watchEventLogs(EVENTS.PropertyBought, {}, (evH2) => {
+            this.setState({evH2});
+            evH2.watch((error, log) => {
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
                 let xx = GFD.getData('x') - 1
                 let yy = GFD.getData('y') - 1;
@@ -125,10 +178,9 @@ class PixelDescriptionBox extends Component {
             });
         });
 
-        ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (handle) => {
-            let eventHandleUpdate = handle;
-            this.setState({eventHandleUpdate});
-            eventHandleUpdate.watch((error, log) => {
+        ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (evH3) => {
+            this.setState({evH3});
+            evH3.watch((error, log) => {
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
                 let xx = GFD.getData('x') - 1
                 let yy = GFD.getData('y') - 1;
@@ -136,9 +188,7 @@ class PixelDescriptionBox extends Component {
                     this.loadProperty(xx, yy);
             });
         });
-
-        this.setState({timerUpdater: setInterval(() => this.timerUpdate(), 1000)});
-    }
+    };
 
     timerUpdate(lastUpdate = this.state.lastUpdate, reserved = this.state.reserved) {
         let lastUpdateFormatted = Func.TimeSince(lastUpdate * 1000) + " ago";
@@ -152,7 +202,9 @@ class PixelDescriptionBox extends Component {
     componentWillUnmount() {
         GFD.closeAll('pixelBrowse');
         this.stopTokenEarnedInterval();
-        this.state.eventHandleUpdate.stopWatching();
+        this.state.evH1.stopWatching();
+        this.state.evH2.stopWatching();
+        this.state.evH3.stopWatching();
         clearTimeout(this.state.timerUpdate);
     }
 

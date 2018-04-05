@@ -35,6 +35,8 @@ class CancelSaleForm extends Component {
             this.setState({y});
         })
         ctr.getSystemSalePrices((data) => {
+            if (data == null)
+                return;
             let ppc = Func.BigNumberToNumber(data[1]);
             this.setState({
                 valuePrice: ppc, 

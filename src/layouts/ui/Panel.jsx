@@ -53,11 +53,23 @@ export class PanelPropertyCanvas extends Component {
         ctx.webkitImageSmoothingEnabled = false;
         ctx.scale(this.props.width / 10, this.props.width / 10);
         this.setState({ ctx, scale: this.props.width });
-        if (GFD.getData('ServerDataManagerInit')) {
-            this.setCanvas(SDM.getPropertyImage(this.props.x, this.props.y));
-        } else {
+        if (GFD.getData('ServerDataManagerInit') > 1) {
             ctr.getPropertyColors(this.props.x, this.props.y, (x, y, canvasData) => {
                 this.setCanvas(canvasData);
+            });
+        } else if (GFD.getData('ServerDataManagerInit') > 0) {
+            this.setCanvas(SDM.getPropertyImage(this.props.x, this.props.y));
+        } else {
+            let id = 'mini ' + this.state.x + this.state.y
+            GFD.listen('ServerDataManagerInit', id, (result) => {
+                if (GFD.getData('ServerDataManagerInit') > 1) {
+                    ctr.getPropertyColors(this.props.x, this.props.y, (x, y, canvasData) => {
+                        this.setCanvas(canvasData);
+                    });
+                } else if (GFD.getData('ServerDataManagerInit') > 0) {
+                    this.setCanvas(SDM.getPropertyImage(this.props.x, this.props.y));
+                }
+                GFD.close('ServerDataManagerInit', id);
             });
         }
     }

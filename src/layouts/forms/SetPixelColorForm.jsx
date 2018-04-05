@@ -450,7 +450,7 @@ class SetPixelColorForm extends Component {
                     </Grid>
                 </Segment>
                 <Divider/>
-                <Grid divided fluid>
+                <Grid divided>
                     <GridRow verticalAlign='middle'>
                         <GridColumn width={4}>
                             <Input

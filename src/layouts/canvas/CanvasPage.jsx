@@ -214,7 +214,7 @@ class CanvasPage extends Component {
                     </Segment>
                     <Segment className='center'>
                         <HoverLabel showPrices={this.state.showPopertiesForSale}/>
-                        <HoverBox/>
+                        {null&&<HoverBox/>}
                         <Canvas/>
                     </Segment>
                     <Segment className='right'>
@@ -233,19 +233,19 @@ class CanvasPage extends Component {
                         </div>
                     </Segment>
                 </SegmentGroup>
-                <Segment className={(this.state.advancedMode ? 'lowerSegment' : 'lowerSegment hideElement')}>
+                <Segment className={(this.state.advancedMode ? 'lowerSegment one' : 'lowerSegment one hideElement')}>
                     <div>
                         <Header>Property Browse</Header>
                         <Tab menu={{ secondary: true, pointing: true }} panes={browsePanes} />
                     </div>
                 </Segment>
-                <Segment className={(this.state.advancedMode ? 'lowerSegment' : 'lowerSegment hideElement')}>
+                <Segment className={(this.state.advancedMode ? 'lowerSegment two' : 'lowerSegment two hideElement')}>
                     <div>
                         <Header>Payout History</Header>
                         <Tab menu={{ secondary: true, pointing: true }} panes={payoutPanes} />
                     </div>
                 </Segment>
-                <Segment className={(this.state.advancedMode ? 'lowerSegment' : 'lowerSegment hideElement')}>
+                <Segment className={(this.state.advancedMode ? 'lowerSegment three' : 'lowerSegment three hideElement')}>
                     <div>
                         <Header>Trade History</Header>
                         <Tab menu={{ secondary: true, pointing: true }} panes={tradePanes} />

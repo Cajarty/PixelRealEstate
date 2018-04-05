@@ -25,10 +25,10 @@ body {
 .ui.segment,
 .ui.segments {
     @include animation(fadein, .8s);
-    border-color: $color5 !important;
+    border-color: $color2 !important;
     background-color: $color3 !important;
     &.attached {
-        border-color: $color5 !important;
+        border-color: $color2 !important;
         border-left: 1px solid darken($color3, 10%);
         border-right: 1px solid darken($color3, 10%);
         border-top: 0;
@@ -127,12 +127,17 @@ body {
 }
 
 .ui.modal {
-    @include animation(fadein, .8s);
+    >.header,
+    >.content,
+    >.actions {
+        @include animation(fadein, .6s);
+        background-color: $color1;
+    }
 }
 
 .ui.disabled.input {
     opacity: 1;
-    @include animation(fadein, .8s);
+    @include animation(fadein, .6s);
 }
 
 .item.xLabel {

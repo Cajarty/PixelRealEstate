@@ -21,6 +21,8 @@ class Canvas extends Component {
             cancelToken: null,
             loaded: false,
             canvasLoaded: false,
+            oldPointerX: -1,
+            oldPointerY: -1,
             queuedUpdates: [],
         }
         this.setCanvasProperty = this.setCanvasProperty.bind(this);
@@ -35,7 +37,8 @@ class Canvas extends Component {
             let bodyRect = document.body.getBoundingClientRect();
             let rect = this.canvas.getBoundingClientRect();
             let x = (e.clientX - rect.left) * (1000 / rect.width);
-            let y = (e.clientY - rect.top) * (1000 / rect.height);  
+            let y = (e.clientY - rect.top) * (1000 / rect.height); 
+            this.setCanvasPointer(Math.floor(x / 10), Math.floor(y / 10));
             GFD.setData('hoverX', x);
             GFD.setData('hoverY', y);
             GFD.setData('canvasTopOffset', rect.top - bodyRect.top); //move this and other 3 to a "on canvas resize"
@@ -46,6 +49,7 @@ class Canvas extends Component {
         this.canvas.onmouseout = (e) => {        
             GFD.setData('hoverX', -1);
             GFD.setData('hoverY', -1);
+            this.setCanvasPointer(-1, -1);
             // GFD.setData('pressX', -1);
             // GFD.setData('pressY', -1);
             // GFD.setData('pressTime', -1);
@@ -88,12 +92,26 @@ class Canvas extends Component {
         //     GFD.setData('pressTime', -1);
         // }
 
+        if (GFD.getData('noMetaMask')) {
+            GFD.listen('noMetaMask', 'canvas', this.setup);
+            return;
+        }
+        this.setup(false);
+    }
+
+    setup(noMetaMask) {
+        if (noMetaMask)
+            return;
+        GFD.close('noMetaMask', 'canvas');
         ctr.listenForResults(LISTENERS.ServerDataManagerInit, 'canvas', (results) => {
             if (results.imageLoaded) {
-                this.setState({canvasLoaded: true});
                 this.setCanvas(SDM.pixelData);
-                for (let i in this.state.queuedUpdates) {
-                    this.setCanvasProperty(this.state.queuedUpdates[i].x, this.state.queuedUpdates[i].y, this.state.queuedUpdates[i].colors);
+                if (GFD.getData('ServerDataManagerInit') > 1) {
+                    console.info('swaety')
+                    this.setState({canvasLoaded: true});
+                    for (let i in this.state.queuedUpdates) {
+                        this.setCanvasProperty(this.state.queuedUpdates[i].x, this.state.queuedUpdates[i].y, this.state.queuedUpdates[i].colors);
+                    }
                 }
             }
         })
@@ -144,6 +162,37 @@ class Canvas extends Component {
             }
         }
         this.state.ctx.putImageData(image, 0, 0);
+    }
+
+    setCanvasPointer(x, y) {
+        let oldX = this.state.oldPointerX;
+        let oldY = this.state.oldPointerY;
+        if (x == -1 || y == -1) {
+            this.colorizePointer(oldX, oldY, 10);
+            this.setState({oldPointerX: -1, oldPointerY: -1});
+            return;
+        }
+        if (x == oldX && y == oldY) {
+            return;
+        }
+        this.colorizePointer(oldX, oldY, 10);
+        this.colorizePointer(x, y, .1);
+        this.setState({oldPointerX: x, oldPointerY: y});
+    }
+
+    //shape vars
+
+    colorizePointer(x, y, alpha) {
+        if (x == -1 || y == -1)
+            return;
+        let ctxID = this.state.ctx.getImageData((x * 10) - 2, (y * 10) - 2, 14, 14);
+        for (let i = 3; i < ctxID.data.length; i+=4) {
+            let idx = (i - 3) / 4;
+            if (idx < 28 || idx >= 168 || idx % 14 < 2 || idx % 14 >= 12) {
+                ctxID.data[i] *= alpha;
+            }
+        }
+        this.state.ctx.putImageData(ctxID, (x * 10) - 2, (y * 10) - 2);
     }
 
     setCanvasProperty(x, y, rgbArr) {

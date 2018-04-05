@@ -161,8 +161,8 @@ class BuyPixelForm extends Component {
                             <Label style={{float: 'right'}}>ETH<LabelDetail>{this.state.ETHToPay}</LabelDetail></Label>
                             <FormInput
                                 className='buySlider'
-                                min={0}
-                                max={this.state.PPCPrice}
+                                min={this.state.PPCPrice}
+                                max={0}
                                 type='range'
                                 step={1}
                                 value={this.state.PPCSelected}

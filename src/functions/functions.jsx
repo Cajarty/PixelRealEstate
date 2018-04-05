@@ -5,6 +5,20 @@ var bigInt = require("big-integer");
 var BigNumber = require('bignumber.js');
 var utf8 = require("utf8");
 
+export const PAGES = {
+    TOP: {query: 'html'},
+    BROWSE: {query: '.lowerSegment.one'},
+    CHANGE_LOG: {query: '.lowerSegment.two'},
+    TRADE_LOG: {query: '.lowerSegment.three'},
+};
+
+export const ScrollTo = (page) => {
+    let element = document.querySelector(page.query);
+    console.info(element, page);
+    if (element != null)
+        element.scrollIntoView({behavior: "smooth", block: "start", inline: "start"});
+}
+
 export const TimeSince = (date, to = false) => {
     let seconds = Math.floor((new Date() - date) / 1000);
     let interval = Math.floor(seconds / 31536000);

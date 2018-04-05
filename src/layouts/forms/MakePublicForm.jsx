@@ -31,7 +31,7 @@ class MakePublicForm extends Component {
         this.setState(update);
     }
 
-    componentDidMount() {
+    componentDidMountOpen() {
         GFD.listen('x', 'ChangePropertyMode', (x) => {
             this.setState({x});
         })
@@ -51,7 +51,7 @@ class MakePublicForm extends Component {
         })
     }
 
-    componentWillUnmount() {
+    componentDidUnmountOpen() {
         GFD.closeAll('ChangePropertyMode');
     }
 
@@ -79,6 +79,12 @@ class MakePublicForm extends Component {
         })
     }
 
+    componentDidUpdate(pP, pS) {
+        if (this.state.isOpen && !pS.isOpen)
+            this.componentDidMountOpen();
+        else if (!this.state.isOpen && pS.isOpen)
+            this.componentDidUnmountOpen();
+    }
 
     changeTokens(t) {
         this.setState({

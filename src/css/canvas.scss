@@ -1,5 +1,6 @@
 @import './animation.scss';
 .canvas {
+    background-color: $color3;
     display: block;
     margin-left: -2px;
     image-rendering: optimizeSpeed;
@@ -8,6 +9,7 @@
     image-rendering: -o-crisp-edges;
     image-rendering: -webkit-optimize-contrast;
     -ms-interpolation-mode: nearest-neighbor;
+    cursor: none;
     min-height: 400px;
     min-width: 400px;
     height: calc(100vh - 60px);

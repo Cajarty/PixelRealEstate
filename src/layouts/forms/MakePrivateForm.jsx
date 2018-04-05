@@ -33,7 +33,7 @@ class MakePrivateForm extends Component {
         this.setState(update);
     }
 
-    componentDidMount() {
+    componentDidMountOpen() {
         GFD.listen('x', 'ChangePropertyMode', (x) => {
             this.setState({x});
         })
@@ -55,7 +55,7 @@ class MakePrivateForm extends Component {
         })
     }
 
-    componentWillUnmount() {
+    componentDidUnmountOpen() {
         GFD.closeAll('ChangePropertyMode');
     }
 
@@ -81,6 +81,14 @@ class MakePrivateForm extends Component {
         ctr.setPropertyMode(x, y, true, this.state.minutesPrivate, () => {
             console.info("Mode toggled, confirmed through a transaction");
         })
+    }
+
+
+    componentDidUpdate(pP, pS) {
+        if (this.state.isOpen && !pS.isOpen)
+            this.componentDidMountOpen();
+        else if (!this.state.isOpen && pS.isOpen)
+            this.componentDidUnmountOpen();
     }
 
 

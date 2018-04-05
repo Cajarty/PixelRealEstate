@@ -213,3 +213,7 @@ body {
     animation-duration: 10s;
     animation-iteration-count: infinite;
 }
+
+.ui.grid.detailTable {
+    @include animation(fadein, .6s);
+}

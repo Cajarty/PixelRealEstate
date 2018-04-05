@@ -158,7 +158,7 @@ contract('VirtualRealEstate', function(accounts) {
   });
 
   // web3.eth.getBalance(accounts[0])
-  
+
   //####PURCHASE, SELLING & TRANSFERING####
  it("User0 can purchase a property at default price in ETH", function() {
    return VirtualRealEstate.deployed().then(function(instance) {
@@ -504,8 +504,8 @@ contract('VirtualRealEstate', function(accounts) {
   }).then(function(balanceAfter)  {
      privPubAfterSet++;
      balanceAfter++;
-     assert.equal(privPubBeforeSet, privPubAfterSet, "Should have spent one coin setting it to public");
-     assert.equal(privPubBeforeSet, balanceAfter, "Should have not gotten that one returned as it should truncate");
+     assert.equal(privPubBeforeSet.toNumber(), privPubAfterSet, "Should have spent one coin setting it to public");
+     assert.equal(privPubBeforeSet.toNumber(), balanceAfter, "Should have not gotten that one returned as it should truncate");
      return pixelPropertyInstance.getPropertyData(0, { from: accounts[0] });
    }).then(function(propertyData) {
      assert.equal(propertyData[4], false, "Should be in public mode");

@@ -51,6 +51,7 @@ let bigIntsToString = (bigInts) => {
   return result.reverse().join("");
 }
 
+
 /**
  * Converts an RGB color value to HSL. Conversion formula
  * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
@@ -155,6 +156,9 @@ contract('VirtualRealEstate', function(accounts) {
       return pxlPropertyInstance.setPixelPropertyContract(pixelPropertyInstance.address);
     });
   });
+
+  // web3.eth.getBalance(accounts[0])
+  
   //####PURCHASE, SELLING & TRANSFERING####
  it("User0 can purchase a property at default price in ETH", function() {
    return VirtualRealEstate.deployed().then(function(instance) {

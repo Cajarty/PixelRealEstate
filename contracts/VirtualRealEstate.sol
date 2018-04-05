@@ -30,7 +30,7 @@ contract VirtualRealEstate {
 
     /* ### Events ### */
     event PropertyColorUpdate(uint16 indexed property, uint256[10] colors, uint256 lastUpdate, address indexed lastUpdaterPayee, uint256 becomePublic);
-    event PropertyBought(uint16 indexed property, address indexed newOwner, uint256 ethAmount, uint256 PXLAmount, uint256 timestamp);
+    event PropertyBought(uint16 indexed property, address indexed newOwner, uint256 ethAmount, uint256 PXLAmount, uint256 timestamp, address indexed oldOwner);
     event SetUserHoverText(address indexed user, uint256[2] newHoverText);
     event SetUserSetLink(address indexed user, uint256[2] newLink);
     event PropertySetForSale(uint16 indexed property, uint256 forSalePrice);
@@ -151,7 +151,7 @@ contract VirtualRealEstate {
     // Transfer Property ownership between accounts. This has no cost, no cut and does not change flag status
     function transferProperty(uint16 propertyID, address newOwner) public validPropertyID(propertyID) returns(bool) {
         require(pxlProperty.getPropertyOwner(propertyID) == msg.sender);
-        _transferProperty(propertyID, newOwner, 0, 0, pxlProperty.getPropertyFlag(propertyID));
+        _transferProperty(propertyID, newOwner, 0, 0, pxlProperty.getPropertyFlag(propertyID), msg.sender);
         return true;
     }
     // Purchase a unowned system-Property in a combination of PXL and ETH
@@ -180,7 +180,7 @@ contract VirtualRealEstate {
         minPercent = systemSalePriceETH * PRICE_ETH_MIN_PERCENT / 100;
         systemSalePriceETH += ((minPercent < PRICE_ETH_MIN_INCREASE) ? minPercent : PRICE_ETH_MIN_INCREASE) * pxlLeft / systemSalePricePXL;
         
-        _transferProperty(propertyID, msg.sender, msg.value, pxlValue, 0);
+        _transferProperty(propertyID, msg.sender, msg.value, pxlValue, 0, 0);
         
         return true;
     }
@@ -188,6 +188,7 @@ contract VirtualRealEstate {
     function buyPropertyInPXL(uint16 propertyID, uint256 PXLValue) public validPropertyID(propertyID) {
         // If Property is system-owned
         var (propertyOwner, propertySalePrice) = pxlProperty.getPropertyOwnerSalePrice(propertyID);
+        address originalOwner = propertyOwner;
         if (propertyOwner == 0) {
             // Turn it into a user-owned at system price with contract owner as owner
             pxlProperty.setPropertySalePrice(propertyID, systemSalePricePXL);
@@ -205,8 +206,9 @@ contract VirtualRealEstate {
         pxlProperty.burnPXL(msg.sender, propertySalePrice);
         pxlProperty.rewardPXL(propertyOwner, amountTransfered);
         pxlProperty.rewardPXL(owner, propertySalePrice - amountTransfered);
-        _transferProperty(propertyID, msg.sender, 0, propertySalePrice, 0);
+        _transferProperty(propertyID, msg.sender, 0, propertySalePrice, 0, originalOwner);
     }
+    
     // Purchase a system-Property in pure ETH
     function buyPropertyInETH(uint16 propertyID) public validPropertyID(propertyID) payable returns(bool) {
         require(pxlProperty.getPropertyOwner(propertyID) == 0);
@@ -216,7 +218,7 @@ contract VirtualRealEstate {
     
         uint256 minPercent = systemSalePriceETH * PRICE_ETH_MIN_PERCENT / 100;
         systemSalePriceETH += (minPercent < PRICE_ETH_MIN_INCREASE) ? minPercent : PRICE_ETH_MIN_INCREASE;
-        _transferProperty(propertyID, msg.sender, msg.value, 0, 0);
+        _transferProperty(propertyID, msg.sender, msg.value, 0, 0, 0);
         return true;
     }
     
@@ -285,7 +287,9 @@ contract VirtualRealEstate {
                 pxlSpent = 3; //We're treating it like 2, but it's N+1 in the math using this
             }
             require(pxlProperty.balanceOf(msg.sender) >= pxlToSpend);
-            pxlProperty.burnPXL(msg.sender, pxlToSpend);
+            if (pxlToSpend != 0) {
+                pxlProperty.burnPXL(msg.sender, pxlToSpend);
+            }
             //Get the amount of generated PXL for this trigger
             uint256 payoutEach = getProjectedPayout(propertyID);
             if (payoutEach > 0) {
@@ -309,10 +313,10 @@ contract VirtualRealEstate {
         return true;
     }
     // Transfer ownership of a Property and reset their info
-    function _transferProperty(uint16 propertyID, address newOwner, uint256 ethAmount, uint256 PXLAmount, uint8 flag) private {
+    function _transferProperty(uint16 propertyID, address newOwner, uint256 ethAmount, uint256 PXLAmount, uint8 flag, address oldOwner) private {
         require(newOwner != 0);
         pxlProperty.setPropertyOwnerSalePricePrivateModeFlag(propertyID, newOwner, 0, false, flag);
-        PropertyBought(propertyID, newOwner, ethAmount, PXLAmount, now);
+        PropertyBought(propertyID, newOwner, ethAmount, PXLAmount, now, oldOwner);
     }
     
     // Gets the (owners address, Ethereum sale price, PXL sale price, last update timestamp, whether its in private mode or not, when it becomes public timestamp, flag) for a Property

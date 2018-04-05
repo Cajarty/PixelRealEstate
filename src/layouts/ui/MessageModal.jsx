@@ -36,7 +36,7 @@ class MessageModal extends Component {
       </ModalContent>
       <ModalActions>
         <Button color='green' primary inverted onClick={() => this.close()}>
-          <Icon name='checkmark'/> Yes
+          <Icon name='checkmark'/> OK
         </Button>
       </ModalActions>
     </Modal>

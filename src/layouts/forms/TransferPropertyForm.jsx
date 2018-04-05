@@ -3,7 +3,8 @@ import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import ConfirmModal from '../ui/ConfirmModal';
-import {Modal, ModalContent, Input, ModalHeader, Popup, Label, Divider, Icon, ModalActions} from 'semantic-ui-react';
+import * as Strings from '../../const/strings';
+import {Modal, ModalContent, Input, ModalHeader, Popup, Label, Divider, Icon, ModalActions, Message} from 'semantic-ui-react';
 
 class TransferPropertyForm extends Component {
     constructor(props) {
@@ -77,6 +78,12 @@ class TransferPropertyForm extends Component {
                 >
                 <ModalHeader>Transfer Property</ModalHeader>
                 <ModalContent>
+                <Message size='mini' floating fluid>
+                    {Strings.FORM_TRANSFER.map((str, i) => (
+                        <p key={i}>{str}</p>
+                    ))}
+                </Message>
+                <Divider/>
                 <Divider horizontal>New Owner</Divider>
                 <Input
                     placeholder="Address"

@@ -2,8 +2,9 @@ import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
+import * as Strings from '../../const/strings';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
-import {Segment, ModalContent, Divider, Modal, Grid, Label, Input, Container, Icon, Button, Popup, ModalActions, ModalHeader} from 'semantic-ui-react';
+import {Segment, ModalContent, Divider, Modal, Grid, Label, Input, Container, Icon, Button, Popup, ModalActions, ModalHeader, Message} from 'semantic-ui-react';
 
 const TOKENS_TO_MINUTES = 1;
 
@@ -107,6 +108,12 @@ class MakePublicForm extends Component {
             >
                 <ModalHeader>Set Property Private</ModalHeader>
                 <ModalContent>
+                <Message size='mini' floating fluid>
+                    {Strings.FORM_SET_PUBLIC.map((str, i) => (
+                        <p key={i}>{str}</p>
+                    ))}
+                </Message>
+                <Divider/>
                 <div className='twoColumn w50 left'>
                     <Input
                         placeholder="1 - 100"

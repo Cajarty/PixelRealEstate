@@ -43,7 +43,10 @@ class PropertiesForSale extends Component {
     }
 
     onResize = (e) => {
-        let containerWidth = document.querySelector('.itemContainer').clientWidth;
+        let container = document.querySelector('.itemContainer');
+        if (!container)
+            return;
+        let containerWidth = container.clientWidth;
         let pageSize = Math.floor(containerWidth / ITEM_SIZE);
         let size = (e.size != null ? e.size : this.state.items);
         this.setState({
@@ -96,6 +99,8 @@ class PropertiesForSale extends Component {
     }
 
     render() {
+        if (this.state.orderedItems.length == 0)
+            return (<h3 className='noContent'>None Yet!</h3>);
         return (
             <div style={{height: '100%'}}>
                {null&& <div>

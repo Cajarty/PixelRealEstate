@@ -6,7 +6,7 @@ import Timestamp from 'react-timestamp';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import Hours from '../ui/Hours';
 import Moment from 'react-moment';
-import {Label, Input, Item, Button, Popup, Icon, Grid, Segment, SegmentGroup} from 'semantic-ui-react';
+import Message, { Label, Input, Item, Button, Popup, Icon, Grid, Segment, SegmentGroup, Divider } from 'semantic-ui-react';
 import BuyPixelForm from '../forms/BuyPixelForm';
 import SellPixelForm from '../forms/SellPixelForm';
 import SetPixelColorForm from '../forms/SetPixelColorForm';
@@ -16,6 +16,7 @@ import MakePrivateForm from '../forms/MakePrivateForm';
 import MakePublicForm from '../forms/MakePublicForm';
 import PlaceBidForm from '../forms/PlaceBidForm';
 import MessageModal from './MessageModal';
+import Info from './Info';
 
 const NOBODY = '0x0000000000000000000000000000000000000000';
 
@@ -306,49 +307,49 @@ class PixelDescriptionBox extends Component {
 
     render() {
         return (
-            <SegmentGroup className='pixelDescriptionBox'>
-                <Segment className='colorPreview'>
+            <div className='pixelDescriptionBox'>
+                <div className='colorPreview'>
                     <Item className='colorPreivewCanvasContainer'>
                         <canvas id='colorPreviewCanvas' width={100} height={100} ref={(canvas) => { this.canvas = canvas; }} ></canvas>
                     </Item>
                     <canvas className='hidden' width={10} height={10} ref={(dataCanvas) => { this.dataCanvas = dataCanvas; }} ></canvas>
-                </Segment>
-                <Segment>
-                    <div className='twoColumn w50 left'>
-                        <Input
-                            placeholder="1 - 100"
-                            type="number"
-                            className='oneColumnFull'
-                            fluid
-                            label={<Popup
-                                trigger={<Label className='uniform'>X</Label>}
-                                content='X Position'
-                                className='Popup'
-                                size='tiny'
-                            />}
-                            value={this.state.x} 
-                            onChange={(e) => this.setX(e.target.value)}
-                        />
-                    </div>
-                    <div className='twoColumn w50 right'>
-                        <Input
-                            placeholder="1 - 100"
-                            type="number"
-                            label={<Popup
-                                trigger={<Label className='uniform'>Y</Label>}
-                                content='Y Position'
-                                className='Popup'
-                                size='tiny'
-                            />}
-                            className='oneColumnFull'
-                            fluid
-                            value={this.state.y} 
-                            onChange={(e) => this.setY(e.target.value)}
-                        />
-                    </div>
-                </Segment>
+                </div>
+                <Divider/>
+                <div className='twoColumn w50 left'>
+                    <Input
+                        placeholder="1 - 100"
+                        type="number"
+                        className='oneColumnFull'
+                        fluid
+                        label={<Popup
+                            trigger={<Label className='uniform'>X</Label>}
+                            content='X Position'
+                            className='Popup'
+                            size='tiny'
+                        />}
+                        value={this.state.x} 
+                        onChange={(e) => this.setX(e.target.value)}
+                    />
+                </div>
+                <div className='twoColumn w50 right'>
+                    <Input
+                        placeholder="1 - 100"
+                        type="number"
+                        label={<Popup
+                            trigger={<Label className='uniform'>Y</Label>}
+                            content='Y Position'
+                            className='Popup'
+                            size='tiny'
+                        />}
+                        className='oneColumnFull'
+                        fluid
+                        value={this.state.y} 
+                        onChange={(e) => this.setY(e.target.value)}
+                    />
+                </div>
                 {this.state.owner != '' ? 
-                    <Segment>
+                    <div>
+                        <Divider/>
                         <Input
                             placeholder="Address"
                             fluid disabled
@@ -478,14 +479,11 @@ class PixelDescriptionBox extends Component {
                             actionPosition='left'
                             value={this.state.link != '' ? this.state.link : "None Set"}
                         />
-                    </Segment>
-                : <Segment>
-                    <p>
-                        Click a Property on the canvas or enter the coordinates above to see more about a property.
-                    </p>
-                </Segment>}
+                    </div>
+                : <Info messages='Click a Property on the canvas or enter the coordinates above to see more about a property.'/>}
                 {this.state.x != '' && this.state.y != '' && !this.state.noAccount &&
-                    <Segment>
+                    <div>
+                        <Divider/>
                         <Grid columns='two' divided>
                             {this.getActionsList().map((action, i) => (
                                 <Grid.Row key={i}>
@@ -498,7 +496,7 @@ class PixelDescriptionBox extends Component {
                                 </Grid.Row>
                             ))}
                         </Grid>
-                    </Segment>
+                    </div>
                 } 
             
                 <BuyPixelForm isOpen={this.state.isOpen.BUY} close={this.toggleAction.bind(this)}/>
@@ -509,7 +507,7 @@ class PixelDescriptionBox extends Component {
                 <MakePrivateForm isOpen={this.state.isOpen.SET_PRIVATE} close={this.toggleAction.bind(this)}/>
                 {/*<TransferPropertyForm isOpen={this.state.isOpen.TRANSFER} close={this.toggleAction.bind(this)}/>*/}
                 <PlaceBidForm isOpen={this.state.isOpen.PLACE_BID} close={this.toggleAction.bind(this)}/>
-            </SegmentGroup>
+            </div>
         );
     }
 }

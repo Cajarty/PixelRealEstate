@@ -99,22 +99,21 @@ class PropertiesOwned extends Component {
     render() {
         if (this.state.orderedItems.length == 0)
             return (<h3 className='noContent'>None Yet!</h3>);
-        else 
-            return (
-                <div style={{height: '100%'}}>
-                    <Button attached='top' onClick={() => {this.changePage(true)}}><Icon name='chevron up'></Icon></Button>
-                    <Segment attached style={{height: 'calc(100% - 74px)'}} className='itemContainer'>
-                        <PanelContainerOwned
-                            data={this.state.orderedItems}
-                            onClick={(x, y) => this.propertySelected(x, y)}
-                            viewStart={this.state.itemIndex}
-                            viewEnd={this.state.itemIndex + this.state.pageSize}
-                            maxPageSize={this.state.maxPageSize}
-                        />
-                    </Segment>
-                    <Button attached='bottom' onClick={() => {this.changePage(false)}}><Icon name='chevron down'></Icon></Button>
-                </div>
-            );
+        return (
+            <div style={{height: '100%'}}>
+                <Button attached='top' onClick={() => {this.changePage(true)}}><Icon name='chevron up'></Icon></Button>
+                <Segment attached style={{height: 'calc(100% - 74px)'}} className='itemContainer'>
+                    <PanelContainerOwned
+                        data={this.state.orderedItems}
+                        onClick={(x, y) => this.propertySelected(x, y)}
+                        viewStart={this.state.itemIndex}
+                        viewEnd={this.state.itemIndex + this.state.pageSize}
+                        maxPageSize={this.state.maxPageSize}
+                    />
+                </Segment>
+                <Button attached='bottom' onClick={() => {this.changePage(false)}}><Icon name='chevron down'></Icon></Button>
+            </div>
+        );
     }
 }
 

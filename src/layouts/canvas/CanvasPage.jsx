@@ -17,6 +17,8 @@ import PropertyChangeLogYou from '../logs/PropertyChangeLogYou';
 import PropertyChangeLog from '../logs/PropertyChangeLog';
 import PropertySalesLogYou from '../logs/PropertySalesLogYou';
 import PropertySalesLog from '../logs/PropertySalesLog';
+import PropertySalesLogTopPXL from '../logs/PropertySalesLogTopPXL';
+import PropertySalesLogTopETH from '../logs/PropertySalesLogTopETH';
 import { Segment, SegmentGroup, Button, Divider, Label, 
     LabelDetail, Input, Icon, Item, ItemContent, ItemImage, 
     ItemGroup, Tab, Header, Grid, Sidebar, MenuItem, TabPane, Menu, Checkbox, Popup} from 'semantic-ui-react';
@@ -147,30 +149,32 @@ class CanvasPage extends Component {
                 /></TabPane> 
             }];
 
-        let payoutPanes = [{ menuItem: 'Top 10', render: () => <TabPane className='middlePane' attached={false}><PropertyChangeLogTop/></TabPane> },
-        { menuItem: 'Recent', render: () => <TabPane className='middlePane' attached={false}><PropertyChangeLog/></TabPane> },
-        { menuItem: 'You', render: () => <TabPane className='middlePane' attached={false}><PropertyChangeLogYou/></TabPane> }];
+        let payoutPanes = [
+            { menuItem: 'Top 10', render: () => <TabPane className='middlePane' attached={false}><PropertyChangeLogTop/></TabPane> },
+            { menuItem: 'Recent', render: () => <TabPane className='middlePane' attached={false}><PropertyChangeLog/></TabPane> },
+            { menuItem: 'You', render: () => <TabPane className='middlePane' attached={false}><PropertyChangeLogYou/></TabPane> }
+        ];
 
-        let tradePanes = [{ menuItem: 'Top 10', render: () => <TabPane className='bottomPane' attached={false}>Tab 1 Content</TabPane> },
-        { menuItem: 'Recent', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLog/></TabPane> },
-        { menuItem: 'You', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLogYou/></TabPane> }];
+        let tradePanes = [
+            { menuItem: 'Top 10 PXL', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLogTopPXL/></TabPane> },
+            { menuItem: 'Top 10 ETH', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLogTopETH/></TabPane> },
+            { menuItem: 'Recent', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLog/></TabPane> },
+            { menuItem: 'You', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLogYou/></TabPane> }
+        ];
         return (
             <div>
                 <SegmentGroup horizontal className='mainSegmentGroup'> 
                     <Segment className='left'>
-                        <SegmentGroup>
-                            <Segment>
+                            
                                 <ZoomCanvas/>
-                            </Segment>
-                            <Segment>
+                                <Divider/>
                                 <ItemGroup>
                                     <Item className='pixelsOwnedItem'>
                                         <ItemImage size='mini' src={this.state.loadingPPC ? Assets.LOADING : Assets.TOKEN}  />
                                         <ItemContent verticalAlign='middle'>{this.state.PPCOwned} </ItemContent>
                                     </Item>
                                 </ItemGroup>
-                            </Segment>
-                            <Segment>
+                                <Divider/>
                                 <Button onClick={() => this.visitPortfolio()} fluid>Visit PixelProperty.io</Button>
                                 <a 
                                     href='https://pixelproperty.io/' 
@@ -193,8 +197,6 @@ class CanvasPage extends Component {
                                     />
                                 </div>
                                 }
-                            </Segment>
-                        </SegmentGroup>
                     </Segment>
                     <Segment className='center'>
                         <HoverLabel showPrices={this.state.showPopertiesForSale}/>
@@ -237,17 +239,13 @@ class CanvasPage extends Component {
                     </div>
                 </Segment>
                 <Sidebar id='footer' className='footer' as={Menu} animation='push' direction='bottom' visible inverted>
-                    <MenuItem name='home'>
-                    <Icon name='home' />
-                    Home
+                    <MenuItem name='file text outline'>
+                    <Icon name='file text outline' />
+                    Privacy Policy
                     </MenuItem>
-                    <MenuItem name='gamepad'>
-                    <Icon name='gamepad' />
-                    Games
-                    </MenuItem>
-                    <MenuItem name='camera'>
-                    <Icon name='camera' />
-                    Channels
+                    <MenuItem name='file text outline'>
+                    <Icon name='file text outline' />
+                    TOS
                     </MenuItem>
                 </Sidebar>
             </div>

@@ -3,7 +3,8 @@ import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import { Slider } from 'react-semantic-ui-range';
-import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon } from 'semantic-ui-react';
+import * as Strings from '../../const/strings';
+import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon, Segment, Message } from 'semantic-ui-react';
 
 class BuyPixelForm extends Component {
     constructor(props) {
@@ -114,6 +115,12 @@ class BuyPixelForm extends Component {
                 >
                 <ModalHeader>Buy Property</ModalHeader>
                 <ModalContent>
+                    <Message size='mini' floating fluid>
+                        {Strings.FORM_BUY.map((str, i) => (
+                            <p key={i}>{str}</p>
+                        ))}
+                    </Message>
+                    <Divider/>
                     <div className='twoColumn w50 left'>
                         <Input
                             placeholder="1 - 100"

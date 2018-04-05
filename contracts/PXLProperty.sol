@@ -27,15 +27,15 @@ contract PXLProperty is StandardToken {
     uint8 constant FLAG_BAN = 2;
     
     /* Accesser Addresses & Levels */
-    address pixelPropertyContract;          // Only contract that has control over PXL creation and Property ownership
-    mapping (address => uint8) regulators;  // Mapping of users/contracts to their control levels
+    address pixelPropertyContract; // Only contract that has control over PXL creation and Property ownership
+    mapping (address => uint8) regulators; // Mapping of users/contracts to their control levels
     
     // Mapping of PropertyID to Property
-    mapping (uint16 => Property) properties;
+    mapping (uint16 => Property) public properties;
     // Property Owner's website
-    mapping (address => uint256[2]) ownerWebsite;
+    mapping (address => uint256[2]) public ownerWebsite;
     // Property Owner's hover text
-    mapping (address => uint256[2]) ownerHoverText;
+    mapping (address => uint256[2]) public ownerHoverText;
     
     /* ### Ownable Property Structure ### */
     struct Property {
@@ -111,13 +111,11 @@ contract PXLProperty is StandardToken {
     
     /* ### PropertyDapp Functions ### */
     function setPropertyColors(uint16 propertyID, uint256[10] colors) public propertyDAppAccess() {
-        Property storage property = properties[propertyID];
-        property.colors = colors;
+        properties[propertyID].colors = colors;
     }
     
     function setPropertyRowColor(uint16 propertyID, uint8 row, uint256 rowColor) public propertyDAppAccess() {
-        Property storage property = properties[propertyID];
-        property.colors[row] = rowColor;
+        properties[propertyID].colors[row] = rowColor;
     }
     
     function setOwnerHoverText(address textOwner, uint256[2] hoverText) public propertyDAppAccess() {
@@ -161,6 +159,30 @@ contract PXLProperty is StandardToken {
         properties[propertyID].earnUntil = earnUntil;
     }
     
+    function setPropertyPrivateModeEarnUntilLastUpdateBecomePublic(uint16 propertyID, bool privateMode, uint256 earnUntil, uint256 lastUpdate, uint256 becomePublic) public pixelPropertyAccess {
+        properties[propertyID].isInPrivateMode = privateMode;
+        properties[propertyID].earnUntil = earnUntil;
+        properties[propertyID].lastUpdate = lastUpdate;
+        properties[propertyID].becomePublic = becomePublic;
+    }
+    
+    function setPropertyLastUpdaterLastUpdate(uint16 propertyID, address lastUpdater, uint256 lastUpdate) public pixelPropertyAccess() {
+        properties[propertyID].lastUpdater = lastUpdater;
+        properties[propertyID].lastUpdate = lastUpdate;
+    }
+    
+    function setPropertyBecomePublicEarnUntil(uint16 propertyID, uint256 becomePublic, uint256 earnUntil) public pixelPropertyAccess() {
+        properties[propertyID].becomePublic = becomePublic;
+        properties[propertyID].earnUntil = earnUntil;
+    }
+    
+    function setPropertyOwnerSalePricePrivateModeFlag(uint16 propertyID, address owner, uint256 salePrice, bool privateMode, uint8 flag) public pixelPropertyAccess() {
+        properties[propertyID].owner = owner;
+        properties[propertyID].salePrice = salePrice;
+        properties[propertyID].isInPrivateMode = privateMode;
+        properties[propertyID].flag = flag;
+    }
+    
     /* ### PixelProperty PXL Functions ### */
     function rewardPXL(address rewardedUser, uint256 amount) public pixelPropertyAccess() {
         require(rewardedUser != 0);
@@ -176,6 +198,14 @@ contract PXLProperty is StandardToken {
     }
     
     /* ### All Getters/Views ### */
+    function getOwnerHoverText(address user) public view returns(uint256[2]) {
+        return ownerHoverText[user];
+    }
+    
+    function getOwnerLink(address user) public view returns(uint256[2]) {
+        return ownerWebsite[user];
+    }
+    
     function getPropertyFlag(uint16 propertyID) public view returns(uint8) {
         return properties[propertyID].flag;
     }
@@ -196,10 +226,6 @@ contract PXLProperty is StandardToken {
         return properties[propertyID].colors;
     }
     
-    function getPropertyRowColor(uint16 propertyID, uint8 row) public view returns(uint256) {
-        return properties[propertyID].colors[row];
-    }
-    
     function getPropertySalePrice(uint16 propertyID) public view returns(uint256) {
         return properties[propertyID].salePrice;
     }
@@ -216,21 +242,13 @@ contract PXLProperty is StandardToken {
         return properties[propertyID].earnUntil;
     }
     
-    function getOwnerHoverText(address textOwner) public view returns(uint256[2]) {
-        return ownerHoverText[textOwner];
-    }
-    
-    function getOwnerLink(address websiteOwner) public view returns(uint256[2]) {
-        return ownerWebsite[websiteOwner];
-    }
-    
     function getRegulatorLevel(address user) public view returns(uint8) {
         return regulators[user];
     }
     
     // Gets the (owners address, Ethereum sale price, PXL sale price, last update timestamp, whether its in private mode or not, when it becomes public timestamp, flag) for a Property
     function getPropertyData(uint16 propertyID, uint256 systemSalePriceETH, uint256 systemSalePricePXL) public view returns(address, uint256, uint256, uint256, bool, uint256, uint8) {
-        Property storage property = properties[propertyID];
+        Property memory property = properties[propertyID];
         bool isInPrivateMode = property.isInPrivateMode;
         //If it's in private, but it has expired and should be public, set our bool to be public
         if (isInPrivateMode && property.becomePublic <= now) { 
@@ -241,5 +259,21 @@ contract PXLProperty is StandardToken {
         } else {
             return (property.owner, 0, property.salePrice, property.lastUpdate, isInPrivateMode, property.becomePublic, property.flag);
         }
+    }
+    
+    function getPropertyPrivateModeBecomePublic(uint16 propertyID) public view returns (bool, uint256) {
+        return (properties[propertyID].isInPrivateMode, properties[propertyID].becomePublic);
+    }
+    
+    function getPropertyLastUpdaterBecomePublic(uint16 propertyID) public view returns (address, uint256) {
+        return (properties[propertyID].lastUpdater, properties[propertyID].becomePublic);
+    }
+    
+    function getPropertyOwnerSalePrice(uint16 propertyID) public view returns (address, uint256) {
+        return (properties[propertyID].owner, properties[propertyID].salePrice);
+    }
+    
+    function getPropertyPrivateModeLastUpdateEarnUntil(uint16 propertyID) public view returns (bool, uint256, uint256) {
+        return (properties[propertyID].isInPrivateMode, properties[propertyID].lastUpdate, properties[propertyID].earnUntil);
     }
 }

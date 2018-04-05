@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
+import Info from '../ui/Info';
 import * as Strings from '../../const/strings';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 import {Segment, ModalContent, Divider, Modal, Grid, Label, Input, Container, Icon, Button, Popup, ModalActions, ModalHeader, Message} from 'semantic-ui-react';
@@ -108,11 +109,7 @@ class MakePublicForm extends Component {
             >
                 <ModalHeader>Set Property Private</ModalHeader>
                 <ModalContent>
-                <Message size='mini' floating fluid>
-                    {Strings.FORM_SET_PUBLIC.map((str, i) => (
-                        <p key={i}>{str}</p>
-                    ))}
-                </Message>
+                <Info messages={Strings.FORM_SET_PUBLIC}/>
                 <Divider/>
                 <div className='twoColumn w50 left'>
                     <Input

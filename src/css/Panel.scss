@@ -3,7 +3,7 @@
     color: $color5;
     padding: 4px;
     margin: 4px;
-    box-shadow: black 1px 1px 1px 1px;
+    box-shadow: $color2 1px 1px 1px 1px;
     div {
         display: inline-block;
         vertical-align: middle;
@@ -15,7 +15,7 @@
         border-top: none;
     }
     &:active {
-        box-shadow: black 0px 0px 1px 1px;
+        box-shadow: $color2 0px 0px 1px 1px;
     }
     &:hover {
         cursor: pointer;

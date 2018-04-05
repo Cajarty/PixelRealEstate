@@ -12,7 +12,7 @@ export class GlobalState {
             pressTime: null,
             canvasTopOffset: null,
             canvasLeftOffset: null,
-            advancedMode: true,
+            advancedMode: false,
             noAccount: false,
             screenWidth: 100,
             screenHeight: 100,

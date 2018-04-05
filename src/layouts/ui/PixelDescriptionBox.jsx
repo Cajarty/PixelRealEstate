@@ -17,6 +17,7 @@ import MakePublicForm from '../forms/MakePublicForm';
 import PlaceBidForm from '../forms/PlaceBidForm';
 import MessageModal from './MessageModal';
 import Info from './Info';
+import ErrorBox from '../ErrorBox';
 
 const NOBODY = '0x0000000000000000000000000000000000000000';
 
@@ -480,7 +481,7 @@ class PixelDescriptionBox extends Component {
                             value={this.state.link != '' ? this.state.link : "None Set"}
                         />
                     </div>
-                : <Info messages='Click a Property on the canvas or enter the coordinates above to see more about a property.'/>}
+                : (!this.state.noAccount && <Info messages='Click a Property on the canvas or enter the coordinates above to see more about a property.'/>)}
                 {this.state.x != '' && this.state.y != '' && !this.state.noAccount &&
                     <div>
                         <Divider/>
@@ -498,6 +499,11 @@ class PixelDescriptionBox extends Component {
                         </Grid>
                     </div>
                 } 
+                {this.state.noAccount && 
+                <div>
+                    <Divider/>
+                    <ErrorBox/>
+                </div>}
             
                 <BuyPixelForm isOpen={this.state.isOpen.BUY} close={this.toggleAction.bind(this)}/>
                 <SellPixelForm isOpen={this.state.isOpen.SELL} close={this.toggleAction.bind(this)}/>

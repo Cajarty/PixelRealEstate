@@ -5,6 +5,7 @@ import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import { ChromePicker } from 'react-color';
 import * as Assets from '../../const/assets';
+import Info from '../ui/Info';
 import * as Strings from '../../const/strings';
 import { Modal, ModalContent, ModalHeader, Button, Divider, Input, Popup, Label, ModalActions, Icon, Segment, Grid, GridColumn, GridRow, ButtonGroup, Message } from 'semantic-ui-react';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
@@ -298,11 +299,7 @@ class SetPixelColorForm extends Component {
             >
             <ModalHeader>Update Property Image</ModalHeader>
             <ModalContent>
-                <Message size='mini' floating fluid>
-                    {Strings.FORM_SET_IMAGE.map((str, i) => (
-                        <p key={i}>{str}</p>
-                    ))}
-                </Message>
+                <Info messages={Strings.FORM_SET_IMAGE}/>
                 <Divider/>
                 <Segment>
                     <Grid>

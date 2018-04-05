@@ -1,3 +1,4 @@
+import Info from '../ui/Info';
 import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
@@ -74,11 +75,7 @@ class CancelSaleForm extends Component {
             >
             <ModalHeader>Delist Property</ModalHeader>
             <ModalContent>
-                <Message size='mini' floating fluid>
-                    {Strings.FORM_CANCEL_SELL.map((str, i) => (
-                        <p key={i}>{str}</p>
-                    ))}
-                </Message>
+                <Info messages={Strings.FORM_CANCEL_SELL}/>
                 <Divider/>
                 <p>Are you sure you want stop offering Property ({this.state.x}, {this.state.y}) for Sale?</p>
             </ModalContent>

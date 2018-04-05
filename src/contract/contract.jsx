@@ -84,6 +84,7 @@ export class Contract {
 
     getAccounts() {
         window.web3.eth.getAccounts((err, accs) => {
+            console.info(err, accs)
             if (err != null) {
                 if (GFD.getData('advancedMode')) {
                     this.sendResults(LISTENERS.Error, {errorId: 1, errorType: ERROR_TYPE.Error, message: "In order to fully interact with the client, it is required to have the MetaMask.io web-plugin installed. MetaMask allows you to store your earnings securely in your own Ethereum lite-wallet. "});
@@ -95,9 +96,9 @@ export class Contract {
 
             if (accs.length == 0) {
                 if (GFD.getData('advancedMode')) {
-                    this.sendResults(LISTENERS.Error, {errorId: 0, errorType: ERROR_TYPE.Error, message: "Couldn't get any accounts! Make sure you're logged into Metamask."});
-                    GFD.setData('noAccount', true);
+                    this.sendResults(LISTENERS.Error, {errorId: 0, errorType: ERROR_TYPE.Error, message: "Couldn't retrieve any accounts! Make sure you're logged into Metamask."});
                 }
+                GFD.setData('noAccount', true);
                 return;
             }
 

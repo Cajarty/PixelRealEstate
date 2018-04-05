@@ -9,7 +9,7 @@ export default class Info extends Component {
     render() {
         if (Array.isArray(this.props.messages))
             return (
-                <Message size='tiny' floating>
+                <Message className='infoMessage' size='tiny' floating>
                     {this.props.messages.map((str, i) => (
                         <p key={i}>{str}</p>
                     ))}
@@ -17,7 +17,7 @@ export default class Info extends Component {
             );
         else
             return (
-                <Message size='tiny' floating>
+                <Message className='infoMessage' floating>
                     {this.props.messages}
                 </Message>
             );

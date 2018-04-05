@@ -269,6 +269,49 @@
 }
 
 // ---- END growDown ----
+//shake
+@-webkit-keyframes shake {
+    90% {
+        transform: rotate(0deg);
+    }
+    90.5% {
+        transform: rotate(-3deg);
+    }
+    91.5% {
+        transform: rotate(3deg);
+    }
+    92.5% {
+        transform: rotate(-3deg);
+    }
+    93.5% {
+        transform: rotate(3deg);
+    }
+    94% {
+        transform: rotate(0deg);
+    }
+}
+
+@keyframes shake {
+    90% {
+        transform: rotate(0deg);
+    }
+    90.5% {
+        transform: rotate(-3deg);
+    }
+    91.5% {
+        transform: rotate(3deg);
+    }
+    92.5% {
+        transform: rotate(-3deg);
+    }
+    93.5% {
+        transform: rotate(3deg);
+    }
+    94% {
+        transform: rotate(0deg);
+    }
+}
+
 @mixin animation($type, $duration) {
     animation: $type $duration;
     -moz-animation: $type $duration;

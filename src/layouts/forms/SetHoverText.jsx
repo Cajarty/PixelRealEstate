@@ -3,6 +3,7 @@ import {Contract, ctr} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions.jsx';
 import * as web3 from 'web3';
 import * as Strings from '../../const/strings';
+import Info from '../ui/Info';
 import {Modal, ModalActions, ModalHeader, ModalContent, Input, Button, Popup, Label, Icon, Message, Divider} from 'semantic-ui-react';
 
 class SetHoverText extends Component {
@@ -34,11 +35,7 @@ class SetHoverText extends Component {
             >
                 <ModalHeader>Set Property Hover Texts</ModalHeader>
                 <ModalContent>
-                <Message size='mini' floating fluid>
-                    {Strings.FORM_SET_TEXT.map((str, i) => (
-                        <p key={i}>{str}</p>
-                    ))}
-                </Message>
+                <Info messages={Strings.FORM_SET_TEXT}/>
                 <Divider/>
                     <Input 
                         fluid

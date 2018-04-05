@@ -4,6 +4,7 @@ import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import { Slider } from 'react-semantic-ui-range';
 import * as Strings from '../../const/strings';
+import Info from '../ui/Info';
 import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon, Segment, Message } from 'semantic-ui-react';
 
 class BuyPixelForm extends Component {
@@ -115,11 +116,7 @@ class BuyPixelForm extends Component {
                 >
                 <ModalHeader>Buy Property</ModalHeader>
                 <ModalContent>
-                    <Message size='mini' floating fluid>
-                        {Strings.FORM_BUY.map((str, i) => (
-                            <p key={i}>{str}</p>
-                        ))}
-                    </Message>
+                <Info messages={Strings.FORM_BUY}/>
                     <Divider/>
                     <div className='twoColumn w50 left'>
                         <Input

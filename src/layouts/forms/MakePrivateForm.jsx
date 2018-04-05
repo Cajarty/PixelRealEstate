@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
+import Info from '../ui/Info';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import * as Strings from '../../const/strings';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
@@ -112,11 +113,7 @@ class MakePrivateForm extends Component {
             >
                 <ModalHeader>Set Property Private</ModalHeader>
                 <ModalContent>
-                <Message size='mini' floating fluid>
-                    {Strings.FORM_SET_PRIVATE.map((str, i) => (
-                        <p key={i}>{str}</p>
-                    ))}
-                </Message>
+                <Info messages={Strings.FORM_SET_PRIVATE}/>
                 <Divider/>
                 <div className='twoColumn w50 left'>
                     <Input

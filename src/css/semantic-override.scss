@@ -188,3 +188,23 @@ body {
         }
     }
 }
+
+.lowerSegment,
+.mainSegmentGroup,
+#footer.footer {
+    box-shadow: $color2 2px 2px 10px 2px !important;
+}
+
+.infoMessage {
+    background-color: $color1 !important;
+}
+
+.modeButton.primary {
+    -webkit-animation-name: shake;
+    /* Safari 4.0 - 8.0 */
+    -webkit-animation-duration: 10s;
+    /* Safari 4.0 - 8.0 */
+    animation-name: shake;
+    animation-duration: 10s;
+    animation-iteration-count: infinite;
+}

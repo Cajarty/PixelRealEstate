@@ -362,7 +362,7 @@ div.hoverLabel.ui {
 .hoverBox {
     border: black 1px solid;
     position: absolute;
-    box-shadow: black 0px 0px 1px 0.7px inset;
+    box-shadow: $color2 0px 0px 1px 0.7px inset;
     pointer-events: none;
 }
 

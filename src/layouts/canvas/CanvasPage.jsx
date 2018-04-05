@@ -117,6 +117,8 @@ class CanvasPage extends Component {
 
     changeMode() {
         let newMode = !this.state.advancedMode;
+        if (newMode)
+            ctr.getAccounts();
         GFD.setData('advancedMode', newMode);
         this.setState({advancedMode: newMode})
     }
@@ -168,13 +170,17 @@ class CanvasPage extends Component {
                             
                                 <ZoomCanvas/>
                                 <Divider/>
-                                <ItemGroup>
-                                    <Item className='pixelsOwnedItem'>
-                                        <ItemImage size='mini' src={this.state.loadingPPC ? Assets.LOADING : Assets.TOKEN}  />
-                                        <ItemContent verticalAlign='middle'>{this.state.PPCOwned} </ItemContent>
-                                    </Item>
-                                </ItemGroup>
-                                <Divider/>
+                                {this.state.advancedMode &&
+                                    <div>
+                                        <ItemGroup>
+                                            <Item className='pixelsOwnedItem'>
+                                                <ItemImage size='mini' src={this.state.loadingPPC ? Assets.LOADING : Assets.TOKEN}  />
+                                                <ItemContent verticalAlign='middle'>{this.state.PPCOwned} </ItemContent>
+                                            </Item>
+                                        </ItemGroup>
+                                        <Divider/>
+                                    </div>
+                                }
                                 <Button onClick={() => this.visitPortfolio()} fluid>Visit PixelProperty.io</Button>
                                 <a 
                                     href='https://pixelproperty.io/' 
@@ -183,7 +189,15 @@ class CanvasPage extends Component {
                                     ref={(portfolioLink) => { this.portfolioLink = portfolioLink; }} 
                                 />
                                 <Divider/>
-                                <Button onClick={() => this.changeMode()} fluid>{this.state.advancedMode ? 'See Less...' : 'See More...'}</Button>
+                                <Button 
+                                    size={this.state.advancedMode ? 'medium' : 'large'} 
+                                    className='modeButton' 
+                                    primary={!this.state.advancedMode} 
+                                    onClick={() => this.changeMode()} 
+                                    fluid
+                                >
+                                    {this.state.advancedMode ? 'Viewing Mode' : 'Get Started'}
+                                </Button>
                                 {this.state.advancedMode &&
                                 <div>
                                     <Divider/>
@@ -204,7 +218,6 @@ class CanvasPage extends Component {
                         <Canvas/>
                     </Segment>
                     <Segment className='right'>
-                        <ErrorBox/>
                         <div className='infoBox'>
                             {this.state.advancedMode ? 
                                 <div>

@@ -154,7 +154,26 @@ body {
 
 .ui.button:not(.inverted),
 .bidButton:not(.inverted) {
+    color: $color5;
     background-color: $color4 !important;
+    &.primary {
+        background-color: $color4 !important;
+        &:hover {
+            background-color: lighten($color4, 10%) !important;
+        }
+        &.active {
+            background-color: lighten($color4, 15%) !important;
+        }
+    }
+    &.secondary {
+        background-color: $color2 !important;
+        &:hover {
+            background-color: lighten($color2, 10%) !important;
+        }
+        &.active {
+            background-color: lighten($color2, 15%) !important;
+        }
+    }
     &:hover {
         background-color: lighten($color4, 10%) !important;
     }

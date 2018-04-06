@@ -73,6 +73,10 @@ class HoverLabel extends Component {
         })
     }
 
+    componentWillUnmount() {
+        GFD.closeAll('hoverLabel');
+    }
+
     updateLabel(x, y) {
         if (x < 0 || y < 0) {
             this.setState({show: false});

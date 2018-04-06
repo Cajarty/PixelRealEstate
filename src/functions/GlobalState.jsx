@@ -1,5 +1,45 @@
 import * as Func from '../functions/functions';
 
+export const TUTORIAL_STATE = {
+    NONE: {
+        index: 0,
+        className: ' tutorialStep step0'
+    },
+    CANVAS: {
+        index: 1,
+        className: ' tutorialStep step1'
+    },
+    DESCBOXDETAILS: {
+        index: 2,
+        className: ' tutorialStep step2'
+    },
+    DESCBOXACTIONS: {
+        index: 3,
+        className: ' tutorialStep step3'
+    },
+    UPDATEFORM: {
+        index: 4,
+        className: ' tutorialStep step4'
+    },
+    BUYFORM: {
+        index: 5,
+        className: ' tutorialStep step5'
+    },
+    DONEMETAMASK: {
+        index: 6,
+        className: ' tutorialStep step6'
+    },
+    DONENOTMETAMASK: {
+        index: 7,
+        className: ' tutorialStep step7'
+    },
+    getClassName(currID, checkID) {
+        if (currID == checkID)
+            return TUTORIAL_STATE[Object.keys(TUTORIAL_STATE)[currID]].className;
+        return '';
+    }
+};
+
 export class GlobalState {
     constructor() {
         this.data = {
@@ -18,7 +58,8 @@ export class GlobalState {
             screenWidth: 100,
             screenHeight: 100,
             balance: 0, //total amount of PXL owned.
-            ServerDataManagerInit: 0 //has the data from the server been loaded? 0 = no, 1 = yes but no events because we have no metamask, 2 = yes
+            ServerDataManagerInit: 0, //has the data from the server been loaded? 0 = no, 1 = yes but no events because we have no metamask, 2 = yes
+            tutorialStateIndex: 0,
         };
         this.limiters = {
             
@@ -34,6 +75,64 @@ export class GlobalState {
             if (y === '') return y;
             return Func.Clamp(1, 100, y);
         });
+        this.setLimiter('tutorialStateIndex', move => {
+            if (move != -1 && move != 1)
+                throw 'Tutorial State change must be -1 or 1 to indicate a step.';
+            let oldId = GFD.getData('tutorialStateIndex');
+            let newIndex = oldId;
+                switch(oldId) {
+                    case TUTORIAL_STATE.NONE.index:
+                        if (move > 0)
+                            newIndex = TUTORIAL_STATE.CANVAS.index;
+                        break;
+                    case TUTORIAL_STATE.CANVAS.index:
+                        if (move > 0)
+                            newIndex = TUTORIAL_STATE.DESCBOXDETAILS.index;
+                        else
+                            newIndex = TUTORIAL_STATE.NONE.index
+                        break;
+                    case TUTORIAL_STATE.DESCBOXDETAILS.index:
+                        if (move > 0)
+                            newIndex = TUTORIAL_STATE.DESCBOXACTIONS.index;
+                        else
+                            newIndex = TUTORIAL_STATE.CANVAS.index;
+                        break;
+                    case TUTORIAL_STATE.DESCBOXACTIONS.index:
+                        if (move > 0)
+                            newIndex = TUTORIAL_STATE.UPDATEFORM.index;
+                        else
+                            newIndex = TUTORIAL_STATE.DESCBOXDETAILS.index;
+                        break;
+                    case TUTORIAL_STATE.UPDATEFORM.index:
+                        if (move > 0)
+                            newIndex = TUTORIAL_STATE.BUYFORM.index;
+                        else
+                            newIndex = TUTORIAL_STATE.DESCBOXACTIONS.index;
+                        break;
+                    case TUTORIAL_STATE.BUYFORM.index:
+                        if (move > 0) {
+                            if (GFD.getData('noMetaMask'))
+                                newIndex = TUTORIAL_STATE.DONENOTMETAMASK.index;
+                            else
+                                newIndex = TUTORIAL_STATE.DONEMETAMASK.index;
+                        } else {
+                            newIndex = TUTORIAL_STATE.UPDATEFORM.index;
+                        }
+                        break;
+                    case TUTORIAL_STATE.DONEMETAMASK.index:
+                    case TUTORIAL_STATE.DONENOTMETAMASK.index:
+                        if (move < 0) {
+                            newIndex = TUTORIAL_STATE.BUYFORM.index;
+                            break;
+                        }
+                    break;
+                    default:
+                        newIndex = TUTORIAL_STATE.NONE.index;
+                        break;
+
+                }
+                return newIndex;
+            });
     }
 
     setLimiter(key, limiterFunction) {

@@ -1,41 +1,9 @@
 import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../contract/contract.jsx';
-import {Message} from 'semantic-ui-react';
-
-export const TUTORIAL_STATE = {
-    NONE: {
-        index: 0,
-        className: 'tutorial0'
-    },
-    CANVAS: {
-        index: 1,
-        className: 'tutorial1'
-    },
-    DESCBOXDETAILS: {
-        index: 2,
-        className: 'tutorial2'
-    },
-    DESCBOXACTIONS: {
-        index: 3,
-        className: 'tutorial3'
-    },
-    UPDATEFORM: {
-        index: 4,
-        className: 'tutorial4'
-    },
-    BUYFORM: {
-        index: 5,
-        className: 'tutorial5'
-    },
-    DONEMETAMASK: {
-        index: 6,
-        className: 'tutorial6'
-    },
-    DONENOTMETAMASK: {
-        index: 7,
-        className: 'tutorial7'
-    }
-};
+import {Modal, Button, Header, ModalContent, ModalActions, Icon} from 'semantic-ui-react';
+import * as Strings from '../const/strings';
+import {GFD, GlobalState, TUTORIAL_STATE} from '../functions/GlobalState';
+import Info from './ui/Info';
 
 class Tutorial extends Component {
     constructor(props) {
@@ -45,39 +13,35 @@ class Tutorial extends Component {
         };
     }
 
-    goToNextState() {
-        let newState = TUTORIAL_STATE.NONE;
-        switch(this.state.tutorialState.index) {
-            case TUTORIAL_STATE.NONE.index:
-                newState = TUTORIAL_STATE.CANVAS;
-                break;
-            case TUTORIAL_STATE.CANVAS.index:
-                newState = TUTORIAL_STATE.DESCBOXDETAILS;
-                break;
-            case TUTORIAL_STATE.DESCBOXDETAILS.index:
-                newState = TUTORIAL_STATE.DESCBOXACTIONS;
-                break;
-            case TUTORIAL_STATE.DESCBOXACTIONS.index:
-                newState = TUTORIAL_STATE.UPDATEFORM;
-                break;
-            case TUTORIAL_STATE.UPDATEFORM.index:
-                newState = TUTORIAL_STATE.BUYFORM;
-                break;
-            case TUTORIAL_STATE.BUYFORM.index:
-                newState = TUTORIAL_STATE.DONEMETAMASK;
-                newState = TUTORIAL_STATE.DONENOTMETAMASK;
-                break;
-            case TUTORIAL_STATE.DONEMETAMASK.index:
-            case TUTORIAL_STATE.DONENOTMETAMASK.index:
-                newState = TUTORIAL_STATE.NONE;
-                break;
-        }
-        this.setState({tutorialState: newState});
+    componentDidMount() {
+        GFD.listen('tutorialStateIndex', 'tutorial', (newID) => {
+            console.info('New Tutorial state: ', newID);
+            this.setState({tutorialState: TUTORIAL_STATE[Object.keys(TUTORIAL_STATE)[newID]]})
+        });
     }
+
+
 
     render() {
         return (
-            <div></div>
+            <div className='tutorialContainer'>
+                <Modal id='tutorialDimmer' className='tutorialDimmer' open={this.state.tutorialState.index != 0} basic size='small'>
+                    <Header icon='help circle' content='Tutorial' />
+                    <ModalContent>
+                        {Strings.TUTORIAL[this.state.tutorialState.index].map((str, i) => (
+                            <p key={i}>{str}</p>
+                        ))}
+                    </ModalContent>
+                    <ModalActions>
+                        <Button basic inverted>
+                        <Icon name='remove' /> Back
+                        </Button>
+                        <Button color='green' inverted>
+                        <Icon name='checkmark' /> Next
+                        </Button>
+                    </ModalActions>
+                </Modal>
+            </div>
         );
     }
 }

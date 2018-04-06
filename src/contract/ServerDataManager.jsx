@@ -260,7 +260,6 @@ export class ServerDataManager {
 
 
         if (ctr.account === this.allProperties[x][y].owner) {
-            console.info('here', this.allProperties[x][y])
             if (this.ownedProperties[x] == null)
                 this.ownedProperties[x] = {};
             this.ownedProperties[x][y] = this.allProperties[x][y];

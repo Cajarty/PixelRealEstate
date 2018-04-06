@@ -55,6 +55,7 @@
         "bignumber.js": "^5.0.0",
         "gulp": "^3.9.1",
         "js-base64": "^2.4.0",
+        "lodash": "^4.17.5",
         "lzwcompress": "^0.2.4",
         "moment": "^2.20.1",
         "npm": "^5.7.1",

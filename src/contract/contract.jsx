@@ -258,14 +258,16 @@ export class Contract {
         });
     }
 
-    sellProperty(x, y, price) {
+    sellProperty(x, y, price, callback) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
             return;
         this.VRE.deployed().then((i) => {
             return i.listForSale(this.toID(parseInt(x), parseInt(y)), price, {from: this.account });
         }).then(() => {
+            callback(true);
             this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " listed for sale."});
         }).catch((e) => {
+            callback(false);
             console.log(e);
             this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to put property " + (x + 1) + "x" + (y + 1) + " on market."});
         });

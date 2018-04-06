@@ -68,6 +68,14 @@ class SellPixelForm extends Component {
         this.props.close('SELL');
     }
 
+    sellProperty() {
+        if (this.state.x >= 1 && this.state.x <= 100 && this.state.y >= 1 && this.state.y <= 100) {
+            ctr.sellProperty(this.state.x - 1, this.state.y - 1, this.state.valuePrice, (result) => {
+                this.toggleModal(!result);
+            });
+        }
+    }
+
     render() {
         return (
             <Modal size='tiny' 
@@ -134,7 +142,7 @@ class SellPixelForm extends Component {
                     </Input>
             </ModalContent>
             <ModalActions>
-                <Button primary onClick={() => ctr.sellProperty(this.state.x - 1, this.state.y - 1, this.state.valuePrice)}>Sell Property</Button>
+                <Button primary onClick={() => this.sellProperty()}>Sell Property</Button>
             </ModalActions>
         </Modal>
         );

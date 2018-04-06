@@ -258,7 +258,6 @@ export class ServerDataManager {
         if (this.allProperties[x][y] == null)
             return;
 
-
         if (ctr.account === this.allProperties[x][y].owner) {
             if (this.ownedProperties[x] == null)
                 this.ownedProperties[x] = {};

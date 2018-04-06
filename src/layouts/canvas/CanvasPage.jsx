@@ -143,6 +143,11 @@ class CanvasPage extends Component {
     }
 
     showAskForTutorial() {
+        if (this.state.advancedMode || localStorage.getItem('hasViewedTutorial')) {
+            this.changeMode();
+            return;
+        }
+        localStorage.setItem('hasViewedTutorial', true);
         this.setState({askForTutorial: true});
     }
 
@@ -187,7 +192,7 @@ class CanvasPage extends Component {
                 size={this.state.advancedMode ? 'medium' : 'large'} 
                 className='modeButton' 
                 primary={!this.state.advancedMode} 
-                onClick={() => {this.state.advancedMode ? this.changeMode() : this.showAskForTutorial()}} 
+                onClick={() => {this.showAskForTutorial()}} 
                 fluid
             >
                 {this.state.advancedMode ? 'Viewing Mode' : 'Get Started'}
@@ -249,12 +254,11 @@ class CanvasPage extends Component {
                                     </Modal>
                                 }
                     </Segment>
-                    {console.info(TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 1))}
                     <Segment id='step1' className={'center' + TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 1)}>
                         {this.state.tutorialState.index == 0 && <HoverLabel showPrices={this.state.showPopertiesForSale}/>}
                         <Canvas/>
                     </Segment>
-                    <Segment className='right'>
+                    <Segment id={(this.state.tutorialState.index == 3 ? 'hiddenForward' : '')} className={'right' + TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 2) + (this.state.tutorialState.index == 3 ? ' hiddenForward' : '')}>
                         <div className='infoBox'>
                             {this.state.advancedMode ? 
                                 <div>
@@ -296,6 +300,10 @@ class CanvasPage extends Component {
                     <MenuItem name='file text outline'>
                     <Icon name='file text outline' />
                     TOS
+                    </MenuItem>
+                    <MenuItem name='file text outline' onClick={() => {GFD.setData('tutorialStateIndex', 1)}}>
+                    <Icon name='help circle' />
+                    Tutorial
                     </MenuItem>
                 </Sidebar>
                 <Tutorial/>

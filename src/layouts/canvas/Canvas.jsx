@@ -63,6 +63,10 @@ class Canvas extends Component {
             let y = Math.floor((e.clientY - rect.top) * (1000 / rect.height) / 10); 
             GFD.setData('x', x + 1);
             GFD.setData('y', y + 1);
+
+            if (GFD.getData('tutorialStateIndex') == 1) {
+                GFD.setData('tutorialStateIndex', 1);
+            }
                 
             if (!GFD.getData('advancedMode') && SDM.isPropertyLoaded(x, y)) {
                 ctr.getLink(SDM.getPropertyData(x, y).owner, (data) => {

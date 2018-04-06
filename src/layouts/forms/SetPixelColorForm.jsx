@@ -9,6 +9,7 @@ import Info from '../ui/Info';
 import * as Strings from '../../const/strings';
 import { Modal, ModalContent, ModalHeader, Button, Divider, Input, Popup, Label, ModalActions, Icon, Segment, Grid, GridColumn, GridRow, ButtonGroup, Message } from 'semantic-ui-react';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
+import {TUTORIAL_STATE} from '../../functions/GlobalState';
 
 const PREVIEW_WIDTH = 100;
 const PREVIEW_HEIGHT = 100;
@@ -290,12 +291,13 @@ class SetPixelColorForm extends Component {
     }
 
     render() {
-        
         return (
             <Modal size='small'
-                open={this.state.isOpen} 
-                closeIcon 
+                open={this.state.isOpen || this.props.tutorialState.index == 4} 
+                closeIcon={this.props.tutorialState.index != 4}
+                dimmer={this.props.tutorialState.index != 4}
                 onClose={() => this.toggleModal(false)}
+                className={TUTORIAL_STATE.getClassName(this.props.tutorialState.index, 4) + ' actions'}
             >
             <ModalHeader>Update Property Image</ModalHeader>
             <ModalContent>
@@ -508,9 +510,9 @@ class SetPixelColorForm extends Component {
                     </GridRow>
                 </Grid>
                 </ModalContent>
-                <ModalActions>
+                {this.props.tutorialState.index != 4 && <ModalActions>
                     <Button primary onClick={() => this.setPixels()}>Change Image</Button>
-                </ModalActions>
+                </ModalActions>}
             </Modal>
         );
     }

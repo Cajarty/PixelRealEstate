@@ -3,7 +3,7 @@ import * as EVENTS from '../../const/events';
 import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions.jsx';
 import Timestamp from 'react-timestamp';
-import {GFD, GlobalState} from '../../functions/GlobalState';
+import {GFD, GlobalState, TUTORIAL_STATE} from '../../functions/GlobalState';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
 import Hours from '../ui/Hours';
 import Moment from 'react-moment';
@@ -44,6 +44,7 @@ class PixelDescriptionBox extends Component {
             hoverText: '',
             link: '',
             PPCOwned: 0,
+            tutorialState: 0,
             isOpen: {
                 BUY: false,
                 SELL: false,
@@ -92,6 +93,9 @@ class PixelDescriptionBox extends Component {
             dataCtx,
         });
 
+        GFD.listen('tutorialStateIndex', 'pixelBrowse', (newID) => {
+            this.setState({tutorialState: TUTORIAL_STATE[Object.keys(TUTORIAL_STATE)[newID]]})
+        });
         GFD.listen('noAccount', 'pixelBrowse', (noAccount) => {
             this.setState({noAccount});
         })
@@ -295,6 +299,10 @@ class PixelDescriptionBox extends Component {
     }
 
     toggleAction(key) {
+        if (this.state.tutorialState.index == 3 && key === 'SET_IMAGE') {
+            GFD.setData('tutorialStateIndex', 1);
+            return;
+        }
         let opens = this.state.isOpen;
         opens[key] = !opens[key];
         this.setState({opens});
@@ -308,7 +316,7 @@ class PixelDescriptionBox extends Component {
         // actions.push(new Action("Place Offer", null));
         if (this.state.isForSale && this.state.owner != ctr.account)
             actions.push(
-                <Button fluid onClick={() => this.toggleAction('BUY')}>Buy</Button>
+                <Button fluid onClick={(this.state.tutorialState.index == 3 ? () => {} : () => this.toggleAction('BUY'))}>Buy</Button>
             );
         if (!this.state.isForSale && this.state.owner == ctr.account)
             actions.push(
@@ -534,8 +542,8 @@ class PixelDescriptionBox extends Component {
                         />
                     </div>
                 : (!this.state.noAccount && <Info messages='Click a Property on the canvas or enter the coordinates above to see more about a property.'/>)}
-                {this.state.x != '' && this.state.y != '' && !this.state.noAccount &&
-                    <div>
+                {this.state.x != '' && this.state.y != '' && !this.state.noAccount && 
+                    <div className={(this.state.tutorialState.index == 3 ? TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 3) + ' actions' : '')}>
                         <Divider/>
                         <Grid columns='two' divided>
                             {this.getActionsList().map((action, i) => (
@@ -557,9 +565,9 @@ class PixelDescriptionBox extends Component {
                     <ErrorBox/>
                 </div>}
             
-                <BuyPixelForm isOpen={this.state.isOpen.BUY} close={this.toggleAction.bind(this)}/>
+                <BuyPixelForm tutorialState={this.state.tutorialState} isOpen={this.state.isOpen.BUY} close={this.toggleAction.bind(this)}/>
                 <SellPixelForm isOpen={this.state.isOpen.SELL} close={this.toggleAction.bind(this)}/>
-                <SetPixelColorForm isOpen={this.state.isOpen.SET_IMAGE} close={this.toggleAction.bind(this)}/>
+                <SetPixelColorForm tutorialState={this.state.tutorialState} isOpen={this.state.isOpen.SET_IMAGE} close={this.toggleAction.bind(this)}/>
                 <CancelSaleForm isOpen={this.state.isOpen.CANCEL_SALE} close={this.toggleAction.bind(this)}/>
                 <MakePublicForm isOpen={this.state.isOpen.SET_PUBLIC} close={this.toggleAction.bind(this)}/>
                 <MakePrivateForm isOpen={this.state.isOpen.SET_PRIVATE} close={this.toggleAction.bind(this)}/>

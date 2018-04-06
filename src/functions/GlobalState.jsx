@@ -3,35 +3,43 @@ import * as Func from '../functions/functions';
 export const TUTORIAL_STATE = {
     NONE: {
         index: 0,
-        className: ' tutorialStep step0'
+        className: ' tutorialStep step0',
+        showNext: true,
     },
     CANVAS: {
         index: 1,
-        className: ' tutorialStep step1'
+        className: ' tutorialStep step1',
+        showNext: false,
     },
     DESCBOXDETAILS: {
         index: 2,
-        className: ' tutorialStep step2'
+        className: ' tutorialStep step2',
+        showNext: true,
     },
     DESCBOXACTIONS: {
         index: 3,
-        className: ' tutorialStep step3'
+        className: ' tutorialStep step3',
+        showNext: false,
     },
     UPDATEFORM: {
         index: 4,
-        className: ' tutorialStep step4'
+        className: ' tutorialStep step4',
+        showNext: true,
     },
     BUYFORM: {
         index: 5,
-        className: ' tutorialStep step5'
+        className: ' tutorialStep step5',
+        showNext: true,
     },
     DONEMETAMASK: {
         index: 6,
-        className: ' tutorialStep step6'
+        className: ' tutorialStep step6',
+        showNext: true,
     },
     DONENOTMETAMASK: {
         index: 7,
-        className: ' tutorialStep step7'
+        className: ' tutorialStep step7',
+        showNext: true,
     },
     getClassName(currID, checkID) {
         if (currID == checkID)
@@ -125,7 +133,6 @@ export class GlobalState {
                             newIndex = TUTORIAL_STATE.BUYFORM.index;
                             break;
                         }
-                    break;
                     default:
                         newIndex = TUTORIAL_STATE.NONE.index;
                         break;

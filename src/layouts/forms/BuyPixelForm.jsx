@@ -5,6 +5,7 @@ import {GFD, GlobalState} from '../../functions/GlobalState';
 import { Slider } from 'react-semantic-ui-range';
 import * as Strings from '../../const/strings';
 import Info from '../ui/Info';
+import {TUTORIAL_STATE} from '../../functions/GlobalState';
 import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon, Segment, Message } from 'semantic-ui-react';
 
 class BuyPixelForm extends Component {
@@ -110,9 +111,11 @@ class BuyPixelForm extends Component {
     render() {
         return (
             <Modal size='mini' 
-                open={this.state.isOpen} 
-                closeIcon 
+                open={this.state.isOpen || this.props.tutorialState.index == 5} 
+                closeIcon={this.props.tutorialState.index != 5}
+                dimmer={this.props.tutorialState.index != 5}
                 onClose={() => this.toggleModal(false)}
+                className={TUTORIAL_STATE.getClassName(this.props.tutorialState.index, 5) + ' actions'}
                 >
                 <ModalHeader>Buy Property</ModalHeader>
                 <ModalContent>
@@ -179,9 +182,10 @@ class BuyPixelForm extends Component {
                             </Button>}
                         </div>}
                 </ModalContent>
-                <ModalActions>
+
+                {this.props.tutorialState.index != 5 && <ModalActions>
                     <Button primary onClick={() => this.buyProperty()}>Buy Property</Button>
-                </ModalActions>
+                </ModalActions>}
             </Modal>
         );
     }

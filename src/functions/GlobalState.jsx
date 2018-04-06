@@ -12,11 +12,13 @@ export class GlobalState {
             pressTime: null,
             canvasTopOffset: null,
             canvasLeftOffset: null,
-            advancedMode: true,
-            noAccount: false,
+            advancedMode: false,
+            noAccount: false, //user isnt logged in
+            noMetaMask: false, //metamask isnt installed
             screenWidth: 100,
             screenHeight: 100,
             balance: 0, //total amount of PXL owned.
+            ServerDataManagerInit: 0 //has the data from the server been loaded? 0 = no, 1 = yes but no events because we have no metamask, 2 = yes
         };
         this.limiters = {
             

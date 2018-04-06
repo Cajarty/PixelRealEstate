@@ -3,7 +3,9 @@ import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import { Slider } from 'react-semantic-ui-range';
-import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon } from 'semantic-ui-react';
+import * as Strings from '../../const/strings';
+import Info from '../ui/Info';
+import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon, Segment, Message } from 'semantic-ui-react';
 
 class BuyPixelForm extends Component {
     constructor(props) {
@@ -30,7 +32,7 @@ class BuyPixelForm extends Component {
         this.setState(update);
     }
 
-    componentDidMount() {
+    componentDidMountOpen() {
         GFD.listen('x', 'buyPixel', (x) => {
             this.setState({x});
         })
@@ -50,8 +52,15 @@ class BuyPixelForm extends Component {
         })
     }
 
-    componentWillUnmount() {
+    componentDidUnmountOpen() {
         GFD.closeAll('buyPixel');
+    }
+
+    componentDidUpdate(pP, pS) {
+        if (this.state.isOpen && !pS.isOpen)
+            this.componentDidMountOpen();
+        else if (!this.state.isOpen && pS.isOpen)
+            this.componentDidUnmountOpen();
     }
 
     setX(x) {
@@ -107,6 +116,8 @@ class BuyPixelForm extends Component {
                 >
                 <ModalHeader>Buy Property</ModalHeader>
                 <ModalContent>
+                <Info messages={Strings.FORM_BUY}/>
+                    <Divider/>
                     <div className='twoColumn w50 left'>
                         <Input
                             placeholder="1 - 100"
@@ -140,7 +151,7 @@ class BuyPixelForm extends Component {
                         />
                         </div>
                         <Divider horizontal>Price</Divider>
-                        {this.state.ETHToPay == 0 ?
+                        {this.state.ETHPrice == 0 ?
                         <div style={{textAlign: 'center'}}>
                             <Label >PXL<LabelDetail>{this.state.PPCToPay}</LabelDetail></Label>
                         </div>
@@ -150,8 +161,8 @@ class BuyPixelForm extends Component {
                             <Label style={{float: 'right'}}>ETH<LabelDetail>{this.state.ETHToPay}</LabelDetail></Label>
                             <FormInput
                                 className='buySlider'
-                                min={0}
-                                max={this.state.PPCPrice}
+                                min={this.state.PPCPrice}
+                                max={0}
                                 type='range'
                                 step={1}
                                 value={this.state.PPCSelected}

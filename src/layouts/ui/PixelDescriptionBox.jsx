@@ -4,9 +4,10 @@ import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions.jsx';
 import Timestamp from 'react-timestamp';
 import {GFD, GlobalState} from '../../functions/GlobalState';
+import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
 import Hours from '../ui/Hours';
 import Moment from 'react-moment';
-import {Label, Input, Item, Button, Popup, Icon, Grid, Segment, SegmentGroup} from 'semantic-ui-react';
+import Message, { Label, Input, Item, Button, Popup, Icon, Grid, Segment, SegmentGroup, Divider } from 'semantic-ui-react';
 import BuyPixelForm from '../forms/BuyPixelForm';
 import SellPixelForm from '../forms/SellPixelForm';
 import SetPixelColorForm from '../forms/SetPixelColorForm';
@@ -16,6 +17,8 @@ import MakePrivateForm from '../forms/MakePrivateForm';
 import MakePublicForm from '../forms/MakePublicForm';
 import PlaceBidForm from '../forms/PlaceBidForm';
 import MessageModal from './MessageModal';
+import Info from './Info';
+import ErrorBox from '../ErrorBox';
 
 const NOBODY = '0x0000000000000000000000000000000000000000';
 
@@ -52,6 +55,9 @@ class PixelDescriptionBox extends Component {
                 PLACCE_BID: false,
             },
             showMessage: false,
+            evH1: null, 
+            evH2: null, 
+            evH3: null,
         }
     }
 
@@ -94,13 +100,63 @@ class PixelDescriptionBox extends Component {
             this.setState({x});
         })
         GFD.listen('y', 'pixelBrowse', (y) => {
-            this.loadProperty(GFD.getData('x') - 1, y - 1);
+            if (!GFD.getData('noMetaMask'))
+                this.loadProperty(GFD.getData('x') - 1, y - 1);
             this.setState({y});
         })
 
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (eventHandleUpdate) => {
-            this.setState({eventHandleUpdate});
-            eventHandleUpdate.watch((error, log) => {
+        this.setState({timerUpdater: setInterval(() => this.timerUpdate(), 1000)});
+
+        ctr.listenForResults(LISTENERS.ServerDataManagerInit, 'PixelBox', (results) => {
+            if (results.imageLoaded && GFD.getData('ServerDataManagerInit') == 1) {
+                let data = SDM.getPropertyData(this.state.x - 1, this.state.y - 1);
+    
+                let ethp = data.ETHPrice;
+                let ppcp = data.PPCPrice;
+                let reserved = data.becomePublic;
+                let lastUpdate = data.lastUpdate;
+                let maxEarnings = Math.pow((reserved - lastUpdate) / 30, 2);
+                this.setState({
+                    owner: data.owner,
+                    isForSale: ppcp != 0,
+                    ETHPrice: ethp,
+                    PPCPrice: ppcp,
+                    lastUpdate,
+                    isInPrivate: data.isInPrivate,
+                    reserved,
+                    latestBid: data.lastestBid,
+                    maxEarnings,
+                    earnings: Func.calculateEarnings(lastUpdate, maxEarnings),
+                });
+    
+                this.timerUpdate(lastUpdate, reserved);
+
+                console.info(this.state, data)
+                
+                let canvasData = SDM.getPropertyImage(this.state.x - 1, this.state.y - 1);
+                
+                this.setCanvas(canvasData);
+    
+                this.startTokenEarnedInterval();
+            } else if (!GFD.getData('noMetaMask')) {
+                ctr.stopListeningForResults(LISTENERS.ServerDataManagerInit, 'PixelBox');
+            }
+        });
+
+        if (GFD.getData('noMetaMask')) {
+            GFD.listen('noMetaMask', 'DescBox', this.setup);
+            return;
+        }
+        this.setup(false);
+    }
+
+    setup(noMetaMask) {            
+        if (noMetaMask)
+            return;
+        GFD.close('noMetaMask', 'DescBox');
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (evH1) => {
+            this.setState({evH1});
+            evH1.watch((error, log) => {
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
                 let xx = GFD.getData('x') - 1
                 let yy = GFD.getData('y') - 1;
@@ -111,10 +167,9 @@ class PixelDescriptionBox extends Component {
             });
         });
 
-        ctr.watchEventLogs(EVENTS.PropertyBought, {}, (handle) => {
-            let eventHandleUpdate = handle;
-            this.setState({eventHandleUpdate});
-            eventHandleUpdate.watch((error, log) => {
+        ctr.watchEventLogs(EVENTS.PropertyBought, {}, (evH2) => {
+            this.setState({evH2});
+            evH2.watch((error, log) => {
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
                 let xx = GFD.getData('x') - 1
                 let yy = GFD.getData('y') - 1;
@@ -123,10 +178,9 @@ class PixelDescriptionBox extends Component {
             });
         });
 
-        ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (handle) => {
-            let eventHandleUpdate = handle;
-            this.setState({eventHandleUpdate});
-            eventHandleUpdate.watch((error, log) => {
+        ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (evH3) => {
+            this.setState({evH3});
+            evH3.watch((error, log) => {
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
                 let xx = GFD.getData('x') - 1
                 let yy = GFD.getData('y') - 1;
@@ -134,9 +188,7 @@ class PixelDescriptionBox extends Component {
                     this.loadProperty(xx, yy);
             });
         });
-
-        this.setState({timerUpdater: setInterval(() => this.timerUpdate(), 1000)});
-    }
+    };
 
     timerUpdate(lastUpdate = this.state.lastUpdate, reserved = this.state.reserved) {
         let lastUpdateFormatted = Func.TimeSince(lastUpdate * 1000) + " ago";
@@ -150,7 +202,9 @@ class PixelDescriptionBox extends Component {
     componentWillUnmount() {
         GFD.closeAll('pixelBrowse');
         this.stopTokenEarnedInterval();
-        this.state.eventHandleUpdate.stopWatching();
+        this.state.evH1.stopWatching();
+        this.state.evH2.stopWatching();
+        this.state.evH3.stopWatching();
         clearTimeout(this.state.timerUpdate);
     }
 
@@ -252,7 +306,7 @@ class PixelDescriptionBox extends Component {
             <Button fluid onClick={() => this.toggleAction('SET_IMAGE')}>Update Image</Button>
         );
         // actions.push(new Action("Place Offer", null));
-        if (this.state.isForSale)
+        if (this.state.isForSale && this.state.owner != ctr.account)
             actions.push(
                 <Button fluid onClick={() => this.toggleAction('BUY')}>Buy</Button>
             );
@@ -294,51 +348,61 @@ class PixelDescriptionBox extends Component {
         win.focus();
     }
 
+    getCurrentPayout() {
+        if (this.state.isInPrivate) {
+            return "N/A";
+        } else if (this.state.lastUpdate == 0) {
+            return "None";
+        } else {
+            return (this.state.earnings + '/' + this.state.maxEarnings) + " PXL";
+        }
+    }
+
     render() {
         return (
-            <SegmentGroup className='pixelDescriptionBox'>
-                <Segment className='colorPreview'>
+            <div className='pixelDescriptionBox'>
+                <div className='colorPreview'>
                     <Item className='colorPreivewCanvasContainer'>
                         <canvas id='colorPreviewCanvas' width={100} height={100} ref={(canvas) => { this.canvas = canvas; }} ></canvas>
                     </Item>
                     <canvas className='hidden' width={10} height={10} ref={(dataCanvas) => { this.dataCanvas = dataCanvas; }} ></canvas>
-                </Segment>
-                <Segment>
-                    <div className='twoColumn w50 left'>
-                        <Input
-                            placeholder="1 - 100"
-                            type="number"
-                            className='oneColumnFull'
-                            fluid
-                            label={<Popup
-                                trigger={<Label className='uniform'>X</Label>}
-                                content='X Position'
-                                className='Popup'
-                                size='tiny'
-                            />}
-                            value={this.state.x} 
-                            onChange={(e) => this.setX(e.target.value)}
-                        />
-                    </div>
-                    <div className='twoColumn w50 right'>
-                        <Input
-                            placeholder="1 - 100"
-                            type="number"
-                            label={<Popup
-                                trigger={<Label className='uniform'>Y</Label>}
-                                content='Y Position'
-                                className='Popup'
-                                size='tiny'
-                            />}
-                            className='oneColumnFull'
-                            fluid
-                            value={this.state.y} 
-                            onChange={(e) => this.setY(e.target.value)}
-                        />
-                    </div>
-                </Segment>
+                </div>
+                <Divider/>
+                <div className='twoColumn w50 left'>
+                    <Input
+                        placeholder="1 - 100"
+                        type="number"
+                        className='oneColumnFull'
+                        fluid
+                        label={<Popup
+                            trigger={<Label className='uniform'>X</Label>}
+                            content='X Position'
+                            className='Popup'
+                            size='tiny'
+                        />}
+                        value={this.state.x} 
+                        onChange={(e) => this.setX(e.target.value)}
+                    />
+                </div>
+                <div className='twoColumn w50 right'>
+                    <Input
+                        placeholder="1 - 100"
+                        type="number"
+                        label={<Popup
+                            trigger={<Label className='uniform'>Y</Label>}
+                            content='Y Position'
+                            className='Popup'
+                            size='tiny'
+                        />}
+                        className='oneColumnFull'
+                        fluid
+                        value={this.state.y} 
+                        onChange={(e) => this.setY(e.target.value)}
+                    />
+                </div>
                 {this.state.owner != '' ? 
-                    <Segment>
+                    <div>
+                        <Divider/>
                         <Input
                             placeholder="Address"
                             fluid disabled
@@ -409,7 +473,7 @@ class PixelDescriptionBox extends Component {
                                 size='tiny'
                             />}
                             className='oneColumn'
-                            value={this.state.lastUpdate == 0 ? "None" : (this.state.earnings + '/' + this.state.maxEarnings) + " PXL"}
+                            value={this.getCurrentPayout()}
                         />
                         <Input
                             label="Reserved"
@@ -468,14 +532,11 @@ class PixelDescriptionBox extends Component {
                             actionPosition='left'
                             value={this.state.link != '' ? this.state.link : "None Set"}
                         />
-                    </Segment>
-                : <Segment>
-                    <p>
-                        Click a Property on the canvas or enter the coordinates here to see more about a property.
-                    </p>
-                </Segment>}
+                    </div>
+                : (!this.state.noAccount && <Info messages='Click a Property on the canvas or enter the coordinates above to see more about a property.'/>)}
                 {this.state.x != '' && this.state.y != '' && !this.state.noAccount &&
-                    <Segment>
+                    <div>
+                        <Divider/>
                         <Grid columns='two' divided>
                             {this.getActionsList().map((action, i) => (
                                 <Grid.Row key={i}>
@@ -488,8 +549,13 @@ class PixelDescriptionBox extends Component {
                                 </Grid.Row>
                             ))}
                         </Grid>
-                    </Segment>
+                    </div>
                 } 
+                {this.state.noAccount && 
+                <div>
+                    <Divider/>
+                    <ErrorBox/>
+                </div>}
             
                 <BuyPixelForm isOpen={this.state.isOpen.BUY} close={this.toggleAction.bind(this)}/>
                 <SellPixelForm isOpen={this.state.isOpen.SELL} close={this.toggleAction.bind(this)}/>
@@ -499,7 +565,7 @@ class PixelDescriptionBox extends Component {
                 <MakePrivateForm isOpen={this.state.isOpen.SET_PRIVATE} close={this.toggleAction.bind(this)}/>
                 {/*<TransferPropertyForm isOpen={this.state.isOpen.TRANSFER} close={this.toggleAction.bind(this)}/>*/}
                 <PlaceBidForm isOpen={this.state.isOpen.PLACE_BID} close={this.toggleAction.bind(this)}/>
-            </SegmentGroup>
+            </div>
         );
     }
 }

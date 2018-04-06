@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import {Contract, ctr} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions.jsx';
-import {Modal, ModalActions, ModalHeader, ModalContent, Input, Button} from 'semantic-ui-react';
+import * as Strings from '../../const/strings';
+import Info from '../ui/Info';
+import {Modal, ModalActions, ModalHeader, ModalContent, Input, Button, Divider, Message} from 'semantic-ui-react';
 
 class SetHoverText extends Component {
     constructor(props) {
@@ -32,6 +34,8 @@ class SetHoverText extends Component {
             >
                 <ModalHeader>Set Property Links</ModalHeader>
                 <ModalContent>
+                <Info messages={Strings.FORM_SET_LINK}/>
+                <Divider/>
                     <Input 
                         fluid
                         label='http://' 

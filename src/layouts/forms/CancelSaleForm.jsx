@@ -1,8 +1,10 @@
+import Info from '../ui/Info';
 import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
-import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon } from 'semantic-ui-react';
+import * as Strings from '../../const/strings';
+import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon, Message} from 'semantic-ui-react';
 
 class CancelSaleForm extends Component {
     constructor(props) {
@@ -33,6 +35,8 @@ class CancelSaleForm extends Component {
             this.setState({y});
         })
         ctr.getSystemSalePrices((data) => {
+            if (data == null)
+                return;
             let ppc = Func.BigNumberToNumber(data[1]);
             this.setState({
                 valuePrice: ppc, 
@@ -67,12 +71,14 @@ class CancelSaleForm extends Component {
     render() {
         return (
             <Modal size='tiny' 
-            open={this.state.isOpen} 
-            closeIcon 
-            onClose={() => this.toggleModal(false)}
+                open={this.state.isOpen} 
+                closeIcon 
+                onClose={() => this.toggleModal(false)}
             >
             <ModalHeader>Delist Property</ModalHeader>
             <ModalContent>
+                <Info messages={Strings.FORM_CANCEL_SELL}/>
+                <Divider/>
                 <p>Are you sure you want stop offering Property ({this.state.x}, {this.state.y}) for Sale?</p>
             </ModalContent>
             <ModalActions>

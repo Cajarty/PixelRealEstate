@@ -2,8 +2,10 @@ import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
+import Info from '../ui/Info';
+import * as Strings from '../../const/strings';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
-import {Segment, ModalContent, Divider, Modal, Grid, Label, Input, Container, Icon, Button, Popup, ModalActions, ModalHeader} from 'semantic-ui-react';
+import {Segment, ModalContent, Divider, Modal, Grid, Label, Input, Container, Icon, Button, Popup, ModalActions, ModalHeader, Message} from 'semantic-ui-react';
 
 const TOKENS_TO_MINUTES = 1;
 
@@ -29,7 +31,7 @@ class MakePublicForm extends Component {
         this.setState(update);
     }
 
-    componentDidMount() {
+    componentDidMountOpen() {
         GFD.listen('x', 'ChangePropertyMode', (x) => {
             this.setState({x});
         })
@@ -49,7 +51,7 @@ class MakePublicForm extends Component {
         })
     }
 
-    componentWillUnmount() {
+    componentDidUnmountOpen() {
         GFD.closeAll('ChangePropertyMode');
     }
 
@@ -77,6 +79,12 @@ class MakePublicForm extends Component {
         })
     }
 
+    componentDidUpdate(pP, pS) {
+        if (this.state.isOpen && !pS.isOpen)
+            this.componentDidMountOpen();
+        else if (!this.state.isOpen && pS.isOpen)
+            this.componentDidUnmountOpen();
+    }
 
     changeTokens(t) {
         this.setState({
@@ -107,6 +115,8 @@ class MakePublicForm extends Component {
             >
                 <ModalHeader>Set Property Private</ModalHeader>
                 <ModalContent>
+                <Info messages={Strings.FORM_SET_PUBLIC}/>
+                <Divider/>
                 <div className='twoColumn w50 left'>
                     <Input
                         placeholder="1 - 100"

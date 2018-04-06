@@ -1,10 +1,11 @@
 
 import * as EVENTS from '../const/events';
 import {ctr, Contract, LISTENERS} from './contract.jsx';
-import Axios from '../network/Axios.jsx';
+import {ax, Axios} from '../network/Axios.jsx';
 import * as Func from '../functions/functions.jsx';
 import * as Assets from '../const/assets';
 import * as Struct from '../const/structs';
+import {GFD, GlobalState} from '../functions/GlobalState';
 
 export const Compares = {
     xAsc: { 
@@ -97,14 +98,14 @@ export class ServerDataManager {
         ctr.watchEventLogs(EVENTS.SetUserHoverText, {}, (handle) => {
             this.evHndl[EVENTS.SetUserHoverText] = handle;
             this.evHndl[EVENTS.SetUserHoverText].watch((error, log) => {
-                console.error('No Event handler for ', Event.SetUserHoverText);
+                console.error('No Event handler for ', EVENTS.SetUserHoverText);
             });
         });
 
         ctr.watchEventLogs(EVENTS.SetUserSetLink, {}, (handle) => {
             this.evHndl[EVENTS.SetUserSetLink] = handle;
             this.evHndl[EVENTS.SetUserSetLink].watch((error, log) => {
-                console.error('No Event handler for ', Event.SetUserSetLink);
+                console.error('No Event handler for ', EVENTS.SetUserSetLink);
             });
         });
 
@@ -168,6 +169,16 @@ export class ServerDataManager {
         this.requestServerImage((imageResult) => {
             this.requestServerData((dataResult) => {
                 this.setupEvents();
+                GFD.setData('ServerDataManagerInit', 2);
+                ctr.sendResults(LISTENERS.ServerDataManagerInit, {imageLoaded: imageResult, dataLoaded: dataResult});
+            });
+        });
+    }
+
+    initNoMetaMask() {
+        this.requestServerImage((imageResult) => {
+            this.requestServerData((dataResult) => {
+                GFD.setData('ServerDataManagerInit', 1);
                 ctr.sendResults(LISTENERS.ServerDataManagerInit, {imageLoaded: imageResult, dataLoaded: dataResult});
             });
         });
@@ -177,7 +188,7 @@ export class ServerDataManager {
     Returns true/false on success/fail of the load.
     */
     requestServerData(resultCallback) {
-        Axios.getInstance().get('/getPropertyData', this.cancelDataRequestToken).then((result) => {
+        ax.get('/getPropertyData', this.cancelDataRequestToken).then((result) => {
             if (result.status == 200 && typeof result.data === 'object') {
                 this.allProperties = result.data;
                 this.organizeAllProperties();
@@ -189,7 +200,7 @@ export class ServerDataManager {
     }
 
     requestServerImage(resultCallback) {
-        Axios.getInstance().get('/getPixelData', this.cancelImageRequestToken).then((result) => {
+        ax.get('/getPixelData', this.cancelImageRequestToken).then((result) => {
             if (result.status == 200) {
                 this.pixelData = result.data;
                 resultCallback(true);
@@ -248,6 +259,7 @@ export class ServerDataManager {
 
 
         if (ctr.account === this.allProperties[x][y].owner) {
+            console.info('here', this.allProperties[x][y])
             if (this.ownedProperties[x] == null)
                 this.ownedProperties[x] = {};
             this.ownedProperties[x][y] = this.allProperties[x][y];
@@ -308,7 +320,7 @@ export class ServerDataManager {
     orderPropertyList(objList, compFunc) {
         return new Promise(resolve => {
             let list = [];
-            if (objList == null || Object.keys(objList).length == 0) {
+            if (GFD.getData('ServerDataManagerInit') < 1 && (objList == null || Object.keys(objList).length == 0)) {
                 setTimeout(() => {
                     resolve(this.orderPropertyList(objList, compFunc));
                 }, 1000);

@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
+import Info from '../ui/Info';
 import {GFD, GlobalState} from '../../functions/GlobalState';
-import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon } from 'semantic-ui-react';
+import * as Strings from '../../const/strings';
+import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon, Message} from 'semantic-ui-react';
 
 class PlaceBidForm extends Component {
     constructor(props) {
@@ -71,6 +73,8 @@ class PlaceBidForm extends Component {
             >
             <ModalHeader>Place Property Bid</ModalHeader>
             <ModalContent>
+                <Info messages={Strings.FORM_BID}/>
+                <Divider/>
                 <div className='twoColumn w50 left'>
                     <Input
                         placeholder="1 - 100"

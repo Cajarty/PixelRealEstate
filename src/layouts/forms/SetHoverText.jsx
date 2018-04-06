@@ -2,7 +2,9 @@ import React, { Component } from 'react'
 import {Contract, ctr} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions.jsx';
 import * as web3 from 'web3';
-import {Modal, ModalActions, ModalHeader, ModalContent, Input, Button, Popup, Label, Icon} from 'semantic-ui-react';
+import * as Strings from '../../const/strings';
+import Info from '../ui/Info';
+import {Modal, ModalActions, ModalHeader, ModalContent, Input, Button, Popup, Label, Icon, Message, Divider} from 'semantic-ui-react';
 
 class SetHoverText extends Component {
     constructor(props) {
@@ -33,6 +35,8 @@ class SetHoverText extends Component {
             >
                 <ModalHeader>Set Property Hover Texts</ModalHeader>
                 <ModalContent>
+                <Info messages={Strings.FORM_SET_TEXT}/>
+                <Divider/>
                     <Input 
                         fluid
                         label={<Popup

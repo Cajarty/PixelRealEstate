@@ -61,6 +61,7 @@ class ZoomCanvas extends Component {
         this.setState({ ctx, dataCtx });
 
         ctr.listenForResults(LISTENERS.ServerDataManagerInit, 'canvasZoom', (results) => {
+            console.info('please ok thanks')
             if (results.imageLoaded) {
                 this.setCanvas(SDM.pixelData);
                 this.setState({canvasLoaded: true});
@@ -71,6 +72,8 @@ class ZoomCanvas extends Component {
         });
 
         ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (handle) => {
+            if (handle == null)
+                return;
             let eventHandle = handle;
             this.setState({eventHandle});
             eventHandle.watch((error, log) => {

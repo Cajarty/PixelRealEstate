@@ -3,6 +3,7 @@ import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 import * as EVENTS from '../../const/events';
 import {ctr, Contract} from '../../contract/contract';
 import * as Func from '../../functions/functions';
+import {GFD, GlobalState} from '../../functions/GlobalState';
 
 export class Panel extends Component {
     render() {
@@ -39,7 +40,11 @@ export class PanelPropertyCanvas extends Component {
             listenerToken: 'PanelPropCanvas' + Math.random(),
             ctx: null,
             scale: 1,
+            updateHandle: null,
         };
+    }
+
+    componentWillMount() {
     }
 
     componentDidMount() {
@@ -48,16 +53,25 @@ export class PanelPropertyCanvas extends Component {
         ctx.webkitImageSmoothingEnabled = false;
         ctx.scale(this.props.width / 10, this.props.width / 10);
         this.setState({ ctx, scale: this.props.width });
-        this.setCanvas(SDM.getPropertyImage(this.props.x, this.props.y));
-        
-
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {property: ctr.toID(this.props.x, this.props.y)}, (updateHandle) => {
-            this.setState({updateHandle})
-            updateHandle.watch((error, log) => {
-                let colors = Func.ContractDataToRGBAArray(log.args.colors);
-                this.setCanvas(colors);
+        if (GFD.getData('ServerDataManagerInit') > 1) {
+            ctr.getPropertyColors(this.props.x, this.props.y, (x, y, canvasData) => {
+                this.setCanvas(canvasData);
             });
-        });
+        } else if (GFD.getData('ServerDataManagerInit') > 0) {
+            this.setCanvas(SDM.getPropertyImage(this.props.x, this.props.y));
+        } else {
+            let id = 'mini ' + this.state.x + this.state.y
+            GFD.listen('ServerDataManagerInit', id, (result) => {
+                if (GFD.getData('ServerDataManagerInit') > 1) {
+                    ctr.getPropertyColors(this.props.x, this.props.y, (x, y, canvasData) => {
+                        this.setCanvas(canvasData);
+                    });
+                } else if (GFD.getData('ServerDataManagerInit') > 0) {
+                    this.setCanvas(SDM.getPropertyImage(this.props.x, this.props.y));
+                }
+                GFD.close('ServerDataManagerInit', id);
+            });
+        }
     }
 
     componentWillReceiveProps(newProps) {

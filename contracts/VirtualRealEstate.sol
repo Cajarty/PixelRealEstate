@@ -29,14 +29,14 @@ contract VirtualRealEstate {
     uint256 systemSalePricePXL;
 
     /* ### Events ### */
-    event PropertyColorUpdate(uint16 indexed property, uint256[10] colors, uint256 lastUpdate, address indexed lastUpdaterPayee, uint256 becomePublic, uint256 indexed rewardedAmount);
+    event PropertyColorUpdate(uint16 indexed property, uint256[10] colors, uint256 lastUpdate, address indexed lastUpdaterPayee, uint256 becomePublic, uint256 indexed rewardedCoins);
     event PropertyBought(uint16 indexed property, address indexed newOwner, uint256 ethAmount, uint256 PXLAmount, uint256 timestamp, address indexed oldOwner);
     event SetUserHoverText(address indexed user, uint256[2] newHoverText);
     event SetUserSetLink(address indexed user, uint256[2] newLink);
     event PropertySetForSale(uint16 indexed property, uint256 forSalePrice);
     event DelistProperty(uint16 indexed property);
     event SetPropertyPublic(uint16 indexed property);
-    event SetPropertyPrivate(uint16 indexed property, uint32 numMinutesPrivate, uint256 indexed rewardedAmount );
+    event SetPropertyPrivate(uint16 indexed property, uint32 numMinutesPrivate, address indexed rewardedUser, uint256 indexed rewardedCoins);
     event Bid(uint16 indexed property, uint256 bid, uint256 timestamp);
     
     /* ### MODIFIERS ### */
@@ -89,6 +89,8 @@ contract VirtualRealEstate {
             pxlProperty.setPropertyPrivateMode(propertyID, false);
         }
     }
+
+    
     
     // Update the 10x10 image data for a Property, triggering potential payouts if it succeeds
     function setColors(uint16 propertyID, uint256[10] newColors, uint256 PXLToSpend) public validPropertyID(propertyID) returns(bool) {
@@ -153,7 +155,7 @@ contract VirtualRealEstate {
         pxlProperty.setPropertyPrivateModeEarnUntilLastUpdateBecomePublic(propertyID, setPrivateMode, 0, 0, whenToBecomePublic);
         
         if (setPrivateMode) {
-            SetPropertyPrivate(propertyID, numMinutesPrivate, rewardedAmount);
+            SetPropertyPrivate(propertyID, numMinutesPrivate, propertyLastUpdater, rewardedAmount);
         } else {
             SetPropertyPublic(propertyID);
         }

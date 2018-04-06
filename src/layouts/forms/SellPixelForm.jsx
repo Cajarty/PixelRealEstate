@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
+import Info from '../ui/Info';
 import {GFD, GlobalState} from '../../functions/GlobalState';
-import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon } from 'semantic-ui-react';
+import * as Strings from '../../const/strings';
+import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon, Message } from 'semantic-ui-react';
 
 class SellPixelForm extends Component {
     constructor(props) {
@@ -33,6 +35,8 @@ class SellPixelForm extends Component {
             this.setState({y});
         })
         ctr.getSystemSalePrices((data) => {
+            if (data == null)
+                return;
             let ppc = Func.BigNumberToNumber(data[1]);
             this.setState({
                 valuePrice: ppc, 
@@ -73,6 +77,8 @@ class SellPixelForm extends Component {
             >
             <ModalHeader>Sell Property</ModalHeader>
             <ModalContent>
+                <Info messages={Strings.FORM_SELL}/>
+                <Divider/>
                 <div className='twoColumn w50 left'>
                     <Input
                         placeholder="1 - 100"

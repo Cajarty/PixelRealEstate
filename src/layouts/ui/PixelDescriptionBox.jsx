@@ -205,7 +205,7 @@ class PixelDescriptionBox extends Component {
         this.state.evH1.stopWatching();
         this.state.evH2.stopWatching();
         this.state.evH3.stopWatching();
-        clearTimeout(this.state.timerUpdate);
+        clearTimeout(this.state.timerUpdater);
     }
 
     setCanvas(rgbArr) {

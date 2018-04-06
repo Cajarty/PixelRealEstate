@@ -7,7 +7,7 @@ import ZoomCanvas from './ZoomCanvas';
 import Axios from '../../network/Axios.jsx';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 import HoverLabel from './HoverLabel';
-import {GFD, GlobalState} from '../../functions/GlobalState';
+import {GFD, GlobalState, TUTORIAL_STATE} from '../../functions/GlobalState';
 import * as Strings from '../../const/strings';
 import HoverBox from './HoverBox';
 import * as Assets from '../../const/assets';
@@ -19,14 +19,16 @@ import PropertySalesLogYou from '../logs/PropertySalesLogYou';
 import PropertySalesLog from '../logs/PropertySalesLog';
 import PropertySalesLogTopPXL from '../logs/PropertySalesLogTopPXL';
 import PropertySalesLogTopETH from '../logs/PropertySalesLogTopETH';
+import Info from '../ui/Info';
 import { Segment, SegmentGroup, Button, Divider, Label, 
     LabelDetail, Input, Icon, Item, ItemContent, ItemImage, 
-    ItemGroup, Tab, Header, Grid, Sidebar, MenuItem, TabPane, Menu, Checkbox, Popup} from 'semantic-ui-react';
+    ItemGroup, Tab, Header, Grid, Sidebar, MenuItem, TabPane, Menu, Checkbox, Popup, Modal, ModalContent, ModalHeader} from 'semantic-ui-react';
 import SetHoverText from '../forms/SetHoverText';
 import SetLink from '../forms/SetLink';
 import PropertiesOwned from '../ui/PropertiesOwned';
 import PropertiesForSale from '../ui/PropertiesForSale';
 import PropertyChangeLogTop from '../logs/PropertyChangeLogTop';
+import Tutorial from '../Tutorial';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -38,6 +40,8 @@ class CanvasPage extends Component {
             PPCOwned: 0,
             advancedMode: false,
             showPopertiesForSale: false,
+            askForTutorial: false,
+            tutorialState: TUTORIAL_STATE.NONE,
 
             tab1Loading: false,
             tab2Loading: false,
@@ -45,6 +49,10 @@ class CanvasPage extends Component {
     }
 
     componentDidMount() {
+        GFD.listen('tutorialStateIndex', 'CanvasPage', (newID) => {
+            this.setState({tutorialState: TUTORIAL_STATE[Object.keys(TUTORIAL_STATE)[newID]]})
+        });
+
         ctr.getBalance((balance) => {
             GFD.setData('balance', balance);
             this.setState({PPCOwned: balance, loadingPPC: false});
@@ -108,6 +116,7 @@ class CanvasPage extends Component {
         this.state.eventHandleTransfer.stopWatching();
         this.state.eventHandleBought.stopWatching();
         this.state.eventHandleUpdate.stopWatching();
+        GFD.closeAll('CanvasPage');
         ctr.stopListeningForEvent(EVENTS.AccountChange, 'CanvasPagePPCListener');
     }
 
@@ -120,12 +129,21 @@ class CanvasPage extends Component {
         if (newMode)
             ctr.getAccounts();
         GFD.setData('advancedMode', newMode);
-        this.setState({advancedMode: newMode})
+        this.setState({advancedMode: newMode, askForTutorial: false})
     }
 
     toggleForSaleProperties(e, data) {
         this.setState({showPopertiesForSale: data.checked});
         ctr.sendResults(LISTENERS.ShowForSale, {show: data.checked});
+    }
+
+    startTutorial() {
+        GFD.setData('tutorialStateIndex', 1);
+        this.changeMode();
+    }
+
+    showAskForTutorial() {
+        this.setState({askForTutorial: true});
     }
 
     render() {
@@ -163,6 +181,18 @@ class CanvasPage extends Component {
             { menuItem: 'Recent', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLog/></TabPane> },
             { menuItem: 'You', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLogYou/></TabPane> }
         ];
+
+        let modeButton = 
+            <Button 
+                size={this.state.advancedMode ? 'medium' : 'large'} 
+                className='modeButton' 
+                primary={!this.state.advancedMode} 
+                onClick={() => {this.state.advancedMode ? this.changeMode() : this.showAskForTutorial()}} 
+                fluid
+            >
+                {this.state.advancedMode ? 'Viewing Mode' : 'Get Started'}
+            </Button>
+
         return (
             <div>
                 <SegmentGroup horizontal className='mainSegmentGroup'> 
@@ -189,32 +219,39 @@ class CanvasPage extends Component {
                                     ref={(portfolioLink) => { this.portfolioLink = portfolioLink; }} 
                                 />
                                 <Divider/>
-                                <Button 
-                                    size={this.state.advancedMode ? 'medium' : 'large'} 
-                                    className='modeButton' 
-                                    primary={!this.state.advancedMode} 
-                                    onClick={() => this.changeMode()} 
-                                    fluid
-                                >
-                                    {this.state.advancedMode ? 'Viewing Mode' : 'Get Started'}
-                                </Button>
-                                {this.state.advancedMode &&
-                                <div>
-                                    <Divider/>
-                                    <SetHoverText/>
-                                    <SetLink/>
-                                    <Divider/>
-                                    <Checkbox 
-                                        label={'Show Properties for sale'} 
-                                        checked={this.state.showPopertiesForSale}
-                                        onChange={(e, data) => {this.toggleForSaleProperties(e, data)}}
-                                    />
-                                </div>
+                                {this.state.advancedMode ? 
+                                    <div>
+                                        {modeButton}
+                                        <Divider/>
+                                        <SetHoverText/>
+                                        <SetLink/>
+                                        <Divider/>
+                                        <Checkbox 
+                                            label={'Show Properties for sale'} 
+                                            checked={this.state.showPopertiesForSale}
+                                            onChange={(e, data) => {this.toggleForSaleProperties(e, data)}}
+                                        />
+                                    </div>
+                                :
+                                    <Modal size='mini' 
+                                        open={this.state.askForTutorial}
+                                        trigger={modeButton}
+                                        closeOnEscape={false}
+                                        closeOnRootNodeClick={false}
+                                    >
+                                        <ModalHeader>Getting Started</ModalHeader>
+                                        <ModalContent>
+                                        <Info messages={Strings.TUTORIAL_START_DIALOG} size='small'/>
+                                            <Button primary fluid onClick={() => {this.startTutorial()}}>Start the Tutorial</Button>
+                                            <Divider/>
+                                            <Button secondary fluid onClick={() => {this.changeMode()}}>I'm a Returning User</Button>
+                                        </ModalContent>
+                                    </Modal>
                                 }
                     </Segment>
-                    <Segment className='center'>
-                        <HoverLabel showPrices={this.state.showPopertiesForSale}/>
-                        {null&&<HoverBox/>}
+                    {console.info(TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 1))}
+                    <Segment id='step1' className={'center' + TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 1)}>
+                        {this.state.tutorialState.index == 0 && <HoverLabel showPrices={this.state.showPopertiesForSale}/>}
                         <Canvas/>
                     </Segment>
                     <Segment className='right'>
@@ -261,6 +298,7 @@ class CanvasPage extends Component {
                     TOS
                     </MenuItem>
                 </Sidebar>
+                <Tutorial/>
             </div>
         );
     }

@@ -21,6 +21,8 @@ export const FORM_TRANSFER = ["Transfer this Property to another address.",
     "Make sure the recipient address is correct, or the Property is unclaimable."];
 export const FORM_BID = ["Place a bid offer on this Property.", 
     "Bids cost 1 PXL, but does not offer any PXL to the Property owner. Bids only notify the owner of your potential offer, trades must still be done through the market."];
+export const TUTORIAL_START_DIALOG = ["Pixel Property is easy to use. Just in case, we've prepared a quick tutorial on how to get started.", 
+    "If you'd like to skip it now, the tutorial can be accessed again from the bottom of the page."];
 
 export const CHANGELOG = [
     {
@@ -32,3 +34,15 @@ export const CHANGELOG = [
 export const ADDRESSES = [
     
 ];
+
+export const TUTORIAL = [
+    [''],
+    ['Welcome to pixel property!', 'This is the Pixel Canvas, live from Ethereum! Click on it to find out more about a Property.'],
+    ['You selected a Property!', 'When clicking the canvas, the inspector will display all details about the Property. These include who owns it, if it’s for sale & how much, if it’s currently editable, and the expected PXLs earned by the last artist.'],
+    ['Use these inspector buttons to interact with the currently inspected property. Some Properties have different actions depending on their current state.', 'Click on “Update Image” to learn how to upload artwork.'],
+    ['Updating the artwork of a Property will temporarily lock it in place as private. After the private mode is up, the artwork will stay until a user changes it again. Longer lasting artwork is awarded more PXL.'],
+    ['PXL allows you to purchase Properties on the canvas.', 'Properties you own can be used to earn passive PXL, or kept private for only your artwork. Owners are also able to advertise a website and phrase of their choosing on all their Properties.'],
+    ['Looks like you’re ready to start!', 'If looking for more info, each inspector action explains what they do in more detail. Additional details are on our [Getting Started] page.', 'If looking for more info, each inspector action explains what they do in more detail. Additional details are on our [Getting Started] page.'],
+    ['Looks like you’re almost ready! In order to begin, you must have the [MetaMask Browser Extension] setup.', 'MetaMask secures your PixelProperty data by storing your sensitive info in an encrypted storage.', 'If looking for more info, each inspector action explains what they do in more detail. Additional details are on our [Getting Started] page.']
+];
+

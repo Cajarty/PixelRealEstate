@@ -55,19 +55,19 @@ export class PanelPropertyCanvas extends Component {
         this.setState({ ctx, scale: this.props.width });
         if (GFD.getData('ServerDataManagerInit') > 1) {
             ctr.getPropertyColors(this.props.x, this.props.y, (x, y, canvasData) => {
-                this.setCanvas(canvasData);
+                this.setCanvas(canvasData, this.canvas);
             });
         } else if (GFD.getData('ServerDataManagerInit') > 0) {
-            this.setCanvas(SDM.getPropertyImage(this.props.x, this.props.y));
+            this.setCanvas(SDM.getPropertyImage(this.props.x, this.props.y), this.canvas);
         } else {
             let id = 'mini ' + this.state.x + this.state.y
             GFD.listen('ServerDataManagerInit', id, (result) => {
                 if (GFD.getData('ServerDataManagerInit') > 1) {
                     ctr.getPropertyColors(this.props.x, this.props.y, (x, y, canvasData) => {
-                        this.setCanvas(canvasData);
+                        this.setCanvas(canvasData, this.canvas);
                     });
                 } else if (GFD.getData('ServerDataManagerInit') > 0) {
-                    this.setCanvas(SDM.getPropertyImage(this.props.x, this.props.y));
+                    this.setCanvas(SDM.getPropertyImage(this.props.x, this.props.y), this.canvas);
                 }
                 GFD.close('ServerDataManagerInit', id);
             });
@@ -84,18 +84,23 @@ export class PanelPropertyCanvas extends Component {
             this.state.updateHandle.stopWatching();
     }
 
-    setCanvas(rgbArr) {
+    setCanvas(rgbArr, canvas = this.canvas) {
         let ctx = this.state.ctx;
         if (ctx == null) {
-            ctx = this.canvas.getContext("2d");
+            ctx = canvas.getContext("2d");
         }
+
+        if (canvas == null)
+            canvas = this.canvas;
+        if (canvas == null)
+            return;
 
         let ctxID = ctx.createImageData(10, 10);
         for (let i = 0; i < 400; i++) {
             ctxID.data[i] = rgbArr[i];
         }
         ctx.putImageData(ctxID, 0, 0)
-        ctx.drawImage(this.canvas, 0, 0);
+        ctx.drawImage(canvas, 0, 0);
     }
 
     render() {

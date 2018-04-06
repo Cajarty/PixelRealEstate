@@ -95,19 +95,20 @@ export class ServerDataManager {
             });
         });
 
-        ctr.watchEventLogs(EVENTS.SetUserHoverText, {}, (handle) => {
-            this.evHndl[EVENTS.SetUserHoverText] = handle;
-            this.evHndl[EVENTS.SetUserHoverText].watch((error, log) => {
-                console.error('No Event handler for ', EVENTS.SetUserHoverText);
-            });
-        });
+        //not really required to listen to
+        // ctr.watchEventLogs(EVENTS.SetUserHoverText, {}, (handle) => {
+        //     this.evHndl[EVENTS.SetUserHoverText] = handle;
+        //     this.evHndl[EVENTS.SetUserHoverText].watch((error, log) => {
+        //         console.error('No Event handler for ', EVENTS.SetUserHoverText);
+        //     });
+        // });
 
-        ctr.watchEventLogs(EVENTS.SetUserSetLink, {}, (handle) => {
-            this.evHndl[EVENTS.SetUserSetLink] = handle;
-            this.evHndl[EVENTS.SetUserSetLink].watch((error, log) => {
-                console.error('No Event handler for ', EVENTS.SetUserSetLink);
-            });
-        });
+        // ctr.watchEventLogs(EVENTS.SetUserSetLink, {}, (handle) => {
+        //     this.evHndl[EVENTS.SetUserSetLink] = handle;
+        //     this.evHndl[EVENTS.SetUserSetLink].watch((error, log) => {
+        //         console.error('No Event handler for ', EVENTS.SetUserSetLink);
+        //     });
+        // });
 
         ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (handle) => {
             this.evHndl[EVENTS.PropertySetForSale] = handle;
@@ -259,7 +260,6 @@ export class ServerDataManager {
 
 
         if (ctr.account === this.allProperties[x][y].owner) {
-            console.info('here', this.allProperties[x][y])
             if (this.ownedProperties[x] == null)
                 this.ownedProperties[x] = {};
             this.ownedProperties[x][y] = this.allProperties[x][y];

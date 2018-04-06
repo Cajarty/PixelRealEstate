@@ -318,29 +318,26 @@ export class ServerDataManager {
     }
 
     orderPropertyList(objList, compFunc) {
-        return new Promise(resolve => {
+        if (GFD.getData('ServerDataManagerInit') < 1 && (objList == null || Object.keys(objList).length == 0)) {
+            return null;
+        }
+        return new Promise((resolve) => {
             let list = [];
-            if (GFD.getData('ServerDataManagerInit') < 1 && (objList == null || Object.keys(objList).length == 0)) {
-                setTimeout(() => {
-                    resolve(this.orderPropertyList(objList, compFunc));
-                }, 1000);
-            } else {
-                let height = Object.keys(objList).length;
-                let width = Object.keys(objList).length;
-                for (let y = 0; y < height; y++) {
-                    for (let x = 0; x < width; x++) {
-                        if (objList[x] != null && objList[x][y] != null) {
-                            let i = 0;
-                            for (; i < list.length; i++) {
-                                if (compFunc(objList[x][y], list[i]))
-                                    break;
-                            }
-                            list.splice(i, 0, objList[x][y]);
+            let w = Object.keys(objList);
+            for (let x = 0; x < w.length; x++) {
+                let h = Object.keys(objList[w[x]]);
+                for (let y = 0; y < h.length; y++) {
+                    if (objList[w[x]] != null && objList[w[x]][h[y]] != null) {
+                        let i = 0;
+                        for (; i < list.length; i++) {
+                            if (compFunc(objList[w[x]][h[y]], list[i]))
+                                break;
                         }
-                    };
+                        list.splice(i, 0, objList[w[x]][h[y]]);
+                    }
                 };
-                resolve(list);
-            }
+            };
+            resolve(list);
         });
     }
 

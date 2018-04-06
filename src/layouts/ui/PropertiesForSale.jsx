@@ -9,6 +9,7 @@ import {GFD, GlobalState} from '../../functions/GlobalState';
 import Dropdown from 'react-dropdown';
 import PanelContainerForSale from './PanelContainerForSale';
 import {Button, Segment, Icon} from 'semantic-ui-react';
+import * as Func from '../../functions/functions';
 
 const ITEM_SIZE = 140;
 
@@ -57,7 +58,9 @@ class PropertiesForSale extends Component {
 
     async reorderItems(orderFunc) {
         //get my current market trade and populate fields
-        let results = await SDM.orderPropertyList(SDM.forSaleProperties, orderFunc)
+        let results = await SDM.orderPropertyList(SDM.forSaleProperties, orderFunc);
+        if (results == null)
+            return;
         this.setState({
             orderedItems: results, 
             items: results.length,
@@ -81,6 +84,7 @@ class PropertiesForSale extends Component {
     propertySelected(x, y) {
         GFD.setData('x', x);
         GFD.setData('y', y);
+        Func.ScrollTo(Func.PAGES.TOP);
     }
 
     changePage(up = true) {

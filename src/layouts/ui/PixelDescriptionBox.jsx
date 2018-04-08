@@ -114,7 +114,6 @@ class PixelDescriptionBox extends Component {
         ctr.listenForResults(LISTENERS.ServerDataManagerInit, 'PixelBox', (results) => {
             if (results.imageLoaded && GFD.getData('ServerDataManagerInit') == 1) {
                 let data = SDM.getPropertyData(this.state.x - 1, this.state.y - 1);
-    
                 let ethp = data.ETHPrice;
                 let ppcp = data.PPCPrice;
                 let reserved = data.becomePublic;
@@ -225,6 +224,7 @@ class PixelDescriptionBox extends Component {
         if (x === '' || y === '')
             return;
         ctr.getPropertyData(x, y, (data) => {  
+            console.info(data);
             let ethp = Func.BigNumberToNumber(data[1]);
             let ppcp = Func.BigNumberToNumber(data[2]);
             let reserved = Func.BigNumberToNumber(data[5]);

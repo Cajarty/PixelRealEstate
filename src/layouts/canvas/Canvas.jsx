@@ -69,6 +69,7 @@ class Canvas extends Component {
             }
                 
             if (!GFD.getData('advancedMode') && SDM.isPropertyLoaded(x, y)) {
+                
                 ctr.getLink(SDM.getPropertyData(x, y).owner, (data) => {
                     if (data != null && data.length > 0) {
                         this.linkTag.href = data;

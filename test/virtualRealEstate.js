@@ -429,7 +429,7 @@ contract('VirtualRealEstate', function(accounts) {
      assert.equal(coloursReturned[0].toNumber(), 5, "Should return 5 from the array of 5's" );
      return pxlPropertyInstance.balanceOf(accounts[4], { from: accounts[0] });
    }).then(function(balance) {
-     assert.equal(balance.toNumber(), 4, "Should have earned four coins from setting it and having it set for four seconds");
+     assert.equal(balance.toNumber(), 29, "Should have earned 29 coins from setting it and having it set for four seconds (+25 bonus)");
      return pxlPropertyInstance.balanceOf(accounts[3], { from: accounts[0] });
    }).then(function(balance) {
      assert.equal(balance, 4, "User3 should have earned the same amount if coins as owner that the setter got");
@@ -450,7 +450,7 @@ contract('VirtualRealEstate', function(accounts) {
    }).then(function(s) {
      return pxlPropertyInstance.balanceOf(accounts[0], {from: accounts[0]});
    }).then(function(balance) {
-     assert.equal(user0Balance - balance, 10, "Burnt 10 coins");
+     assert.equal(balance - user0Balance, 15, "Burnt 10 coins, but bonus +25 for being first setter. 15 coin difference");
    });
  });
 

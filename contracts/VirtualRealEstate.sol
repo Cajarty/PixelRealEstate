@@ -8,6 +8,8 @@ contract VirtualRealEstate {
     address owner;
     PXLProperty pxlProperty;
     
+    mapping (uint16 => bool) hasBeenSet;
+    
     // The amount for with ETH and PXL system prices increase
     uint256 PRICE_ETH_MIN_INCREASE = 1000;//10000000000000000000000; //0.0001 ETH
     uint256 PRICE_PXL_MIN_INCREASE = 10;
@@ -89,21 +91,18 @@ contract VirtualRealEstate {
             pxlProperty.setPropertyPrivateMode(propertyID, false);
         }
     }
-
-    
     
     // Update the 10x10 image data for a Property, triggering potential payouts if it succeeds
     function setColors(uint16 propertyID, uint256[10] newColors, uint256 PXLToSpend) public validPropertyID(propertyID) returns(bool) {
-        bool firstSet = pxlProperty.getPropertyLastUpdater(propertyID) == 0;
         uint256 projectedPayout = getProjectedPayout(propertyID);
         if (_tryTriggerPayout(propertyID, PXLToSpend)) {
             pxlProperty.setPropertyColors(propertyID, newColors);
             var (lastUpdater, becomePublic) = pxlProperty.getPropertyLastUpdaterBecomePublic(propertyID);
             PropertyColorUpdate(propertyID, newColors, now, lastUpdater, becomePublic, projectedPayout);
             // The first user to set a Properties color ever is awarded extra PXL due to eating the extra GAS cost of creating the uint256[10]
-            if (firstSet) {
-                //totalSupply += 25;
-                //balances[msg.sender] += 25;
+            if (!hasBeenSet[propertyID]) {
+                pxlProperty.rewardPXL(msg.sender, 25);
+                hasBeenSet[propertyID] = true;
             }
             return true;
         }
@@ -132,14 +131,14 @@ contract VirtualRealEstate {
         
         if (setPrivateMode) {
             //If inprivate, we can extend the duration, otherwise if becomePublic > now it means a free-use user locked it
-            require(propertyIsInPrivateMode || propertyBecomePublic <= now); 
+            require(propertyIsInPrivateMode || propertyBecomePublic <= now || propertyLastUpdater == msg.sender ); 
             require(numMinutesPrivate > 0);
             require(pxlProperty.balanceOf(msg.sender) >= numMinutesPrivate);
             pxlProperty.burnPXL(msg.sender, numMinutesPrivate);
             // Determines when the Property becomes public, one payout interval per coin burned
             whenToBecomePublic = now + PROPERTY_GENERATION_PAYOUT_INTERVAL * numMinutesPrivate;
 
-            rewardedAmount = getProjectedPayout(propertyID);
+            rewardedAmount = getProjectedPayout(propertyIsInPrivateMode, propertyLastUpdate, propertyEarnUntil);
             if (rewardedAmount > 0 && propertyLastUpdater != 0) {
                 pxlProperty.rewardPXL(propertyLastUpdater, rewardedAmount);
                 pxlProperty.rewardPXL(msg.sender, rewardedAmount);
@@ -182,8 +181,7 @@ contract VirtualRealEstate {
         // Must have spent enough ETH to cover the ETH left after PXL price was subtracted
         require(msg.value >= ethLeft);
         
-        pxlProperty.rewardPXL(owner, pxlValue);
-        pxlProperty.burnPXL(msg.sender, pxlValue);
+        pxlProperty.burnPXLRewardPXL(msg.sender, pxlValue, owner, pxlValue);
         
         uint256 minPercent = systemSalePricePXL * PRICE_PXL_MIN_PERCENT / 100;
         systemSalePricePXL += ((minPercent < PRICE_PXL_MIN_INCREASE) ? minPercent : PRICE_PXL_MIN_INCREASE) * pxlValue / systemSalePricePXL;
@@ -211,13 +209,9 @@ contract VirtualRealEstate {
             uint256 minPercent = systemSalePricePXL * PRICE_PXL_MIN_PERCENT / 100;
             systemSalePricePXL += (minPercent < PRICE_PXL_MIN_INCREASE) ? minPercent : PRICE_PXL_MIN_INCREASE;
         }
-        require(pxlProperty.getPropertySalePrice(propertyID) <= PXLValue);
-        require(pxlProperty.balanceOf(msg.sender) >= propertySalePrice);
-        uint256 amountTransfered = 0;
-        amountTransfered = propertySalePrice * USER_BUY_CUT_PERCENT / 100;
-        pxlProperty.burnPXL(msg.sender, propertySalePrice);
-        pxlProperty.rewardPXL(propertyOwner, amountTransfered);
-        pxlProperty.rewardPXL(owner, propertySalePrice - amountTransfered);
+        require(propertySalePrice <= PXLValue);
+        uint256 amountTransfered = propertySalePrice * USER_BUY_CUT_PERCENT / 100;
+        pxlProperty.burnPXLRewardPXLx2(msg.sender, propertySalePrice, propertyOwner, amountTransfered, owner, (propertySalePrice - amountTransfered));
         _transferProperty(propertyID, msg.sender, 0, propertySalePrice, 0, originalOwner);
     }
 
@@ -286,7 +280,7 @@ contract VirtualRealEstate {
     function _tryTriggerPayout(uint16 propertyID, uint256 pxlToSpend) private returns(bool) {
         var (propertyFlag, propertyIsInPrivateMode, propertyOwner, propertyLastUpdater, propertySalePrice, propertyLastUpdate, propertyBecomePublic, propertyEarnUntil) = pxlProperty.properties(propertyID);
         //If the Property is in private mode and expired, make it public
-        if (propertyIsInPrivateMode && propertyBecomePublic < now) {
+        if (propertyIsInPrivateMode && propertyBecomePublic <= now) {
             pxlProperty.setPropertyPrivateMode(propertyID, false);
             propertyIsInPrivateMode = false;
         }
@@ -295,27 +289,14 @@ contract VirtualRealEstate {
             require(msg.sender == propertyOwner);
             require(propertyFlag != 2);
         //If if its in free-use mode
-        } else if (propertyBecomePublic < now) {
+        } else if (propertyBecomePublic <= now || propertyLastUpdater == msg.sender) {
             uint256 pxlSpent = pxlToSpend + 1; //All pxlSpent math uses N+1, so built in for convenience
             if (pxlToSpend < 2 && isInGracePeriod()) { //If first 3 days and we spent <2 coins, treat it as if we spent 2
                 pxlSpent = 3; //We're treating it like 2, but it's N+1 in the math using this
             }
-            require(pxlProperty.balanceOf(msg.sender) >= pxlToSpend);
-            if (pxlToSpend != 0) {
-                pxlProperty.burnPXL(msg.sender, pxlToSpend);
-            }
-            //Get the amount of generated PXL for this trigger
-            uint256 payoutEach = getProjectedPayout(propertyID);
-            if (payoutEach > 0) {
-                if (propertyLastUpdater != 0) {
-                    //Payout lastUpdater
-                    pxlProperty.rewardPXL(propertyLastUpdater, payoutEach);
-                }
-                if (propertyOwner != 0) {
-                    //Payout the owner of the Property
-                    pxlProperty.rewardPXL(propertyOwner, payoutEach);
-                }
-            }
+            
+            uint256 projectedAmount = getProjectedPayout(propertyIsInPrivateMode, propertyLastUpdate, propertyEarnUntil );
+            pxlProperty.burnPXLRewardPXLx2(msg.sender, pxlToSpend, propertyLastUpdater, projectedAmount, propertyOwner, projectedAmount);
             
             //BecomePublic = (N+1)/2 minutes of user-private mode
             //EarnUntil = (N+1)^2 coins earned max/minutes we can earn from
@@ -355,10 +336,15 @@ contract VirtualRealEstate {
     // Gets the projected sale price for a property should it be triggered at this very moment
     function getProjectedPayout(uint16 propertyID) public view returns(uint256) {
         var (propertyIsInPrivateMode, propertyLastUpdate, propertyEarnUntil) = pxlProperty.getPropertyPrivateModeLastUpdateEarnUntil(propertyID);
+        return getProjectedPayout(propertyIsInPrivateMode, propertyLastUpdate, propertyEarnUntil);
+    }
+    
+    function getProjectedPayout(bool propertyIsInPrivateMode, uint256 propertyLastUpdate, uint256 propertyEarnUntil) public view returns(uint256) {
         if (!propertyIsInPrivateMode && propertyLastUpdate != 0) {
             uint256 earnedUntil = (now < propertyEarnUntil) ? now : propertyEarnUntil;
             uint256 minutesSinceLastColourChange = (earnedUntil - propertyLastUpdate) / PROPERTY_GENERATION_PAYOUT_INTERVAL;
             return minutesSinceLastColourChange * PROPERTY_GENERATES_PER_MINUTE;
+            //return (((now < propertyEarnUntil) ? now : propertyEarnUntil - propertyLastUpdate) / PROPERTY_GENERATION_PAYOUT_INTERVAL) * PROPERTY_GENERATES_PER_MINUTE; //Gave too high number wtf?
         }
         return 0;
     }

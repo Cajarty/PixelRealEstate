@@ -217,9 +217,10 @@ contract PXLProperty_PixelPropertyAccess_UnitTests {
         pxlProperty.burnPXL(address(this), 3000);
         pxlProperty.rewardPXL(address(this), 100);
         pxlProperty.burnPXL(address(this), 50);
+        pxlProperty.burnPXLRewardPXLx2(address(this), 10, address(this), 100, msg.sender, 100);
         
-        uint256 senderPXL = 10000 + 200 - 1000 + 50;
-        uint256 thisPXL = 5000 - 3000 + 100 - 50;
+        uint256 senderPXL = 10000 + 200 - 1000 + 50 + 100;
+        uint256 thisPXL = 5000 - 3000 + 100 - 50 - 10 + 100;
         uint256 properSupply = totalSupply + senderPXL + thisPXL;
         
         assert(pxlProperty.totalSupply() == properSupply);

@@ -1,6 +1,9 @@
 import React, { Component } from 'react'
-import Loader from './Loader';
 import {GFD, GlobalState} from '../../functions/GlobalState';
+import CircularProgressbar from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
+import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
+import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 
 export default class ClickLoader extends Component {
     constructor(props) {
@@ -15,28 +18,38 @@ export default class ClickLoader extends Component {
             canvasHeight: 0,
             offsetX: 0,
             offsetY: 0,
-            waitTime: 2000,
+            loaderValue: 0,
+            clickTime: 1000,
+            startClickTime: 0,
         }
     }
 
     componentDidMount() {
         GFD.listen('hoverX', 'clickLoader', (x) => {
             let hoverX = Math.floor(x / 10);
-            if (hoverX != this.state.hoverX)
-                this.updateLoaderPosition(hoverX, this.state.hoverY);
+            if (hoverX == this.state.hoverX)
+                return;
             this.setState({
                 hoverX: hoverX,
-                labelX: this.state.offsetX + (x * (this.state.canvasWidth / 1000)) - 8
+                labelX: (hoverX - 1.5) * this.state.canvasWidth / 100
             });
         })
         GFD.listen('hoverY', 'clickLoader', (y) => {
             let hoverY = Math.floor(y / 10);
-            if (hoverY != this.state.hoverY)
-                this.updateLoaderPosition(this.state.hoverX, hoverY);
+            if (hoverY == this.state.hoverY)
+                return;
             this.setState({
                 hoverY: hoverY,
-                labelY: this.state.offsetY + (y * (this.state.canvasHeight / 1000)) + 20
+                labelY: (hoverY - 1.5) * this.state.canvasHeight / 100
             });
+        })
+        GFD.listen('pressX', 'clickLoader', (x) => {
+            if (this.state.hoverY != -1)
+                this.updateLoaderPosition(x, this.state.hoverY);
+        })
+        GFD.listen('pressY', 'clickLoader', (y) => {
+            if (this.state.hoverX != -1)
+                this.updateLoaderPosition(this.state.hoverX, y);
         })
         GFD.listen('canvasTopOffset', 'clickLoader', (top) => {
             this.setState({
@@ -58,51 +71,72 @@ export default class ClickLoader extends Component {
                 canvasHeight: height
             });
         })
-        GFD.listen('pressTime', 'clickLoader', (time) => {
-            if (time == -1) {
-                this.updateLoaderPosition(-1, -1);
-                clearTimeout(this.state.clickTimeout);
-                return;
-            }
-            let now = new Date().getTime();
-            let difference = now - time;
-            if (difference >= this.state.waitTime) {
-                this.performClick(GFD.getData('pressX'), GFD.getData('pressY'));
-            } else {
-                this.setState({
-                    clickTimeout: setTimeout(() => {
-                        if (GFD.getData('pressTime') == -1)
-                            return;
-                        this.performClick(GFD.getData('pressX'), GFD.getData('pressY'));
-                    }, Math.max(this.state.waitTime - difference, 5)),
-                });
-            }
-        })
     }
 
     performClick(x, y) {
-        //add actions here.
+        this.setState({show: false});
+        this.linkTag.click();
+    }
+
+    componentWillUnmount() {
+        this.clearClickAttempt();
+    }
+
+    clearClickAttempt() {
+        if (this.state.clickTimeout != null)
+            clearTimeout(this.state.clickTimeout);
+        if (this.state.loaderTimeout != null)
+            clearTimeout(this.state.loaderTimeout);
+        this.setState({startClickTime: 0, show: false, loaderValue: 0});
     }
 
     updateLoaderPosition(x, y) {
-        if (x < 0 || y < 0) {
-            this.setState({show: false})
-        } else {
-            this.setState({show: true});
+        this.clearClickAttempt();
+
+        if (x < 0 || y < 0)
+            return;
+
+        if (SDM.isPropertyLoaded(x, y)) {
+            ctr.getLink(SDM.getPropertyData(x, y).owner, (data) => {
+                if (data != null && data.length > 0) {
+                    this.linkTag.href = data;
+                }
+            });
         }
+
+        this.setState({
+            show: true,
+            startClickTime: new Date().getTime(),
+            clickTimeout: setTimeout(() => {
+                this.performClick(GFD.getData('pressX'), GFD.getData('pressY'));
+            }, this.state.clickTime + 100),
+            loaderTimeout: setInterval(() => {
+                let newVal = ((new Date().getTime() - this.state.startClickTime) / this.state.clickTime) * 100;
+                console.info(newVal)
+                this.setState({
+                    loaderValue: newVal,
+                })
+            }, this.state.clickTime / 20),
+        });
     }
 
     render() {
         return (
-
             <div 
                 className={'clickLoader ' + (this.state.show ? '' : 'hidden')}
                 style={{
                     left: this.state.labelX,
                     top: this.state.labelY,
+                    width: this.state.canvasWidth / 25 || 1,
+                    height: this.state.canvasHeight / 25 || 1,
                 }}
                 >
-                <Loader className='clickLoaderLoader' progress={100} maxWidth={24}/>
+                <CircularProgressbar 
+                    className='clickLoaderLoader' 
+                    percentage={this.state.loaderValue}
+                    textForPercentage=''
+                />
+                <a target='_blank' ref={(linkTag) => {this.linkTag = linkTag}} style={{display: 'hidden'}}></a>
             </div>
         );
     }

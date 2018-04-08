@@ -57,7 +57,6 @@ export class GlobalState {
             hoverY: null,
             pressX: null,
             pressY: null,
-            pressTime: null,
             canvasTopOffset: null,
             canvasLeftOffset: null,
             advancedMode: false,

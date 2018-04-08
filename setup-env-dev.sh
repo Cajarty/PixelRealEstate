@@ -3,7 +3,7 @@ chmod 777 ./destroy-env-dev.sh
 ganache-cli &> ./logs/ganache.txt &
 echo "kill -9" $! >| destroy-env-dev.sh
 truffle compile &> ./logs/ctr-compile.txt
-truffle migrate --reset --network development &> ./logs/ctr.txt
+truffle migrate --reset --network development; &> ./logs/ctr.txt
 cp ./build/contracts/*.json ../PixelRealEstate-Server/build/contracts/
 cd ../PixelRealEstate-Server/
 node . dev cache &> ../PixelRealEstate/logs/server.txt &

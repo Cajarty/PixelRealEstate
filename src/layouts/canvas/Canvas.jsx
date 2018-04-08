@@ -50,9 +50,8 @@ class Canvas extends Component {
             GFD.setData('hoverX', -1);
             GFD.setData('hoverY', -1);
             this.setCanvasPointer(-1, -1);
-            // GFD.setData('pressX', -1);
-            // GFD.setData('pressY', -1);
-            // GFD.setData('pressTime', -1);
+            GFD.setData('pressX', -1);
+            GFD.setData('pressY', -1);
         };
         this.canvas.onclick = (e) => {    
             if (!e.isTrusted)
@@ -67,35 +66,22 @@ class Canvas extends Component {
             if (GFD.getData('tutorialStateIndex') == 1) {
                 GFD.setData('tutorialStateIndex', 1);
             }
-                
-            if (!GFD.getData('advancedMode') && SDM.isPropertyLoaded(x, y)) {
-                
-                ctr.getLink(SDM.getPropertyData(x, y).owner, (data) => {
-                    if (data != null && data.length > 0) {
-                        this.linkTag.href = data;
-                        this.linkTag.click();
-                    }
-                });
-            }
         };
+        this.canvas.onmousedown = (e) => {
+            if (!e.isTrusted || e.button != 0)
+                return;
 
-        // this.canvas.onmousedown = (e) => {     
-        //     if (!e.isTrusted)
-        //         return;
+            let rect = this.canvas.getBoundingClientRect();
+            let x = Math.floor((e.clientX - rect.left) * (1000 / rect.width) / 10);
+            let y = Math.floor((e.clientY - rect.top) * (1000 / rect.height) / 10); 
+            GFD.setData('pressX', x + 1);
+            GFD.setData('pressY', y + 1);
+        }
 
-        //     let rect = this.canvas.getBoundingClientRect();
-        //     let x = Math.floor((e.clientX - rect.left) * (1000 / rect.width) / 10);
-        //     let y = Math.floor((e.clientY - rect.top) * (1000 / rect.height) / 10); 
-        //     GFD.setData('pressX', x + 1);
-        //     GFD.setData('pressY', y + 1);
-        //     GFD.setData('pressTime', new Date().getTime());
-        // }
-
-        // this.canvas.onmouseup = (e) => {     
-        //     GFD.setData('pressX', -1);
-        //     GFD.setData('pressY', -1);
-        //     GFD.setData('pressTime', -1);
-        // }
+        this.canvas.onmouseup = (e) => {     
+            GFD.setData('pressX', -1);
+            GFD.setData('pressY', -1);
+        }
 
         if (GFD.getData('noMetaMask')) {
             GFD.listen('noMetaMask', 'canvas', this.setup);
@@ -237,7 +223,7 @@ class Canvas extends Component {
                 <div className={!this.state.loaded ? 'loading' : 'hidden'}>
                     <img className='icon' src={Assets.LOADING} draggable={false}></img>
                 </div>
-                {/*<a target='_blank' ref={(linkTag) => {this.linkTag = linkTag}} style={{display: 'hidden'}}></a>*/}
+                <a target='_blank' ref={(linkTag) => {this.linkTag = linkTag}} style={{display: 'hidden'}}></a>
             </div>
         );
     }

@@ -256,6 +256,7 @@ class CanvasPage extends Component {
                     </Segment>
                     <Segment id='step1' className={'center' + TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 1)}>
                         {this.state.tutorialState.index == 0 && <HoverLabel showPrices={this.state.showPopertiesForSale}/>}
+                        {this.state.tutorialState.index == 0 && <ClickLoader/>}
                         <Canvas/>
                     </Segment>
                     <Segment id={(this.state.tutorialState.index == 3 ? 'hiddenForward' : '')} className={'right' + TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 2) + (this.state.tutorialState.index == 3 ? ' hiddenForward' : '')}>

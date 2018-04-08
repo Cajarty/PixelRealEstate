@@ -427,3 +427,18 @@ div.hoverLabel.ui {
     box-sizing: content-box;
     text-align: center;
 }
+
+.clickLoader {
+    .CircularProgressbar.clickLoaderLoader {
+        margin-left: calc(1em - 1px);
+        margin-top: 1em;
+        .CircularProgressbar-path {
+            transition: stroke-dashoffset 0.05s cubic-bezier(0.08, 0.11, 1, 0.89) 0s;
+            animation-delay: 1s;
+            @include animation_adv(fadeout, .5s, linear, 1s)
+        }
+        .CircularProgressbar-trail {
+            stroke: none;
+        }
+    }
+}

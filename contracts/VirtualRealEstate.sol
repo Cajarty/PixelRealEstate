@@ -22,7 +22,7 @@ contract VirtualRealEstate {
     // The point in time when the initial grace period is over, and users get the default values based on coins burned
     uint256 GRACE_PERIOD_END_TIMESTAMP;
     // The amount of time required for a Property to generate tokens for payouts
-    uint256 PROPERTY_GENERATION_PAYOUT_INTERVAL = (1 seconds); //Generation amount
+    uint256 PROPERTY_GENERATION_PAYOUT_INTERVAL = (1 minutes); //Generation amount
     
     uint256 ownerEth = 0; // Amount of ETH the contract owner is entitled to withdraw (only Root account can do withdraws)
     
@@ -181,8 +181,7 @@ contract VirtualRealEstate {
         // Must have spent enough ETH to cover the ETH left after PXL price was subtracted
         require(msg.value >= ethLeft);
         
-        pxlProperty.rewardPXL(owner, pxlValue);
-        pxlProperty.burnPXL(msg.sender, pxlValue);
+        pxlProperty.burnPXLRewardPXL(msg.sender, pxlValue, owner, pxlValue);
         
         uint256 minPercent = systemSalePricePXL * PRICE_PXL_MIN_PERCENT / 100;
         systemSalePricePXL += ((minPercent < PRICE_PXL_MIN_INCREASE) ? minPercent : PRICE_PXL_MIN_INCREASE) * pxlValue / systemSalePricePXL;
@@ -210,13 +209,9 @@ contract VirtualRealEstate {
             uint256 minPercent = systemSalePricePXL * PRICE_PXL_MIN_PERCENT / 100;
             systemSalePricePXL += (minPercent < PRICE_PXL_MIN_INCREASE) ? minPercent : PRICE_PXL_MIN_INCREASE;
         }
-        require(pxlProperty.getPropertySalePrice(propertyID) <= PXLValue);
-        require(pxlProperty.balanceOf(msg.sender) >= propertySalePrice);
-        uint256 amountTransfered = 0;
-        amountTransfered = propertySalePrice * USER_BUY_CUT_PERCENT / 100;
-        pxlProperty.burnPXL(msg.sender, propertySalePrice);
-        pxlProperty.rewardPXL(propertyOwner, amountTransfered);
-        pxlProperty.rewardPXL(owner, propertySalePrice - amountTransfered);
+        require(propertySalePrice <= PXLValue);
+        uint256 amountTransfered = propertySalePrice * USER_BUY_CUT_PERCENT / 100;
+        pxlProperty.burnPXLRewardPXLx2(msg.sender, propertySalePrice, propertyOwner, amountTransfered, owner, (propertySalePrice - amountTransfered));
         _transferProperty(propertyID, msg.sender, 0, propertySalePrice, 0, originalOwner);
     }
 
@@ -300,7 +295,8 @@ contract VirtualRealEstate {
                 pxlSpent = 3; //We're treating it like 2, but it's N+1 in the math using this
             }
             
-            pxlProperty.triggerPXLPayout(msg.sender, pxlToSpend, propertyLastUpdater, propertyOwner, getProjectedPayout(propertyIsInPrivateMode, propertyLastUpdate, propertyEarnUntil ));
+            uint256 projectedAmount = getProjectedPayout(propertyIsInPrivateMode, propertyLastUpdate, propertyEarnUntil );
+            pxlProperty.burnPXLRewardPXLx2(msg.sender, pxlToSpend, propertyLastUpdater, projectedAmount, propertyOwner, projectedAmount);
             
             //BecomePublic = (N+1)/2 minutes of user-private mode
             //EarnUntil = (N+1)^2 coins earned max/minutes we can earn from

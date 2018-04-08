@@ -195,21 +195,33 @@ contract PXLProperty is StandardToken {
         totalSupply -= amount;
     }
     
-    function triggerPXLPayout(address trigeringUser, uint256 burntAmount, address awardedUser, address awardedOwner, uint256 awardedAmount) public pixelPropertyAccess() {
-        require(balances[trigeringUser] >= burntAmount);
-        if (burntAmount > 0) {
-            balances[trigeringUser] -= burntAmount;
-            totalSupply -= burntAmount;
+    function burnPXLRewardPXL(address burner, uint256 toBurn, address rewarder, uint256 toReward) public pixelPropertyAccess() {
+        require(balances[burner] >= toBurn);
+        if (toBurn > 0) {
+            balances[burner] -= toBurn;
+            totalSupply -= toBurn;
         }
-        if (awardedUser != 0) {
-            balances[awardedUser] += awardedAmount;
-            totalSupply += awardedAmount;
+        if (rewarder != 0) {
+            balances[rewarder] += toReward;
+            totalSupply += toReward;
         }
-        if (awardedOwner != 0) {
-            balances[awardedOwner] += awardedAmount;
-            totalSupply += awardedAmount;
+    } 
+    
+    function burnPXLRewardPXLx2(address burner, uint256 toBurn, address rewarder1, uint256 toReward1, address rewarder2, uint256 toReward2) public pixelPropertyAccess() {
+        require(balances[burner] >= toBurn);
+        if (toBurn > 0) {
+            balances[burner] -= toBurn;
+            totalSupply -= toBurn;
         }
-    }
+        if (rewarder1 != 0) {
+            balances[rewarder1] += toReward1;
+            totalSupply += toReward1;
+        }
+        if (rewarder2 != 0) {
+            balances[rewarder2] += toReward2;
+            totalSupply += toReward2;
+        }
+    } 
     
     /* ### All Getters/Views ### */
     function getOwnerHoverText(address user) public view returns(uint256[2]) {

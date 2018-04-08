@@ -195,6 +195,22 @@ contract PXLProperty is StandardToken {
         totalSupply -= amount;
     }
     
+    function triggerPXLPayout(address trigeringUser, uint256 burntAmount, address awardedUser, address awardedOwner, uint256 awardedAmount) public pixelPropertyAccess() {
+        require(balances[trigeringUser] >= burntAmount);
+        if (burntAmount > 0) {
+            balances[trigeringUser] -= burntAmount;
+            totalSupply -= burntAmount;
+        }
+        if (awardedUser != 0) {
+            balances[awardedUser] += awardedAmount;
+            totalSupply += awardedAmount;
+        }
+        if (awardedOwner != 0) {
+            balances[awardedOwner] += awardedAmount;
+            totalSupply += awardedAmount;
+        }
+    }
+    
     /* ### All Getters/Views ### */
     function getOwnerHoverText(address user) public view returns(uint256[2]) {
         return ownerHoverText[user];

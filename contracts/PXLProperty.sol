@@ -78,12 +78,10 @@ contract PXLProperty is StandardToken {
     /* ### Moderator, Admin & Root Functions ### */
     // Moderator Flags
     function setPropertyFlag(uint16 propertyID, uint8 flag) public regulatorAccess(flag == FLAG_NSFW ? LEVEL_1_MODERATOR : LEVEL_2_MODERATOR) {
-        Property storage property = properties[propertyID];
-    
-        property.flag = flag;
+        properties[propertyID].flag = flag;
         if (flag == FLAG_BAN) {
-            require(property.isInPrivateMode); //Can't ban an owner's property if a public user caused the NSFW content
-            property.colors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            require(properties[propertyID].isInPrivateMode); //Can't ban an owner's property if a public user caused the NSFW content
+            properties[propertyID].colors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         }
     }
     
@@ -97,6 +95,7 @@ contract PXLProperty is StandardToken {
     }
     
     function setPixelPropertyContract(address newPixelPropertyContract) public regulatorAccess(LEVEL_2_ROOT) {
+        require(newPixelPropertyContract != 0);
         if (pixelPropertyContract != 0) {
             regulators[pixelPropertyContract] = 0; //If we already have a pixelPropertyContract, revoke its ownership
         }
@@ -105,8 +104,9 @@ contract PXLProperty is StandardToken {
         regulators[newPixelPropertyContract] = LEVEL_PIXEL_PROPERTY;
     }
     
-    function setPropertyDAppContract(address propertyDApp, bool giveAccess) public regulatorAccess(LEVEL_1_ROOT) {
-        regulators[propertyDApp] = giveAccess ? LEVEL_PIXEL_PROPERTY : 0;
+    function setPropertyDAppContract(address propertyDAppContract, bool giveAccess) public regulatorAccess(LEVEL_1_ROOT) {
+        require(propertyDAppContract != 0);
+        regulators[propertyDAppContract] = giveAccess ? LEVEL_PROPERTY_DAPPS : 0;
     }
     
     /* ### PropertyDapp Functions ### */
@@ -119,13 +119,11 @@ contract PXLProperty is StandardToken {
     }
     
     function setOwnerHoverText(address textOwner, uint256[2] hoverText) public propertyDAppAccess() {
-        require (msg.sender == pixelPropertyContract);
         require (textOwner != 0);
         ownerHoverText[textOwner] = hoverText;
     }
     
     function setOwnerLink(address websiteOwner, uint256[2] website) public propertyDAppAccess() {
-        require (msg.sender == pixelPropertyContract);
         require (websiteOwner != 0);
         ownerWebsite[websiteOwner] = website;
     }
@@ -224,6 +222,11 @@ contract PXLProperty is StandardToken {
     
     function getPropertyColors(uint16 propertyID) public view returns(uint256[10]) {
         return properties[propertyID].colors;
+    }
+
+    function getPropertyColorsOfRow(uint16 propertyID, uint8 rowIndex) public view returns(uint256) {
+        require(rowIndex <= 9);
+        return properties[propertyID].colors[rowIndex];
     }
     
     function getPropertySalePrice(uint16 propertyID) public view returns(uint256) {

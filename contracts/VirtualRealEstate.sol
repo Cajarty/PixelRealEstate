@@ -20,7 +20,7 @@ contract VirtualRealEstate {
     // The point in time when the initial grace period is over, and users get the default values based on coins burned
     uint256 GRACE_PERIOD_END_TIMESTAMP;
     // The amount of time required for a Property to generate tokens for payouts
-    uint256 PROPERTY_GENERATION_PAYOUT_INTERVAL = (1 seconds); //Generation amount
+    uint256 PROPERTY_GENERATION_PAYOUT_INTERVAL = (1 minutes); //Generation amount
     
     uint256 ownerEth = 0; // Amount of ETH the contract owner is entitled to withdraw (only Root account can do withdraws)
     
@@ -265,12 +265,14 @@ contract VirtualRealEstate {
     function withdraw(uint256 amount) public ownerOnly() {
         if (amount <= ownerEth) {
             owner.transfer(amount);
+            ownerEth -= amount;
         }
     }
     
     // Contract owner can withdraw ownerEth amount
     function withdrawAll() public ownerOnly() {
         owner.transfer(ownerEth);
+        ownerEth = 0;
     }
     
     // Contract owner can change who is the contract owner

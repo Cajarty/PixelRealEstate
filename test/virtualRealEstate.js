@@ -1,4 +1,5 @@
 var PXLProperty = artifacts.require("./PXLProperty.sol");
+var PXLPropertyUnitTests = artifacts.require("./PXLPropertyUnitTests.sol");
 var VirtualRealEstate = artifacts.require("./VirtualRealEstate.sol");
 var bigInt = require("big-integer");
 var BigNumber = require('bignumber.js');
@@ -137,7 +138,58 @@ function decompressHsl() {
   
 }
 
+let pxlPropertyTestInstance;
+
+contract('PXLProperty', function(accounts) {
+  it("PXLProperty Testing Deployment", function() {
+    return PXLProperty.deployed().then(function(instance) {
+      pxlPropertyTestInstance = instance;
+    });
+  });
+});
+
+//PXLPropertyUnitTests
+contract('PXLPropertyUnitTests', function(accounts) {
+  it("Load Unit Test Data", function() {
+    return PXLPropertyUnitTests.deployed().then(function(instance) {
+      pxlPropertyUnitTests = instance;
+      return pxlPropertyTestInstance.setRegulatorAccessLevel(pxlPropertyUnitTests.address, 6, {from: accounts[0]});
+    }).then(function(result) {
+      return pxlPropertyUnitTests.LoadUnitTests(pxlPropertyTestInstance.address);
+    });
+  });
+  it("VirtualRealEstate Access Unit Tests", function() {
+    return PXLPropertyUnitTests.deployed().then(function(instance) {
+      return pxlPropertyUnitTests.RunPixelPropertyAccessUnitTests();
+    }).then(function(result) {
+      assert(result, true, "Should have passed all tests. Returns false on fail");
+    });
+  });
+  it("PropertyDapp Access Unit Tests", function() {
+    return PXLPropertyUnitTests.deployed().then(function(instance) {
+      return pxlPropertyUnitTests.RunPropertyDAppAccessUnitTests();
+    }).then(function(result) {
+      assert(result, true, "Should have passed all tests. Returns false on fail");
+    });
+  });
+  it("Moderation & Admin Unit Tests", function() {
+    return PXLPropertyUnitTests.deployed().then(function(instance) {
+      return pxlPropertyUnitTests.RunModerationUnitTests();
+    }).then(function(result) {
+      assert(result, true, "Should have passed all tests. Returns false on fail");
+    });
+  });
+  it("Upgradable Contract Unit Tests", function() {
+    return PXLPropertyUnitTests.deployed().then(function(instance) {
+      return pxlPropertyUnitTests.RunContractUpdateUnitTests();
+    }).then(function(result) {
+      assert(result, true, "Should have passed all tests. Returns false on fail");
+    });
+  });
+});
+
 let pxlPropertyInstance;
+let ownerETH = 0;
 
 contract('PXLProperty', function(accounts) {
   it("PXL Deployment", function() {
@@ -157,8 +209,6 @@ contract('VirtualRealEstate', function(accounts) {
     });
   });
 
-  // web3.eth.getBalance(accounts[0])
-
   //####PURCHASE, SELLING & TRANSFERING####
  it("User0 can purchase a property at default price in ETH", function() {
    return VirtualRealEstate.deployed().then(function(instance) {
@@ -167,6 +217,7 @@ contract('VirtualRealEstate', function(accounts) {
      return pixelPropertyInstance.getPropertyData(0, { from: accounts[1] });
    }).then(function(propertyData) {
      assert.equal(propertyData[0], accounts[1], "Should be owned by account 1" );
+     ownerETH += 10000;
    });
    //User1 owns property [0] with 0 PXL
  });
@@ -188,6 +239,7 @@ contract('VirtualRealEstate', function(accounts) {
      return pixelPropertyInstance.getPropertyData(3, { from: accounts[1] });
    }).then(function(propertyData){
      assert.equal(propertyData[0], accounts[1], "Should be owned by account 1" );
+     ownerETH += 11000 + 13000 + 15000;
    });
    //User1 owns property [0,1,2,3] with 0 PXL
  });
@@ -326,6 +378,7 @@ contract('VirtualRealEstate', function(accounts) {
    }).then(function() {
      return pixelPropertyInstance.buyProperty(75, initialPricesForPXLETHBuy[1] / 2, { from: accounts[3], value: initialPricesForPXLETHBuy[0] / 2})
    }).then(function() {
+     ownerETH += initialPricesForPXLETHBuy[0] / 2;
      return pxlPropertyInstance.balanceOf(accounts[3]);
    }).then(function(balance) {
      assert.equal(balance - user5InitialBalance, 0, "Should have spent the same amount earned");
@@ -376,7 +429,7 @@ contract('VirtualRealEstate', function(accounts) {
      assert.equal(coloursReturned[0].toNumber(), 5, "Should return 5 from the array of 5's" );
      return pxlPropertyInstance.balanceOf(accounts[4], { from: accounts[0] });
    }).then(function(balance) {
-     assert.equal(balance, 4, "Should have earned four coins from setting it and having it set for four seconds");
+     assert.equal(balance.toNumber(), 4, "Should have earned four coins from setting it and having it set for four seconds");
      return pxlPropertyInstance.balanceOf(accounts[3], { from: accounts[0] });
    }).then(function(balance) {
      assert.equal(balance, 4, "User3 should have earned the same amount if coins as owner that the setter got");
@@ -410,8 +463,6 @@ contract('VirtualRealEstate', function(accounts) {
      pixelPropertyInstance = instance;
      return pixelPropertyInstance.setHoverText(byteArrayOnes, { from: accounts[0] });
    }).then(function() {
-     return pixelPropertyInstance.setColors(0, [1,2,3,4,5,6,7,8,9,10], 0, {  from: accounts[0] })
-   }).then(function(setText) {
      return pxlPropertyInstance.getOwnerHoverText(accounts[0], { from: accounts[0] });
    }).then(function(hoverText) {
      assert.equal( hoverText[0], 1, "Should match byteArrayOnes");
@@ -483,7 +534,7 @@ contract('VirtualRealEstate', function(accounts) {
      pixelPropertyInstance = instance;
      return pxlPropertyInstance.balanceOf(accounts[0], { from: accounts[0] });
    }).then(function(balance)  {
-     privPubBeforeSet = balance;
+     privPubBeforeSet = balance.toNumber(); // Balance before making private
      return new Promise((resolve, reject) => { //Wait a second for the setColors to wear off
       let wait = setTimeout(() => {
         resolve("Delay Finished");
@@ -494,7 +545,8 @@ contract('VirtualRealEstate', function(accounts) {
    }).then(function(s) {
     return pxlPropertyInstance.balanceOf(accounts[0], { from: accounts[0] });
   }).then(function(balance)  {
-     privPubAfterSet = balance;
+     privPubAfterSet = balance.toNumber(); // Balance before making it public.
+     assert.equal(privPubBeforeSet, privPubAfterSet - 1, "Should have burned one coin when setting it private");
      return pixelPropertyInstance.getPropertyData(0, { from: accounts[0] });
    }).then(function(propertyData) {
      assert.equal(propertyData[4], true, "Should be in private mode");
@@ -502,16 +554,14 @@ contract('VirtualRealEstate', function(accounts) {
    }).then(function(s) {
     return pxlPropertyInstance.balanceOf(accounts[0], { from: accounts[0] });
   }).then(function(balanceAfter)  {
-     privPubAfterSet++;
-     balanceAfter++;
-     assert.equal(privPubBeforeSet.toNumber(), privPubAfterSet, "Should have spent one coin setting it to public");
-     assert.equal(privPubBeforeSet.toNumber(), balanceAfter, "Should have not gotten that one returned as it should truncate");
+     privPubResetPub = balanceAfter.toNumber(); //0 coins should be refunded
+     assert.equal(privPubAfterSet, balanceAfter, "Should have not gotten that one returned as it should truncate");
      return pixelPropertyInstance.getPropertyData(0, { from: accounts[0] });
    }).then(function(propertyData) {
      assert.equal(propertyData[4], false, "Should be in public mode");
    });
  });
- it("Owners can make it public, wait a bit, then cancel and be refunded appropriately", function() {
+ it("Owners can make it private, wait a bit, then cancel and be refunded appropriately", function() {
   return VirtualRealEstate.deployed().then(function(instance) {
     pixelPropertyInstance = instance;
     return pixelPropertyInstance.setPropertyMode(0, true, 5, { from: accounts[0] }); //Set to private for 10 seconds
@@ -521,7 +571,7 @@ contract('VirtualRealEstate', function(accounts) {
     assert.equal(propertyData[4], true, "Should be in private mode");
     return pxlPropertyInstance.balanceOf(accounts[0], { from: accounts[0] });
   }).then(function(balance) {
-    privPubRefundBefore = parseInt(balance);
+    privPubRefundBefore = balance.toNumber();
     return new Promise((resolve, reject) => {
       let wait = setTimeout(() => {
         resolve("Delay Finished");
@@ -532,8 +582,7 @@ contract('VirtualRealEstate', function(accounts) {
   }).then(function() {
     return pxlPropertyInstance.balanceOf(accounts[0], { from: accounts[0] });
   }).then(function(balance) {
-    privPubRefundBefore += 2;
-    assert.equal(privPubRefundBefore, balance, "Should have refunded 2 coins");
+    assert.equal(privPubRefundBefore + 2, balance.toNumber(), "Should have refunded 2 coins");
   });
  });
  it("SetColor on PrivateMode property that's expired changes it to Free-use mode", function() {
@@ -558,13 +607,19 @@ contract('VirtualRealEstate', function(accounts) {
    });
  });
 
- //###MODERATION FUNCTIONS####
-
- //####OWNER FUNCTIONS####
- //#Can withdraw a set amount that is only up to owners justified amount
- //#Can withdrawAll which pays to the owner everything
- //#Can change owners to transfer contract ownership
- //#Can't change owners to the void
- //#Can change the default price if we're an owner
- //#Non-owners can't call ANY of the listed above functions
+ //Owner can withdraw money
+ /*it("Contract owner can withdraw earned ETH", function() {
+   return VirtualRealEstate.deployed().then(function(instance) {
+     pixelPropertyInstance = instance;
+     return web3.eth.getBalance(accounts[0]);
+   }).then(function(balance) {
+     ownerBalanceBefore = balance.toNumber();
+     return pixelPropertyInstance.withdrawAll({from: accounts[0]});
+    }).then(function() {
+     return web3.eth.getBalance(accounts[0]);
+   }).then(function(balance) {
+     console.log(ownerBalanceBefore);
+     assert.equal(ownerBalanceBefore + ownerETH, balance.toNumber(), "Can withdraw all earned currency");
+   });
+ });*/
 });

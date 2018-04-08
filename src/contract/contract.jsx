@@ -10,6 +10,7 @@ import {SDM, ServerDataManager} from '../contract/ServerDataManager';
 
 // Import our contract artifacts and turn them into usable abstractions.
 import VirtualRealEstate from '../../build/contracts/VirtualRealEstate.json'
+import PXLProperty from '../../build/contracts/PXLProperty.json'
 
 
 export const ERROR_TYPE = {
@@ -30,6 +31,7 @@ export class Contract {
         this.accounts = null;
         this.account = null;
         this.VRE = contract(VirtualRealEstate);
+        this.PXLPP = contract(PXLProperty);
 
         this.propertyTradeLog = [];
 
@@ -64,11 +66,18 @@ export class Contract {
             if (typeof web3 !== 'undefined') {
                 window.web3 = new Web3(window.web3.currentProvider);
                 this.VRE.setProvider(window.web3.currentProvider);
+                this.PXLPP.setProvider(window.web3.currentProvider);
 
                 this.getAccounts();
+
     
-                this.VRE.deployed().then((instance) => {
+                this.PXLPP.deployed().then((instance) => {
                     SDM.init();
+                    console.info("PXLPP-Init", this.PXLPP.address);
+                });
+
+                this.VRE.deployed().then((instance) => {
+                    console.info("VRE", this.VRE.address);
                 });
                 
                 if (this.setupRetryInterval != null) {
@@ -82,6 +91,7 @@ export class Contract {
         if (typeof web3 !== 'undefined') {
             success();
         } else {
+            console.info("80");
             GFD.setData('noMetaMask', true);
             SDM.initNoMetaMask();
             this.setupRetryInterval = setInterval(() => success(), 15000);
@@ -149,6 +159,7 @@ export class Contract {
 
         let filter = {fromBlock: 0, toBlock: 'latest'};
 
+        // VRE DApp Events
         this.VRE.deployed().then((i) => {
             switch(event) {
                 case EVENTS.PropertyBought:
@@ -169,6 +180,12 @@ export class Contract {
                     return i.SetPropertyPrivate(params, filter).get(callback);
                 case EVENTS.Bid:
                     return i.Bid(params, filter).get(callback);
+            }
+        });
+
+        // PXL ERC20 Events
+        this.PXLPP.deployed().then((i) => {
+            switch(event) {
                 case EVENTS.Transfer:
                     return i.Transfer(params, filter).get(callback);
                 case EVENTS.Approval:
@@ -186,6 +203,7 @@ export class Contract {
 
         let filter = {fromBlock: 0, toBlock: 'latest'};
 
+        // VRE DApp Events
         this.VRE.deployed().then((i) => {
             switch(event) {
                 case EVENTS.PropertyBought:
@@ -206,6 +224,12 @@ export class Contract {
                     return callback( i.SetPropertyPrivate(params, filter));
                 case EVENTS.Bid:
                     return callback( i.Bid(params, filter));
+            }
+        });
+
+        // PXL ERC20 Events
+        this.PXLPP.deployed().then((i) => {
+            switch(event) {
                 case EVENTS.Transfer:
                     return callback( i.Transfer(params, filter));
                 case EVENTS.Approval:
@@ -387,7 +411,7 @@ export class Contract {
     getBalance(callback) {
         if (GFD.getData('noMetaMask'))
             return callback(false);
-        this.VRE.deployed().then((i) => {
+        this.PXLPP.deployed().then((i) => {
             i.balanceOf(this.account, { from: this.account }).then((r) => {
                 callback(Func.BigNumberToNumber(r));
             });
@@ -424,8 +448,8 @@ export class Contract {
     getHoverText(address, callback) {
         if (GFD.getData('noMetaMask'))
             return callback(false);
-        this.VRE.deployed().then((i) => {
-            return i.getHoverText.call(address).then((r) => {
+        this.PXLPP.deployed().then((i) => {
+            return i.getOwnerHoverText.call(address).then((r) => {
                 return callback(Func.BigIntsToString(r));
             });
         }).catch((e) => {
@@ -436,8 +460,8 @@ export class Contract {
     getLink(address, callback) {
         if (GFD.getData('noMetaMask'))
             return callback(false);
-        this.VRE.deployed().then((i) => {
-            return i.getLink.call(address).then((r) => {
+        this.PXLPP.deployed().then((i) => {
+            return i.getOwnerLink.call(address).then((r) => {
                 return callback(Func.BigIntsToString(r));
             });
         }).catch((e) => {
@@ -448,7 +472,7 @@ export class Contract {
     getPropertyColorsOfRow(x, row, callback) {
         if (GFD.getData('noMetaMask'))
             return callback(false);
-        this.VRE.deployed().then((i) => {
+        this.PXLPP.deployed().then((i) => {
             return i.getPropertyColorsOfRow.call(x, row).then((r) => {
                 callback(x, row, Func.ContractDataToRGBAArray(r));
             });
@@ -460,7 +484,7 @@ export class Contract {
     getPropertyColors(x, y, callback) {
         if (GFD.getData('noMetaMask'))
             return callback(false);
-        this.VRE.deployed().then((i) => {
+        this.PXLPP.deployed().then((i) => {
             return i.getPropertyColors.call(this.toID(x, y)).then((r) => {
                 callback(x, y, Func.ContractDataToRGBAArray(r));
             });

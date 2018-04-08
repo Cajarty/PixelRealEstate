@@ -318,3 +318,10 @@
     -webkit-animation: $type $duration;
     -o-animation: $type $duration;
 }
+
+@mixin animation_adv($type, $duration, $curve, $delay) {
+    animation: $type $duration $curve $delay;
+    -moz-animation: $type $duration $curve $delay;
+    -webkit-animation: $type $duration $curve $delay;
+    -o-animation: $type $duration $curve $delay;
+}

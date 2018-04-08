@@ -4,10 +4,11 @@ import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import {SDM, ServerDataManager, Compares} from '../../contract/ServerDataManager.jsx';
 import PanelContainerOwned from './PanelContainerOwned';
 import * as Assets from '../../const/assets.jsx';
-import Dropdown from 'react-dropdown';
 import {GFD, GlobalState} from '../../functions/GlobalState';
+import Hours from '../ui/Hours';
 import * as Func from '../../functions/functions';
-import {Segment, Button, Icon} from 'semantic-ui-react';
+import {Segment, Button, Icon, Table} from 'semantic-ui-react';
+import {Panel, PanelItem, PanelPropertyCanvas, PanelDivider} from './Panel';
 
 const ITEM_SIZE = 140;
 
@@ -16,13 +17,10 @@ class PropertiesOwned extends Component {
         super(props);
         this.state = {
             orderedItems: [],
-            compare: Compares.xDesc,
-            itemIndex: 0, //on page #
-            items: 0, //total pages
-            pageSize: 0, //how many elements per page?
-            maxPageSize: 0, //page size if there wasnt a max on the list
+            column: '',
+            ascending: true,
         };
-        this.cancelSort = false;
+        this.newestSort = new Date().getTime();
     }
 
     componentDidMount() {
@@ -37,40 +35,29 @@ class PropertiesOwned extends Component {
             });
         });
         this.reorderItems();
-        window.addEventListener('resize', this.onResize);
     }
 
-    onResize = (e) => {
-        let container = document.querySelector('.itemContainer');
-        if (!container)
-            return;
-        let containerWidth = container.clientWidth;
-        let pageSize = Math.floor(containerWidth / ITEM_SIZE);
-        let size = (e.size != null ? e.size : this.state.items);
-        this.setState({
-            maxPageSize: pageSize,
-            pageSize: (pageSize >= this.state.items ? this.state.items : pageSize),
-        });
-        this.forceUpdate();
-    }
+    reorderItems(column = this.state.column, ascending = this.state.ascending) {
 
-    async reorderItems() {
-        //get my current market trade and populate fields
-        let results = await SDM.orderPropertyList(SDM.ownedProperties, this.state.compare.func);
-        if (results == null)
-            return;
-        this.setState({
-            orderedItems: results, 
-            items: results.length,
-        });
-        this.props.isLoading(false);
-        this.onResize({size: results.length});
+        this.cancelSort = new Date().getTime();
+        let promise = SDM.orderPropertyListAsync(SDM.ownedProperties, column, ascending);
+
+        let relisten = (results) => {
+            if (results.startTime < this.cancelSort)
+                return;
+            this.setState({
+                orderedItems: results.data, 
+            });
+            if (results.promise)
+                results.promise.then(relisten);
+        }
+
+        promise.then(relisten);
     }
 
     componentWillUnmount() {
-        this.cancelSort = true;
-        window.removeEventListener('resize', this.onResize);
         this.state.eventHandle.stopWatching();
+        this.cancelSort = new Date().getTime();
     }
 
     handleInput(key, value) {
@@ -85,39 +72,98 @@ class PropertiesOwned extends Component {
         Func.ScrollTo(Func.PAGES.TOP);
     }
 
-    changePage(up = true) {
-        let item = this.state.itemIndex + (up ? this.state.pageSize : -this.state.pageSize);
-        if (item < 0)
-            item += this.state.items;
-        if (item >= this.state.items)
-            item -= this.state.items;
-        this.setState({itemIndex: item});        
+    reorderList(column) {
+        this.reorderItems(column, !this.state.ascending);
+        this.setState({
+            column,
+            ascending: !this.state.ascending
+        });
     }
 
-    reorderList(value) {
-        this.setState({compare: Compares[value.value]});
-        this.reorderItems(Compares[value.value].func);
+    cancelSale(e) {
+        window.alert("hellode")
     }
 
     render() {
         if (this.state.orderedItems.length == 0)
             return (<h3 className='noContent'>None Yet!</h3>);
         return (
-            <div style={{height: '100%'}}>
-                <Button attached='top' onClick={() => {this.changePage(true)}}><Icon name='chevron up'></Icon></Button>
-                <Segment attached style={{height: 'calc(100% - 74px)'}} className='itemContainer'>
-                    <PanelContainerOwned
-                        data={this.state.orderedItems}
-                        onClick={(x, y) => this.propertySelected(x, y)}
-                        viewStart={this.state.itemIndex}
-                        viewEnd={this.state.itemIndex + this.state.pageSize}
-                        maxPageSize={this.state.maxPageSize}
-                    />
-                </Segment>
-                <Button attached='bottom' onClick={() => {this.changePage(false)}}><Icon name='chevron down'></Icon></Button>
-            </div>
+            <Table celled sortable>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell width={2}>Canvas</Table.HeaderCell>
+                <Table.HeaderCell 
+                    width={1} 
+                    sorted={this.state.column === 'x' ? bToAsc(this.state.ascending) : null} 
+                    onClick={() => {this.reorderList('x')}}
+                >X</Table.HeaderCell>
+                <Table.HeaderCell 
+                    width={1} 
+                    sorted={this.state.column === 'y' ? bToAsc(this.state.ascending) : null} 
+                    onClick={() => {this.reorderList('y')}}
+                >Y</Table.HeaderCell>
+                <Table.HeaderCell 
+                    width={3}
+                    sorted={this.state.column === 'PPCPrice' ? bToAsc(this.state.ascending) : null} 
+                    onClick={() => {this.reorderList('PPCPrice')}}
+                >For Sale</Table.HeaderCell>
+                <Table.HeaderCell 
+                    width={1}
+                    sorted={this.state.column === 'isInPrivate' ? bToAsc(this.state.ascending) : null} 
+                    onClick={() => {this.reorderList('isInPrivate')}}
+                >Private</Table.HeaderCell>
+                <Table.HeaderCell 
+                    width={3}
+                    sorted={this.state.column === 'lastUpdate' ? bToAsc(!this.state.ascending) : null} 
+                    onClick={() => {this.reorderList('lastUpdate')}}
+                >Last Update</Table.HeaderCell>
+                <Table.HeaderCell 
+                    width={5}
+                >Action</Table.HeaderCell>
+              </Table.Row>
+            </Table.Header>
+        
+            <Table.Body className='tableBodyUi'>
+                {this.state.orderedItems.map((child, i) => (   
+                    i >= 50 ? null :
+                    <Table.Row key={i} className='segmentButton' onClick={() => {this.propertySelected(child.x + 1, child.y + 1)}}>
+                        <Table.Cell>
+                            <PanelPropertyCanvas x={child.x} y={child.y} width={20}/>
+                        </Table.Cell>
+                        <Table.Cell>
+                            {child.x + 1}
+                        </Table.Cell>
+                        <Table.Cell>
+                            {child.y + 1}
+                        </Table.Cell>
+                        <Table.Cell>
+                            {!child.isForSale ? 'No' : 
+                                (child.PPCPrice + ' PXL')
+                            }
+                        </Table.Cell>
+                        <Table.Cell>
+                            {child.isInPrivate ? 'Yes' : 'No'}
+                        </Table.Cell>
+                        <Table.Cell>
+                            {child.lastUpdate != null && child.lastUpdate > 0 ? <Hours time={child.lastUpdate} /> : 'Never'}
+                        </Table.Cell>
+                        <Table.Cell>
+                            {child.isForSale ? 
+                                <Button className='delistButton' fluid size='mini' onClick={(e) => this.cancelSale(e)}>Delist</Button>
+                            : null}
+                        </Table.Cell>
+                    </Table.Row>
+                ))}
+            </Table.Body>
+          </Table>
         );
     }
+}
+
+const bToAsc = (bool) => {
+    if (bool)
+        return 'descending';
+    return 'ascending';
 }
 
 export default PropertiesOwned

@@ -156,8 +156,8 @@ class CanvasPage extends Component {
             { 
                 menuItem: 'Owned', 
                 render: () => <TabPane 
+                    as='div'
                     className='topPane' 
-                    attached={false}
                     loading={this.state.tab1Loading}
                     ><PropertiesOwned 
                         isLoading={(r) => this.setState({tab1Loading: r})}
@@ -166,8 +166,8 @@ class CanvasPage extends Component {
             { 
                 menuItem: 'For Sale', 
                 render: () => <TabPane 
+                as='div'
                     className='topPane' 
-                    attached={false}
                     loading={this.state.tab2Loading}
                     ><PropertiesForSale 
                         isLoading={(r) => this.setState({tab2Loading: r})}

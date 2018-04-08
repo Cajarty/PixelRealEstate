@@ -58,7 +58,7 @@
         "lodash": "^4.17.5",
         "lzwcompress": "^0.2.4",
         "moment": "^2.20.1",
-        "npm": "^5.7.1",
+        "npm": "^5.8.0",
         "querystringify": "^1.0.0",
         "react": "^15.4.2",
         "react-color": "^2.13.8",

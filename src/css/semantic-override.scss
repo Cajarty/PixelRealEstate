@@ -78,7 +78,7 @@ body {
     }
 }
 
-.ui.raised.segment.segmentButton {
+tr.segmentButton {
     &:hover {
         background-color: darken($color3, 4%) !important;
         cursor: pointer;
@@ -108,6 +108,11 @@ body {
     &::after {
         top: 50%;
     }
+}
+
+.active.tab.topPane {
+    height: 400px;
+    overflow-y: auto;
 }
 
 .ui.segment.tab {
@@ -235,4 +240,10 @@ body {
 
 .ui.grid.detailTable {
     @include animation(fadein, .6s);
+}
+
+.tableBodyUi {
+    min-height: 400px;
+    max-height: 400px;
+    overflow-y: auto;
 }

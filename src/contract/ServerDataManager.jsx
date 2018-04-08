@@ -40,6 +40,12 @@ export const Compares = {
     },
 };
 
+const comp = (a, b, asc) => {
+    if (asc)
+        return a < b;
+    return a > b;
+}
+
 export class ServerDataManager {
     constructor() {
         //pixel data
@@ -316,36 +322,41 @@ export class ServerDataManager {
         this.allProperties[x][y] = property;
     }
 
-    orderPropertyList(objList, compFunc) {
-        if (GFD.getData('ServerDataManagerInit') < 1 && (objList == null || Object.keys(objList).length == 0)) {
-            return null;
-        }
+
+
+    orderPropertyList(objList, column, ascending) {
         return new Promise((resolve) => {
-            let list = [];
-            let w = Object.keys(objList);
-            for (let x = 0; x < w.length; x++) {
-                let h = Object.keys(objList[w[x]]);
-                for (let y = 0; y < h.length; y++) {
-                    if (objList[w[x]] != null && objList[w[x]][h[y]] != null) {
-                        let i = 0;
-                        for (; i < list.length; i++) {
-                            if (compFunc(objList[w[x]][h[y]], list[i]))
-                                break;
+            if (GFD.getData('ServerDataManagerInit') < 1 && (objList == null || Object.keys(objList).length == 0)) {
+                setTimeout(() => {	
+                    resolve(this.orderPropertyList(objList, column, ascending));
+                }, 1000);
+            } else {
+                let list = [];
+                let w = Object.keys(objList);
+                for (let x = 0; x < w.length; x++) {
+                    let h = Object.keys(objList[w[x]]);
+                    for (let y = 0; y < h.length; y++) {
+                        if (objList[w[x]] != null && objList[w[x]][h[y]] != null) {
+                            let i = 0;
+                            for (; i < list.length; i++) {
+                                if (comp(objList[w[x]][h[y]][column], list[i][column], ascending))
+                                    break;
+                            }
+                            list.splice(i, 0, objList[w[x]][h[y]]);
                         }
-                        list.splice(i, 0, objList[w[x]][h[y]]);
-                    }
+                    };
                 };
-            };
-            resolve(list);
+                resolve(list);
+            }
         });
     }
 
-    partialOrderPropertyListByIndex(sortedArray, objArr, startIndex, endIndex, compFunc) {
+    partialOrderPropertyListByIndex(sortedArray, objArr, startIndex, endIndex, column, ascending) {
         let list = sortedArray;
         for (let xy = startIndex; xy < endIndex && xy < objArr.length; xy++) {
             let i = 0;
             for (; i < list.length; i++) {
-                if (compFunc(objArr[xy], list[i]))
+                if (comp(objArr[xy][column], list[i][column], ascending))
                     break;
             }
             list.splice(i, 0, objArr[xy]);
@@ -353,27 +364,30 @@ export class ServerDataManager {
         return list;
     }
 
-    orderPropertyListAsync(objList, compFunc) {
+    orderPropertyListAsync(objList, column, ascending) {
         let index = 0;
-        let block = 1000;
+        let block = 100;
         let sortedArray = [];
 
         let objArr = [];
+        let w = Object.keys(objList);
+        for (let x = 0; x < w.length; x++) {
+            let h = Object.keys(objList[w[x]]);
+            for (let y = 0; y < h.length; y++) {
+                objArr.push(objList[w[x]][h[y]])
+            };
+        };
 
-        Object.keys(objList).map(x => {
-            Object.keys(objList[x]).map(y => {
-                objArr.push(objList[x][y]);
-            });
-        });
+        let startTime = new Date().getTime();
 
         let repromise = (res, rej) => {
             setTimeout(() => {
-                sortedArray = this.partialOrderPropertyListByIndex(sortedArray, objArr, index, index + block, compFunc);
+                sortedArray = this.partialOrderPropertyListByIndex(sortedArray, objArr, index, index + block, column, ascending);
                 index += block;
                 if (index < objArr.length)
-                    res({promise: new Promise(repromise), data: sortedArray});
+                    res({promise: new Promise(repromise), data: sortedArray, startTime});
                 else 
-                    res({promise: null, data: sortedArray});
+                    res({promise: null, data: sortedArray, startTime});
             }, 20);
         }
 

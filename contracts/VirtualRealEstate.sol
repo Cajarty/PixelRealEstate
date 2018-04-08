@@ -286,7 +286,7 @@ contract VirtualRealEstate {
     function _tryTriggerPayout(uint16 propertyID, uint256 pxlToSpend) private returns(bool) {
         var (propertyFlag, propertyIsInPrivateMode, propertyOwner, propertyLastUpdater, propertySalePrice, propertyLastUpdate, propertyBecomePublic, propertyEarnUntil) = pxlProperty.properties(propertyID);
         //If the Property is in private mode and expired, make it public
-        if (propertyIsInPrivateMode && propertyBecomePublic < now) {
+        if (propertyIsInPrivateMode && propertyBecomePublic <= now) {
             pxlProperty.setPropertyPrivateMode(propertyID, false);
             propertyIsInPrivateMode = false;
         }
@@ -295,7 +295,7 @@ contract VirtualRealEstate {
             require(msg.sender == propertyOwner);
             require(propertyFlag != 2);
         //If if its in free-use mode
-        } else if (propertyBecomePublic < now) {
+        } else if (propertyBecomePublic <= now || propertyLastUpdater == msg.sender) {
             uint256 pxlSpent = pxlToSpend + 1; //All pxlSpent math uses N+1, so built in for convenience
             if (pxlToSpend < 2 && isInGracePeriod()) { //If first 3 days and we spent <2 coins, treat it as if we spent 2
                 pxlSpent = 3; //We're treating it like 2, but it's N+1 in the math using this

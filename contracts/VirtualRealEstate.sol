@@ -132,7 +132,7 @@ contract VirtualRealEstate {
         
         if (setPrivateMode) {
             //If inprivate, we can extend the duration, otherwise if becomePublic > now it means a free-use user locked it
-            require(propertyIsInPrivateMode || propertyBecomePublic <= now); 
+            require(propertyIsInPrivateMode || propertyBecomePublic <= now || propertyLastUpdater == msg.sender ); 
             require(numMinutesPrivate > 0);
             require(pxlProperty.balanceOf(msg.sender) >= numMinutesPrivate);
             pxlProperty.burnPXL(msg.sender, numMinutesPrivate);

@@ -70,16 +70,14 @@ export class Contract {
 
                 this.getAccounts();
 
+                this.break = false;
     
-                this.PXLPP.deployed().then((instance) => {
-                    SDM.init();
-                    console.info("PXLPP-Init", this.PXLPP.address);
+                this.PXLPP.deployed().then((PXLPPInstance) => {
+                    this.VRE.deployed().then((VREInstance) => {
+                        SDM.init();
+                    });
                 });
 
-                this.VRE.deployed().then((instance) => {
-                    console.info("VRE", this.VRE.address);
-                });
-                
                 if (this.setupRetryInterval != null) {
                     clearInterval(this.setupRetryInterval);
                 }
@@ -261,6 +259,15 @@ export class Contract {
     // ----------------------------------         SETTERS         ----------------------------------------------
     // ---------------------------------------------------------------------------------------------------------
     // ---------------------------------------------------------------------------------------------------------
+
+    setupContracts() {
+        this.PXLPP.deployed().then((PXLPPInstance) => {
+            this.VRE.deployed().then((VREInstance) => {
+                VREInstance.setPXLPropertyContract(PXLPPInstance.address, {from: this.account}).then((r) => {console.info(r)}).catch((e) => {console.info(e)});
+                PXLPPInstance.setPixelPropertyContract(VREInstance.address, {from: this.account}).then((r) => {console.info(r)}).catch((e) => {console.info(e)});
+            });
+        });
+    }
 
     buyProperty(x, y, eth, ppc, callback) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))

@@ -306,6 +306,9 @@ class CanvasPage extends Component {
                     <Icon name='help circle' />
                     Tutorial
                     </MenuItem>
+                    <MenuItem position='right' name='settings' onClick={() => {ctr.setupContracts()}}>
+                    <Icon name='settings'></Icon>
+                    </MenuItem>
                 </Sidebar>
                 <Tutorial/>
             </div>

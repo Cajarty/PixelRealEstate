@@ -21,6 +21,7 @@ export default class ClickLoader extends Component {
             loaderValue: 0,
             clickTime: 1000,
             startClickTime: 0,
+            loadedLink: false,
         }
     }
 
@@ -44,12 +45,14 @@ export default class ClickLoader extends Component {
             });
         })
         GFD.listen('pressX', 'clickLoader', (x) => {
-            if (this.state.hoverY != -1)
-                this.updateLoaderPosition(x, this.state.hoverY);
+            console.info(x)
+            if (this.state.hoverY != -1 && x != this.state.hoverX)
+                this.updateLoaderPosition(x, GFD.getData('pressY'));
         })
         GFD.listen('pressY', 'clickLoader', (y) => {
-            if (this.state.hoverX != -1)
-                this.updateLoaderPosition(this.state.hoverX, y);
+            console.info(y)
+            if (this.state.hoverX != -1 && y != this.state.hoverY)
+                this.updateLoaderPosition(GFD.getData('pressX'), y);
         })
         GFD.listen('canvasTopOffset', 'clickLoader', (top) => {
             this.setState({
@@ -73,9 +76,12 @@ export default class ClickLoader extends Component {
         })
     }
 
-    performClick(x, y) {
+    performClick() {
         this.setState({show: false});
-        this.linkTag.click();
+        if (this.state.loadedLink) {
+            this.linkTag.click();
+            this.linkTag.href = '';
+        }
     }
 
     componentWillUnmount() {
@@ -87,7 +93,7 @@ export default class ClickLoader extends Component {
             clearTimeout(this.state.clickTimeout);
         if (this.state.loaderTimeout != null)
             clearTimeout(this.state.loaderTimeout);
-        this.setState({startClickTime: 0, show: false, loaderValue: 0});
+        this.setState({startClickTime: 0, show: false, loaderValue: 0, loadedLink: false});
     }
 
     updateLoaderPosition(x, y) {
@@ -96,10 +102,13 @@ export default class ClickLoader extends Component {
         if (x < 0 || y < 0)
             return;
 
-        if (SDM.isPropertyLoaded(x, y)) {
-            ctr.getLink(SDM.getPropertyData(x, y).owner, (data) => {
+            console.info(SDM.getPropertyData(x - 1, y - 1));
+
+        if (SDM.isPropertyLoaded(x - 1, y - 1)) {
+            ctr.getLink(SDM.getPropertyData(x - 1, y - 1).owner, (data) => {
                 if (data != null && data.length > 0) {
                     this.linkTag.href = data;
+                    this.setState({loadedLink: true})
                 }
             });
         }
@@ -108,11 +117,10 @@ export default class ClickLoader extends Component {
             show: true,
             startClickTime: new Date().getTime(),
             clickTimeout: setTimeout(() => {
-                this.performClick(GFD.getData('pressX'), GFD.getData('pressY'));
+                this.performClick();
             }, this.state.clickTime + 100),
             loaderTimeout: setInterval(() => {
                 let newVal = ((new Date().getTime() - this.state.startClickTime) / this.state.clickTime) * 100;
-                console.info(newVal)
                 this.setState({
                     loaderValue: newVal,
                 })

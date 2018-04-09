@@ -310,9 +310,11 @@ class PixelDescriptionBox extends Component {
 
     getActionsList() {
         let actions = [];
-        actions.push(
-            <Button fluid onClick={() => this.toggleAction('SET_IMAGE')}>Update Image</Button>
-        );
+        if (!this.state.isInPrivate || this.state.tutorialState.index == 3) {
+            actions.push(
+                <Button fluid onClick={() => this.toggleAction('SET_IMAGE')}>Update Image</Button>
+            );
+        }
         // actions.push(new Action("Place Offer", null));
         if (this.state.isForSale && this.state.owner != ctr.account)
             actions.push(

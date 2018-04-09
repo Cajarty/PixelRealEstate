@@ -42,11 +42,11 @@ class PropertiesForSale extends Component {
 
     reorderItems(column = this.state.column, ascending = this.state.ascending) {
 
-        this.cancelSort = new Date().getTime();
+        this.newestSort = new Date().getTime();
         let promise = SDM.orderPropertyListAsync(SDM.forSaleProperties, column, ascending);
 
         let relisten = (results) => {
-            if (results.startTime < this.cancelSort)
+            if (results.startTime < this.newestSort)
                 return;
             this.setState({
                 orderedItems: results.data, 
@@ -60,7 +60,7 @@ class PropertiesForSale extends Component {
 
     componentWillUnmount() {
         this.state.eventHandle.stopWatching();
-        this.cancelSort = new Date().getTime();
+        this.newestSort = new Date().getTime();
     }
 
     handleInput(key, value) {

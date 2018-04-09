@@ -39,11 +39,11 @@ class PropertiesOwned extends Component {
 
     reorderItems(column = this.state.column, ascending = this.state.ascending) {
 
-        this.cancelSort = new Date().getTime();
+        this.newestSort = new Date().getTime();
         let promise = SDM.orderPropertyListAsync(SDM.ownedProperties, column, ascending);
 
         let relisten = (results) => {
-            if (results.startTime < this.cancelSort)
+            if (results.startTime < this.newestSort)
                 return;
             this.setState({
                 orderedItems: results.data, 
@@ -57,7 +57,7 @@ class PropertiesOwned extends Component {
 
     componentWillUnmount() {
         this.state.eventHandle.stopWatching();
-        this.cancelSort = new Date().getTime();
+        this.newestSort = new Date().getTime();
     }
 
     handleInput(key, value) {
@@ -81,7 +81,7 @@ class PropertiesOwned extends Component {
     }
 
     cancelSale(e) {
-        window.alert("hellode")
+        window.alert("Not setup yet. Please cancel a sale from Property Inspection.");
     }
 
     render() {

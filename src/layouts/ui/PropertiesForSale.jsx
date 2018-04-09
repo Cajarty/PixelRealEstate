@@ -84,7 +84,7 @@ class PropertiesForSale extends Component {
     }
 
     buyProperty(e) {
-        window.alert("hellode")
+        window.alert("Not setup yet. Please buya property from Property Inspection.");
     }
 
     render() {

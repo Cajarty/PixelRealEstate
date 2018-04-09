@@ -124,8 +124,7 @@ class CanvasPage extends Component {
         this.portfolioLink.click();
     }
 
-    changeMode() {
-        let newMode = !this.state.advancedMode;
+    changeMode(newMode = !this.state.advancedMode) {
         if (newMode)
             ctr.getAccounts();
         GFD.setData('advancedMode', newMode);
@@ -139,7 +138,7 @@ class CanvasPage extends Component {
 
     startTutorial() {
         GFD.setData('tutorialStateIndex', 1);
-        this.changeMode();
+        this.changeMode(true);
     }
 
     showAskForTutorial() {
@@ -255,7 +254,7 @@ class CanvasPage extends Component {
                                 }
                     </Segment>
                     <Segment id='step1' className={'center' + TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 1)}>
-                        {this.state.tutorialState.index == 0 && <HoverLabel showPrices={this.state.showPopertiesForSale}/>}
+                        <HoverLabel showPrices={this.state.showPopertiesForSale}/>
                         {this.state.tutorialState.index == 0 && <ClickLoader/>}
                         <Canvas/>
                     </Segment>
@@ -302,7 +301,9 @@ class CanvasPage extends Component {
                     <Icon name='file text outline' />
                     TOS
                     </MenuItem>
-                    <MenuItem name='file text outline' onClick={() => {GFD.setData('tutorialStateIndex', 1)}}>
+                    <MenuItem name='file text outline' onClick={() => {
+                        this.startTutorial();
+                    }}>
                     <Icon name='help circle' />
                     Tutorial
                     </MenuItem>

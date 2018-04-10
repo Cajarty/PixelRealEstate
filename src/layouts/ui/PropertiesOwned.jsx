@@ -57,7 +57,8 @@ class PropertiesOwned extends Component {
     }
 
     componentWillUnmount() {
-        this.state.eventHandle.stopWatching();
+        if (this.state.eventHandle != null)
+            this.state.eventHandle.stopWatching();
         this.newestSort = new Date().getTime();
     }
 

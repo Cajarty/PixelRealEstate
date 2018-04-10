@@ -155,44 +155,44 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
             return;
 
-        let filter = {fromBlock: 'latest', toBlock: 'pending'};
+        let filter = {fromBlock: 'latest', toBlock: 'latest'};
 
         window.web3.eth.getBlock('latest').then((r) => {
             filter.fromBlock = r.number - 1000;
-        });
 
-        // VRE DApp Events
-        this.VRE.deployed().then((i) => {
-            switch(event) {
-                case EVENTS.PropertyBought:
-                    return i.PropertyBought(params, filter).get(callback);
-                case EVENTS.PropertyColorUpdate:
-                    return i.PropertyColorUpdate(params, filter).get(callback);
-                case EVENTS.SetUserHoverText:
-                    return i.SetUserHoverText(params, filter).get(callback);
-                case EVENTS.SetUserSetLink:
-                    return i.SetUserSetLink(params, filter).get(callback);
-                case EVENTS.PropertySetForSale:
-                    return i.PropertySetForSale(params, filter).get(callback);
-                case EVENTS.DelistProperty:
-                    return i.DelistProperty(params, filter).get(callback);
-                case EVENTS.SetPropertyPublic:
-                    return i.SetPropertyPublic(params, filter).get(callback);
-                case EVENTS.SetPropertyPrivate:
-                    return i.SetPropertyPrivate(params, filter).get(callback);
-                case EVENTS.Bid:
-                    return i.Bid(params, filter).get(callback);
-            }
-        });
+            // VRE DApp Events
+            this.VRE.deployed().then((i) => {
+                switch(event) {
+                    case EVENTS.PropertyBought:
+                        return i.PropertyBought(params, filter).get(callback);
+                    case EVENTS.PropertyColorUpdate:
+                        return i.PropertyColorUpdate(params, filter).get(callback);
+                    case EVENTS.SetUserHoverText:
+                        return i.SetUserHoverText(params, filter).get(callback);
+                    case EVENTS.SetUserSetLink:
+                        return i.SetUserSetLink(params, filter).get(callback);
+                    case EVENTS.PropertySetForSale:
+                        return i.PropertySetForSale(params, filter).get(callback);
+                    case EVENTS.DelistProperty:
+                        return i.DelistProperty(params, filter).get(callback);
+                    case EVENTS.SetPropertyPublic:
+                        return i.SetPropertyPublic(params, filter).get(callback);
+                    case EVENTS.SetPropertyPrivate:
+                        return i.SetPropertyPrivate(params, filter).get(callback);
+                    case EVENTS.Bid:
+                        return i.Bid(params, filter).get(callback);
+                }
+            });
 
-        // PXL ERC20 Events
-        this.PXLPP.deployed().then((i) => {
-            switch(event) {
-                case EVENTS.Transfer:
-                    return i.Transfer(params, filter).get(callback);
-                case EVENTS.Approval:
-                    return i.Approval(params, filter).get(callback);
-            }
+            // PXL ERC20 Events
+            this.PXLPP.deployed().then((i) => {
+                switch(event) {
+                    case EVENTS.Transfer:
+                        return i.Transfer(params, filter).get(callback);
+                    case EVENTS.Approval:
+                        return i.Approval(params, filter).get(callback);
+                }
+            });
         });
     }
 
@@ -203,44 +203,44 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
             return;
 
-        let filter = {fromBlock: 'latest', toBlock: 'pending'};
+        let filter = {fromBlock: 'latest', toBlock: 'latest'};
 
         window.web3.eth.getBlock('latest').then((r) => {
             filter.fromBlock = r.number - 1000;
-        });
 
-        // VRE DApp Events
-        this.VRE.deployed().then((i) => {
-            switch(event) {
-                case EVENTS.PropertyBought:
-                    return callback(i.PropertyBought(params, filter));
-                case EVENTS.PropertyColorUpdate:
-                    return callback( i.PropertyColorUpdate(params, filter));
-                case EVENTS.SetUserHoverText:
-                    return callback( i.SetUserHoverText(params, filter));
-                case EVENTS.SetUserSetLink:
-                    return callback( i.SetUserSetLink(params, filter));
-                case EVENTS.PropertySetForSale:
-                    return callback( i.PropertySetForSale(params, filter));
-                case EVENTS.DelistProperty:
-                    return callback( i.DelistProperty(params, filter));
-                case EVENTS.SetPropertyPublic:
-                    return callback( i.SetPropertyPublic(params, filter));
-                case EVENTS.SetPropertyPrivate:
-                    return callback( i.SetPropertyPrivate(params, filter));
-                case EVENTS.Bid:
-                    return callback( i.Bid(params, filter));
-            }
-        });
+            // VRE DApp Events
+            this.VRE.deployed().then((i) => {
+                switch(event) {
+                    case EVENTS.PropertyBought:
+                        return callback(i.PropertyBought(params, filter));
+                    case EVENTS.PropertyColorUpdate:
+                        return callback( i.PropertyColorUpdate(params, filter));
+                    case EVENTS.SetUserHoverText:
+                        return callback( i.SetUserHoverText(params, filter));
+                    case EVENTS.SetUserSetLink:
+                        return callback( i.SetUserSetLink(params, filter));
+                    case EVENTS.PropertySetForSale:
+                        return callback( i.PropertySetForSale(params, filter));
+                    case EVENTS.DelistProperty:
+                        return callback( i.DelistProperty(params, filter));
+                    case EVENTS.SetPropertyPublic:
+                        return callback( i.SetPropertyPublic(params, filter));
+                    case EVENTS.SetPropertyPrivate:
+                        return callback( i.SetPropertyPrivate(params, filter));
+                    case EVENTS.Bid:
+                        return callback( i.Bid(params, filter));
+                }
+            });
 
-        // PXL ERC20 Events
-        this.PXLPP.deployed().then((i) => {
-            switch(event) {
-                case EVENTS.Transfer:
-                    return callback( i.Transfer(params, filter));
-                case EVENTS.Approval:
-                    return callback( i.Approval(params, filter));
-            }
+            // PXL ERC20 Events
+            this.PXLPP.deployed().then((i) => {
+                switch(event) {
+                    case EVENTS.Transfer:
+                        return callback( i.Transfer(params, filter));
+                    case EVENTS.Approval:
+                        return callback( i.Approval(params, filter));
+                }
+            });
         });
     }
 

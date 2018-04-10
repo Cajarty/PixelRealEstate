@@ -45,12 +45,10 @@ export default class ClickLoader extends Component {
             });
         })
         GFD.listen('pressX', 'clickLoader', (x) => {
-            console.info(x)
             if (this.state.hoverY != -1 && x != this.state.hoverX)
                 this.updateLoaderPosition(x, GFD.getData('pressY'));
         })
         GFD.listen('pressY', 'clickLoader', (y) => {
-            console.info(y)
             if (this.state.hoverX != -1 && y != this.state.hoverY)
                 this.updateLoaderPosition(GFD.getData('pressX'), y);
         })

@@ -155,7 +155,11 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
             return;
 
-        let filter = {fromBlock: 0, toBlock: 'latest'};
+        let filter = {fromBlock: 'latest', toBlock: 'pending'};
+
+        window.web3.eth.getBlock('latest').then((r) => {
+            filter.fromBlock = r.number - 1000;
+        });
 
         // VRE DApp Events
         this.VRE.deployed().then((i) => {
@@ -199,7 +203,11 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
             return;
 
-        let filter = {fromBlock: 0, toBlock: 'latest'};
+        let filter = {fromBlock: 'latest', toBlock: 'pending'};
+
+        window.web3.eth.getBlock('latest').then((r) => {
+            filter.fromBlock = r.number - 1000;
+        });
 
         // VRE DApp Events
         this.VRE.deployed().then((i) => {

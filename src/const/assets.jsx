@@ -16,5 +16,5 @@ export const LOADING = BASE_PATH + 'icons/loading.gif';
 export const TOKEN = BASE_PATH + 'icons/token.png';
 
 
-export const CANVAS_IMAGE = '/public/assets/canvas/canvas.png';
-export const CANVAS_PROPERTIES= '/public/assets/canvas/properties.json';
+export const CANVAS_IMAGE = '/assets/canvas/canvas.png';
+export const CANVAS_PROPERTIES= '/assets/canvas/properties.json';

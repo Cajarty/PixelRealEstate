@@ -44,7 +44,7 @@ if (env['process.env'].NODE_ENV !== '"production"') {
     throw new Error('Production builds must have NODE_ENV=production.');
 }
 
-env['process.env'].CACHE_SERVER_URL = '"https://pixelproperty.io"';
+env['process.env'].CACHE_SERVER_URL = '"https://pixelproperty.io:6500"';
 
 // This is the production configuration.
 // It compiles slowly and is focused on producing a fast and minimal bundle.

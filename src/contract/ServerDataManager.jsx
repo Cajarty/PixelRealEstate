@@ -57,7 +57,7 @@ export class ServerDataManager {
         this.ownedProperties = {};
         this.bids = {};
 
-        this.useLocalFile = true;
+        this.useLocalFile = false; //not supported yet
 
         //for network requests
         this.cancelDataRequestToken = null;

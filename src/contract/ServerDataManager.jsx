@@ -57,6 +57,8 @@ export class ServerDataManager {
         this.ownedProperties = {};
         this.bids = {};
 
+        this.useLocalFile = true;
+
         //for network requests
         this.cancelDataRequestToken = null;
         this.cancelImageRequestToken = null;
@@ -195,7 +197,7 @@ export class ServerDataManager {
     Returns true/false on success/fail of the load.
     */
     requestServerData(resultCallback) {
-        ax.get('/getPropertyData', this.cancelDataRequestToken).then((result) => {
+        ax.get(this.useLocalFile ? Assets.CANVAS_PROPERTIES : '/getPropertyData', this.cancelDataRequestToken).then((result) => {
             if (result.status == 200 && typeof result.data === 'object') {
                 this.allProperties = result.data;
                 this.organizeAllProperties();
@@ -207,7 +209,7 @@ export class ServerDataManager {
     }
 
     requestServerImage(resultCallback) {
-        ax.get('/getPixelData', this.cancelImageRequestToken).then((result) => {
+        ax.get(this.useLocalFile ? Assets.CANVAS_IMAGE : '/getPixelData', this.cancelImageRequestToken).then((result) => {
             if (result.status == 200) {
                 this.pixelData = result.data;
                 resultCallback(true);

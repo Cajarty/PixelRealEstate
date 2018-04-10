@@ -51,12 +51,10 @@ export class Axios {
     /*
     Sends get request, returns a promise.
     */
-    get(url, cancelToken) {
+    get(url, headers = {}) {
         if (typeof (dataObject) === Object)
             throw new Error('Incorrect request data.');
-        return this.axios.get(url, {
-            cancelToken: cancelToken,
-        });
+        return this.axios.get(url, headers);
     }
 
     /*

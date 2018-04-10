@@ -61,9 +61,8 @@ class ZoomCanvas extends Component {
         this.setState({ ctx, dataCtx });
 
         ctr.listenForResults(LISTENERS.ServerDataManagerInit, 'canvasZoom', (results) => {
-            console.info('please ok thanks')
             if (results.imageLoaded) {
-                this.setCanvas(SDM.pixelData);
+                this.setCanvasWithImage(SDM.imagePNG);
                 this.setState({canvasLoaded: true});
                 for (let i in this.state.queuedUpdates) {
                     this.setCanvasProperty(this.state.queuedUpdates[i].x, this.state.queuedUpdates[i].y, this.state.queuedUpdates[i].colors);
@@ -97,6 +96,10 @@ class ZoomCanvas extends Component {
             this.setState({hoverY});
             this.drawWindow(GFD.getData('hoverX'), hoverY);
         })
+    }
+
+    setCanvasWithImage(img) {
+        this.state.dataCtx.drawImage(img, 0, 0);
     }
 
     componentWillUnmount() {

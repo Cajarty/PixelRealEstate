@@ -96,7 +96,7 @@ class Canvas extends Component {
         GFD.close('noMetaMask', 'canvas');
         ctr.listenForResults(LISTENERS.ServerDataManagerInit, 'canvas', (results) => {
             if (results.imageLoaded) {
-                this.setCanvas(SDM.pixelData);
+                this.setCanvasWithImage(SDM.imagePNG);
                 if (GFD.getData('ServerDataManagerInit') > 1) {
                     console.info('swaety')
                     this.setState({canvasLoaded: true});
@@ -192,6 +192,12 @@ class Canvas extends Component {
             ctxID.data[i] = rgbArr[i];
         }
         this.state.ctx.putImageData(ctxID, x * 10, y * 10);
+    }
+
+    setCanvasWithImage(img) {
+        this.state.ctx.drawImage(img, 0, 0);
+        this.setState({loaded: true});
+        SDM.pixelData = this.state.ctx.getImageData(0, 0, Const.CANVAS_WIDTH, Const.CANVAS_HEIGHT).data;
     }
 
     setCanvas(rgbArr) {

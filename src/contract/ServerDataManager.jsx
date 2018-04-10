@@ -48,6 +48,9 @@ const comp = (a, b, asc) => {
 
 export class ServerDataManager {
     constructor() {
+        //initial loaded image
+        this.imagePNG;
+
         //pixel data
         this.pixelData = [];
 
@@ -200,7 +203,7 @@ export class ServerDataManager {
         if (this.useLocalFile) {
 
         } else {
-            ax.get('/getPropertyData', this.cancelDataRequestToken).then((result) => {
+            ax.get('/getPropertyData', {cancelToken: this.cancelDataRequestToken}).then((result) => {
                 if (result.status == 200 && typeof result.data === 'object') {
                     this.allProperties = result.data;
                     this.organizeAllProperties();
@@ -216,9 +219,16 @@ export class ServerDataManager {
         if (this.useLocalFile) {
 
         } else {
-            ax.get('/getPixelData', this.cancelImageRequestToken).then((result) => {
+            ax.get('/getImage.png', {cancelToken: this.cancelImageRequestToken, responseType: 'arraybuffer'}).then((result) => {
                 if (result.status == 200) {
-                    this.pixelData = result.data;
+                    //this.imagePNG = result.data.ArrayBuffer;
+                    //this.imagePNG = new Buffer(result.data, 'binary').toString('base64')
+
+                    let image = new Image();
+                    image.onload = () => {
+                        this.imagePNG = image
+                    };
+                    image.src = "data:image/png;base64," + new Buffer(result.data, 'binary').toString('base64');
                     resultCallback(true);
                 } else {
                     resultCallback(false);

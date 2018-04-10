@@ -19,6 +19,7 @@ class PropertiesOwned extends Component {
             orderedItems: [],
             column: '',
             ascending: true,
+            eventHandle: null,
         };
         this.newestSort = new Date().getTime();
     }

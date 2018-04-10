@@ -197,7 +197,10 @@ class Canvas extends Component {
     setCanvasWithImage(img) {
         this.state.ctx.drawImage(img, 0, 0);
         this.setState({loaded: true});
-        SDM.pixelData = this.state.ctx.getImageData(0, 0, Const.CANVAS_WIDTH, Const.CANVAS_HEIGHT).data;
+        let pxlData = this.state.ctx.getImageData(0, 0, Const.CANVAS_WIDTH, Const.CANVAS_HEIGHT).data;
+        for (let y = 0; y < 1000; y++) {
+            SDM.pixelData[y] = pxlData.slice(y * 4000, (y + 1) * 4000);
+        }
     }
 
     setCanvas(rgbArr) {

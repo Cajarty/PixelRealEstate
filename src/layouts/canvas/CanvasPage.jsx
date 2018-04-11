@@ -201,7 +201,10 @@ class CanvasPage extends Component {
             <div>
                 <SegmentGroup horizontal className='mainSegmentGroup'> 
                     <Segment className='left'>
-                            
+                                <div className='logo'>
+                                    <Header>PIXEL PROPERTY</Header>
+                                </div>
+                                <Divider/>
                                 <ZoomCanvas/>
                                 <Divider/>
                                 {this.state.advancedMode &&

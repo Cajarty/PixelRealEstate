@@ -46,10 +46,10 @@ $(function() {
         var secondFeature = $('#features').offset().top;
         var scroll = $(window).scrollTop();
         if (scroll >= 40 && $(window).width() > 960) {
-            $('.sticky-navigation').css({ "background-color": '#d81b60' });
+            $('.sticky-navigation').css({ "background-color": '#23B5D3' });
             // $('.sticky-navigation').css({ "background-color": '#89cff0' });
         } else {
-            $('.sticky-navigation').css({ "background-color": '#d81b60' });
+            $('.sticky-navigation').css({ "background-color": '#23B5D3' });
             // $('.sticky-navigation').css({ "background-color": '#89cff0' });
         }
         if (scroll >= secondFeature - 10) {

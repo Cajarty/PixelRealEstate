@@ -6,6 +6,58 @@
 *****************/
 
 /*****************
+    0. color overrides
+
+    dark            23B5D3
+    light           98DFEA   
+    offwhite        EAE5E7   
+    weird white     BAA7B0
+    black           071013
+
+*****************/
+
+.text-primary {
+    color: #23B5D3 !important;
+}
+.bg-texture {
+    background: #23B5D3 !important;
+}
+.nav-bar {
+    background: #23B5D3 !important;
+}
+.card .card-body .icon-box {
+    color: #98DFEA;
+}
+a {
+    color: #071013
+}
+a:hover {
+    color: #EAE5E7
+}
+/*.icon-links > a {
+    color: #98DFEA;
+}*/
+.bg-footer a {
+    color: #98DFEA !important;
+}
+.bg-footer a:hover {
+    color: #EAE5E7 !important;
+}
+.list-default > li::before {
+    color: #98DFEA;
+}
+strong {
+    color: #071013;
+}
+.btn-primary {
+    background-color: #98DFEA !important;
+    border-color: #98DFEA !important;
+}
+.card a:hover {
+    color: #98DFEA !important;
+}
+
+/*****************
     1. general
 *****************/
 @font-face {
@@ -280,6 +332,21 @@ a {
     }
     .text-primary  {
         font-size: 1.1em !important;
+    }
+}
+
+@media only screen and (max-width: 667px) {
+    .iphone-mt {
+        margin-top: 5em !important;
+    }
+    .iphone-mt-large {
+        margin-top: 6em !important;
+    }
+    .mt-5 {
+        margin-top: 1em !important;
+    }
+    .iphone-mt-small {
+        margin-top: 1em !important;
     }
 }
 /**

@@ -16,8 +16,6 @@ export default class ClickLoader extends Component {
             labelY: -1,
             canvasWidth: 0,
             canvasHeight: 0,
-            offsetX: 0,
-            offsetY: 0,
             loaderValue: 0,
             clickTime: 1000,
             startClickTime: 0,
@@ -51,16 +49,6 @@ export default class ClickLoader extends Component {
         GFD.listen('pressY', 'clickLoader', (y) => {
             if (this.state.hoverX != -1 && y != this.state.hoverY)
                 this.updateLoaderPosition(GFD.getData('pressX'), y);
-        })
-        GFD.listen('canvasTopOffset', 'clickLoader', (top) => {
-            this.setState({
-                offsetY: top
-            });
-        })
-        GFD.listen('canvasLeftOffset', 'clickLoader', (left) => {
-            this.setState({
-                offsetX: left
-            });
         })
         GFD.listen('canvasWidth', 'clickLoader', (width) => {
             this.setState({

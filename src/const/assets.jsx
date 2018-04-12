@@ -15,6 +15,9 @@ export const CLOSE = BASE_PATH + 'icons/close.svg';
 export const LOADING = BASE_PATH + 'icons/loading.gif';
 export const TOKEN = BASE_PATH + 'icons/token.png';
 
+export const LOGO = BASE_PATH + 'icons/PixelProperty.svg';
+export const METAMASK_DOWNLOAD = BASE_PATH + 'img/download-metamask.png';
+
 
 export const CANVAS_IMAGE = '/assets/canvas/canvas.png';
 export const CANVAS_PROPERTIES= '/assets/canvas/properties.json';

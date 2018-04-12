@@ -428,6 +428,19 @@ div.hoverLabel.ui {
     text-align: center;
 }
 
+.logo#logo {
+    img {
+        @include animation(fadein, .8s);
+        max-height: 100%;
+        max-width: 100%;
+        margin-bottom: -6px;
+        -webkit-user-drag: none;
+        -khtml-user-drag: none;
+        -moz-user-drag: none;
+        -o-user-drag: none;
+    }
+}
+
 .clickLoader {
     .CircularProgressbar.clickLoaderLoader {
         margin-left: calc(1em - 1px);
@@ -440,5 +453,16 @@ div.hoverLabel.ui {
         .CircularProgressbar-trail {
             stroke: none;
         }
+    }
+}
+
+.ui.compact.segment.WelcomeSidebar {
+    height: 100%;
+    background: linear-gradient(to bottom right, lighten($color3, 10%), darken($color3, 5%));
+    .ui.image.downloadImage {
+        background-color: lighten($color3, 10%);
+    }
+    .message#message {
+        background: linear-gradient(to bottom right, darken($color3, 5%), lighten($color3, 10%));
     }
 }

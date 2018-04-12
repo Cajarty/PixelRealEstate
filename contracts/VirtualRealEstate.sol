@@ -24,8 +24,10 @@ contract VirtualRealEstate {
     // The current system prices of ETH and PXL, for which unsold Properties are listed for sale at
     uint256 systemSalePriceETH;
     uint256 systemSalePricePXL;
-    uint256 systemPriceIncreaseStep;
-    uint256 systemPixelIncreasePercent;
+    uint8 systemPixelIncreasePercent;
+    uint8 systemPriceIncreaseStep;
+    uint16 systemETHStepTally;
+    uint16 systemPXLStepTally;
 
     /* ### Events ### */
     event PropertyColorUpdate(uint16 indexed property, uint256[10] colors, uint256 lastUpdate, address indexed lastUpdaterPayee, uint256 becomePublic, uint256 indexed rewardedCoins);
@@ -63,6 +65,8 @@ contract VirtualRealEstate {
         GRACE_PERIOD_END_TIMESTAMP = now + 3 days; // Give all users extra functionality for the first three days
         systemPriceIncreaseStep = 10;
         systemPixelIncreasePercent = 5;
+        systemETHStepTally = 0;
+        systemPXLStepTally = 0;
     }
     
     function setPXLPropertyContract(address pxlPropertyContract) public ownerOnly() {
@@ -182,11 +186,21 @@ contract VirtualRealEstate {
         
         pxlProperty.burnPXLRewardPXL(msg.sender, pxlValue, owner, pxlValue);
         
+        systemPXLStepTally += uint16(100 * pxlValue / systemSalePricePXL);
+        if (systemPXLStepTally >= 1000) {
+            systemSalePricePXL = systemSalePricePXL * (10215 - (200 * (systemPriceIncreaseStep / (10000 * systemPixelIncreasePercent)))) / 10000;
+            systemPXLStepTally -= 1000;
+        }
+
         systemSalePricePXL *= ((10215 - (200 * (systemPriceIncreaseStep / (10000 * systemPixelIncreasePercent)))) / 10000) * pxlLeft / pxlValue;
 
         ownerEth += msg.value;
-        
-        systemSalePriceETH *= ((10215 - (200 * (systemPriceIncreaseStep / (10000 * (1 - systemPixelIncreasePercent))))) / 10000) * ((pxlValue - pxlLeft) / pxlValue);
+
+        systemETHStepTally += uint16(100 * pxlLeft / systemSalePricePXL);
+        if (systemETHStepTally >= 1000) {
+            systemSalePriceETH = systemSalePriceETH * (10215 - (200 * (systemPriceIncreaseStep / (10000 * (1 - systemPixelIncreasePercent))))) / 10000;
+            systemETHStepTally -= 1000;
+        }
 
         _transferProperty(propertyID, msg.sender, msg.value, pxlValue, 0, 0);
         
@@ -204,11 +218,15 @@ contract VirtualRealEstate {
             propertyOwner = owner;
             propertySalePrice = systemSalePricePXL;
             // Increase system PXL price
-            systemSalePricePXL *= ((10215 - (200 * (systemPriceIncreaseStep / (10000 * systemPixelIncreasePercent)))) / 10000);
+            systemPXLStepTally += 100;
+            if (systemPXLStepTally >= 1000) {
+                systemSalePricePXL = systemSalePricePXL * (10215 - (200 * (systemPriceIncreaseStep / (10000 * systemPixelIncreasePercent)))) / 10000;
+                systemPXLStepTally -= 1000;
+            }
         }
         require(propertySalePrice <= PXLValue);
         uint256 amountTransfered = propertySalePrice * USER_BUY_CUT_PERCENT / 100;
-        pxlProperty.burnPXLRewardPXLx2(msg.sender, propertySalePrice, propertyOwner, amountTransfered, owner, (propertySalePrice - amountTransfered));
+        pxlProperty.burnPXLRewardPXLx2(msg.sender, propertySalePrice, propertyOwner, amountTransfered, owner, (propertySalePrice - amountTransfered));        
         _transferProperty(propertyID, msg.sender, 0, propertySalePrice, 0, originalOwner);
     }
 
@@ -218,8 +236,11 @@ contract VirtualRealEstate {
         require(msg.value >= systemSalePriceETH);
         
         ownerEth += msg.value;
-    
-        systemSalePriceETH *= ((10215 - (200 * (systemPriceIncreaseStep / (10000 * (1 - systemPixelIncreasePercent))))) / 10000);
+        systemETHStepTally += 100;
+        if (systemETHStepTally >= 1000) {
+            systemSalePriceETH = systemSalePriceETH * (10215 - (200 * (systemPriceIncreaseStep / (10000 * (1 - systemPixelIncreasePercent))))) / 10000;
+            systemETHStepTally -= 1000;
+        }
         _transferProperty(propertyID, msg.sender, msg.value, 0, 0, 0);
         return true;
     }

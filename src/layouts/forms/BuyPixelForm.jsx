@@ -108,6 +108,10 @@ class BuyPixelForm extends Component {
         return obj;
     }
 
+    weiToEth(wei) {
+        return wei / 1000000000000000000.0;
+    }
+
     render() {
         return (
             <Modal size='mini' 
@@ -160,7 +164,7 @@ class BuyPixelForm extends Component {
                         </div>
                         :
                         <div>
-                            <Label>ETH<LabelDetail>{this.state.ETHToPay}</LabelDetail></Label>
+                            <Label>ETH<LabelDetail>{this.weiToEth(this.state.ETHToPay)}</LabelDetail></Label>
                             <Label style={{float: 'right'}}>PXL<LabelDetail>{this.state.PPCToPay}</LabelDetail></Label>
                             <FormInput
                                 className='buySlider'

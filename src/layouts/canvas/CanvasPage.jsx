@@ -29,6 +29,7 @@ import PropertiesOwned from '../ui/PropertiesOwned';
 import PropertiesForSale from '../ui/PropertiesForSale';
 import PropertyChangeLogTop from '../logs/PropertyChangeLogTop';
 import Tutorial from '../Tutorial';
+import WelcomeSidebar from '../ui/WelcomeSidebar';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -201,8 +202,8 @@ class CanvasPage extends Component {
             <div>
                 <SegmentGroup horizontal className='mainSegmentGroup'> 
                     <Segment className='left'>
-                                <div className='logo'>
-                                    <Header>PIXEL PROPERTY</Header>
+                                <div id='logo' className='logo'>
+                                    <img src={Assets.LOGO}/>
                                 </div>
                                 <Divider/>
                                 <ZoomCanvas/>
@@ -268,11 +269,7 @@ class CanvasPage extends Component {
                                     <PixelDescriptionBox/>
                                 </div> 
                             : 
-                                <div>
-                                    {Strings.SIMPLE_MODE_INTRO_RIGHT}
-                                    <br/>
-                                    {Strings.ADDRESSES[Math.floor(Math.random() * Strings.ADDRESSES.length)]}
-                                </div>
+                                <WelcomeSidebar/>
                             }
                         </div>
                     </Segment>

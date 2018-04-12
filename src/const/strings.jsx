@@ -1,3 +1,5 @@
+import React, { Component } from 'react';
+
 export const ADVANCED_MODE_INTRO_RIGHT = "Welcome to PixelProperty! This is some text for you advanced users.";
 export const SIMPLE_MODE_INTRO_RIGHT = "Welcome to PixelProperty!";
 
@@ -26,8 +28,12 @@ export const TUTORIAL_START_DIALOG = ["Pixel Property is easy to use. Just in ca
 
 export const CHANGELOG = [
     {
-        date: new Date().getTime(),
-        message: "Not Much."
+        date: new Date('2018-4-10'),
+        title: 'Beta Testing',
+        messages: 
+        ['Live on the Rinkeby test network!', 
+        'Change your MetaMask network from "Main" to "Rinkeby" to begin testing.', 
+        <div>You'll need funds from the Rinkeby faucet at: <a href="https://www.rinkeby.io/#faucet" target='blank'>Rinkeby.io</a></div>],
     }
 ];
 

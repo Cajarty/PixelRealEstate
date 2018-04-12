@@ -123,8 +123,8 @@ class PixelDescriptionBox extends Component {
                 this.setState({
                     owner: data.owner,
                     isForSale: ppcp != 0,
-                    ETHPrice: ethp,
-                    PPCPrice: ppcp,
+                    ETHPrice: Func.NumberWithCommas( Func.WeiToEth( ethp ) ),
+                    PPCPrice: Func.NumberWithCommas (ppcp ),
                     lastUpdate,
                     isInPrivate: data.isInPrivate,
                     reserved,
@@ -232,8 +232,8 @@ class PixelDescriptionBox extends Component {
             this.setState({
                 owner: data[0],
                 isForSale: ppcp != 0,
-                ETHPrice: ethp,
-                PPCPrice: ppcp,
+                ETHPrice: Func.NumberWithCommas( Func.WeiToEth( ethp ) ),
+                PPCPrice: Func.NumberWithCommas( ppcp ),
                 lastUpdate,
                 isInPrivate: data[4],
                 reserved,

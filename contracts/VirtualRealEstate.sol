@@ -10,11 +10,6 @@ contract VirtualRealEstate {
     
     mapping (uint16 => bool) hasBeenSet;
     
-    // The amount for with ETH and PXL system prices increase
-    uint256 PRICE_ETH_MIN_INCREASE = 1000;//10000000000000000000000; //0.0001 ETH
-    uint256 PRICE_PXL_MIN_INCREASE = 10;
-    uint8 PRICE_ETH_MIN_PERCENT = 20; //0.0001 ETH
-    uint8 PRICE_PXL_MIN_PERCENT = 20;
     // The amount in % for which a user is paid
     uint8 USER_BUY_CUT_PERCENT = 98;
     // Maximum amount of generated PXL a property can give away per minute
@@ -29,6 +24,8 @@ contract VirtualRealEstate {
     // The current system prices of ETH and PXL, for which unsold Properties are listed for sale at
     uint256 systemSalePriceETH;
     uint256 systemSalePricePXL;
+    uint256 systemPriceIncreaseStep;
+    uint256 systemPixelIncreasePercent;
 
     /* ### Events ### */
     event PropertyColorUpdate(uint16 indexed property, uint256[10] colors, uint256 lastUpdate, address indexed lastUpdaterPayee, uint256 becomePublic, uint256 indexed rewardedCoins);
@@ -61,9 +58,11 @@ contract VirtualRealEstate {
     /* CONSTRUCTOR */
     function VirtualRealEstate() public {
         owner = msg.sender; // Default the owner to be whichever Ethereum account created the contract
-        systemSalePricePXL = 100; //Initial PXL system price
-        systemSalePriceETH = 10000;//1000000000000000000; //0.001 ETH //Initial ETH system price
+        systemSalePricePXL = 1000; //Initial PXL system price
+        systemSalePriceETH = 19500000000000000; //Initial ETH system price
         GRACE_PERIOD_END_TIMESTAMP = now + 3 days; // Give all users extra functionality for the first three days
+        systemPriceIncreaseStep = 10;
+        systemPixelIncreasePercent = 5;
     }
     
     function setPXLPropertyContract(address pxlPropertyContract) public ownerOnly() {
@@ -183,13 +182,12 @@ contract VirtualRealEstate {
         
         pxlProperty.burnPXLRewardPXL(msg.sender, pxlValue, owner, pxlValue);
         
-        uint256 minPercent = systemSalePricePXL * PRICE_PXL_MIN_PERCENT / 100;
-        systemSalePricePXL += ((minPercent < PRICE_PXL_MIN_INCREASE) ? minPercent : PRICE_PXL_MIN_INCREASE) * pxlValue / systemSalePricePXL;
+        systemSalePricePXL *= ((10215 - (200 * (systemPriceIncreaseStep / (10000 * systemPixelIncreasePercent)))) / 10000) * pxlLeft / pxlValue;
 
         ownerEth += msg.value;
-        minPercent = systemSalePriceETH * PRICE_ETH_MIN_PERCENT / 100;
-        systemSalePriceETH += ((minPercent < PRICE_ETH_MIN_INCREASE) ? minPercent : PRICE_ETH_MIN_INCREASE) * pxlLeft / systemSalePricePXL;
         
+        systemSalePriceETH *= ((10215 - (200 * (systemPriceIncreaseStep / (10000 * (1 - systemPixelIncreasePercent))))) / 10000) * ((pxlValue - pxlLeft) / pxlValue);
+
         _transferProperty(propertyID, msg.sender, msg.value, pxlValue, 0, 0);
         
         return true;
@@ -206,8 +204,7 @@ contract VirtualRealEstate {
             propertyOwner = owner;
             propertySalePrice = systemSalePricePXL;
             // Increase system PXL price
-            uint256 minPercent = systemSalePricePXL * PRICE_PXL_MIN_PERCENT / 100;
-            systemSalePricePXL += (minPercent < PRICE_PXL_MIN_INCREASE) ? minPercent : PRICE_PXL_MIN_INCREASE;
+            systemSalePricePXL *= ((10215 - (200 * (systemPriceIncreaseStep / (10000 * systemPixelIncreasePercent)))) / 10000);
         }
         require(propertySalePrice <= PXLValue);
         uint256 amountTransfered = propertySalePrice * USER_BUY_CUT_PERCENT / 100;
@@ -222,8 +219,7 @@ contract VirtualRealEstate {
         
         ownerEth += msg.value;
     
-        uint256 minPercent = systemSalePriceETH * PRICE_ETH_MIN_PERCENT / 100;
-        systemSalePriceETH += (minPercent < PRICE_ETH_MIN_INCREASE) ? minPercent : PRICE_ETH_MIN_INCREASE;
+        systemSalePriceETH *= ((10215 - (200 * (systemPriceIncreaseStep / (10000 * (1 - systemPixelIncreasePercent))))) / 10000);
         _transferProperty(propertyID, msg.sender, msg.value, 0, 0, 0);
         return true;
     }

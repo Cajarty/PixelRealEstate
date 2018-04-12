@@ -35,13 +35,15 @@ class Canvas extends Component {
         this.setState({ ctx });
         this.canvas.onmousemove = (e) => {          
             let rect = this.canvas.getBoundingClientRect();
-            let x = (e.clientX - rect.left) * (1000 / rect.width);
-            let y = (e.clientY - rect.top) * (1000 / rect.height); 
-            this.setCanvasPointer(Math.floor(x / 10), Math.floor(y / 10));
-            GFD.setData('hoverX', x);
-            GFD.setData('hoverY', y);
-            GFD.setData('canvasWidth', rect.width);
-            GFD.setData('canvasHeight', rect.height);
+            let x = Math.floor((e.clientX - rect.left) * (100 / rect.width));
+            if (x != GFD.getData('hoverX')) {
+                GFD.setData('hoverX', x);
+            }
+            let y = Math.floor((e.clientY - rect.top) * (100 / rect.height)); 
+            if (y != GFD.getData('hoverY')) {
+                GFD.setData('hoverY', y);
+            }
+            this.setCanvasPointer(x, y);
         };
         this.canvas.onmouseout = (e) => {        
             GFD.setData('hoverX', -1);
@@ -49,6 +51,9 @@ class Canvas extends Component {
             this.setCanvasPointer(-1, -1);
             GFD.setData('pressX', -1);
             GFD.setData('pressY', -1);
+            let rect = this.canvas.getBoundingClientRect();
+            GFD.setData('canvasWidth', rect.width);
+            GFD.setData('canvasHeight', rect.height);
         };
         this.canvas.onclick = (e) => {    
             if (!e.isTrusted)

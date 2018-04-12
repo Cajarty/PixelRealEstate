@@ -24,19 +24,13 @@ export default class ClickLoader extends Component {
     }
 
     componentDidMount() {
-        GFD.listen('hoverX', 'clickLoader', (x) => {
-            let hoverX = Math.floor(x / 10);
-            if (hoverX == this.state.hoverX)
-                return;
+        GFD.listen('hoverX', 'clickLoader', (hoverX) => {
             this.setState({
                 hoverX: hoverX,
                 labelX: (hoverX - 1.5) * this.state.canvasWidth / 100
             });
         })
-        GFD.listen('hoverY', 'clickLoader', (y) => {
-            let hoverY = Math.floor(y / 10);
-            if (hoverY == this.state.hoverY)
-                return;
+        GFD.listen('hoverY', 'clickLoader', (hoverY) => {
             this.setState({
                 hoverY: hoverY,
                 labelY: (hoverY - 1.5) * this.state.canvasHeight / 100

@@ -81,7 +81,6 @@ class PixelDescriptionBox extends Component {
     }
 
     componentDidMount() {
-        console.info('mountie')
         let ctx = this.canvas.getContext('2d');
         ctx.scale(10, 10);
         ctx.imageSmoothingEnabled = false;
@@ -110,7 +109,7 @@ class PixelDescriptionBox extends Component {
             this.setState({y});
         })
 
-        this.setState({timerUpdater: setInterval(() => this.timerUpdate(), 1000)});
+        this.setState({timerUpdater: setInterval(() => this.timerUpdate(), 60000)});
 
         ctr.listenForResults(LISTENERS.ServerDataManagerInit, 'PixelBox', (results) => {
             if (results.imageLoaded && GFD.getData('ServerDataManagerInit') == 1) {
@@ -150,6 +149,10 @@ class PixelDescriptionBox extends Component {
             return;
         }
         this.setup(false);
+    }
+
+    componentDidUpdate(oldP, oldS, snap) {
+        console.info(oldP, oldS, snap);
     }
 
     setup(noMetaMask) {            
@@ -271,7 +274,7 @@ class PixelDescriptionBox extends Component {
                 let newEarned = Func.calculateEarnings(this.state.lastUpdate, this.state.maxEarnings);
                 if (this.state.earnings != newEarned)
                     this.setState({earnings: newEarned});
-            }, 1000)
+            }, 60000)
         })
     }
 
@@ -338,19 +341,8 @@ class PixelDescriptionBox extends Component {
                     <Button fluid onClick={() => this.toggleAction('SET_PRIVATE')}>Set Private</Button>
                 );
             }
-            // actions.push(
-            //     <Button fluid onClick={() => this.toggleAction('TRANSFER')}>Transfer</Button>
-            // );
         }
-        //blank one in case odd elements
-        if (actions.length % 2 == 1) {
-            actions.push(null);
-        }
-        let packed = [];
-        for (let i = 0; i < actions.length; i += 2) {
-            packed.push({a1: actions[i], a2: actions[i + 1]});
-        }
-        return packed;
+        return actions;
     }
 
     visitLink() {
@@ -547,16 +539,11 @@ class PixelDescriptionBox extends Component {
                 {this.state.x != '' && this.state.y != '' && !this.state.noAccount && 
                     <div className={(this.state.tutorialState.index == 3 ? TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 3) + ' actions' : '')}>
                         <Divider/>
-                        <Grid columns='two' divided>
+                        <Grid columns='2' divided>
                             {this.getActionsList().map((action, i) => (
-                                <Grid.Row key={i}>
-                                    <Grid.Column>
-                                        {action.a1}
-                                    </Grid.Column>
-                                    <Grid.Column>
-                                        {action.a2}
-                                    </Grid.Column>
-                                </Grid.Row>
+                                <Grid.Column>
+                                    {action}
+                                </Grid.Column>
                             ))}
                         </Grid>
                     </div>
@@ -573,7 +560,6 @@ class PixelDescriptionBox extends Component {
                 <CancelSaleForm isOpen={this.state.isOpen.CANCEL_SALE} close={this.toggleAction.bind(this)}/>
                 <MakePublicForm isOpen={this.state.isOpen.SET_PUBLIC} close={this.toggleAction.bind(this)}/>
                 <MakePrivateForm isOpen={this.state.isOpen.SET_PRIVATE} close={this.toggleAction.bind(this)}/>
-                {/*<TransferPropertyForm isOpen={this.state.isOpen.TRANSFER} close={this.toggleAction.bind(this)}/>*/}
                 <PlaceBidForm isOpen={this.state.isOpen.PLACE_BID} close={this.toggleAction.bind(this)}/>
             </div>
         );

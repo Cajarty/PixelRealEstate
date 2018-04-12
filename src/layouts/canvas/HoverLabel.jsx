@@ -31,10 +31,7 @@ class HoverLabel extends Component {
     }
 
     componentDidMount() {
-        GFD.listen('hoverX', 'hoverLabel', (x) => {
-            let hoverX = Math.floor(x / 10);
-            if (hoverX == this.state.hoverX)
-                return;
+        GFD.listen('hoverX', 'hoverLabel', (hoverX) => {
             this.updateLabel(hoverX, this.state.hoverY);
             
             this.setState({
@@ -42,10 +39,7 @@ class HoverLabel extends Component {
                 labelX: hoverX * this.state.canvasWidth / 100
             });
         })
-        GFD.listen('hoverY', 'hoverLabel', (y) => {
-            let hoverY = Math.floor(y / 10);
-            if (hoverY == this.state.hoverY)
-                return;  
+        GFD.listen('hoverY', 'hoverLabel', (hoverY) => {
             this.updateLabel(this.state.hoverX, hoverY);
             
             this.setState({

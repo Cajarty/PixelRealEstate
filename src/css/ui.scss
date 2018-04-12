@@ -466,3 +466,7 @@ div.hoverLabel.ui {
         background: linear-gradient(to bottom right, darken($color3, 5%), lighten($color3, 10%));
     }
 }
+
+canvas {
+    will-change: transform !important;
+}

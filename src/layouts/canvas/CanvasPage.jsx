@@ -9,7 +9,6 @@ import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 import HoverLabel from './HoverLabel';
 import {GFD, GlobalState, TUTORIAL_STATE} from '../../functions/GlobalState';
 import * as Strings from '../../const/strings';
-import HoverBox from './HoverBox';
 import * as Assets from '../../const/assets';
 import ClickLoader from '../ui/ClickLoader';
 import PixelDescriptionBox from '../ui/PixelDescriptionBox';
@@ -263,15 +262,11 @@ class CanvasPage extends Component {
                         <Canvas/>
                     </Segment>
                     <Segment id={(this.state.tutorialState.index == 3 ? 'hiddenForward' : '')} className={'right' + TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 2) + (this.state.tutorialState.index == 3 ? ' hiddenForward' : '')}>
-                        <div className='infoBox'>
                             {this.state.advancedMode ? 
-                                <div>
-                                    <PixelDescriptionBox/>
-                                </div> 
+                                <PixelDescriptionBox/>
                             : 
                                 <WelcomeSidebar/>
                             }
-                        </div>
                     </Segment>
                 </SegmentGroup>
                 <Segment className={(this.state.advancedMode ? 'lowerSegment one' : 'lowerSegment one hideElement')}>

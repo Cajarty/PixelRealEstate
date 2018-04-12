@@ -81,6 +81,7 @@ class PixelDescriptionBox extends Component {
     }
 
     componentDidMount() {
+        console.info('mountie')
         let ctx = this.canvas.getContext('2d');
         ctx.scale(10, 10);
         ctx.imageSmoothingEnabled = false;
@@ -133,8 +134,6 @@ class PixelDescriptionBox extends Component {
                 });
     
                 this.timerUpdate(lastUpdate, reserved);
-
-                console.info(this.state, data)
                 
                 let canvasData = SDM.getPropertyImage(this.state.x - 1, this.state.y - 1);
                 
@@ -204,6 +203,7 @@ class PixelDescriptionBox extends Component {
 
     componentWillUnmount() {
         GFD.closeAll('pixelBrowse');
+        ctr.stopListeningForResults(LISTENERS.ServerDataManagerInit, 'PixelBox');
         this.stopTokenEarnedInterval();
         this.state.evH1.stopWatching();
         this.state.evH2.stopWatching();
@@ -224,7 +224,6 @@ class PixelDescriptionBox extends Component {
         if (x === '' || y === '')
             return;
         ctr.getPropertyData(x, y, (data) => {  
-            console.info(data);
             let ethp = Func.BigNumberToNumber(data[1]);
             let ppcp = Func.BigNumberToNumber(data[2]);
             let reserved = Func.BigNumberToNumber(data[5]);
@@ -262,6 +261,7 @@ class PixelDescriptionBox extends Component {
         } else {
             this.setCanvas(canvasData);
         }
+        this.stopTokenEarnedInterval();
         this.startTokenEarnedInterval();
     }
 

@@ -53,16 +53,6 @@ class HoverLabel extends Component {
                 labelY: (hoverY * this.state.canvasHeight / 100) + 30
             });
         })
-        GFD.listen('canvasTopOffset', 'hoverLabel', (top) => {
-            this.setState({
-                offsetY: top
-            });
-        })
-        GFD.listen('canvasLeftOffset', 'hoverLabel', (left) => {
-            this.setState({
-                offsetX: left
-            });
-        })
         GFD.listen('canvasWidth', 'hoverLabel', (width) => {
             this.setState({
                 canvasWidth: width

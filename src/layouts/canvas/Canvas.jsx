@@ -34,15 +34,12 @@ class Canvas extends Component {
         ctx.webkitImageSmoothingEnabled = false;
         this.setState({ ctx });
         this.canvas.onmousemove = (e) => {          
-            let bodyRect = document.body.getBoundingClientRect();
             let rect = this.canvas.getBoundingClientRect();
             let x = (e.clientX - rect.left) * (1000 / rect.width);
             let y = (e.clientY - rect.top) * (1000 / rect.height); 
             this.setCanvasPointer(Math.floor(x / 10), Math.floor(y / 10));
             GFD.setData('hoverX', x);
             GFD.setData('hoverY', y);
-            GFD.setData('canvasTopOffset', rect.top - bodyRect.top); //move this and other 3 to a "on canvas resize"
-            GFD.setData('canvasLeftOffset', rect.left - bodyRect.left);
             GFD.setData('canvasWidth', rect.width);
             GFD.setData('canvasHeight', rect.height);
         };
@@ -133,6 +130,7 @@ class Canvas extends Component {
 
     componentWillUnmount() {
         this.state.eventHandle.stopWatching();
+        ctr.stopListeningForResults(LISTENERS.ShowForSale, 'Canvas');
     }
 
     showPropertiesForSale() {

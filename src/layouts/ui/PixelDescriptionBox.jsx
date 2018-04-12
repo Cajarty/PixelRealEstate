@@ -151,10 +151,6 @@ class PixelDescriptionBox extends Component {
         this.setup(false);
     }
 
-    componentDidUpdate(oldP, oldS, snap) {
-        console.info(oldP, oldS, snap);
-    }
-
     setup(noMetaMask) {            
         if (noMetaMask)
             return;

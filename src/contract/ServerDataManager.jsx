@@ -223,9 +223,6 @@ export class ServerDataManager {
         } else {
             ax.get('/getImage.png', {cancelToken: this.cancelImageRequestToken, responseType: 'arraybuffer'}).then((result) => {
                 if (result.status == 200) {
-                    //this.imagePNG = result.data.ArrayBuffer;
-                    //this.imagePNG = new Buffer(result.data, 'binary').toString('base64')
-
                     let image = new Image();
                     image.onload = () => {
                         this.imagePNG = image

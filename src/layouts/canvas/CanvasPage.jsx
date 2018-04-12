@@ -293,12 +293,16 @@ class CanvasPage extends Component {
                     </div>
                 </Segment>
                 <Sidebar id='footer' className='footer' as={Menu} animation='push' direction='bottom' visible inverted>
-                    <MenuItem name='file text outline'>
-                    <Icon name='file text outline' />
+                    <MenuItem name='file text outline' onClick={() => {
+                        window.open("https://www.pixelproperty.io/privacy-policy.html","_self");
+                    }}>
+                    <Icon name='file text outline'/>
                     Privacy Policy
                     </MenuItem>
-                    <MenuItem name='file text outline'>
-                    <Icon name='file text outline' />
+                    <MenuItem name='file text outline' onClick={() => {
+                        window.open("https://www.pixelproperty.io/terms-of-service.html","_self");
+                    }} >
+                    <Icon name='file text outline'/>
                     TOS
                     </MenuItem>
                     <MenuItem name='file text outline' onClick={() => {

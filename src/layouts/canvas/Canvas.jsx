@@ -215,7 +215,6 @@ class Canvas extends Component {
     }
 
     render() {
-        console.info('state update')
         return (
             <div className='canvasContainer'>
                 <canvas className='dataCanvas hidden'

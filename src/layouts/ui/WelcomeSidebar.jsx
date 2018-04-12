@@ -28,10 +28,10 @@ class WelcomeSidebar extends Component {
                     <List divided relaxed>
                     {Strings.CHANGELOG.map((log, i) => {
                         return (
-                            <List.Item as='li' value='*'>{log.title + ' - ' + log.date.toDateString()}
+                            <List.Item key={i} as='li' value='*'>{log.title + ' - ' + log.date.toDateString()}
                                 <List.Item as='ol'>
                                 {log.messages.map((msg, ii) => {
-                                    return (<List.Item as='li' value='-'>{msg}</List.Item>);
+                                    return (<List.Item key={ii} as='li' value='-'>{msg}</List.Item>);
                                 })}
                                 </List.Item>
                             </List.Item>

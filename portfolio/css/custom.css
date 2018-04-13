@@ -53,6 +53,9 @@ strong {
     background-color: #98DFEA !important;
     border-color: #98DFEA !important;
 }
+.btn-white {
+    color: #23B5D3 !important;
+}
 .card a:hover {
     color: #98DFEA !important;
 }

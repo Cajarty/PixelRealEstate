@@ -258,7 +258,6 @@ class SetPixelColorForm extends Component {
             if (pointIsUnvisited(xToCheck, yToCheck)) {
                 visitedPoints.push(pointToCheck);
                 if (ifReplaceColor(currentRGB)) {
-                    visitedPoints.push(pointToCheck);
                     tryAddPointToCheck(xToCheck - 1, yToCheck);
                     tryAddPointToCheck(xToCheck + 1, yToCheck);
                     tryAddPointToCheck(xToCheck, yToCheck - 1);

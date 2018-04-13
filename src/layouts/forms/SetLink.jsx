@@ -46,7 +46,7 @@ class SetHoverText extends Component {
                     />
                 </ModalContent>
                 <ModalActions>
-                    <Button primary onClick={() => ctr.setLink('http://' + this.state.linkText)}>Set Link</Button>
+                    <Button primary onClick={() => ctr.setLink('http://' + this.state.linkText.replace(/(^\w+:|^)\/\//, ''))}>Set Link</Button>
                 </ModalActions>
             </Modal>
         );

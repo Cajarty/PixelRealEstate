@@ -132,7 +132,7 @@ class SetPixelColorForm extends Component {
             case DrawMode.PIXEL:
                 return this.drawPixel(pixelClick.x, pixelClick.y);
             case DrawMode.FILL:
-                return this.drawFill();
+                return this.drawFill(pixelClick.x, pixelClick.y);
             case DrawMode.PICK:
                 return this.pickPixelColor(pixelClick.x, pixelClick.y);
             case DrawMode.ERASE:
@@ -198,7 +198,8 @@ class SetPixelColorForm extends Component {
         });
     }
 
-    drawFill() {
+    //Old "Fill" that filled the whole Property with one color. Still may be useful as a UI item if properly name
+    drawClearToColor() {
         let ctxID = this.state.ctxLrg.createImageData(100, 100);
         for (let i = 0; i < 40000; i+=4) {
             ctxID.data[i] = this.state.drawColor.r;
@@ -208,6 +209,63 @@ class SetPixelColorForm extends Component {
         }
         this.state.ctxLrg.putImageData(ctxID, 0, 0);
         this.state.ctxSml.putImageData(ctxID, 0, 0, 0, 0, 10, 10);
+
+        this.setState({
+            imageData: this.state.ctxSml.getImageData(0, 0, Const.PROPERTY_LENGTH, Const.PROPERTY_LENGTH).data,
+        });
+    }
+
+    drawFill(x, y) {
+        let colorToReplace = this.state.ctxSml.getImageData(x, y, 1, 1);
+        let visitedPoints  = [];
+        let pointsToCheck = [ {x: x, y : y} ];
+
+        let ifReplaceColor = function(colorToCheck) {
+            return colorToReplace.data[0] == colorToCheck.data[0] && colorToReplace.data[1] == colorToCheck.data[1] && colorToReplace.data[2] == colorToCheck.data[2];
+        }
+
+        let pointIsUnvisited = function(xToCheck, yToCheck) {
+            for (let i = 0 ; i < visitedPoints.length; ++i)
+                if (visitedPoints[i]["x"] === xToCheck && visitedPoints[i]["y"] === yToCheck)
+                    return false;
+            return true;
+        }
+
+        let tryAddPointToCheck = function(xToCheck, yToCheck) {
+            if (xToCheck >= 0 && yToCheck >= 0 && xToCheck <= 9 && yToCheck <= 9 && pointIsUnvisited(xToCheck, yToCheck) ) {
+                pointsToCheck.push( {x : xToCheck, y : yToCheck });
+            }
+        }
+
+        let updateColor = function(xToChange, yToChange, state) {
+            let ctxID = state.ctxLrg.createImageData(10, 10);
+            for (let i = 0; i < 400; i+=4) {
+                ctxID.data[i] = state.drawColor.r;
+                ctxID.data[i+1] = state.drawColor.g;
+                ctxID.data[i+2] = state.drawColor.b;
+                ctxID.data[i+3] = state.drawColor.a * 255;
+            }
+            state.ctxLrg.putImageData(ctxID, xToChange * 10, yToChange * 10);
+            state.ctxSml.putImageData(ctxID, xToChange, yToChange, 0, 0, 1, 1);
+        }
+
+        while(pointsToCheck.length != 0) {
+            let pointToCheck = pointsToCheck.pop();
+            let xToCheck = pointToCheck["x"];
+            let yToCheck = pointToCheck["y"];
+            let currentRGB = this.state.ctxSml.getImageData(xToCheck, yToCheck, 1, 1);
+
+            if (pointIsUnvisited(xToCheck, yToCheck)) {
+                visitedPoints.push(pointToCheck);
+                if (ifReplaceColor(currentRGB)) {
+                    tryAddPointToCheck(xToCheck - 1, yToCheck);
+                    tryAddPointToCheck(xToCheck + 1, yToCheck);
+                    tryAddPointToCheck(xToCheck, yToCheck - 1);
+                    tryAddPointToCheck(xToCheck, yToCheck + 1);
+                    updateColor(xToCheck, yToCheck, this.state);
+                }
+            }
+        }
 
         this.setState({
             imageData: this.state.ctxSml.getImageData(0, 0, Const.PROPERTY_LENGTH, Const.PROPERTY_LENGTH).data,

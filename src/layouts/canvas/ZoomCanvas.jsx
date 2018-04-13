@@ -41,12 +41,12 @@ class ZoomCanvas extends Component {
         
         //the commented out code is for snapping as grid
 
-        let xx = Math.floor(x / 10) * 10;
-        let yy = Math.floor(y / 10) * 10;
+        let xx = x * 10;
+        let yy = y * 10;
         this.state.ctx.drawImage(this.dataCanvas, Math.min(Math.max(0, xx - 20), 950), Math.min(Math.max(0, yy - 20), 950), 500, 500, 0, 0, 1000, 1000);
         this.setState({
-            hoverX: Math.floor(x / 10),
-            hoverY: Math.floor(y / 10),
+            hoverX: x,
+            hoverY: y,
         })
     }
 
@@ -89,11 +89,9 @@ class ZoomCanvas extends Component {
         });
 
         GFD.listen('hoverX', 'zoomCanvas', (hoverX) => {
-            this.setState({hoverX});
             this.drawWindow(hoverX, GFD.getData('hoverY'));
         })
         GFD.listen('hoverY', 'zoomCanvas', (hoverY) => {
-            this.setState({hoverY});
             this.drawWindow(GFD.getData('hoverX'), hoverY);
         })
     }

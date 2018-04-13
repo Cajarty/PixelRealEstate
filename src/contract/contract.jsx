@@ -33,6 +33,9 @@ export class Contract {
         this.VRE = contract(VirtualRealEstate);
         this.PXLPP = contract(PXLProperty);
 
+        this.VREInstance = null;
+        this.PXLPPInstance = null;
+
         this.propertyTradeLog = [];
 
         this.getAccountsInterval = null;
@@ -74,6 +77,8 @@ export class Contract {
     
                 this.PXLPP.deployed().then((PXLPPInstance) => {
                     this.VRE.deployed().then((VREInstance) => {
+                        this.VREInstance = VREInstance;
+                        this.PXLPPInstance = PXLPPInstance;
                         SDM.init();
                     });
                 });
@@ -254,6 +259,20 @@ export class Contract {
         obj.y = Math.floor(id / 100);
         return obj;
     }
+
+    getVREInstance() {
+        if (this.VREInstance)
+            return new Promise((res, rej) => {res(this.VREInstance);});
+        else
+            return this.VRE.deployed();
+    }
+
+    getPXLPPInstance() {
+        if (this.PXLPPInstance)
+            return new Promise((res, rej) => {res(this.PXLPPInstance);});
+        else
+            return this.PXLPP.deployed();
+    }
     // ---------------------------------------------------------------------------------------------------------
     // ---------------------------------------------------------------------------------------------------------
     // ---------------------------------       SETUP & MISC       ----------------------------------------------
@@ -280,7 +299,7 @@ export class Contract {
     buyProperty(x, y, eth, ppc, callback) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
             return callback(false);
-        this.VRE.deployed().then((i) => {
+        this.getVREInstance().then((i) => {
             if (eth == 0)
                 return i.buyPropertyInPXL(this.toID(x, y), ppc, {from: this.account });
             else if (ppc == 0)
@@ -300,7 +319,7 @@ export class Contract {
     sellProperty(x, y, price, callback) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
             return;
-        this.VRE.deployed().then((i) => {
+        this.getVREInstance().then((i) => {
             return i.listForSale(this.toID(parseInt(x), parseInt(y)), price, {from: this.account });
         }).then(() => {
             callback(true);
@@ -315,7 +334,7 @@ export class Contract {
     delistProperty(x, y, callback) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
             return callback(false);
-        this.VRE.deployed().then((i) => {
+        this.getVREInstance().then((i) => {
             return i.delist(this.toID(parseInt(x), parseInt(y)), {from: this.account });
         }).then(() => {
             callback(true);
@@ -330,7 +349,7 @@ export class Contract {
     setPropertyMode(x, y, isPrivate, minutesPrivate, callback) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
             return callback(false);
-        this.VRE.deployed().then((i) => {
+        this.getVREInstance().then((i) => {
             return i.setPropertyMode(this.toID(parseInt(x), parseInt(y)), isPrivate, minutesPrivate, {from: this.account });
         }).then((r) => {
             return callback(r);
@@ -343,7 +362,7 @@ export class Contract {
     setHoverText(text) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
             return;
-        this.VRE.deployed().then((i) => {
+        this.getVREInstance().then((i) => {
             return i.setHoverText(Func.StringToBigInts(text), {from: this.account});
         }).then(function() {
             console.info("Hover text set!");
@@ -356,7 +375,7 @@ export class Contract {
     setLink(text) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
             return;
-        this.VRE.deployed().then((i) => {
+        this.getVREInstance().then((i) => {
             return i.setLink(Func.StringToBigInts(text), {from: this.account });
         }).then(function() {
             console.info("Property link updated!");
@@ -368,7 +387,7 @@ export class Contract {
     transferProperty(x, y, newOwner, callback) { 
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
             return callback(false);
-        this.VRE.deployed().then((i) => {
+        this.getVREInstance().then((i) => {
             return i.transferProperty(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account}).then((r) => {
                 return callback(true);
             });
@@ -380,7 +399,7 @@ export class Contract {
     makeBid(x, y, bid, callback) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
             return callback(false);
-        this.VRE.deployed().then((i) => {
+        this.getVREInstance().then((i) => {
             return i.makeBid(this.toID(x, y), bid, {from: this.account });
         }).then(() => {
             callback(true);
@@ -394,7 +413,7 @@ export class Contract {
     setColors(x, y, data, PPT, callback) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
             return callback(false);
-        this.VRE.deployed().then((i) => {
+        this.getVREInstance().then((i) => {
             return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), PPT, {from: this.account });
         }).then(() => {
             callback(true);
@@ -426,7 +445,7 @@ export class Contract {
     getBalance(callback) {
         if (GFD.getData('noMetaMask'))
             return callback(false);
-        this.PXLPP.deployed().then((i) => {
+        this.getPXLPPInstance().then((i) => {
             i.balanceOf(this.account, { from: this.account }).then((r) => {
                 callback(Func.BigNumberToNumber(r));
             });
@@ -439,7 +458,7 @@ export class Contract {
     getSystemSalePrices(callback) {
         if (GFD.getData('noMetaMask'))
             return callback(null);
-        this.VRE.deployed().then((i) => {
+        this.getVREInstance().then((i) => {
             return i.getSystemSalePrices.call().then((r) => {
                 return callback(r);
             });
@@ -451,7 +470,7 @@ export class Contract {
     getForSalePrices(x, y, callback) {
         if (GFD.getData('noMetaMask'))
             return callback(false);
-        this.VRE.deployed().then((i) => {
+    this.getVREInstance().then((i) => {
             return i.getForSalePrices.call(this.toID(x, y)).then((r) => {
                 return callback(r);
             });
@@ -463,7 +482,7 @@ export class Contract {
     getHoverText(address, callback) {
         if (GFD.getData('noMetaMask'))
             return callback(false);
-        this.PXLPP.deployed().then((i) => {
+        this.getPXLPPInstance().then((i) => {
             return i.getOwnerHoverText.call(address).then((r) => {
                 return callback(Func.BigIntsToString(r));
             });
@@ -475,7 +494,7 @@ export class Contract {
     getLink(address, callback) {
         if (GFD.getData('noMetaMask'))
             return callback(false);
-        this.PXLPP.deployed().then((i) => {
+        this.getPXLPPInstance().then((i) => {
             return i.getOwnerLink.call(address).then((r) => {
                 return callback(Func.BigIntsToString(r));
             });
@@ -487,7 +506,7 @@ export class Contract {
     getPropertyColorsOfRow(x, row, callback) {
         if (GFD.getData('noMetaMask'))
             return callback(false);
-        this.PXLPP.deployed().then((i) => {
+        this.getPXLPPInstance().then((i) => {
             return i.getPropertyColorsOfRow.call(x, row).then((r) => {
                 callback(x, row, Func.ContractDataToRGBAArray(r));
             });
@@ -499,7 +518,7 @@ export class Contract {
     getPropertyColors(x, y, callback) {
         if (GFD.getData('noMetaMask'))
             return callback(false);
-        this.PXLPP.deployed().then((i) => {
+        this.getPXLPPInstance().then((i) => {
             return i.getPropertyColors.call(this.toID(x, y)).then((r) => {
                 callback(x, y, Func.ContractDataToRGBAArray(r));
             });
@@ -512,7 +531,7 @@ export class Contract {
         if (GFD.getData('noMetaMask'))
             return callback(false);
         //returns address, price, renter, rent length, rentedUntil, rentPrice
-        this.VRE.deployed().then((i) => {
+        this.getVREInstance().then((i) => {
             i.getPropertyData.call(this.toID(x, y)).then((r) => {
                 return callback(r);
             });

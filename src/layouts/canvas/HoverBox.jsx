@@ -29,6 +29,7 @@ class HoverLabel extends Component {
             this.setState({
                 hoverX: hoverX,
             });
+            this.updateLabel(hoverX, GFD.getData('hoverY'));
         })
         GFD.listen('hoverY', 'hoverBox', (hoverY) => {
             this.setState({
@@ -73,8 +74,8 @@ class HoverLabel extends Component {
                 <div 
                     className={'hoverBox ' + (this.state.show ? '' : 'hidden')}
                     style={{
-                        left: (this.state.offsetY + Math.floor(Math.floor(this.state.hoverX / 10) * (this.state.canvasWidth / 100)) - 3) + 'px',
-                        top: (this.state.offsetY + Math.floor(Math.floor(this.state.hoverY / 10) * (this.state.canvasHeight / 100)) - 1) + 'px',
+                        left: (this.state.offsetY + Math.floor(this.state.hoverX * (this.state.canvasWidth / 100)) - 3) + 'px',
+                        top: (this.state.offsetY + Math.floor(this.state.hoverY * (this.state.canvasHeight / 100)) - 1) + 'px',
                         minWidth: (this.state.canvasWidth / 100) + 1.9 + 'px',
                         minHeight: (this.state.canvasWidth / 100) + 1.9 + 'px'
                     }}

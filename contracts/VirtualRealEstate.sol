@@ -28,6 +28,7 @@ contract VirtualRealEstate {
     uint8 systemPriceIncreaseStep;
     uint16 systemETHStepTally;
     uint16 systemPXLStepTally;
+    uint16 systemStepCount;
 
     /* ### Events ### */
     event PropertyColorUpdate(uint16 indexed property, uint256[10] colors, uint256 lastUpdate, address indexed lastUpdaterPayee, uint256 becomePublic, uint256 indexed rewardedCoins);
@@ -67,6 +68,7 @@ contract VirtualRealEstate {
         systemPixelIncreasePercent = 5;
         systemETHStepTally = 0;
         systemPXLStepTally = 0;
+        systemStepCount = 0;
     }
     
     function setPXLPropertyContract(address pxlPropertyContract) public ownerOnly() {
@@ -188,7 +190,7 @@ contract VirtualRealEstate {
         
         systemPXLStepTally += uint16(100 * pxlValue / systemSalePricePXL);
         if (systemPXLStepTally >= 1000) {
-            systemSalePricePXL = systemSalePricePXL * (10215 - (200 * (systemPriceIncreaseStep / (10000 * systemPixelIncreasePercent)))) / 10000;
+            systemSalePricePXL += systemSalePricePXL * 9 / systemStepCount++ / 10;
             systemPXLStepTally -= 1000;
         }
 
@@ -198,7 +200,7 @@ contract VirtualRealEstate {
 
         systemETHStepTally += uint16(100 * pxlLeft / systemSalePricePXL);
         if (systemETHStepTally >= 1000) {
-            systemSalePriceETH = systemSalePriceETH * (10215 - (200 * (systemPriceIncreaseStep / (10000 * (1 - systemPixelIncreasePercent))))) / 10000;
+            systemSalePriceETH += systemSalePriceETH * 9 / systemStepCount++ / 10;
             systemETHStepTally -= 1000;
         }
 
@@ -220,7 +222,7 @@ contract VirtualRealEstate {
             // Increase system PXL price
             systemPXLStepTally += 100;
             if (systemPXLStepTally >= 1000) {
-                systemSalePricePXL = systemSalePricePXL * (10215 - (200 * (systemPriceIncreaseStep / (10000 * systemPixelIncreasePercent)))) / 10000;
+                systemSalePricePXL += systemSalePricePXL * 9 / systemStepCount++ / 10;
                 systemPXLStepTally -= 1000;
             }
         }
@@ -238,7 +240,7 @@ contract VirtualRealEstate {
         ownerEth += msg.value;
         systemETHStepTally += 100;
         if (systemETHStepTally >= 1000) {
-            systemSalePriceETH = systemSalePriceETH * (10215 - (200 * (systemPriceIncreaseStep / (10000 * (1 - systemPixelIncreasePercent))))) / 10000;
+            systemSalePriceETH += systemSalePriceETH * 9 / systemStepCount++ / 10;
             systemETHStepTally -= 1000;
         }
         _transferProperty(propertyID, msg.sender, msg.value, 0, 0, 0);

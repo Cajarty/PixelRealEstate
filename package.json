@@ -53,6 +53,8 @@
         "axios": "^0.17.1",
         "big-integer": "^1.6.27",
         "bignumber.js": "^5.0.0",
+        "eth-sig-util": "^1.4.2",
+        "firebase": "^4.12.1",
         "gulp": "^3.9.1",
         "js-base64": "^2.4.3",
         "lodash": "^4.17.5",

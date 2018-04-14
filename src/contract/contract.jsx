@@ -3,6 +3,7 @@
 import { default as Web3 } from 'web3';
 import * as Const from '../const/const.jsx';
 import * as Func from '../functions/functions.jsx';
+import sigUtil from 'eth-sig-util';
 import * as EVENTS from '../const/events';
 import { default as contract } from 'truffle-contract';
 import {GFD, GlobalState} from '../functions/GlobalState';
@@ -11,6 +12,7 @@ import {SDM, ServerDataManager} from '../contract/ServerDataManager';
 // Import our contract artifacts and turn them into usable abstractions.
 import VirtualRealEstate from '../../build/contracts/VirtualRealEstate.json'
 import PXLProperty from '../../build/contracts/PXLProperty.json'
+import Verifier from '../../build/contracts/Verifier.json'
 
 
 export const ERROR_TYPE = {
@@ -32,9 +34,11 @@ export class Contract {
         this.account = null;
         this.VRE = contract(VirtualRealEstate);
         this.PXLPP = contract(PXLProperty);
+        this.Verify = contract(Verifier);
 
         this.VREInstance = null;
         this.PXLPPInstance = null;
+        this.VerifyInstance = null;
 
         this.propertyTradeLog = [];
 
@@ -128,7 +132,7 @@ export class Contract {
             this.accounts = accs;
             if (this.account !== this.accounts[0].toLowerCase()) {
                 this.account = this.accounts[0].toLowerCase();
-                this.sendEvent(EVENTS.AccountChange, this.accounts[0]);
+                this.sendEvent(EVENTS.AccountChange, this.account);
             }
         });
     }
@@ -273,6 +277,84 @@ export class Contract {
         else
             return this.PXLPP.deployed();
     }
+
+    getVerifyInstance() {
+        if (this.VerifyInstance)
+            return new Promise((res, rej) => {res(this.VerifyInstance);});
+        else
+            return this.Verify.deployed();
+    }
+
+    /*
+        
+        callback:
+            bool: isValid,
+            string: response message,
+            string: signature,
+    */
+    sign(params, signer, callback) {
+        window.web3.currentProvider.sendAsync({
+            method: 'eth_signTypedData',
+            params: [params, signer],
+            from: signer,
+        }, (err, result) => {
+            if (err) {
+                console.info(err);
+                this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to sign message with this wallet."});
+                return callback(false, "Unable to sign message with this wallet.", null);
+            }
+            if (this.verify(params, result.result, signer))
+                callback(true, 'Message signed successfully', result.result);
+            else
+                callback(false, "Unable to sign message with this wallet.", null);
+        })
+    }
+
+    verify(params, signature, signer) {
+        const recovered = sigUtil.recoverTypedSignature({
+            data: params,
+            sig: signature
+        })
+        return recovered === signer;
+    }
+
+    // sign(text, callback) {
+    //     window.web3.eth.sign('0x' + this.toHex(text), this.account, (result) => {
+    //         let sig = result.substr(2);
+    //         let r = '0x' + sig.substr(0, 64);
+    //         let s = '0x' + sig.substr(64, 64);
+    //         let v = window.web3.toDecimal(sig.substr(128, 2)) + 27;
+    //         let v_decimal = window.web3.toDecimal(v);
+    //         let fixed_msg = `\x19Ethereum Signed Message:\n${text.length}${text}`
+    //         let fixed_msg_sha = window.web3.sha3(fixed_msg)
+    //         this.verify(fixed_msg_sha, v_decimal, r, s, (result2) =>{
+    //             console.info(result2);
+    //         });
+    //         //return {sha, v, r, s};
+    //     });
+    // }
+
+    // toHex(str) {
+    //     let hex = ''
+    //     for(let i=0 ; i<str.length; i++) {
+    //         hex += ''+str.charCodeAt(i).toString(16);
+    //     }
+    //     return hex;
+    // }
+
+    // verify(msgHash, v, r, s, callback) {
+    //     this.getVerifyInstance().then((i) => {
+    //         return i.isSigned.call(msgHash, v, r, s, {from: this.account }).then(() => {
+    //             callback(true);
+    //             this.sendResults(LISTENERS.Alert, {result: true, message: "User Verified."});
+    //         }).catch((e) => {
+    //             callback(false);
+    //             console.log(e);
+    //             this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to verify user."});
+    //         });
+    //     });
+    // }
+
     // ---------------------------------------------------------------------------------------------------------
     // ---------------------------------------------------------------------------------------------------------
     // ---------------------------------       SETUP & MISC       ----------------------------------------------

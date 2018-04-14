@@ -29,6 +29,7 @@ import PropertiesForSale from '../ui/PropertiesForSale';
 import PropertyChangeLogTop from '../logs/PropertyChangeLogTop';
 import Tutorial from '../Tutorial';
 import WelcomeSidebar from '../ui/WelcomeSidebar';
+import {FB, FireBase} from '../../const/firebase';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -72,6 +73,7 @@ class CanvasPage extends Component {
         });
 
         ctr.listenForEvent(EVENTS.AccountChange, 'CanvasPagePPCListener', (data) => {
+            FB.signIn();
             this.setState({loadingPPC: true});
             ctr.getBalance((balance) => {
                 this.setState({PPCOwned: balance, loadingPPC: false});

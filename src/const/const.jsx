@@ -8,3 +8,6 @@ export const WEI_IN_ETH = 1000000000000000000;
 
 export const VirtualRealEstate = '0x1fb6ce46917543cad5f61cd995fa26d889716e5b';
 export const PXLProperty = '0x4be75a8a3b769fdea12a00a7cc99a039163ba352';
+export const Verifier = '';
+
+export const TOS_VERSION = 1;

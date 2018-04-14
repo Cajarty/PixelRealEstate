@@ -5,6 +5,7 @@ import {GFD, GlobalState} from '../../functions/GlobalState';
 import * as Strings from '../../const/strings';
 import { Segment, Header, Image , Button, Message, Form, List, Divider} from 'semantic-ui-react';
 import * as Assets from '../../const/assets';
+import SignUpForm from '../forms/SignUpForm';
 
 class WelcomeSidebar extends Component {
     constructor(props) {
@@ -38,6 +39,7 @@ class WelcomeSidebar extends Component {
                         );
                     })}
                     </List>
+                    <SignUpForm/>
                 </Message.Content>
                 </Message>
             </Segment>

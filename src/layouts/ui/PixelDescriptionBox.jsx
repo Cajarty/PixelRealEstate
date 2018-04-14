@@ -204,9 +204,12 @@ class PixelDescriptionBox extends Component {
         GFD.closeAll('pixelBrowse');
         ctr.stopListeningForResults(LISTENERS.ServerDataManagerInit, 'PixelBox');
         this.stopTokenEarnedInterval();
-        this.state.evH1.stopWatching();
-        this.state.evH2.stopWatching();
-        this.state.evH3.stopWatching();
+        if (this.state.evH1 != null)
+            this.state.evH1.stopWatching();
+        if (this.state.evH2 != null)
+            this.state.evH2.stopWatching();
+        if (this.state.evH3 != null)
+            this.state.evH3.stopWatching();
         clearTimeout(this.state.timerUpdater);
     }
 

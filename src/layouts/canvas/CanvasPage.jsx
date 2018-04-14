@@ -30,6 +30,7 @@ import PropertyChangeLogTop from '../logs/PropertyChangeLogTop';
 import Tutorial from '../Tutorial';
 import WelcomeSidebar from '../ui/WelcomeSidebar';
 import {FB, FireBase} from '../../const/firebase';
+import GetStarted from '../GetStarted';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -74,6 +75,7 @@ class CanvasPage extends Component {
 
         ctr.listenForEvent(EVENTS.AccountChange, 'CanvasPagePPCListener', (data) => {
             FB.signIn();
+            ctr.updateNetwork();
             this.setState({loadingPPC: true});
             ctr.getBalance((balance) => {
                 this.setState({PPCOwned: balance, loadingPPC: false});
@@ -106,6 +108,10 @@ class CanvasPage extends Component {
         });
         this.updateScreen();
         window.onresize = (ev) => this.updateScreen;
+        if (localStorage.getItem('startInAdvancedMode')) {
+            this.setState({advancedMode: true});
+            localStorage.removeItem('startInAdvancedMode');
+        }
     }
 
     updateScreen() {
@@ -144,11 +150,10 @@ class CanvasPage extends Component {
     }
 
     showAskForTutorial() {
-        if (this.state.advancedMode || localStorage.getItem('hasViewedTutorial')) {
+        if (this.state.advancedMode || FB.userLoggedIn) {
             this.changeMode();
             return;
         }
-        localStorage.setItem('hasViewedTutorial', true);
         this.setState({askForTutorial: true});
     }
 
@@ -188,17 +193,6 @@ class CanvasPage extends Component {
             { menuItem: 'You', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLogYou/></TabPane> }
         ];
 
-        let modeButton = 
-            <Button 
-                className='modeButton' 
-                primary={!this.state.advancedMode} 
-                onClick={() => {this.showAskForTutorial()}} 
-                fluid
-                size={this.state.advancedMode ? 'medium' : 'massive'}
-            >
-                {this.state.advancedMode ? 'Viewing Mode' : 'Get Started'}
-            </Button>
-
         return (
             <div>
                 <SegmentGroup horizontal className='mainSegmentGroup'> 
@@ -228,9 +222,18 @@ class CanvasPage extends Component {
                                     ref={(portfolioLink) => { this.portfolioLink = portfolioLink; }} 
                                 />
                                 <Divider/>
-                                {this.state.advancedMode ? 
+
+                                <Button 
+                                    className='modeButton' 
+                                    primary={!this.state.advancedMode} 
+                                    onClick={() => {this.changeMode()}} 
+                                    fluid
+                                    size={this.state.advancedMode ? 'medium' : 'massive'}
+                                >
+                                    {this.state.advancedMode ? 'Viewing Mode' : 'Get Started'}
+                                </Button>
+                                {this.state.advancedMode &&
                                     <div>
-                                        {modeButton}
                                         <Divider/>
                                         <SetHoverText/>
                                         <SetLink/>
@@ -241,22 +244,11 @@ class CanvasPage extends Component {
                                             onChange={(e, data) => {this.toggleForSaleProperties(e, data)}}
                                         />
                                     </div>
-                                :
-                                    <Modal size='mini' 
-                                        open={this.state.askForTutorial}
-                                        trigger={modeButton}
-                                        closeOnEscape={false}
-                                        closeOnRootNodeClick={false}
-                                    >
-                                        <ModalHeader>Getting Started</ModalHeader>
-                                        <ModalContent>
-                                        <Info messages={Strings.TUTORIAL_START_DIALOG} size='small'/>
-                                            <Button primary fluid onClick={() => {this.startTutorial()}}>Start the Tutorial</Button>
-                                            <Divider/>
-                                            <Button secondary fluid onClick={() => {this.changeMode()}}>I'm a Returning User</Button>
-                                        </ModalContent>
-                                    </Modal>
                                 }
+                        <GetStarted 
+                            advancedMode={this.state.advancedMode}
+                            changeMode={() => {this.changeMode()}}
+                        />
                     </Segment>
                     <Segment id='step1' className={'center' + TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 1)}>
                         <HoverLabel showPrices={this.state.showPopertiesForSale}/>

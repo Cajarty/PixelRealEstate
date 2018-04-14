@@ -16,7 +16,6 @@ class Tutorial extends Component {
 
     componentDidMount() {
         GFD.listen('tutorialStateIndex', 'tutorial', (newID) => {
-            console.info('New Tutorial state: ', newID);
             let newState = TUTORIAL_STATE[Object.keys(TUTORIAL_STATE)[newID]];
             this.setState({tutorialState: newState})
             Func.ScrollTo(Func.PAGES.TOP);

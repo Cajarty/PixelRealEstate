@@ -39,7 +39,6 @@ class WelcomeSidebar extends Component {
                         );
                     })}
                     </List>
-                    <SignUpForm/>
                 </Message.Content>
                 </Message>
             </Segment>
@@ -48,35 +47,3 @@ class WelcomeSidebar extends Component {
 }
 
 export default WelcomeSidebar
-
-/*
-<Message className='message' id='message'>
-                    <Message.Header>
-                        Play Now!
-                    </Message.Header>
-                    <Message.Content>
-                    <p>
-                        To start, all you need is the MetaMask browser extension:
-                    </p>
-                    <Image 
-                        rounded fluid bordered
-                        className='downloadImage'
-                        src={Assets.METAMASK_DOWNLOAD}
-                        href='https://metamask.io' 
-                        as='a'
-                        target='_blank'
-                    />
-                    <Form>
-                        <Form.Field>
-                            <label>Wallet Address</label>
-                            <input placeholder='First Name' />
-                        </Form.Field>
-                        <Form.Field>
-                            <label>Email Address</label>
-                            <input placeholder='example@pixelproperty.io' />
-                        </Form.Field>
-                        <Button type='submit'>Submit</Button>
-                    </Form>
-                </Message.Content>
-                </Message>
-*/

@@ -1,6 +1,7 @@
 import * as firebase from 'firebase';
 import {Contract, ctr, LISTENERS} from '../contract/contract';
 import * as Const from '../const/const';
+import {GFD, GlobalState} from '../functions/GlobalState';
 
 const prodConfig = {
     apiKey: "AIzaSyCnvCPxeZIYBTUrb_Q6jhiLlBKqfWuJnnY",
@@ -36,23 +37,19 @@ the data and will not set the user to logged in.
 */
 export class FireBase {
     constructor() {
-        this.userAnonymous = false;
-        this.userLoggedIn = false;
-        this.user = {};
-
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                this.userAnonymous = true;
+                GFD.setData('userSignedIn', true);
                 if (ctr.account != null)
                     this.checkSignIn();
             } else {
-                this.userAnonymous = false;
+                GFD.setData('userSignedIn', false);
             }
         });
     }
 
     signIn() {
-        if (!this.userAnonymous) {
+        if (!GFD.getData('userSignedIn')) {
             firebase.auth().signInAnonymously().catch((error) => {
                 console.info(error);
             });
@@ -75,11 +72,11 @@ export class FireBase {
 
     checkUserExists(wallet, callback) {
         firebase.database().ref('Accounts/' + wallet.toLowerCase()).once('value').then((snap) => {
-            this.userLoggedIn = snap.exists();
-            if (this.userLoggedIn) {
-                this.user = snap.val();
+            GFD.setData('userExists', snap.exists());
+            if (this.userExists) {
+                GFD.setData('user', snap.val());
             }
-            callback(this.userLoggedIn, this.user);
+            callback(this.userExists, this.user);
         });
     }
 

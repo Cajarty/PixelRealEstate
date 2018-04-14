@@ -75,33 +75,36 @@ export class Contract {
                 this.VRE.setProvider(window.web3.currentProvider);
                 this.PXLPP.setProvider(window.web3.currentProvider);
 
-                this.getAccounts();
 
-                this.break = false;
-    
-                this.PXLPP.deployed().then((PXLPPInstance) => {
-                    this.VRE.deployed().then((VREInstance) => {
-                        this.VREInstance = VREInstance;
-                        this.PXLPPInstance = PXLPPInstance;
-                        SDM.init();
-                    });
-                });
+                this.updateNetwork((id) => {
+                    if (id === Const.NETWORK_RINKEBY) {
+                        this.getAccounts();
+        
+                        this.break = false;
+            
+                        this.PXLPP.deployed().then((PXLPPInstance) => {
+                            this.VRE.deployed().then((VREInstance) => {
+                                this.VREInstance = VREInstance;
+                                this.PXLPPInstance = PXLPPInstance;
+                                SDM.init();
+                            });
+                        });
 
-                if (this.setupRetryInterval != null) {
-                    clearInterval(this.setupRetryInterval);
-                }
-                this.getAccountsInterval = setInterval(() => this.getAccounts(), 1000);
-                GFD.setData('noMetaMask', false);
+                        this.getAccountsInterval = setInterval(() => this.getAccounts(), 1000);
+                        GFD.setData('noMetaMask', false);
+                    } else {
+                        SDM.initNoMetaMask();
+                        GFD.setData('noMetaMask', false);
+                    }
+                })
             }
         }
 
         if (typeof web3 !== 'undefined') {
             success();
         } else {
-            console.info("80");
             GFD.setData('noMetaMask', true);
             SDM.initNoMetaMask();
-            this.setupRetryInterval = setInterval(() => success(), 15000);
         }
     }
 
@@ -141,7 +144,7 @@ export class Contract {
     Requests all events of event type EVENT.
     */
     getEventLogs(event, params = {}, callback) {
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return;
 
         let filter = {fromBlock: 'latest', toBlock: 'latest'};
@@ -189,7 +192,7 @@ export class Contract {
     Requests all events of event type EVENT.
     */
     watchEventLogs(event, params, callback) {
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return;
 
         let filter = {fromBlock: 'latest', toBlock: 'latest'};
@@ -298,42 +301,31 @@ export class Contract {
         return recovered === signer;
     }
 
-    // sign(text, callback) {
-    //     window.web3.eth.sign('0x' + this.toHex(text), this.account, (result) => {
-    //         let sig = result.substr(2);
-    //         let r = '0x' + sig.substr(0, 64);
-    //         let s = '0x' + sig.substr(64, 64);
-    //         let v = window.web3.toDecimal(sig.substr(128, 2)) + 27;
-    //         let v_decimal = window.web3.toDecimal(v);
-    //         let fixed_msg = `\x19Ethereum Signed Message:\n${text.length}${text}`
-    //         let fixed_msg_sha = window.web3.sha3(fixed_msg)
-    //         this.verify(fixed_msg_sha, v_decimal, r, s, (result2) =>{
-    //             console.info(result2);
-    //         });
-    //         //return {sha, v, r, s};
-    //     });
-    // }
-
-    // toHex(str) {
-    //     let hex = ''
-    //     for(let i=0 ; i<str.length; i++) {
-    //         hex += ''+str.charCodeAt(i).toString(16);
-    //     }
-    //     return hex;
-    // }
-
-    // verify(msgHash, v, r, s, callback) {
-    //     this.getVerifyInstance().then((i) => {
-    //         return i.isSigned.call(msgHash, v, r, s, {from: this.account }).then(() => {
-    //             callback(true);
-    //             this.sendResults(LISTENERS.Alert, {result: true, message: "User Verified."});
-    //         }).catch((e) => {
-    //             callback(false);
-    //             console.log(e);
-    //             this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to verify user."});
-    //         });
-    //     });
-    // }
+    updateNetwork(callback = () => {}) {
+        window.web3.eth.net.getId().then((netId) => {
+            switch (netId) {
+              case 1:
+                GFD.setData('network', Const.NETWORK_MAIN);
+                callback(Const.NETWORK_MAIN);
+                break
+              case 3:
+                GFD.setData('network', Const.NETWORK_ROPSTEN);
+                callback(Const.NETWORK_ROPSTEN);
+                break
+              case 4:
+                GFD.setData('network', Const.NETWORK_RINKEBY);
+                callback(Const.NETWORK_RINKEBY);
+                break
+              case 42:
+                GFD.setData('network', Const.NETWORK_KOVAN);
+                callback(Const.NETWORK_KOVAN);
+                break
+              default:
+                GFD.setData('network', Const.NETWORK_DEV);
+                callback(Const.NETWORK_DEV);
+            }
+        })
+    }
 
     // ---------------------------------------------------------------------------------------------------------
     // ---------------------------------------------------------------------------------------------------------
@@ -350,6 +342,7 @@ export class Contract {
     // ---------------------------------------------------------------------------------------------------------
 
     setupContracts() {
+        return;
         this.PXLPP.deployed().then((PXLPPInstance) => {
             this.VRE.deployed().then((VREInstance) => {
                 VREInstance.setPXLPropertyContract(PXLPPInstance.address, {from: this.account}).then((r) => {console.info(r)}).catch((e) => {console.info(e)});
@@ -359,7 +352,7 @@ export class Contract {
     }
 
     buyProperty(x, y, eth, ppc, callback) {
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return callback(false);
         this.getVREInstance().then((i) => {
             if (eth == 0)
@@ -379,7 +372,7 @@ export class Contract {
     }
 
     sellProperty(x, y, price, callback) {
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return;
         this.getVREInstance().then((i) => {
             return i.listForSale(this.toID(parseInt(x), parseInt(y)), price, {from: this.account });
@@ -394,7 +387,7 @@ export class Contract {
     }
 
     delistProperty(x, y, callback) {
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return callback(false);
         this.getVREInstance().then((i) => {
             return i.delist(this.toID(parseInt(x), parseInt(y)), {from: this.account });
@@ -409,7 +402,7 @@ export class Contract {
     }
 
     setPropertyMode(x, y, isPrivate, minutesPrivate, callback) {
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return callback(false);
         this.getVREInstance().then((i) => {
             return i.setPropertyMode(this.toID(parseInt(x), parseInt(y)), isPrivate, minutesPrivate, {from: this.account });
@@ -422,7 +415,7 @@ export class Contract {
 
     //array of 2 32 bytes of string
     setHoverText(text) {
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return;
         this.getVREInstance().then((i) => {
             return i.setHoverText(Func.StringToBigInts(text), {from: this.account});
@@ -435,7 +428,7 @@ export class Contract {
 
     //array of 2 32 bytes
     setLink(text) {
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return;
         this.getVREInstance().then((i) => {
             return i.setLink(Func.StringToBigInts(text), {from: this.account });
@@ -447,7 +440,7 @@ export class Contract {
     }
 
     transferProperty(x, y, newOwner, callback) { 
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return callback(false);
         this.getVREInstance().then((i) => {
             return i.transferProperty(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account}).then((r) => {
@@ -459,7 +452,7 @@ export class Contract {
     }
 
     makeBid(x, y, bid, callback) {
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return callback(false);
         this.getVREInstance().then((i) => {
             return i.makeBid(this.toID(x, y), bid, {from: this.account });
@@ -473,7 +466,7 @@ export class Contract {
     }
 
     setColors(x, y, data, PPT, callback) {
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount'))
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return callback(false);
         this.getVREInstance().then((i) => {
             return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), PPT, {from: this.account });

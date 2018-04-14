@@ -1,4 +1,5 @@
 import * as Func from '../functions/functions';
+import * as Const from '../const/const';
 
 export const TUTORIAL_STATE = {
     NONE: {
@@ -59,7 +60,11 @@ export class GlobalState {
             pressY: null,
             advancedMode: false,
             noAccount: false, //user isnt logged in
-            noMetaMask: false, //metamask isnt installed
+            noMetaMask: true, //metamask isnt installed
+            network: Const.NETWORK_DEV, //current metamask network used.
+            userSignedIn: false, //firebase auth signed in
+            userExists: false, //firebase user exists.
+            user: {}, //firebase user.
             screenWidth: 100,
             screenHeight: 100,
             balance: 0, //total amount of PXL owned.

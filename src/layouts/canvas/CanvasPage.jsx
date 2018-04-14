@@ -190,12 +190,11 @@ class CanvasPage extends Component {
 
         let modeButton = 
             <Button 
-                size={this.state.advancedMode ? 'medium' : 'large'} 
                 className='modeButton' 
                 primary={!this.state.advancedMode} 
                 onClick={() => {this.showAskForTutorial()}} 
                 fluid
-                size='massive'
+                size={this.state.advancedMode ? 'medium' : 'massive'}
             >
                 {this.state.advancedMode ? 'Viewing Mode' : 'Get Started'}
             </Button>

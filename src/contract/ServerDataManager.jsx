@@ -181,7 +181,6 @@ export class ServerDataManager {
         this.requestServerImage((imageResult) => {
             this.requestServerData((dataResult) => {
                 this.setupEvents();
-                console.info('do we hit ROROOROROOR ')
                 GFD.setData('ServerDataManagerInit', 2);
                 ctr.sendResults(LISTENERS.ServerDataManagerInit, {imageLoaded: imageResult, dataLoaded: dataResult});
             });
@@ -191,7 +190,6 @@ export class ServerDataManager {
     initNoMetaMask() {
         this.requestServerImage((imageResult) => {
             this.requestServerData((dataResult) => {
-                console.info('do we hit here')
                 GFD.setData('ServerDataManagerInit', 1);
                 ctr.sendResults(LISTENERS.ServerDataManagerInit, {imageLoaded: imageResult, dataLoaded: dataResult});
             });
@@ -225,10 +223,10 @@ export class ServerDataManager {
                 if (result.status == 200) {
                     let image = new Image();
                     image.onload = () => {
-                        this.imagePNG = image
+                        this.imagePNG = image;
+                        resultCallback(true);
                     };
                     image.src = "data:image/png;base64," + new Buffer(result.data, 'binary').toString('base64');
-                    resultCallback(true);
                 } else {
                     resultCallback(false);
                 }

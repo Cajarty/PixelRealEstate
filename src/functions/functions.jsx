@@ -14,7 +14,6 @@ export const PAGES = {
 
 export const ScrollTo = (page) => {
     let element = document.querySelector(page.query);
-    console.info(element, page);
     if (element != null)
         element.scrollIntoView({behavior: "smooth", block: "start", inline: "start"});
 }

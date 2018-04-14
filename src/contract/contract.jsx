@@ -137,26 +137,6 @@ export class Contract {
         });
     }
 
-    // setupEvents() {
-    //     this.VRE.deployed().then((instance) => {
-    //         this.events.event = instance.allEvents({fromBlock: 0, toBlock: 'latest'});
-    //         SDM.init();
-    //         this.listenForResults(LISTENERS.ServerDataManagerInit, 'contract', () => {
-    //             this.stopListeningForResults(LISTENERS.ServerDataManagerInit, 'contract');
-    //             this.events.event.watch((error, result) => {
-    //                 if (error) {
-    //                     console.info(result, error);
-    //                 } else {
-    //                     for (let i = 0; i < result.length; i++)
-    //                         this.sendEvent(result[i].event, result[i]);
-    //                 }
-    //             });
-    //         });
-    //     }).catch((c) => {
-    //         console.info(c);
-    //     });
-    // }
-
     /*
     Requests all events of event type EVENT.
     */

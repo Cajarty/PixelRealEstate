@@ -62,10 +62,14 @@ class ZoomCanvas extends Component {
 
         ctr.listenForResults(LISTENERS.ServerDataManagerInit, 'canvasZoom', (results) => {
             if (results.imageLoaded) {
-                this.setCanvasWithImage(SDM.imagePNG);
-                this.setState({canvasLoaded: true});
-                for (let i in this.state.queuedUpdates) {
-                    this.setCanvasProperty(this.state.queuedUpdates[i].x, this.state.queuedUpdates[i].y, this.state.queuedUpdates[i].colors);
+                if (!this.state.loaded) {
+                    this.setCanvasWithImage(SDM.imagePNG);
+                    this.setState({loaded: true});
+                }
+                if (GFD.getData('ServerDataManagerInit') > 1) {
+                    for (let i in this.state.queuedUpdates) {
+                        this.setCanvasProperty(this.state.queuedUpdates[i].x, this.state.queuedUpdates[i].y, this.state.queuedUpdates[i].colors);
+                    }
                 }
             }
         });

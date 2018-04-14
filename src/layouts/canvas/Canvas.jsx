@@ -20,7 +20,6 @@ class Canvas extends Component {
             loadValue: 0,
             cancelToken: null,
             loaded: false,
-            canvasLoaded: false,
             queuedUpdates: [],
         }
         this.setCanvasProperty = this.setCanvasProperty.bind(this);
@@ -85,6 +84,20 @@ class Canvas extends Component {
             GFD.setData('pressY', -1);
         }
 
+        ctr.listenForResults(LISTENERS.ServerDataManagerInit, 'canvas', (results) => {
+            if (results.imageLoaded) {
+                if (!this.state.loaded) {
+                    this.setCanvasWithImage(SDM.imagePNG);
+                    this.setState({loaded: true});
+                }
+                if (GFD.getData('ServerDataManagerInit') > 1) {
+                    for (let i in this.state.queuedUpdates) {
+                        this.setCanvasProperty(this.state.queuedUpdates[i].x, this.state.queuedUpdates[i].y, this.state.queuedUpdates[i].colors);
+                    }
+                }
+            }
+        });
+
         if (GFD.getData('noMetaMask')) {
             GFD.listen('noMetaMask', 'canvas', this.setup);
             return;
@@ -96,18 +109,6 @@ class Canvas extends Component {
         if (noMetaMask)
             return;
         GFD.close('noMetaMask', 'canvas');
-        ctr.listenForResults(LISTENERS.ServerDataManagerInit, 'canvas', (results) => {
-            if (results.imageLoaded) {
-                this.setCanvasWithImage(SDM.imagePNG);
-                if (GFD.getData('ServerDataManagerInit') > 1) {
-                    console.info('swaety')
-                    this.setState({canvasLoaded: true});
-                    for (let i in this.state.queuedUpdates) {
-                        this.setCanvasProperty(this.state.queuedUpdates[i].x, this.state.queuedUpdates[i].y, this.state.queuedUpdates[i].colors);
-                    }
-                }
-            }
-        })
 
         ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (handle) => {
             let eventHandle = handle;
@@ -115,7 +116,7 @@ class Canvas extends Component {
             eventHandle.watch((error, log) => {
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
                 let colors = Func.ContractDataToRGBAArray(log.args.colors);
-                if (this.state.canvasLoaded) {
+                if (this.state.loaded) {
                     this.setCanvasProperty(id.x, id.y, colors);
                 } else {
                     let update = this.state.queuedUpdates;

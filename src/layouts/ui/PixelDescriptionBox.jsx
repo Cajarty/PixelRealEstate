@@ -540,7 +540,7 @@ class PixelDescriptionBox extends Component {
                         <Divider/>
                         <Grid columns='2' divided>
                             {this.getActionsList().map((action, i) => (
-                                <Grid.Column>
+                                <Grid.Column key={i}>
                                     {action}
                                 </Grid.Column>
                             ))}

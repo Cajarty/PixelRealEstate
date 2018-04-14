@@ -2,11 +2,11 @@ import * as firebase from 'firebase';
 import {Contract, ctr, LISTENERS} from '../contract/contract';
 import * as Const from '../const/const';
 import {GFD, GlobalState} from '../functions/GlobalState';
-import {devConfig, prodConfig} from '../../private/firebaseConfig';
-  
+import * as FBC from '../private/firebaseConfig';
+
   const config = process.env.NODE_ENV === 'production'
-    ? prodConfig
-    : devConfig;
+    ? FBC.prodConfig
+    : FBC.devConfig;
 
 if (!firebase.apps.length) {
   firebase.initializeApp(config);

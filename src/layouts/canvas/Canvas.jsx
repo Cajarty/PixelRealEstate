@@ -94,24 +94,14 @@ class Canvas extends Component {
                     for (let i in this.state.queuedUpdates) {
                         this.setCanvasProperty(this.state.queuedUpdates[i].x, this.state.queuedUpdates[i].y, this.state.queuedUpdates[i].colors);
                     }
+                    this.setup();
                 }
             }
         });
-
-        if (GFD.getData('noMetaMask')) {
-            GFD.listen('noMetaMask', 'canvas', this.setup);
-            return;
-        }
-        this.setup(false);
     }
 
-    setup(noMetaMask) {
-        if (noMetaMask)
-            return;
-        GFD.close('noMetaMask', 'canvas');
-
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (handle) => {
-            let eventHandle = handle;
+    setup() {
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (eventHandle) => {
             this.setState({eventHandle});
             eventHandle.watch((error, log) => {
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
@@ -135,7 +125,8 @@ class Canvas extends Component {
     }
 
     componentWillUnmount() {
-        this.state.eventHandle.stopWatching();
+        if (this.state.eventHandle != null)
+            this.state.eventHandle.stopWatching();
         ctr.stopListeningForResults(LISTENERS.ShowForSale, 'Canvas');
     }
 

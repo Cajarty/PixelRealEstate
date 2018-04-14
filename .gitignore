@@ -66,4 +66,4 @@ build/contracts/
 /logs/
 
 #private data
-/private/
+/src/private/

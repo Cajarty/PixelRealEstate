@@ -195,6 +195,7 @@ class CanvasPage extends Component {
                 primary={!this.state.advancedMode} 
                 onClick={() => {this.showAskForTutorial()}} 
                 fluid
+                size='massive'
             >
                 {this.state.advancedMode ? 'Viewing Mode' : 'Get Started'}
             </Button>

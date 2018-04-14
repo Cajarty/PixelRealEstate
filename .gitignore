@@ -65,5 +65,5 @@ build/contracts/
 #ganache-cli outputs
 /logs/
 
-#firebase config
-/src/const/firebaseConfig.*
+#private data
+/private/

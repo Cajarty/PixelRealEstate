@@ -2,24 +2,7 @@ import * as firebase from 'firebase';
 import {Contract, ctr, LISTENERS} from '../contract/contract';
 import * as Const from '../const/const';
 import {GFD, GlobalState} from '../functions/GlobalState';
-
-const prodConfig = {
-    apiKey: "AIzaSyCnvCPxeZIYBTUrb_Q6jhiLlBKqfWuJnnY",
-    authDomain: "pixelpropertyio.firebaseapp.com",
-    databaseURL: "https://pixelpropertyio.firebaseio.com",
-    projectId: "pixelpropertyio",
-    storageBucket: "pixelpropertyio.appspot.com",
-    messagingSenderId: "563271767141"
-  };
-  
-  const devConfig = {
-    apiKey: "AIzaSyDTcrZ8R1g8_E3xBPvGF3-JDkt_NaQcptU",
-    authDomain: "pixelpropertydev.firebaseapp.com",
-    databaseURL: "https://pixelpropertydev.firebaseio.com",
-    projectId: "pixelpropertydev",
-    storageBucket: "pixelpropertydev.appspot.com",
-    messagingSenderId: "465183832590"
-  };
+import {devConfig, prodConfig} from '../const/firebaseConfig';
   
   const config = process.env.NODE_ENV === 'production'
     ? prodConfig

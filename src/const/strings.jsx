@@ -28,6 +28,13 @@ export const TUTORIAL_START_DIALOG = ["Pixel Property is easy to use. Just in ca
 
 export const CHANGELOG = [
     {
+        date: new Date('2018-4-13'),
+        title: 'Ease of Use Updates',
+        messages: 
+        ['Explenation on how to setup to use PixelProperty in the Get Started section.', 
+        'Major speed optimizations'],
+    },
+    {
         date: new Date('2018-4-10'),
         title: 'Beta Testing',
         messages: 

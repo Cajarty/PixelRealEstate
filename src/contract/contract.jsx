@@ -12,7 +12,6 @@ import {SDM, ServerDataManager} from '../contract/ServerDataManager';
 // Import our contract artifacts and turn them into usable abstractions.
 import VirtualRealEstate from '../../build/contracts/VirtualRealEstate.json'
 import PXLProperty from '../../build/contracts/PXLProperty.json'
-import Verifier from '../../build/contracts/Verifier.json'
 
 
 export const ERROR_TYPE = {
@@ -34,11 +33,9 @@ export class Contract {
         this.account = null;
         this.VRE = contract(VirtualRealEstate);
         this.PXLPP = contract(PXLProperty);
-        this.Verify = contract(Verifier);
 
         this.VREInstance = null;
         this.PXLPPInstance = null;
-        this.VerifyInstance = null;
 
         this.propertyTradeLog = [];
 
@@ -259,46 +256,6 @@ export class Contract {
             return new Promise((res, rej) => {res(this.PXLPPInstance);});
         else
             return this.PXLPP.deployed();
-    }
-
-    getVerifyInstance() {
-        if (this.VerifyInstance)
-            return new Promise((res, rej) => {res(this.VerifyInstance);});
-        else
-            return this.Verify.deployed();
-    }
-
-    /*
-        
-        callback:
-            bool: isValid,
-            string: response message,
-            string: signature,
-    */
-    sign(params, signer, callback) {
-        window.web3.currentProvider.sendAsync({
-            method: 'eth_signTypedData',
-            params: [params, signer],
-            from: signer,
-        }, (err, result) => {
-            if (err) {
-                console.info(err);
-                this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to sign message with this wallet."});
-                return callback(false, "Unable to sign message with this wallet.", null);
-            }
-            if (this.verify(params, result.result, signer))
-                callback(true, 'Message signed successfully', result.result);
-            else
-                callback(false, "Unable to sign message with this wallet.", null);
-        })
-    }
-
-    verify(params, signature, signer) {
-        const recovered = sigUtil.recoverTypedSignature({
-            data: params,
-            sig: signature
-        })
-        return recovered === signer;
     }
 
     updateNetwork(callback = () => {}) {

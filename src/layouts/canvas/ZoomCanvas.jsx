@@ -25,7 +25,7 @@ class ZoomCanvas extends Component {
             hoverY: -1,
             hideCanvas: true,
             queuedUpdates: [],
-            canvasLoaded: false,
+            loaded: false,
         }
         this.setCanvasProperty = this.setCanvasProperty.bind(this);
     }
@@ -70,27 +70,25 @@ class ZoomCanvas extends Component {
                     for (let i in this.state.queuedUpdates) {
                         this.setCanvasProperty(this.state.queuedUpdates[i].x, this.state.queuedUpdates[i].y, this.state.queuedUpdates[i].colors);
                     }
+
+                    ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (eventHandle) => {
+                        this.setState({eventHandle});
+                        eventHandle.watch((error, log) => {
+                            let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
+                            let colors = Func.ContractDataToRGBAArray(log.args.colors);
+                            if (this.state.loaded) {
+                                this.setCanvasProperty(id.x, id.y, colors);
+                            } else {
+                                let update = this.state.queuedUpdates;
+                                update.push(Struct.CondensedColorUpdate(id.x, id.y, colors));
+                                this.setState({queuedUpdates: update});
+                            }
+                        });
+                    });
                 }
             }
         });
-
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (handle) => {
-            if (handle == null)
-                return;
-            let eventHandle = handle;
-            this.setState({eventHandle});
-            eventHandle.watch((error, log) => {
-                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                let colors = Func.ContractDataToRGBAArray(log.args.colors);
-                if (this.state.canvasLoaded) {
-                    this.setCanvasProperty(id.x, id.y, colors);
-                } else {
-                    let update = this.state.queuedUpdates;
-                    update.push(Struct.CondensedColorUpdate(id.x, id.y, colors));
-                    this.setState({queuedUpdates: update});
-                }
-            });
-        });
+       
 
         GFD.listen('hoverX', 'zoomCanvas', (hoverX) => {
             this.drawWindow(hoverX, GFD.getData('hoverY'));

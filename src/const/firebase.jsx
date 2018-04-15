@@ -55,11 +55,14 @@ export class FireBase {
 
     checkUserExists(wallet, callback) {
         firebase.database().ref('Accounts/' + wallet.toLowerCase()).once('value').then((snap) => {
-            GFD.setData('userExists', snap.exists());
-            if (this.userExists) {
-                GFD.setData('user', snap.val());
+            let exists = snap.exists();
+            let user = {};
+            if (exists) {
+                user = snap.val();
             }
-            callback(this.userExists, this.user);
+            GFD.setData('userExists', exists);
+            GFD.setData('user', user);
+            callback(exists, user);
         });
     }
 

@@ -96,13 +96,14 @@ class GetStarted extends Component {
                     </ModalActions>
                 </Modal>
                 <Modal
-                    open={!this.state.noMetaMask && this.state.network === Const.NETWORK_RINKEBY && !this.state.userExists && 4== 3}
+                    size='tiny'
+                    open={!this.state.noMetaMask && this.state.network === Const.NETWORK_RINKEBY && !this.state.userExists}
                     closeOnEscape={false}
                     closeOnRootNodeClick={false}
                 >
                     <ModalHeader>Sign Up</ModalHeader>
                     <ModalContent>  
-                        <SignUpForm/>
+                        <SignUpForm cancel={() => this.props.changeMode()}/>
                     </ModalContent>
                 </Modal>
             </div>

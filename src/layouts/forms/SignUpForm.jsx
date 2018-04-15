@@ -6,7 +6,7 @@ import { Slider } from 'react-semantic-ui-range';
 import * as Strings from '../../const/strings';
 import Info from '../ui/Info';
 import {TUTORIAL_STATE} from '../../functions/GlobalState';
-import { Form, Button } from 'semantic-ui-react';
+import { Form, Button, Message } from 'semantic-ui-react';
 import {FB, FireBase} from '../../const/firebase';
 import * as EVENTS from '../../const/events';
 import * as Const from '../../const/const';
@@ -22,7 +22,7 @@ class SignUpForm extends Component {
     }
 
     componentDidMount() {
-        if (!GFD.getData('noAccount'))   
+        if (!GFD.getData('noAccount') && ctr.account != null)   
             this.setState({wallet: ctr.account});
         ctr.listenForEvent(EVENTS.AccountChange, 'SignUpForm', (data) => {
             this.setState({wallet: data});
@@ -44,6 +44,9 @@ class SignUpForm extends Component {
     render() {
         return (
             <Form>
+                <Message>
+                    Please enter your email address and a username for PixelProperty.
+                </Message>
                 <Form.Field>
                     <label>Wallet Address</label>
                     <input disabled value={this.state.wallet} onChange={() => {}}/>
@@ -64,6 +67,11 @@ class SignUpForm extends Component {
                         onChange={(e) => this.updateUsername(e.target.value)}
                     />
                 </Form.Field>
+                <Message color='orange'>
+                    Make sure to keep a backup of your wallet and private key. 
+                    We can't help you regain access if it's lost.
+                </Message>
+                <Button secondary onClick={() => this.props.cancel()} >Cancel</Button>
                 <Button type='submit' onClick={() => this.signUp()} >Submit</Button>
             </Form>
         );

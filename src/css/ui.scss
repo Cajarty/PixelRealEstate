@@ -442,6 +442,7 @@ div.hoverLabel.ui {
 }
 
 .clickLoader {
+    z-index: 2000;
     .CircularProgressbar.clickLoaderLoader {
         margin-left: calc(1em - 1px);
         margin-top: 1em;

@@ -146,11 +146,17 @@ export class Contract {
 
         let filter = {fromBlock: 'latest', toBlock: 'latest'};
 
-        window.web3.eth.getBlock('latest').then((r) => {
-            filter.fromBlock = r.number - 1000;
+        window.web3.eth.getBlock('latest').then((latestBlock) => {
 
             // VRE DApp Events
             this.VRE.deployed().then((i) => {
+
+                let filter = {
+                    fromBlock: latestBlock.number - 1000000, 
+                    toBlock: 'latest',
+                    address: Const.VirtualRealEstate,
+                };
+
                 switch(event) {
                     case EVENTS.PropertyBought:
                         return i.PropertyBought(params, filter).get(callback);
@@ -175,6 +181,13 @@ export class Contract {
 
             // PXL ERC20 Events
             this.PXLPP.deployed().then((i) => {
+
+                let filter = {
+                    fromBlock: latestBlock.number - 1000000, 
+                    toBlock: 'latest',
+                    address: Const.PXLProperty,
+                };
+
                 switch(event) {
                     case EVENTS.Transfer:
                         return i.Transfer(params, filter).get(callback);
@@ -192,13 +205,17 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return;
 
-        let filter = {fromBlock: 'latest', toBlock: 'latest'};
-
-        window.web3.eth.getBlock('latest').then((r) => {
-            filter.fromBlock = r.number - 1000;
+        window.web3.eth.getBlock('latest').then((latestBlock) => {
 
             // VRE DApp Events
             this.VRE.deployed().then((i) => {
+
+                let filter = {
+                    fromBlock: latestBlock.number - 1000000, 
+                    toBlock: 'latest',
+                    address: Const.VirtualRealEstate,
+                };
+
                 switch(event) {
                     case EVENTS.PropertyBought:
                         return callback(i.PropertyBought(params, filter));
@@ -223,6 +240,13 @@ export class Contract {
 
             // PXL ERC20 Events
             this.PXLPP.deployed().then((i) => {
+
+                let filter = {
+                    fromBlock: latestBlock.number - 1000000, 
+                    toBlock: 'latest',
+                    address: Const.PXLProperty,
+                };
+
                 switch(event) {
                     case EVENTS.Transfer:
                         return callback( i.Transfer(params, filter));

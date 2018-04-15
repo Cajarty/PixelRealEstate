@@ -481,7 +481,7 @@ class PixelDescriptionBox extends Component {
                             className='oneColumn'
                             value={this.getCurrentPayout()}
                         />}
-                        {this.state.reserved != 0 && this.state.reserved * 1000 <= new Date().getTime() &&
+                        {(this.state.isInPrivate || (this.state.reserved != 0 && this.state.reserved * 1000 > new Date().getTime())) &&
                         <Input
                             label="Reserved"
                             fluid disabled

@@ -292,8 +292,8 @@ class PixelDescriptionBox extends Component {
     }
 
     getPriceFormat() {
-        if (this.state.ETHPrice == 0 && this.state.PPCPrice == 0) 
-            return "Not for sale"
+        // if (this.state.ETHPrice == 0 && this.state.PPCPrice == 0) 
+        //     return "Not for sale"
         let s = this.state.ETHPrice == 0 ? '' : this.state.ETHPrice + ' ETH';
         s += this.state.ETHPrice != 0 && this.state.PPCPrice != 0 ? ' - ' : '';
         s += this.state.PPCPrice == 0 ? '' : this.state.PPCPrice + ' PXL';
@@ -404,25 +404,27 @@ class PixelDescriptionBox extends Component {
                 {this.state.owner != '' ? 
                     <div>
                         <Divider/>
+                        {this.state.owner !== NOBODY &&
                         <Input
                             placeholder="Address"
                             fluid disabled
                             className='oneColumn'
-                            value={(this.state.owner === ctr.account ? "You" : (this.state.owner === NOBODY ? "Unowned" : this.state.owner))} 
+                            value={(this.state.owner === ctr.account ? "You" : this.state.owner)} 
                             label={<Popup
                                 trigger={<Label><Icon className='uniform' name='user'/></Label>}
                                 content='Owner Address'
                                 className='Popup'
                                 size='tiny'
                             />}
-                        />
+                        />}
+                        {this.state.latestBid != 0 &&
                         <Input 
                             fluid disabled
                             labelPosition='right' 
-                            type={this.state.latestBid == 0 ? "text" : "number"}
+                            type="text"
                             placeholder={"Enter PXL"}
                             className='oneColumn bidInput'
-                            value={this.state.latestBid == 0 ? "None" : this.state.latestBid}
+                            value={this.state.latestBid}
                             onChange={(e) => this.setState({latestBid: e.target.value})}
                         >
                             <Popup
@@ -436,13 +438,14 @@ class PixelDescriptionBox extends Component {
                                 className='bidButton'
                                 onClick={() => this.placeBid()} 
                             >Bid</Label>
-                        </Input>
+                        </Input>}
                         <MessageModal 
                             title='Not Enough PXL!'
                             description='You must have at least 1 PXL to place a bid.'
                             isOpen={this.state.showMessage} 
                             onClose={() => {this.setState({showMessage: false})}}
                         />
+                        {(this.state.ETHPrice != 0 || this.state.PPCPrice != 0) &&
                         <Input
                             label={<Popup
                                 trigger={<Label><Icon className='uniform' name='dollar'/></Label>}
@@ -453,7 +456,8 @@ class PixelDescriptionBox extends Component {
                             disabled
                             className='oneColumn'
                             value={this.getPriceFormat()} 
-                        />
+                        />}
+                        {this.state.lastUpdate != 0 &&
                         <Input
                             fluid disabled
                             label={<Popup
@@ -464,7 +468,8 @@ class PixelDescriptionBox extends Component {
                             />}
                             className='oneColumn'
                             value={this.state.lastUpdate == 0 ? 'Never' : this.state.lastUpdateFormatted}
-                        />
+                        />}
+                        {!this.state.isInPrivate && this.state.lastUpdate != 0 &&
                         <Input
                             fluid disabled
                             label={<Popup
@@ -475,7 +480,8 @@ class PixelDescriptionBox extends Component {
                             />}
                             className='oneColumn'
                             value={this.getCurrentPayout()}
-                        />
+                        />}
+                        {this.state.reserved != 0 && this.state.reserved * 1000 <= new Date().getTime() &&
                         <Input
                             label="Reserved"
                             fluid disabled
@@ -486,8 +492,9 @@ class PixelDescriptionBox extends Component {
                                 className='Popup'
                                 size='tiny'
                             />}
-                            value={this.state.reserved == 0 || this.state.reserved * 1000 <= new Date().getTime() ? 'No'  : this.state.reservedFormatted}
-                        />
+                            value={this.state.reservedFormatted}
+                        />}
+                        {this.state.isInPrivate &&
                         <Input
                             label="Private"
                             fluid disabled
@@ -499,7 +506,8 @@ class PixelDescriptionBox extends Component {
                                 size='tiny'
                             />}
                             value={this.state.isInPrivate ? 'Yes' : 'No'}
-                        />
+                        />}
+                        {this.state.owner !== NOBODY &&
                         <Input
                             label={<Popup
                                 trigger={<Label><Icon className='uniform' name='comment'/></Label>}
@@ -510,7 +518,8 @@ class PixelDescriptionBox extends Component {
                             fluid disabled
                             className='oneColumn'
                             value={this.state.hoverText != '' ? this.state.hoverText : "None Set"}
-                        />
+                        />}
+                        {this.state.owner !== NOBODY &&
                         <Input
                             className='oneColumn combined'
                             fluid disabled
@@ -532,7 +541,7 @@ class PixelDescriptionBox extends Component {
                             )}
                             actionPosition='left'
                             value={this.state.link != '' ? this.state.link : "None Set"}
-                        />
+                        />}
                     </div>
                 : (!this.state.noAccount && <Info messages='Click a Property on the canvas or enter the coordinates above to see more about a property.'/>)}
                 {this.state.x != '' && this.state.y != '' && !this.state.noAccount && 

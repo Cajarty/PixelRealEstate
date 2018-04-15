@@ -37,12 +37,10 @@ export default class ClickLoader extends Component {
             });
         })
         GFD.listen('pressX', 'clickLoader', (x) => {
-            if (this.state.hoverY != -1 && x != this.state.hoverX)
-                this.updateLoaderPosition(x, GFD.getData('pressY'));
+            this.updateLoaderPosition(x, GFD.getData('pressY'));
         })
         GFD.listen('pressY', 'clickLoader', (y) => {
-            if (this.state.hoverX != -1 && y != this.state.hoverY)
-                this.updateLoaderPosition(GFD.getData('pressX'), y);
+            this.updateLoaderPosition(GFD.getData('pressX'), y);
         })
         GFD.listen('canvasWidth', 'clickLoader', (width) => {
             this.setState({
@@ -82,8 +80,6 @@ export default class ClickLoader extends Component {
         if (x < 0 || y < 0)
             return;
 
-            console.info(SDM.getPropertyData(x - 1, y - 1));
-
         if (SDM.isPropertyLoaded(x - 1, y - 1)) {
             ctr.getLink(SDM.getPropertyData(x - 1, y - 1).owner, (data) => {
                 if (data != null && data.length > 0) {
@@ -111,7 +107,7 @@ export default class ClickLoader extends Component {
     render() {
         return (
             <div 
-                className={'clickLoader ' + (this.state.show ? '' : 'hidden')}
+                className={'clickLoader ' + (this.state.show && this.state.loadedLink ? '' : 'hidden')}
                 style={{
                     left: this.state.labelX,
                     top: this.state.labelY,

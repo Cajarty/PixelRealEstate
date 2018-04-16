@@ -21,7 +21,7 @@ import PropertySalesLogTopETH from '../logs/PropertySalesLogTopETH';
 import Info from '../ui/Info';
 import { Segment, SegmentGroup, Button, Divider, Label, 
     LabelDetail, Input, Icon, Item, ItemContent, ItemImage, 
-    ItemGroup, Tab, Header, Grid, Sidebar, MenuItem, TabPane, Menu, Checkbox, Popup, Modal, ModalContent, ModalHeader} from 'semantic-ui-react';
+    ItemGroup, Tab, Header, Grid, Sidebar, MenuItem, TabPane, Menu, Checkbox, Popup, Modal, ModalContent, ModalHeader, GridRow, GridColumn} from 'semantic-ui-react';
 import SetHoverText from '../forms/SetHoverText';
 import SetLink from '../forms/SetLink';
 import PropertiesOwned from '../ui/PropertiesOwned';
@@ -223,6 +223,7 @@ class CanvasPage extends Component {
                                 />
                                 <Divider/>
 
+                                {!this.state.advancedMode && 
                                 <Button 
                                     className='modeButton' 
                                     primary={!this.state.advancedMode} 
@@ -231,12 +232,18 @@ class CanvasPage extends Component {
                                     size={this.state.advancedMode ? 'medium' : 'massive'}
                                 >
                                     {this.state.advancedMode ? 'Viewing Mode' : 'Get Started'}
-                                </Button>
+                                </Button>}
+                                {!this.state.advancedMode && <Divider/>}
                                 {this.state.advancedMode &&
                                     <div>
-                                        <Divider/>
-                                        <SetHoverText/>
-                                        <SetLink/>
+                                        <Grid columns='2' divided>
+                                            <GridColumn stretched>
+                                                <SetHoverText/>
+                                            </GridColumn>
+                                            <GridColumn stretched>
+                                                <SetLink/>
+                                            </GridColumn>
+                                        </Grid>
                                         <Divider/>
                                         <Checkbox 
                                             label={'Show Properties for sale'} 

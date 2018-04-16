@@ -58,6 +58,10 @@ export class GlobalState {
             hoverY: null,
             pressX: null,
             pressY: null,
+            rectX1: null,
+            rectY1: null,
+            rectX2: null,
+            rectY2: null,
             advancedMode: false,
             noAccount: false, //user isnt logged in
             noMetaMask: true, //metamask isnt installed
@@ -174,6 +178,7 @@ export class GlobalState {
         this.listeners[key][id] = callback;
         if (this.data[key] != null)
             callback(this.data[key]);
+            console.info('trigger: ', key, this.listeners[key])
     }
 
     close(key, id) {
@@ -187,7 +192,6 @@ export class GlobalState {
     }
 
     notify(key) {
-        //console.info('trigger: ', key, this.listeners[key])
         Object.keys(this.listeners[key]).map((i) => {
             this.listeners[key][i](this.data[key]);
         })

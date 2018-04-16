@@ -9,6 +9,7 @@ import SetHoverText from '../forms/SetHoverText';
 import SetLink from '../forms/SetLink';
 import TransferProperty from '../forms/TransferProperty';
 import ChangePropertyMode from '../forms/ChangePropertyMode';
+import { GridColumn } from 'semantic-ui-react';
 
 class ActionPanel extends Component {
     constructor(props) {
@@ -33,8 +34,10 @@ class ActionPanel extends Component {
                         <SetPixelColorForm/>
                     </PulloutTab>
                     <PulloutTab icon={Assets.ICON_MONEY} tabName='Set Property Info'>
-                        <SetHoverText/>
-                        <SetLink/>
+                        <GridColumn width='2'>
+                            <SetHoverText/>
+                            <SetLink/>
+                        </GridColumn>
                         <ChangePropertyMode/>
                     </PulloutTab>
                  </Pullout>

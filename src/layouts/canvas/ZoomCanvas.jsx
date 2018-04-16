@@ -139,8 +139,6 @@ class ZoomCanvas extends Component {
                     width={100}
                     height={100}
                 ></canvas>
-                  <Label>X<LabelDetail>{this.state.hoverX + 1}</LabelDetail></Label>
-                  <Label>Y<LabelDetail>{this.state.hoverY + 1}</LabelDetail></Label>
             </div>
         );
     }

@@ -30,7 +30,7 @@ class SetHoverText extends Component {
             <Modal
                 closeIcon
                 size='tiny'
-                trigger={<Button style={{marginTop: '16px'}} fluid>Set Link</Button>}
+                trigger={<Button fluid>Set Link</Button>}
             >
                 <ModalHeader>Set Property Links</ModalHeader>
                 <ModalContent>

@@ -25,6 +25,11 @@ class Canvas extends Component {
         this.setCanvasProperty = this.setCanvasProperty.bind(this);
         this.oldPointerX = -1;
         this.oldPointerY = -1;
+
+        this.oldRectX1 = -1;
+        this.oldRectY1 = -1;
+        this.oldRectX2 = -1;
+        this.oldRectY2 = -1;
     }
     
     componentDidMount() {
@@ -42,6 +47,26 @@ class Canvas extends Component {
             if (y != GFD.getData('hoverY')) {
                 GFD.setData('hoverY', y);
             }
+            if (e.buttons == 1 && GFD.getData('rectX1') != -1 && GFD.getData('rectY1') != -1) {
+                if (x != GFD.getData('rectX2') - 1) {
+                    let x1 = GFD.getData('rectX1');
+                    if (x1 - x > 9)
+                        GFD.setData('rectX2', x1 - 10);
+                    else if (x - x1 > 9)
+                        GFD.setData('rectX2', x1 + 10);
+                    else 
+                        GFD.setData('rectX2', x + 1);
+                }
+                if (y != GFD.getData('rectY2') - 1) {
+                    let y1 = GFD.getData('rectY1');
+                    if (y1 - y > 9)
+                        GFD.setData('rectY2', y1 - 10);
+                    else if (y - y1 > 9)
+                        GFD.setData('rectY2', y1 + 10);
+                    else 
+                        GFD.setData('rectY2', y + 1);
+                }
+            }
             this.setCanvasPointer(x, y);
         };
         this.canvas.onmouseout = (e) => {        
@@ -50,10 +75,13 @@ class Canvas extends Component {
             this.setCanvasPointer(-1, -1);
             GFD.setData('pressX', -1);
             GFD.setData('pressY', -1);
+        };
+        this.canvas.onmouseenter = (e) => {
             let rect = this.canvas.getBoundingClientRect();
             GFD.setData('canvasWidth', rect.width);
             GFD.setData('canvasHeight', rect.height);
         };
+        
         this.canvas.onclick = (e) => {    
             if (!e.isTrusted)
                 return;
@@ -77,6 +105,11 @@ class Canvas extends Component {
             let y = Math.floor((e.clientY - rect.top) * (1000 / rect.height) / 10); 
             GFD.setData('pressX', x + 1);
             GFD.setData('pressY', y + 1);
+
+            GFD.setData('rectX1', x + 1);
+            GFD.setData('rectY1', y + 1);
+            GFD.setData('rectX2', x + 1);
+            GFD.setData('rectY2', y + 1);
         }
 
         this.canvas.onmouseup = (e) => {     
@@ -97,6 +130,14 @@ class Canvas extends Component {
                     this.setup();
                 }
             }
+        });
+
+        GFD.listen('rectX2', 'canvasBox', (x2) => {
+            this.updateSelectRect(GFD.getData('rectX1') - 1, GFD.getData('rectY1') - 1, x2 - 1, GFD.getData('rectY2') - 1);
+        });
+
+        GFD.listen('rectY2', 'canvasBox', (y2) => {
+            this.updateSelectRect(GFD.getData('rectX1') - 1, GFD.getData('rectY1') - 1, GFD.getData('rectX2') - 1, y2 - 1);
         });
     }
 
@@ -127,6 +168,7 @@ class Canvas extends Component {
     componentWillUnmount() {
         if (this.state.eventHandle != null)
             this.state.eventHandle.stopWatching();
+        GFD.closeAll('Canvas');
         ctr.stopListeningForResults(LISTENERS.ShowForSale, 'Canvas');
     }
 
@@ -150,34 +192,57 @@ class Canvas extends Component {
         this.state.ctx.putImageData(image, 0, 0);
     }
 
+    updateSelectRect(x1, y1, x2, y2) {
+        this.colorizePointer(this.oldRectX1, this.oldRectY1, this.oldRectX2, this.oldRectY2, 10);
+        this.oldRectX1 = x1;
+        this.oldRectY1 = y1;
+        this.oldRectX2 = x2;
+        this.oldRectY2 = y2;
+        this.colorizePointer(x1, y1, x2, y2, .1);
+    }
+
     setCanvasPointer(x, y) {
         if (x == -1 || y == -1) {
-            this.colorizePointer(this.oldPointerX, this.oldPointerY, 10);
+            this.colorizePointer(this.oldPointerX, this.oldPointerY, this.oldPointerX, this.oldPointerY, 10);
             this.oldPointerX = this.oldPointerY = -1;
             return;
         }
         if (x == this.oldPointerX && y == this.oldPointerY) {
             return;
         }
-        this.colorizePointer(this.oldPointerX, this.oldPointerY, 10);
-        this.colorizePointer(x, y, .1);
+        this.colorizePointer(this.oldPointerX, this.oldPointerY, this.oldPointerX, this.oldPointerY, 10);
+        this.colorizePointer(x, y, x, y, .1);
         this.oldPointerX = x;
         this.oldPointerY = y;
     }
 
     //shape vars
 
-    colorizePointer(x, y, alpha) {
-        if (x == -1 || y == -1)
+    colorizePointer(x1, y1, x2, y2, alpha) {
+        if (x1 == -1 || y1 == -1)
             return;
-        let ctxID = this.state.ctx.getImageData((x * 10) - 2, (y * 10) - 2, 14, 14);
+        if (x2 < x1) {
+            let t = x1;
+            x1 = x2;
+            x2 = t;
+        }
+        if (y2 < y1) {
+            let t = y1;
+            y1 = y2;
+            y2 = t;
+        }
+        let w = Math.abs(x2 - x1) + 1;
+        let h = Math.abs(y2 - y1) + 1;
+        let wp = (w * 10) + 4;
+        let hp = (h * 10) + 4;
+        let ctxID = this.state.ctx.getImageData((x1 * 10) - 2, (y1 * 10) - 2, wp, hp);
         for (let i = 3; i < ctxID.data.length; i+=4) {
             let idx = (i - 3) / 4;
-            if (idx < 28 || idx >= 168 || idx % 14 < 2 || idx % 14 >= 12) {
+            if (idx < wp * 2 || idx >= (wp * hp) - (wp * 2) || idx % wp < 2 || idx % wp >= wp - 2) {
                 ctxID.data[i] *= alpha;
             }
         }
-        this.state.ctx.putImageData(ctxID, (x * 10) - 2, (y * 10) - 2);
+        this.state.ctx.putImageData(ctxID, (x1 * 10) - 2, (y1 * 10) - 2);
     }
 
     setCanvasProperty(x, y, rgbArr) {

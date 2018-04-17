@@ -50,21 +50,27 @@ class Canvas extends Component {
             if (e.buttons == 1 && GFD.getData('rectX1') != -1 && GFD.getData('rectY1') != -1) {
                 if (x != GFD.getData('rectX2') - 1) {
                     let x1 = GFD.getData('rectX1');
-                    if (x1 - x > 9)
-                        GFD.setData('rectX2', x1 - 10);
-                    else if (x - x1 > 9)
-                        GFD.setData('rectX2', x1 + 10);
-                    else 
+                    if (x1 - x >= 9) {
+                        if (GFD.getData('rectX2') != x1 - 9)
+                            GFD.setData('rectX2', x1 - 9);
+                    } else if (x - x1 >= 9) {
+                        if (GFD.getData('rectX2') != x1 + 9)
+                            GFD.setData('rectX2', x1 + 9);
+                    } else {
                         GFD.setData('rectX2', x + 1);
+                    }
                 }
                 if (y != GFD.getData('rectY2') - 1) {
                     let y1 = GFD.getData('rectY1');
-                    if (y1 - y > 9)
-                        GFD.setData('rectY2', y1 - 10);
-                    else if (y - y1 > 9)
-                        GFD.setData('rectY2', y1 + 10);
-                    else 
+                    if (y1 - y >= 9) {
+                        if (GFD.getData('rectY2') != y1 - 9)
+                            GFD.setData('rectY2', y1 - 9);
+                    } else if (y - y1 >= 9) {
+                        if (GFD.getData('rectY2') != y1 + 9)
+                        GFD.setData('rectY2', y1 + 9);
+                    } else {
                         GFD.setData('rectY2', y + 1);
+                    }
                 }
             }
             this.setCanvasPointer(x, y);
@@ -83,7 +89,7 @@ class Canvas extends Component {
         };
         
         this.canvas.onclick = (e) => {    
-            if (!e.isTrusted)
+            if (!e.isTrusted || GFD.getData('rectX1') != GFD.getData('rectX2') || GFD.getData('rectY1') != GFD.getData('rectY2'))
                 return;
 
             let rect = this.canvas.getBoundingClientRect();

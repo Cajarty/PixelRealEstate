@@ -178,7 +178,6 @@ export class GlobalState {
         this.listeners[key][id] = callback;
         if (this.data[key] != null)
             callback(this.data[key]);
-            console.info('trigger: ', key, this.listeners[key])
     }
 
     close(key, id) {

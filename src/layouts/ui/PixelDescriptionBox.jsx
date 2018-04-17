@@ -29,6 +29,11 @@ class PixelDescriptionBox extends Component {
             tokenEarnedInterval: null,
             x: '', 
             y: '',
+            x1: -1,
+            y1: -1,
+            x2: -1,
+            y2: -1,
+            multiRect: false,
             ctx: null,
             dataCtx: null,
             owner: "",
@@ -82,7 +87,6 @@ class PixelDescriptionBox extends Component {
 
     componentDidMount() {
         let ctx = this.canvas.getContext('2d');
-        ctx.scale(10, 10);
         ctx.imageSmoothingEnabled = false;
         ctx.webkitImageSmoothingEnabled = false;
         let dataCtx = this.dataCanvas.getContext('2d');
@@ -107,6 +111,29 @@ class PixelDescriptionBox extends Component {
             if (!GFD.getData('noMetaMask'))
                 this.loadProperty(GFD.getData('x') - 1, y - 1);
             this.setState({y});
+        })
+
+        // GFD.listen('rectX2', 'pixelBrowse', (x2) => {
+        //     let x1 = GFD.getData('rectX1');
+        //     let y1 = GFD.getData('rectY1');
+        //     let y2 = GFD.getData('rectY2');
+        //     let multiRect = x2 != -1 && y2 != -1 && (x1 != x2 || y1 != y2);
+        //     this.setState({
+        //         x1, y1, x2, y2, multiRect,
+        //     });
+        //     if (multiRect)
+        //         this.loadMultiProperty(x1, y1, x2, y2);
+        // })
+        GFD.listen('rectY2', 'pixelBrowse', (y2) => {
+            let x1 = GFD.getData('rectX1');
+            let y1 = GFD.getData('rectY1');
+            let x2 = GFD.getData('rectX2');
+            let multiRect = x2 != -1 && y2 != -1 && (x1 != x2 || y1 != y2);
+            this.setState({
+                x1, y1, x2, y2, multiRect,
+            });
+            if (multiRect)
+                this.loadMultiProperty(x1, y1, x2, y2);
         })
 
         this.setState({timerUpdater: setInterval(() => this.timerUpdate(), 60000)});
@@ -214,12 +241,36 @@ class PixelDescriptionBox extends Component {
     }
 
     setCanvas(rgbArr) {
+        this.state.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.state.ctx.scale(10, 10);
         let ctxID = this.state.dataCtx.createImageData(10, 10);
         for (let i = 0; i < rgbArr.length; i++) {
             ctxID.data[i] = rgbArr[i];
         }
         this.state.dataCtx.putImageData(ctxID, 0, 0);
         this.state.ctx.drawImage(this.dataCanvas, 0, 0);
+    }
+
+    loadMultiProperty(x1, y1, x2, y2) {
+        console.info(x1, y1, x2, y2)
+        let w = Math.abs(x1 - x2) + 1;
+        let h = Math.abs(y1 - y2) + 1;
+        this.state.ctx.canvas.width = this.state.dataCtx.canvas.width = w * 10;
+        this.state.ctx.canvas.height = this.state.dataCtx.canvas.height = h * 10;
+        this.state.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.state.ctx.scale(20 / w, 20 / h);
+        let ctxID = this.state.dataCtx.createImageData(w * 10, h * 10);
+
+        let rgbArr = SDM.getPropertyRect(x1, y1, x2, y2);
+        //console.info(rgbArr)
+
+        // for (let y = 0; y < h * 10; y++) {
+        //     for (let i = 0; i < w * 40; i++) {
+        //         ctxID.data[i] = rgbArr[y][i];
+        //     }
+        // }
+        // this.state.dataCtx.putImageData(ctxID, 0, 0);
+        // this.state.ctx.drawImage(this.dataCanvas, 0, 0);
     }
 
     loadProperty(x, y, canvasData = null) {
@@ -317,6 +368,8 @@ class PixelDescriptionBox extends Component {
                 <Button fluid onClick={() => this.toggleAction('SET_IMAGE')}>Update Image</Button>
             );
         }
+        if (this.state.multiRect)
+            return actions;
         // actions.push(new Action("Place Offer", null));
         if (this.state.isForSale && this.state.owner != ctr.account)
             actions.push(
@@ -372,7 +425,7 @@ class PixelDescriptionBox extends Component {
                 <div className='twoColumn w50 left'>
                     <Input
                         placeholder="1 - 100"
-                        type="number"
+                        type={this.state.multiRect ? 'text' : 'number'}
                         className='oneColumnFull'
                         fluid
                         label={<Popup
@@ -381,14 +434,14 @@ class PixelDescriptionBox extends Component {
                             className='Popup'
                             size='tiny'
                         />}
-                        value={this.state.x} 
+                        value={this.state.multiRect ? this.state.x1 + ' - ' + this.state.x2 : this.state.x} 
                         onChange={(e) => this.setX(e.target.value)}
                     />
                 </div>
                 <div className='twoColumn w50 right'>
                     <Input
                         placeholder="1 - 100"
-                        type="number"
+                        type={this.state.multiRect ? 'text' : 'number'}
                         label={<Popup
                             trigger={<Label className='uniform'>Y</Label>}
                             content='Y Position'
@@ -397,153 +450,155 @@ class PixelDescriptionBox extends Component {
                         />}
                         className='oneColumnFull'
                         fluid
-                        value={this.state.y} 
+                        value={this.state.multiRect ? this.state.y1 + ' - ' + this.state.y2 : this.state.y} 
                         onChange={(e) => this.setY(e.target.value)}
                     />
                 </div>
-                {this.state.owner != '' ? 
+                {!this.state.multiRect && this.state.x != '' && this.state.y != '' &&
                     <div>
-                        <Divider/>
-                        {this.state.owner !== NOBODY &&
-                        <Input
-                            placeholder="Address"
-                            fluid disabled
-                            className='oneColumn'
-                            value={(this.state.owner === ctr.account ? "You" : this.state.owner)} 
-                            label={<Popup
-                                trigger={<Label><Icon className='uniform' name='user'/></Label>}
-                                content='Owner Address'
-                                className='Popup'
-                                size='tiny'
+                        <div>
+                            <Divider/>
+                            {this.state.owner !== NOBODY &&
+                            <Input
+                                placeholder="Address"
+                                fluid disabled
+                                className='oneColumn'
+                                value={(this.state.owner === ctr.account ? "You" : this.state.owner)} 
+                                label={<Popup
+                                    trigger={<Label><Icon className='uniform' name='user'/></Label>}
+                                    content='Owner Address'
+                                    className='Popup'
+                                    size='tiny'
+                                />}
                             />}
-                        />}
-                        {this.state.latestBid != 0 &&
-                        <Input 
-                            fluid disabled
-                            labelPosition='right' 
-                            type="text"
-                            placeholder={"Enter PXL"}
-                            className='oneColumn bidInput'
-                            value={this.state.latestBid}
-                            onChange={(e) => this.setState({latestBid: e.target.value})}
-                        >
-                            <Popup
-                                trigger={<Label><Icon name='legal'/></Label>}
-                                content='Lastest Bid'
-                                className='Popup'
-                                size='tiny'
+                            {this.state.latestBid != 0 &&
+                            <Input 
+                                fluid disabled
+                                labelPosition='right' 
+                                type="text"
+                                placeholder={"Enter PXL"}
+                                className='oneColumn bidInput'
+                                value={this.state.latestBid}
+                                onChange={(e) => this.setState({latestBid: e.target.value})}
+                            >
+                                <Popup
+                                    trigger={<Label><Icon name='legal'/></Label>}
+                                    content='Lastest Bid'
+                                    className='Popup'
+                                    size='tiny'
+                                />
+                                <input className='bid'/>
+                                <Label as='a'
+                                    className='bidButton'
+                                    onClick={() => this.placeBid()} 
+                                >Bid</Label>
+                            </Input>}
+                            <MessageModal 
+                                title='Not Enough PXL!'
+                                description='You must have at least 1 PXL to place a bid.'
+                                isOpen={this.state.showMessage} 
+                                onClose={() => {this.setState({showMessage: false})}}
                             />
-                            <input className='bid'/>
-                            <Label as='a'
-                                className='bidButton'
-                                onClick={() => this.placeBid()} 
-                            >Bid</Label>
-                        </Input>}
-                        <MessageModal 
-                            title='Not Enough PXL!'
-                            description='You must have at least 1 PXL to place a bid.'
-                            isOpen={this.state.showMessage} 
-                            onClose={() => {this.setState({showMessage: false})}}
-                        />
-                        {(this.state.ETHPrice != 0 || this.state.PPCPrice != 0) &&
-                        <Input
-                            label={<Popup
-                                trigger={<Label><Icon className='uniform' name='dollar'/></Label>}
-                                content='Price'
-                                className='Popup'
-                                size='tiny'
-                            />} 
-                            disabled
-                            className='oneColumn'
-                            value={this.getPriceFormat()} 
-                        />}
-                        {this.state.lastUpdate != 0 &&
-                        <Input
-                            fluid disabled
-                            label={<Popup
-                                trigger={<Label><Icon className='uniform' name='time'/></Label>}
-                                content='Last Update'
-                                className='Popup'
-                                size='tiny'
-                            />}
-                            className='oneColumn'
-                            value={this.state.lastUpdate == 0 ? 'Never' : this.state.lastUpdateFormatted}
-                        />}
-                        {!this.state.isInPrivate && this.state.lastUpdate != 0 &&
-                        <Input
-                            fluid disabled
-                            label={<Popup
-                                trigger={<Label><Icon className='uniform' name='money'/></Label>}
-                                content='Current/Maximum Payout'
-                                className='Popup'
-                                size='tiny'
-                            />}
-                            className='oneColumn'
-                            value={this.getCurrentPayout()}
-                        />}
-                        {(this.state.isInPrivate || (this.state.reserved != 0 && this.state.reserved * 1000 > new Date().getTime())) &&
-                        <Input
-                            label="Reserved"
-                            fluid disabled
-                            className='oneColumn'
-                            label={<Popup
-                                trigger={<Label><Icon className='uniform' name='ban'/></Label>}
-                                content='Is Reserved'
-                                className='Popup'
-                                size='tiny'
-                            />}
-                            value={this.state.reservedFormatted}
-                        />}
-                        {this.state.isInPrivate &&
-                        <Input
-                            label="Private"
-                            fluid disabled
-                            className='oneColumn'
-                            label={<Popup
-                                trigger={<Label><Icon className='uniform' name='hide'/></Label>}
-                                content='Is Private'
-                                className='Popup'
-                                size='tiny'
-                            />}
-                            value={this.state.isInPrivate ? 'Yes' : 'No'}
-                        />}
-                        {this.state.owner !== NOBODY &&
-                        <Input
-                            label={<Popup
-                                trigger={<Label><Icon className='uniform' name='comment'/></Label>}
-                                content='Comment'
-                                className='Popup'
-                                size='tiny'
-                            />}
-                            fluid disabled
-                            className='oneColumn'
-                            value={this.state.hoverText != '' ? this.state.hoverText : "None Set"}
-                        />}
-                        {this.state.owner !== NOBODY &&
-                        <Input
-                            className='oneColumn combined'
-                            fluid disabled
-                            action={(this.state.link != '' ? 
-                                <Popup
-                                    trigger={<Button onClick={() => this.visitLink()}><Icon className='uniform' name='linkify'/>Visit</Button>}
-                                    content='Link'
+                            {(this.state.ETHPrice != 0 || this.state.PPCPrice != 0) &&
+                            <Input
+                                label={<Popup
+                                    trigger={<Label><Icon className='uniform' name='dollar'/></Label>}
+                                    content='Price'
                                     className='Popup'
                                     size='tiny'
-                                /> : null
-                            )}
-                            label={(this.state.link == '' ? 
-                                <Popup
-                                    trigger={<Label><Icon className='uniform' name='linkify'/></Label>}
-                                    content='Link'
+                                />} 
+                                disabled
+                                className='oneColumn'
+                                value={this.getPriceFormat()} 
+                            />}
+                            {this.state.lastUpdate != 0 &&
+                            <Input
+                                fluid disabled
+                                label={<Popup
+                                    trigger={<Label><Icon className='uniform' name='time'/></Label>}
+                                    content='Last Update'
                                     className='Popup'
                                     size='tiny'
-                                /> : null
-                            )}
-                            actionPosition='left'
-                            value={this.state.link != '' ? this.state.link : "None Set"}
-                        />}
+                                />}
+                                className='oneColumn'
+                                value={this.state.lastUpdate == 0 ? 'Never' : this.state.lastUpdateFormatted}
+                            />}
+                            {!this.state.isInPrivate && this.state.lastUpdate != 0 &&
+                            <Input
+                                fluid disabled
+                                label={<Popup
+                                    trigger={<Label><Icon className='uniform' name='money'/></Label>}
+                                    content='Current/Maximum Payout'
+                                    className='Popup'
+                                    size='tiny'
+                                />}
+                                className='oneColumn'
+                                value={this.getCurrentPayout()}
+                            />}
+                            {(this.state.isInPrivate || (this.state.reserved != 0 && this.state.reserved * 1000 > new Date().getTime())) &&
+                            <Input
+                                label="Reserved"
+                                fluid disabled
+                                className='oneColumn'
+                                label={<Popup
+                                    trigger={<Label><Icon className='uniform' name='ban'/></Label>}
+                                    content='Is Reserved'
+                                    className='Popup'
+                                    size='tiny'
+                                />}
+                                value={this.state.reservedFormatted}
+                            />}
+                            {this.state.isInPrivate &&
+                            <Input
+                                label="Private"
+                                fluid disabled
+                                className='oneColumn'
+                                label={<Popup
+                                    trigger={<Label><Icon className='uniform' name='hide'/></Label>}
+                                    content='Is Private'
+                                    className='Popup'
+                                    size='tiny'
+                                />}
+                                value={this.state.isInPrivate ? 'Yes' : 'No'}
+                            />}
+                            {this.state.owner !== NOBODY &&
+                            <Input
+                                label={<Popup
+                                    trigger={<Label><Icon className='uniform' name='comment'/></Label>}
+                                    content='Comment'
+                                    className='Popup'
+                                    size='tiny'
+                                />}
+                                fluid disabled
+                                className='oneColumn'
+                                value={this.state.hoverText != '' ? this.state.hoverText : "None Set"}
+                            />}
+                            {this.state.owner !== NOBODY &&
+                            <Input
+                                className='oneColumn combined'
+                                fluid disabled
+                                action={(this.state.link != '' ? 
+                                    <Popup
+                                        trigger={<Button onClick={() => this.visitLink()}><Icon className='uniform' name='linkify'/>Visit</Button>}
+                                        content='Link'
+                                        className='Popup'
+                                        size='tiny'
+                                    /> : null
+                                )}
+                                label={(this.state.link == '' ? 
+                                    <Popup
+                                        trigger={<Label><Icon className='uniform' name='linkify'/></Label>}
+                                        content='Link'
+                                        className='Popup'
+                                        size='tiny'
+                                    /> : null
+                                )}
+                                actionPosition='left'
+                                value={this.state.link != '' ? this.state.link : "None Set"}
+                            />}
+                        </div>
                     </div>
-                : (!this.state.noAccount && <Info messages='Click a Property on the canvas or enter the coordinates above to see more about a property.'/>)}
+                }
                 {this.state.x != '' && this.state.y != '' && !this.state.noAccount && 
                     <div className={(this.state.tutorialState.index == 3 ? TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 3) + ' actions' : '')}>
                         <Divider/>

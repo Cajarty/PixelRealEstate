@@ -420,6 +420,16 @@ export class ServerDataManager {
                 }
         return data;
     }
+
+    getPropertyRect(xx, yy, xx2, yy2) {
+        let data = [];
+        for (let y = yy * 10; y < (yy2 + 1) * 10; y++)
+            for (let x = xx * 10; x < (xx2 + 1) * 10; x++)
+                for (let i = 0; i < 4; i++) {
+                    data.push(this.pixelData[y][x * 4 + i]);
+                }
+        return data;
+    }
 }
 
 export const SDM = new ServerDataManager();

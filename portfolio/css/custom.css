@@ -94,6 +94,10 @@ strong {
 .card-body:hover {
     cursor: pointer;
 }
+.div-justify {
+    text-align: justify;
+    text-justify: inter-word;
+}
 .font-pixel {
     font-family: 'Unibody8Pro-Bold';
 }

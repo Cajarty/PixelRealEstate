@@ -241,6 +241,8 @@ class PixelDescriptionBox extends Component {
     }
 
     setCanvas(rgbArr) {
+        this.state.ctx.canvas.width = this.state.dataCtx.canvas.width = 100;
+        this.state.ctx.canvas.height = this.state.dataCtx.canvas.height = 100;
         this.state.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.state.ctx.scale(10, 10);
         let ctxID = this.state.dataCtx.createImageData(10, 10);
@@ -252,25 +254,22 @@ class PixelDescriptionBox extends Component {
     }
 
     loadMultiProperty(x1, y1, x2, y2) {
-        console.info(x1, y1, x2, y2)
         let w = Math.abs(x1 - x2) + 1;
         let h = Math.abs(y1 - y2) + 1;
-        this.state.ctx.canvas.width = this.state.dataCtx.canvas.width = w * 10;
-        this.state.ctx.canvas.height = this.state.dataCtx.canvas.height = h * 10;
+        this.state.ctx.canvas.width = this.state.dataCtx.canvas.width = w * 20;
+        this.state.ctx.canvas.height = this.state.dataCtx.canvas.height = h * 20;
         this.state.ctx.setTransform(1, 0, 0, 1, 0, 0);
-        this.state.ctx.scale(20 / w, 20 / h);
+        this.state.ctx.scale(2, 2);
         let ctxID = this.state.dataCtx.createImageData(w * 10, h * 10);
 
-        let rgbArr = SDM.getPropertyRect(x1, y1, x2, y2);
-        //console.info(rgbArr)
+        let rgbArr = SDM.getPropertyRect(x1 - 1, y1 - 1, x2 - 1, y2 - 1);
+        console.info(rgbArr)
 
-        // for (let y = 0; y < h * 10; y++) {
-        //     for (let i = 0; i < w * 40; i++) {
-        //         ctxID.data[i] = rgbArr[y][i];
-        //     }
-        // }
-        // this.state.dataCtx.putImageData(ctxID, 0, 0);
-        // this.state.ctx.drawImage(this.dataCanvas, 0, 0);
+        for (let i = 0; i < rgbArr.length; i++) {
+            ctxID.data[i] = rgbArr[i];
+        }
+        this.state.dataCtx.putImageData(ctxID, 0, 0);
+        this.state.ctx.drawImage(this.dataCanvas, 0, 0);
     }
 
     loadProperty(x, y, canvasData = null) {

@@ -161,6 +161,7 @@ tr.segmentButton {
 .bidButton:not(.inverted) {
     color: $color5;
     background-color: $color4 !important;
+    box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, .8);
     &.primary {
         background-color: $color4 !important;
         &:hover {

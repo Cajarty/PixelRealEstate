@@ -51,17 +51,14 @@ export const TUTORIAL_STATE = {
 
 export class GlobalState {
     constructor() {
-        this.data = {
+        this.state = {
             x: null,
             y: null,
             hoverX: null,
             hoverY: null,
             pressX: null,
             pressY: null,
-            rectX1: null,
-            rectY1: null,
-            rectX2: null,
-            rectY2: null,
+            select: {x1: -1, y1: -1, x2: -1, y2: -1},
             advancedMode: false,
             noAccount: false, //user isnt logged in
             noMetaMask: true, //metamask isnt installed
@@ -157,15 +154,15 @@ export class GlobalState {
             this.addNewEvent(key);
         }
         if (this.limiters[key] != null) {
-            this.data[key] = this.limiters[key](value);
+            this.state[key] = this.limiters[key](value);
         } else {
-            this.data[key] = value;
+            this.state[key] = value;
         }
         this.notify(key);
     }
 
     getData(key) {
-        return this.data[key];
+        return this.state[key];
     }
 
     addNewEvent(key) {
@@ -176,8 +173,8 @@ export class GlobalState {
         if (this.listeners[key] == null)
             this.addNewEvent(key);
         this.listeners[key][id] = callback;
-        if (this.data[key] != null)
-            callback(this.data[key]);
+        if (this.state[key] != null)
+            callback(this.state[key]);
     }
 
     close(key, id) {
@@ -192,7 +189,7 @@ export class GlobalState {
 
     notify(key) {
         Object.keys(this.listeners[key]).map((i) => {
-            this.listeners[key][i](this.data[key]);
+            this.listeners[key][i](this.state[key]);
         })
     }
 }

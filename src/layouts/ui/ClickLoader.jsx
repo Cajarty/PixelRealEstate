@@ -36,12 +36,8 @@ export default class ClickLoader extends Component {
                 labelY: (hoverY - 1.5) * this.state.canvasHeight / 100
             });
         })
-        GFD.listen('rectX2', 'clickLoader', (x2) => {
-            if (GFD.getData('rectX1') != x2)
-                this.clearClickAttempt();
-        });
-        GFD.listen('rectY2', 'clickLoader', (y2) => {
-            if (GFD.getData('rectY1') != y2)
+        GFD.listen('select', 'clickLoader', (select) => {
+            if (select.x1 != select.x2 || select.y1 != select.y2)
                 this.clearClickAttempt();
         });
         GFD.listen('pressX', 'clickLoader', (x) => {

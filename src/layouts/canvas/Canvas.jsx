@@ -26,10 +26,7 @@ class Canvas extends Component {
         this.oldPointerX = -1;
         this.oldPointerY = -1;
 
-        this.oldRectX1 = -1;
-        this.oldRectY1 = -1;
-        this.oldRectX2 = -1;
-        this.oldRectY2 = -1;
+        this.oldSelect = {x1: -1, y1: -1, x2: -1, y2: -1};
     }
     
     componentDidMount() {
@@ -47,32 +44,40 @@ class Canvas extends Component {
             if (y != GFD.getData('hoverY')) {
                 GFD.setData('hoverY', y);
             }
-            if (e.buttons == 1 && GFD.getData('rectX1') != -1 && GFD.getData('rectY1') != -1) {
-                if (x != GFD.getData('rectX2') - 1) {
-                    let x1 = GFD.getData('rectX1');
+            let select = GFD.getData('select');
+            if (e.buttons == 1 && select.x1 != -1 && select.y1 != -1) {
+                if (x != select.x2 - 1) {
+                    let x1 = select.x1;
                     if (x1 - x >= 9) {
-                        if (GFD.getData('rectX2') != x1 - 9)
-                            GFD.setData('rectX2', x1 - 9);
+                        if (select.x2 != x1 - 9)
+                            select.x2 = x1 - 9;
                     } else if (x - x1 >= 9) {
-                        if (GFD.getData('rectX2') != x1 + 9)
-                            GFD.setData('rectX2', x1 + 9);
+                        if (select.x2 != x1 + 9)
+                            select.x2 = x1 + 9;
                     } else {
-                        GFD.setData('rectX2', x + 1);
+                        select.x2 = x + 1;
                     }
                 }
-                if (y != GFD.getData('rectY2') - 1) {
-                    let y1 = GFD.getData('rectY1');
+                if (y != select.y2 - 1) {
+                    let y1 = select.y1;
                     if (y1 - y >= 9) {
-                        if (GFD.getData('rectY2') != y1 - 9)
-                            GFD.setData('rectY2', y1 - 9);
+                        if (select.y2 != y1 - 9)
+                        select.y2 = y1 - 9;
                     } else if (y - y1 >= 9) {
-                        if (GFD.getData('rectY2') != y1 + 9)
-                        GFD.setData('rectY2', y1 + 9);
+                        if (select.y2 != y1 + 9)
+                        select.y2 = y1 + 9;
                     } else {
-                        GFD.setData('rectY2', y + 1);
+                        select.y2 = y + 1;
                     }
                 }
             }
+            let newSelect = {
+                x1: Math.min(select.x1, select.x2), 
+                y1: Math.min(select.y1, select.y2), 
+                x2: Math.max(select.x1, select.x2), 
+                y2: Math.max(select.y1, select.y2), 
+            };
+            GFD.setData('select', newSelect);
             this.setCanvasPointer(x, y);
         };
         this.canvas.onmouseout = (e) => {        
@@ -89,7 +94,8 @@ class Canvas extends Component {
         };
         
         this.canvas.onclick = (e) => {    
-            if (!e.isTrusted || GFD.getData('rectX1') != GFD.getData('rectX2') || GFD.getData('rectY1') != GFD.getData('rectY2'))
+            let select = GFD.getData('select');
+            if (!e.isTrusted || select.x1 != select.x2 || select.y1 != select.y2)
                 return;
 
             let rect = this.canvas.getBoundingClientRect();
@@ -112,10 +118,12 @@ class Canvas extends Component {
             GFD.setData('pressX', x + 1);
             GFD.setData('pressY', y + 1);
 
-            GFD.setData('rectX1', x + 1);
-            GFD.setData('rectY1', y + 1);
-            GFD.setData('rectX2', x + 1);
-            GFD.setData('rectY2', y + 1);
+            let select = GFD.state.select;
+            select.x1 = x + 1;
+            select.y1 = y + 1;
+            select.x2 = x + 1;
+            select.y2 = y + 1;
+            GFD.setData('select', select);
         }
 
         this.canvas.onmouseup = (e) => {     
@@ -138,12 +146,10 @@ class Canvas extends Component {
             }
         });
 
-        GFD.listen('rectX2', 'canvasBox', (x2) => {
-            this.updateSelectRect(GFD.getData('rectX1') - 1, GFD.getData('rectY1') - 1, x2 - 1, GFD.getData('rectY2') - 1);
-        });
-
-        GFD.listen('rectY2', 'canvasBox', (y2) => {
-            this.updateSelectRect(GFD.getData('rectX1') - 1, GFD.getData('rectY1') - 1, GFD.getData('rectX2') - 1, y2 - 1);
+        GFD.listen('select', 'canvasBox', (select) => {
+            if (select.x1 == -1 || select.y1 == -1 || select.x2 == -1 || select.y2 == -1)
+                return;
+            this.updateSelectRect(select.x1 - 1, select.y1 - 1, select.x2 - 1, select.y2 - 1);
         });
     }
 
@@ -199,31 +205,27 @@ class Canvas extends Component {
     }
 
     updateSelectRect(x1, y1, x2, y2) {
-        this.colorizePointer(this.oldRectX1, this.oldRectY1, this.oldRectX2, this.oldRectY2, 10);
-        this.oldRectX1 = x1;
-        this.oldRectY1 = y1;
-        this.oldRectX2 = x2;
-        this.oldRectY2 = y2;
-        this.colorizePointer(x1, y1, x2, y2, .1);
+        this.colorizePointer(this.oldSelect.x1, this.oldSelect.y1, this.oldSelect.x2, this.oldSelect.y2, 255);
+        this.oldSelect = {x1, y1, x2, y2};
+        this.colorizePointer(x1, y1, x2, y2, 100);
     }
 
     setCanvasPointer(x, y) {
         if (x == -1 || y == -1) {
-            this.colorizePointer(this.oldPointerX, this.oldPointerY, this.oldPointerX, this.oldPointerY, 10);
+            this.colorizePointer(this.oldPointerX, this.oldPointerY, this.oldPointerX, this.oldPointerY, 255);
             this.oldPointerX = this.oldPointerY = -1;
             return;
         }
         if (x == this.oldPointerX && y == this.oldPointerY) {
             return;
         }
-        this.colorizePointer(this.oldPointerX, this.oldPointerY, this.oldPointerX, this.oldPointerY, 10);
-        this.colorizePointer(x, y, x, y, .1);
+        this.colorizePointer(this.oldPointerX, this.oldPointerY, this.oldPointerX, this.oldPointerY, 255);
+        this.colorizePointer(x, y, x, y, 100);
         this.oldPointerX = x;
         this.oldPointerY = y;
     }
 
     //shape vars
-
     colorizePointer(x1, y1, x2, y2, alpha) {
         if (x1 == -1 || y1 == -1)
             return;
@@ -245,7 +247,8 @@ class Canvas extends Component {
         for (let i = 3; i < ctxID.data.length; i+=4) {
             let idx = (i - 3) / 4;
             if (idx < wp * 2 || idx >= (wp * hp) - (wp * 2) || idx % wp < 2 || idx % wp >= wp - 2) {
-                ctxID.data[i] *= alpha;
+                ctxID.data[i] = alpha;
+                console.info(ctxID.data[i])
             }
         }
         this.state.ctx.putImageData(ctxID, (x1 * 10) - 2, (y1 * 10) - 2);

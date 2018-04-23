@@ -29,10 +29,7 @@ class PixelDescriptionBox extends Component {
             tokenEarnedInterval: null,
             x: '', 
             y: '',
-            x1: -1,
-            y1: -1,
-            x2: -1,
-            y2: -1,
+            select: {x1: -1, y1: -1, x2: -1, y2: -1},
             multiRect: false,
             ctx: null,
             dataCtx: null,
@@ -113,27 +110,13 @@ class PixelDescriptionBox extends Component {
             this.setState({y});
         })
 
-        // GFD.listen('rectX2', 'pixelBrowse', (x2) => {
-        //     let x1 = GFD.getData('rectX1');
-        //     let y1 = GFD.getData('rectY1');
-        //     let y2 = GFD.getData('rectY2');
-        //     let multiRect = x2 != -1 && y2 != -1 && (x1 != x2 || y1 != y2);
-        //     this.setState({
-        //         x1, y1, x2, y2, multiRect,
-        //     });
-        //     if (multiRect)
-        //         this.loadMultiProperty(x1, y1, x2, y2);
-        // })
-        GFD.listen('rectY2', 'pixelBrowse', (y2) => {
-            let x1 = GFD.getData('rectX1');
-            let y1 = GFD.getData('rectY1');
-            let x2 = GFD.getData('rectX2');
-            let multiRect = x2 != -1 && y2 != -1 && (x1 != x2 || y1 != y2);
+        GFD.listen('select', 'pixelBrowse', (select) => {
+            let multiRect = select.x2 != -1 && select.y2 != -1 && (select.x1 != select.x2 || select.y1 != select.y2);
             this.setState({
-                x1, y1, x2, y2, multiRect,
+                select, multiRect,
             });
             if (multiRect)
-                this.loadMultiProperty(x1, y1, x2, y2);
+                this.loadMultiProperty(select.x1, select.y1, select.x2, select.y2);
         })
 
         this.setState({timerUpdater: setInterval(() => this.timerUpdate(), 60000)});
@@ -241,8 +224,14 @@ class PixelDescriptionBox extends Component {
     }
 
     setCanvas(rgbArr) {
-        this.state.ctx.canvas.width = this.state.dataCtx.canvas.width = 100;
-        this.state.ctx.canvas.height = this.state.dataCtx.canvas.height = 100;
+        if (this.state.ctx.canvas.width != 100)
+            this.state.ctx.canvas.width = 100;
+        if (this.state.ctx.canvas.height != 100)
+            this.state.ctx.canvas.height = 100;
+        if (this.state.dataCtx.canvas.width != 100)
+            this.state.dataCtx.canvas.width = 100;
+        if (this.state.dataCtx.canvas.height != 100)
+            this.state.dataCtx.canvas.height = 100;
         this.state.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.state.ctx.scale(10, 10);
         let ctxID = this.state.dataCtx.createImageData(10, 10);
@@ -263,7 +252,6 @@ class PixelDescriptionBox extends Component {
         let ctxID = this.state.dataCtx.createImageData(w * 10, h * 10);
 
         let rgbArr = SDM.getPropertyRect(x1 - 1, y1 - 1, x2 - 1, y2 - 1);
-        console.info(rgbArr)
 
         for (let i = 0; i < rgbArr.length; i++) {
             ctxID.data[i] = rgbArr[i];

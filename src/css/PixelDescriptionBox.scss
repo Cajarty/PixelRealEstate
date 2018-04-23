@@ -5,6 +5,12 @@
         margin: auto;
     }
     #colorPreviewCanvas {
+        image-rendering: optimizeSpeed;
+        image-rendering: crisp-edges;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -o-crisp-edges;
+        image-rendering: -webkit-optimize-contrast;
+        -ms-interpolation-mode: nearest-neighbor;
         border-radius: 2px;
         box-shadow: 0px 0px 7px 1px;
         background-color: white;

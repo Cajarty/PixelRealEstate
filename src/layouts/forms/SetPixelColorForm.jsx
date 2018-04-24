@@ -27,6 +27,8 @@ class SetPixelColorForm extends Component {
         this.state = {
             x: '',
             y: '',
+            select: {x1: -1, y1: -1, x2: -1, y2: -1, w: 0, h: 0},
+            multiRect: false,
             ppt: '0',
             ctxLrg: null,
             ctxSml: null,
@@ -88,8 +90,10 @@ class SetPixelColorForm extends Component {
             return;
         let ctxLrg = canvasLrg.getContext("2d");
         let ctxSml = canvasSml.getContext("2d");
-        ctxLrg.imageSmoothingEnabled = false;
         ctxSml.imageSmoothingEnabled = false;
+        ctxLrg.imageSmoothingEnabled = false;
+        ctxSml.webkitImageSmoothingEnabled = false;
+        ctxLrg.webkitImageSmoothingEnabled = false;
         this.canvasLrg.onmousedown = this.canvasLrg.onmouseenter = (ev) => {
             if (ev.buttons == 0 || ev.button != 0)
                 return;
@@ -103,6 +107,19 @@ class SetPixelColorForm extends Component {
             if (this.state.mousePressed)
                 this.attemptDraw(ev);
         };
+        GFD.listen('select', 'UpdatePixel', (select) => {
+            let multiRect = select.x2 != -1 && select.y2 != -1 && (select.x1 != select.x2 || select.y1 != select.y2);
+            select.w = Math.abs(select.x2 - select.x1) + 1;
+            select.h = Math.abs(select.y2 - select.y1) + 1;
+            if (multiRect) {
+                this.setMultiCanvas(select.w, select.h, SDM.getPropertyRect(select.x1 - 1, select.y1 - 1, select.x2 - 1, select.y2 - 1), ctxSml, ctxLrg, canvasSml);
+            } else if (GFD.getData('x') - 1 > -1 && GFD.getData('y') - 1 > -1) {
+                this.setCanvas(SDM.getPropertyImage(GFD.getData('x') - 1, GFD.getData('y') - 1), ctxSml, ctxLrg, canvasSml);
+            }
+            this.setState({
+                select, multiRect,
+            });
+        })
         this.setState({
             ctxLrg, 
             ctxSml,
@@ -115,8 +132,6 @@ class SetPixelColorForm extends Component {
         GFD.listen('y', 'UpdatePixel', (y) => {
             this.setState({y});
         })
-        this.setCanvas(SDM.getPropertyImage(GFD.getData('x') - 1, GFD.getData('y') - 1), ctxSml, ctxLrg, canvasSml);
-        this.drawImages();
     }
 
     attemptDraw(ev) {
@@ -143,6 +158,14 @@ class SetPixelColorForm extends Component {
     }
 
     setCanvas(rgbArr, ctxSml = this.state.ctxSml, ctxLrg = this.state.ctxLrg, canvasSml = this.state.canvasSml) {
+        ctxLrg.canvas.width = 100;
+        ctxLrg.canvas.height = 100;
+        ctxSml.canvas.width = 10;
+        ctxSml.canvas.height = 10;
+        ctxLrg.imageSmoothingEnabled = false;
+        ctxLrg.webkitImageSmoothingEnabled = false;
+        ctxSml.imageSmoothingEnabled = false;
+        ctxSml.webkitImageSmoothingEnabled = false;
         let ctxID = ctxSml.createImageData(10, 10);
         for (let i = 0; i < rgbArr.length; i++) {
             ctxID.data[i] = rgbArr[i];
@@ -152,6 +175,27 @@ class SetPixelColorForm extends Component {
 
         this.setState({
             imageData: ctxSml.getImageData(0, 0, Const.PROPERTY_LENGTH, Const.PROPERTY_LENGTH).data,
+        });
+    }
+
+    setMultiCanvas(w, h, rgbArr, ctxSml = this.state.ctxSml, ctxLrg = this.state.ctxLrg, canvasSml = this.state.canvasSml) {
+        ctxLrg.canvas.width = w * 100;
+        ctxLrg.canvas.height = h * 100;
+        ctxSml.canvas.width = w * 10;
+        ctxSml.canvas.height = h * 10;
+        ctxLrg.imageSmoothingEnabled = false;
+        ctxLrg.webkitImageSmoothingEnabled = false;
+        ctxSml.imageSmoothingEnabled = false;
+        ctxSml.webkitImageSmoothingEnabled = false;
+        let ctxID = ctxSml.createImageData(w * 10, h * 10);
+        for (let i = 0; i < rgbArr.length; i++) {
+            ctxID.data[i] = rgbArr[i];
+        }
+        ctxSml.putImageData(ctxID, 0, 0);
+        ctxLrg.drawImage(canvasSml, 0, 0, w * 100, h * 100);
+
+        this.setState({
+            imageData: ctxSml.getImageData(0, 0, w * 10, h * 10).data,
         });
     }
 
@@ -218,7 +262,7 @@ class SetPixelColorForm extends Component {
     drawFill(x, y) {
         let colorToReplace = this.state.ctxSml.getImageData(x, y, 1, 1);
         let visitedPoints  = [];
-        let pointsToCheck = [ {x: x, y : y} ];
+        let pointsToCheck = [ {x, y} ];
 
         let ifReplaceColor = function(colorToCheck) {
             return colorToReplace.data[0] == colorToCheck.data[0] && colorToReplace.data[1] == colorToCheck.data[1] && colorToReplace.data[2] == colorToCheck.data[2];
@@ -338,7 +382,12 @@ class SetPixelColorForm extends Component {
     }
 
     loadCanvas() {
-        this.setCanvas(SDM.getPropertyImage(this.state.x - 1, this.state.y - 1), this.state.ctxSml, this.state.ctxLrg, this.state.canvasSml);
+        if (this.state.multiRect) {
+            let select = this.state.select;
+            this.setMultiCanvas(select.w, select.h, SDM.getPropertyRect(select.x1 - 1, select.y1 - 1, select.x2 - 1, select.y2 - 1), this.state.ctxSml, this.state.ctxLrg, this.state.canvasSml);
+        } else {
+            this.setCanvas(SDM.getPropertyImage(this.state.x - 1, this.state.y - 1), this.state.ctxSml, this.state.ctxLrg, this.state.canvasSml);
+        }
     }
 
     componentDidUpdate(pP, pS) {
@@ -353,21 +402,36 @@ class SetPixelColorForm extends Component {
             <Modal size='large'
                 open={this.state.isOpen || this.props.tutorialState.index == 4} 
                 closeIcon={this.props.tutorialState.index != 4}
+                closeOnRootNodeClick={false}
                 dimmer={this.props.tutorialState.index != 4}
                 onClose={() => this.toggleModal(false)}
                 className={TUTORIAL_STATE.getClassName(this.props.tutorialState.index, 4) + ' actions'}
             >
             <ModalHeader>Update Property Image</ModalHeader>
-            <ModalContent>                                       
-                <canvas id='normal' className='hidden' width={Const.PROPERTY_LENGTH} height={Const.PROPERTY_LENGTH} ref={(canvasSml) => { this.canvasSml = canvasSml; }}></canvas>
+            <ModalContent>     
                 <Grid>
                     <GridRow columns={2} stretched>
                         <GridColumn width={7}>
                             <Segment>
                                 <Grid divided>
-                                    <GridRow>
-                                        <GridColumn style={{height: 280}}>
-                                            <canvas id='large' width={PREVIEW_WIDTH} height={PREVIEW_HEIGHT} ref={(canvasLrg) => { this.canvasLrg = canvasLrg; }}></canvas>
+                                    <GridRow columns={2} stretched divided>
+                                        <GridColumn width={12} stretched>
+                                            <div className='largeCanvasContainer'>
+                                                <canvas 
+                                                    id='large' 
+                                                    width={100} 
+                                                    height={100} 
+                                                    ref={(canvasLrg) => { this.canvasLrg = canvasLrg; }}
+                                                ></canvas>
+                                            </div>
+                                        </GridColumn>
+                                        <GridColumn width={4}>                           
+                                            <canvas 
+                                                id='normal' 
+                                                width={10} 
+                                                height={10} 
+                                                ref={(canvasSml) => { this.canvasSml = canvasSml; }}
+                                            ></canvas>
                                         </GridColumn>
                                     </GridRow>
                                     <GridRow columns={2}>
@@ -492,7 +556,7 @@ class SetPixelColorForm extends Component {
                                             </GridColumn>
                                         </GridRow>
                                         <GridRow columns={2}>
-                                            <GridColumn width={6} stretched>
+                                            <GridColumn width={7} stretched>
                                                 <ChromePicker 
                                                     className='colorPicker' 
                                                     onChangeComplete={(color, event) => this.colorChange(color, event)}
@@ -500,27 +564,28 @@ class SetPixelColorForm extends Component {
                                                     disableAlpha={true}
                                                 />
                                             </GridColumn>
-                                            <GridColumn width={10} stretched>
+                                            <GridColumn width={9} stretched>
                                                 <GridRow>
                                                     <Input
                                                         placeholder="1 - 100"
-                                                        type="number"
+                                                        type={this.state.multiRect ? 'text' : 'number'}
                                                         className='oneColumnFull'
                                                         fluid
+                                                        disabled={this.state.multiRect}
                                                         label={<Popup
                                                             trigger={<Label className='uniform'>X</Label>}
                                                             content='X Position'
                                                             className='Popup'
                                                             size='tiny'
                                                         />}
-                                                        value={this.state.x} 
+                                                        value={this.state.multiRect ? this.state.select.x1 + ' - ' + this.state.select.x2 : this.state.x} 
                                                         onChange={(e) => this.setX(e.target.value)}
                                                     />
                                                 </GridRow>
                                                 <GridRow>
                                                     <Input
                                                         placeholder="1 - 100"
-                                                        type="number"
+                                                        type={this.state.multiRect ? 'text' : 'number'}
                                                         label={<Popup
                                                             trigger={<Label className='uniform'>Y</Label>}
                                                             content='Y Position'
@@ -529,7 +594,8 @@ class SetPixelColorForm extends Component {
                                                         />}
                                                         className='oneColumnFull'
                                                         fluid
-                                                        value={this.state.y} 
+                                                        disabled={this.state.multiRect}
+                                                        value={this.state.multiRect ? this.state.select.y1 + ' - ' + this.state.select.y2 : this.state.y} 
                                                         onChange={(e) => this.setY(e.target.value)}
                                                     />
                                                 </GridRow>

@@ -286,6 +286,13 @@ input:focus[type=number] {
     }
 }
 
+.largeCanvasContainer {
+    overflow: auto;
+    //max-width: 300px;
+    max-height: 300px;
+    padding: 0px !important;
+}
+
 .SetPixelColorForm {
     canvas {
         border: 1px solid $color5;

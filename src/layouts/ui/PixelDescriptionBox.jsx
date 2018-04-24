@@ -224,15 +224,14 @@ class PixelDescriptionBox extends Component {
     }
 
     setCanvas(rgbArr) {
-        if (this.state.ctx.canvas.width != 100)
-            this.state.ctx.canvas.width = 100;
-        if (this.state.ctx.canvas.height != 100)
-            this.state.ctx.canvas.height = 100;
-        if (this.state.dataCtx.canvas.width != 100)
-            this.state.dataCtx.canvas.width = 100;
-        if (this.state.dataCtx.canvas.height != 100)
-            this.state.dataCtx.canvas.height = 100;
-        this.state.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.state.ctx.canvas.width = 100;
+        this.state.ctx.canvas.height = 100;
+        this.state.dataCtx.canvas.width = 10;
+        this.state.dataCtx.canvas.height = 10;
+        this.state.ctx.imageSmoothingEnabled = false;
+        this.state.ctx.webkitImageSmoothingEnabled = false;
+        this.state.dataCtx.imageSmoothingEnabled = false;
+        this.state.dataCtx.webkitImageSmoothingEnabled = false;
         this.state.ctx.scale(10, 10);
         let ctxID = this.state.dataCtx.createImageData(10, 10);
         for (let i = 0; i < rgbArr.length; i++) {
@@ -245,9 +244,14 @@ class PixelDescriptionBox extends Component {
     loadMultiProperty(x1, y1, x2, y2) {
         let w = Math.abs(x1 - x2) + 1;
         let h = Math.abs(y1 - y2) + 1;
-        this.state.ctx.canvas.width = this.state.dataCtx.canvas.width = w * 20;
-        this.state.ctx.canvas.height = this.state.dataCtx.canvas.height = h * 20;
-        this.state.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.state.ctx.canvas.width = w * 20;
+        this.state.ctx.canvas.height = h * 20;
+        this.state.dataCtx.canvas.width = w * 10;
+        this.state.dataCtx.canvas.height = h * 10;
+        this.state.ctx.imageSmoothingEnabled = false;
+        this.state.ctx.webkitImageSmoothingEnabled = false;
+        this.state.dataCtx.imageSmoothingEnabled = false;
+        this.state.dataCtx.webkitImageSmoothingEnabled = false;
         this.state.ctx.scale(2, 2);
         let ctxID = this.state.dataCtx.createImageData(w * 10, h * 10);
 

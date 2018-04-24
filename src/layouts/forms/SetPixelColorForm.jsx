@@ -263,6 +263,8 @@ class SetPixelColorForm extends Component {
         let colorToReplace = this.state.ctxSml.getImageData(x, y, 1, 1);
         let visitedPoints  = [];
         let pointsToCheck = [ {x, y} ];
+        let smallCanvasWidth = this.state.ctxSml.canvas.width;
+        let smallCanvasHeight = this.state.ctxSml.canvas.height;
 
         let ifReplaceColor = function(colorToCheck) {
             return colorToReplace.data[0] == colorToCheck.data[0] && colorToReplace.data[1] == colorToCheck.data[1] && colorToReplace.data[2] == colorToCheck.data[2];
@@ -276,7 +278,7 @@ class SetPixelColorForm extends Component {
         }
 
         let tryAddPointToCheck = function(xToCheck, yToCheck) {
-            if (xToCheck >= 0 && yToCheck >= 0 && xToCheck <= 9 && yToCheck <= 9 && pointIsUnvisited(xToCheck, yToCheck) ) {
+            if (xToCheck >= 0 && yToCheck >= 0 && xToCheck <= smallCanvasWidth - 1 && yToCheck <= smallCanvasHeight - 1 && pointIsUnvisited(xToCheck, yToCheck) ) {
                 pointsToCheck.push( {x : xToCheck, y : yToCheck });
             }
         }

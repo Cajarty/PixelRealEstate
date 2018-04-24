@@ -248,7 +248,6 @@ class Canvas extends Component {
             let idx = (i - 3) / 4;
             if (idx < wp * 2 || idx >= (wp * hp) - (wp * 2) || idx % wp < 2 || idx % wp >= wp - 2) {
                 ctxID.data[i] = alpha;
-                console.info(ctxID.data[i])
             }
         }
         this.state.ctx.putImageData(ctxID, (x1 * 10) - 2, (y1 * 10) - 2);

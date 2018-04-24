@@ -350,7 +350,7 @@ class SetPixelColorForm extends Component {
 
     render() {
         return (
-            <Modal size='small'
+            <Modal size='large'
                 open={this.state.isOpen || this.props.tutorialState.index == 4} 
                 closeIcon={this.props.tutorialState.index != 4}
                 dimmer={this.props.tutorialState.index != 4}
@@ -358,25 +358,20 @@ class SetPixelColorForm extends Component {
                 className={TUTORIAL_STATE.getClassName(this.props.tutorialState.index, 4) + ' actions'}
             >
             <ModalHeader>Update Property Image</ModalHeader>
-            <ModalContent>
-                <Info messages={Strings.FORM_SET_IMAGE}/>
-                <Divider/>
-                <Segment>
-                    <Grid>
-                        <GridRow columns='two' stretched>
-                            <GridColumn width={9}>
-                                <Segment>
+            <ModalContent>                                       
+                <canvas id='normal' className='hidden' width={Const.PROPERTY_LENGTH} height={Const.PROPERTY_LENGTH} ref={(canvasSml) => { this.canvasSml = canvasSml; }}></canvas>
+                <Grid>
+                    <GridRow columns={2} stretched>
+                        <GridColumn width={7}>
+                            <Segment>
                                 <Grid divided>
-                                    <GridRow columns='two'>
-                                        <GridColumn width={10}>
+                                    <GridRow>
+                                        <GridColumn style={{height: 280}}>
                                             <canvas id='large' width={PREVIEW_WIDTH} height={PREVIEW_HEIGHT} ref={(canvasLrg) => { this.canvasLrg = canvasLrg; }}></canvas>
                                         </GridColumn>
-                                        <GridColumn width={6}>
-                                            <canvas id='normal' width={Const.PROPERTY_LENGTH} height={Const.PROPERTY_LENGTH} ref={(canvasSml) => { this.canvasSml = canvasSml; }}></canvas>
-                                        </GridColumn>
                                     </GridRow>
-                                    <GridRow>
-                                        <GridColumn width={10}>
+                                    <GridRow columns={2}>
+                                        <GridColumn width={9}>
                                             <ButtonGroup fluid>
                                                 <Popup 
                                                 trigger={
@@ -436,39 +431,46 @@ class SetPixelColorForm extends Component {
                                                 />
                                                 </ButtonGroup>
                                             </GridColumn>
-                                            <GridColumn width={6}>
-                                            <ButtonGroup fluid>
-                                                <Popup 
-                                                    trigger={
-                                                        <Button icon
-                                                            onClick={(e) => {this.clearCanvas()}}
-                                                        ><Icon name='trash outline'/></Button>
-                                                    }
-                                                    content='Clear drawing canvas'
-                                                    position='bottom left'
-                                                    className='Popup'
-                                                    size='tiny'
-                                                    basic
-                                                />
-                                                <Popup 
-                                                    trigger={
-                                                        <Button icon
-                                                            onClick={(e) => {this.loadCanvas()}}
-                                                        ><Icon name='cloud upload'/></Button>
-                                                    }
-                                                    content='Load current image'
-                                                    position='bottom left'
-                                                    className='Popup'
-                                                    size='tiny'
-                                                    basic
-                                                />
-                                            </ButtonGroup>
-                                        </GridColumn>
-                                    </GridRow>
-                                    <GridRow>
-                                        <GridColumn width={10}>
-                                        </GridColumn>
-                                        <GridColumn width={6}>
+                                            <GridColumn width={7}>
+                                                <ButtonGroup fluid>
+                                                    <Popup 
+                                                        trigger={
+                                                            <Button icon
+                                                                onClick={(e) => {this.clearCanvas()}}
+                                                            ><Icon name='trash outline'/></Button>
+                                                        }
+                                                        content='Clear drawing canvas'
+                                                        position='bottom left'
+                                                        className='Popup'
+                                                        size='tiny'
+                                                        basic
+                                                    />
+                                                    <Popup 
+                                                        trigger={
+                                                            <Button icon
+                                                                onClick={(e) => {this.loadCanvas()}}
+                                                            ><Icon name='cloud upload'/></Button>
+                                                        }
+                                                        content='Load current image'
+                                                        position='bottom left'
+                                                        className='Popup'
+                                                        size='tiny'
+                                                        basic
+                                                    />
+                                                    <Popup 
+                                                        trigger={
+                                                            <Button icon
+                                                                id='imageInputButton' 
+                                                                onClick={(e) => {this.input.click()}}
+                                                            ><Icon name='upload'/></Button>
+                                                        }
+                                                        content='Upload from file...'
+                                                        position='bottom left'
+                                                        className='Popup'
+                                                        size='tiny'
+                                                        basic
+                                                    />
+                                                </ButtonGroup>
                                             <input 
                                                 id='imageInput' 
                                                 type='file' 
@@ -476,97 +478,89 @@ class SetPixelColorForm extends Component {
                                                 style={{display: 'none'}} 
                                                 ref={(input) => { this.input = input; }}
                                             ></input>
-                                            <Popup 
-                                                trigger={
-                                                    <Button 
-                                                        fluid
-                                                        id='imageInputButton' 
-                                                        type='button' 
-                                                        onClick={(e) => {this.input.click()}}
-                                                    ><Icon name='upload'/></Button>
-                                                }
-                                                content='Upload from file...'
-                                                position='bottom left'
-                                                className='Popup'
-                                                size='tiny'
-                                                basic
-                                            />
                                         </GridColumn>
                                     </GridRow>
                                 </Grid>
                                 </Segment>
                             </GridColumn>
-                            <GridColumn width={7}>
+                            <GridColumn width={9}>
                                 <Segment>
-                                    <ChromePicker 
-                                        className='colorPicker' 
-                                        onChangeComplete={(color, event) => this.colorChange(color, event)}
-                                        color={this.state.drawColor}
-                                        disableAlpha={true}
-                                    />
+                                    <Grid divided>
+                                        <GridRow>
+                                            <GridColumn width={16} stretched>
+                                                <Info messages={Strings.FORM_SET_IMAGE}/>
+                                            </GridColumn>
+                                        </GridRow>
+                                        <GridRow columns={2}>
+                                            <GridColumn width={6} stretched>
+                                                <ChromePicker 
+                                                    className='colorPicker' 
+                                                    onChangeComplete={(color, event) => this.colorChange(color, event)}
+                                                    color={this.state.drawColor}
+                                                    disableAlpha={true}
+                                                />
+                                            </GridColumn>
+                                            <GridColumn width={10} stretched>
+                                                <GridRow>
+                                                    <Input
+                                                        placeholder="1 - 100"
+                                                        type="number"
+                                                        className='oneColumnFull'
+                                                        fluid
+                                                        label={<Popup
+                                                            trigger={<Label className='uniform'>X</Label>}
+                                                            content='X Position'
+                                                            className='Popup'
+                                                            size='tiny'
+                                                        />}
+                                                        value={this.state.x} 
+                                                        onChange={(e) => this.setX(e.target.value)}
+                                                    />
+                                                </GridRow>
+                                                <GridRow>
+                                                    <Input
+                                                        placeholder="1 - 100"
+                                                        type="number"
+                                                        label={<Popup
+                                                            trigger={<Label className='uniform'>Y</Label>}
+                                                            content='Y Position'
+                                                            className='Popup'
+                                                            size='tiny'
+                                                        />}
+                                                        className='oneColumnFull'
+                                                        fluid
+                                                        value={this.state.y} 
+                                                        onChange={(e) => this.setY(e.target.value)}
+                                                    />
+                                                </GridRow>
+                                                <GridRow>
+                                                    <Input 
+                                                        fluid
+                                                        labelPosition='right' 
+                                                        type={"number"}
+                                                        placeholder={"Enter Optional PXL"}
+                                                        value={this.state.ppt}
+                                                    >
+                                                        <Popup
+                                                            trigger={<Label><Icon className='uniform' name='money'/></Label>}
+                                                            content='PXL to Spend'
+                                                            className='Popup'
+                                                            size='tiny'
+                                                        />
+                                                        <input 
+                                                        className='bid'
+                                                        onChange={(e) => this.handlePrice('ppt', e.target.value)}
+                                                        />
+                                                        <Label>PXL</Label>
+                                                    </Input>
+                                                </GridRow>
+                                            </GridColumn>
+                                        </GridRow>
+                                    </Grid>
                                 </Segment>
                             </GridColumn>
                         </GridRow>
                     </Grid>
-                </Segment>
-                <Divider/>
-                <Grid divided>
-                    <GridRow verticalAlign='middle'>
-                        <GridColumn width={4}>
-                            <Input
-                                placeholder="1 - 100"
-                                type="number"
-                                className='oneColumnFull'
-                                fluid
-                                label={<Popup
-                                    trigger={<Label className='uniform'>X</Label>}
-                                    content='X Position'
-                                    className='Popup'
-                                    size='tiny'
-                                />}
-                                value={this.state.x} 
-                                onChange={(e) => this.setX(e.target.value)}
-                            />
-                            </GridColumn>
-                        <GridColumn width={4}>
-                            <Input
-                                placeholder="1 - 100"
-                                type="number"
-                                label={<Popup
-                                    trigger={<Label className='uniform'>Y</Label>}
-                                    content='Y Position'
-                                    className='Popup'
-                                    size='tiny'
-                                />}
-                                className='oneColumnFull'
-                                fluid
-                                value={this.state.y} 
-                                onChange={(e) => this.setY(e.target.value)}
-                            />
-                        </GridColumn>
-                        <GridColumn width={8}>
-                            <Input 
-                                fluid
-                                labelPosition='right' 
-                                type={"number"}
-                                placeholder={"Enter Optional PXL"}
-                                value={this.state.ppt}
-                            >
-                                <Popup
-                                    trigger={<Label><Icon className='uniform' name='money'/></Label>}
-                                    content='PXL to Spend'
-                                    className='Popup'
-                                    size='tiny'
-                                />
-                                <input 
-                                className='bid'
-                                onChange={(e) => this.handlePrice('ppt', e.target.value)}
-                                />
-                                <Label>PXL</Label>
-                            </Input>
-                        </GridColumn>
-                    </GridRow>
-                </Grid>
                 </ModalContent>
                 {this.props.tutorialState.index != 4 && <ModalActions>
                     <Button primary onClick={() => this.setPixels()}>Change Image</Button>

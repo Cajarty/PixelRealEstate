@@ -350,7 +350,7 @@ class PixelDescriptionBox extends Component {
 
     getActionsList() {
         let actions = [];
-        if (!this.state.isInPrivate || this.state.tutorialState.index == 3) {
+        if (!this.state.isInPrivate || this.state.tutorialState.index == 3 || this.state.multiRect) {
             actions.push(
                 <Button fluid onClick={() => this.toggleAction('SET_IMAGE')}>Update Image</Button>
             );
@@ -421,7 +421,7 @@ class PixelDescriptionBox extends Component {
                             className='Popup'
                             size='tiny'
                         />}
-                        value={this.state.multiRect ? this.state.x1 + ' - ' + this.state.x2 : this.state.x} 
+                        value={this.state.multiRect ? this.state.select.x1 + ' - ' + this.state.select.x2 : this.state.x} 
                         onChange={(e) => this.setX(e.target.value)}
                     />
                 </div>
@@ -437,7 +437,7 @@ class PixelDescriptionBox extends Component {
                         />}
                         className='oneColumnFull'
                         fluid
-                        value={this.state.multiRect ? this.state.y1 + ' - ' + this.state.y2 : this.state.y} 
+                        value={this.state.multiRect ? this.state.select.y1 + ' - ' + this.state.select.y2 : this.state.y} 
                         onChange={(e) => this.setY(e.target.value)}
                     />
                 </div>
@@ -586,7 +586,7 @@ class PixelDescriptionBox extends Component {
                         </div>
                     </div>
                 }
-                {this.state.x != '' && this.state.y != '' && !this.state.noAccount && 
+                {((this.state.x != '' && this.state.y != '') || this.state.multiRect) && !this.state.noAccount && 
                     <div className={(this.state.tutorialState.index == 3 ? TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 3) + ' actions' : '')}>
                         <Divider/>
                         <Grid columns='2' divided>

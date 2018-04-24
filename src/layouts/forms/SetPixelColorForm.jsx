@@ -357,10 +357,30 @@ class SetPixelColorForm extends Component {
     }
 
     setPixels() {
-        ctr.setColors(this.state.x - 1, this.state.y - 1, this.state.imageData, this.state.ppt, (result) => {
-            this.toggleModal(!result);
-        });
+        if (this.state.multiRect) {
+            let xx = 0;
+            let yy = 0;
+            for (let x = this.state.select.x1; x <= this.state.select.x2; x++) {
+                for (let y = this.state.select.y1; y <= this.state.select.y2; y++) {
+                    ctr.setColors(x - 1, y - 1, this.getImageDataOfRect(this.state.imageData, xx, yy), this.state.ppt, (result) => {});
+                    yy++;
+                }
+                xx++;
+            }
+        } else {
+            ctr.setColors(this.state.x - 1, this.state.y - 1, this.state.imageData, this.state.ppt, (result) => {});
+        }
     }
+
+    getImageDataOfRect(data, xx, yy) {
+            let retData = [];
+            for (let y = yy * 10; y < (yy + 1) * 10; y++)
+                for (let x = xx * 10; x < (xx + 1) * 10; x++)
+                    for (let i = 0; i < 4; i++) {
+                        retData.push(data[y * 40 + x * 4 + i]);
+                    }
+            return retData;
+        }
 
     toggleModal(set = null) {
         let res = set != null ? set : !this.state.isOpen;

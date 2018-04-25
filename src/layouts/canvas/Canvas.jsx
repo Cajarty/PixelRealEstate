@@ -48,24 +48,24 @@ class Canvas extends Component {
             if (e.buttons == 1 && select.x1 != -1 && select.y1 != -1) {
                 if (x != select.x2 - 1) {
                     let x1 = select.x1;
-                    if (x1 - x >= 9) {
-                        if (select.x2 != x1 - 9)
-                            select.x2 = x1 - 9;
-                    } else if (x - x1 >= 9) {
-                        if (select.x2 != x1 + 9)
-                            select.x2 = x1 + 9;
+                    if (x1 - x >= 4) {
+                        if (select.x2 != x1 - 4)
+                            select.x2 = x1 - 4;
+                    } else if (x - x1 >= 4) {
+                        if (select.x2 != x1 + 4)
+                            select.x2 = x1 + 4;
                     } else {
                         select.x2 = x + 1;
                     }
                 }
                 if (y != select.y2 - 1) {
                     let y1 = select.y1;
-                    if (y1 - y >= 9) {
-                        if (select.y2 != y1 - 9)
-                        select.y2 = y1 - 9;
-                    } else if (y - y1 >= 9) {
-                        if (select.y2 != y1 + 9)
-                        select.y2 = y1 + 9;
+                    if (y1 - y >= 4) {
+                        if (select.y2 != y1 - 4)
+                        select.y2 = y1 - 4;
+                    } else if (y - y1 >= 4) {
+                        if (select.y2 != y1 + 4)
+                        select.y2 = y1 + 4;
                     } else {
                         select.y2 = y + 1;
                     }

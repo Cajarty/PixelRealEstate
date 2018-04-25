@@ -34,7 +34,6 @@ class SetPixelColorForm extends Component {
             ctxSml: null,
             canvasLrg: null,
             canvasSml: null,
-            imageData: null,
             drawColor: {
                     r: 255,
                     g: 255,
@@ -172,10 +171,6 @@ class SetPixelColorForm extends Component {
         }
         ctxSml.putImageData(ctxID, 0, 0);
         ctxLrg.drawImage(canvasSml, 0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT);
-
-        this.setState({
-            imageData: ctxSml.getImageData(0, 0, Const.PROPERTY_LENGTH, Const.PROPERTY_LENGTH).data,
-        });
     }
 
     setMultiCanvas(w, h, rgbArr, ctxSml = this.state.ctxSml, ctxLrg = this.state.ctxLrg, canvasSml = this.state.canvasSml) {
@@ -193,10 +188,6 @@ class SetPixelColorForm extends Component {
         }
         ctxSml.putImageData(ctxID, 0, 0);
         ctxLrg.drawImage(canvasSml, 0, 0, w * 100, h * 100);
-
-        this.setState({
-            imageData: ctxSml.getImageData(0, 0, w * 10, h * 10).data,
-        });
     }
 
     pickPixelColor(x, y) {
@@ -220,10 +211,6 @@ class SetPixelColorForm extends Component {
         }
         this.state.ctxLrg.putImageData(ctxID, x * 10, y * 10);
         this.state.ctxSml.putImageData(ctxID, x, y, 0, 0, 1, 1);
-
-        this.setState({
-            imageData: this.state.ctxSml.getImageData(0, 0, Const.PROPERTY_LENGTH, Const.PROPERTY_LENGTH).data,
-        });
     }
 
     drawPixel(x, y) {
@@ -236,27 +223,20 @@ class SetPixelColorForm extends Component {
         }
         this.state.ctxLrg.putImageData(ctxID, x * 10, y * 10);
         this.state.ctxSml.putImageData(ctxID, x, y, 0, 0, 1, 1);
-
-        this.setState({
-            imageData: this.state.ctxSml.getImageData(0, 0, Const.PROPERTY_LENGTH, Const.PROPERTY_LENGTH).data,
-        });
     }
 
     //Old "Fill" that filled the whole Property with one color. Still may be useful as a UI item if properly name
     drawClearToColor() {
-        let ctxID = this.state.ctxLrg.createImageData(100, 100);
-        for (let i = 0; i < 40000; i+=4) {
+        let editor = this.getEditorSize();
+        let ctxID = this.state.ctxLrg.createImageData(editor.w, editor.h);
+        for (let i = 0; i < editor.size; i+=4) {
             ctxID.data[i] = this.state.drawColor.r;
             ctxID.data[i+1] = this.state.drawColor.g;
             ctxID.data[i+2] = this.state.drawColor.b;
             ctxID.data[i+3] = this.state.drawColor.a * 255;
         }
         this.state.ctxLrg.putImageData(ctxID, 0, 0);
-        this.state.ctxSml.putImageData(ctxID, 0, 0, 0, 0, 10, 10);
-
-        this.setState({
-            imageData: this.state.ctxSml.getImageData(0, 0, Const.PROPERTY_LENGTH, Const.PROPERTY_LENGTH).data,
-        });
+        this.state.ctxSml.putImageData(ctxID, 0, 0, 0, 0, editor.w / 10, editor.h / 10);
     }
 
     drawFill(x, y) {
@@ -310,10 +290,6 @@ class SetPixelColorForm extends Component {
                 }
             }
         }
-
-        this.setState({
-            imageData: this.state.ctxSml.getImageData(0, 0, Const.PROPERTY_LENGTH, Const.PROPERTY_LENGTH).data,
-        });
     }
 
     colorChange(color, event) {
@@ -348,39 +324,57 @@ class SetPixelColorForm extends Component {
         if (img == null) 
             return;
 
-        this.state.ctxLrg.drawImage(img, 0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT);
-        this.state.ctxSml.drawImage(img, 0, 0, Const.PROPERTY_LENGTH, Const.PROPERTY_LENGTH);
+        let editor = this.getEditorSize();
 
-        this.setState({
-            imageData: this.state.ctxSml.getImageData(0, 0, Const.PROPERTY_LENGTH, Const.PROPERTY_LENGTH).data,
-        });
+        this.state.ctxLrg.drawImage(img, 0, 0, editor.w, editor.h);
+        this.state.ctxSml.drawImage(img, 0, 0, editor.w / 10, editor.h / 10);
+    }
+
+    getEditorSize() {
+        let ret = {
+            rect: this.state.multiRect,
+            w: 100,
+            h: 100,
+            s: this.w * this.h * 4,
+        }
+        if (this.state.multiRect) {
+            ret.w = this.state.select.w * 100;
+            ret.h = this.state.select.h * 100;
+        }
+        return ret;
     }
 
     setPixels() {
+        let editor = this.getEditorSize();
+        let pixelData = this.state.ctxSml.getImageData(0, 0, editor.w / 10, editor.h / 10).data;
+        console.info(pixelData)
         if (this.state.multiRect) {
             let xx = 0;
-            let yy = 0;
             for (let x = this.state.select.x1; x <= this.state.select.x2; x++) {
+                let yy = 0;
                 for (let y = this.state.select.y1; y <= this.state.select.y2; y++) {
-                    ctr.setColors(x - 1, y - 1, this.getImageDataOfRect(this.state.imageData, xx, yy), this.state.ppt, (result) => {});
+                    ctr.setColors(x - 1, y - 1, this.getImageDataFromRect(pixelData, xx, yy, this.state.select.w, this.state.select.h), this.state.ppt, (result) => {});
                     yy++;
                 }
                 xx++;
             }
         } else {
-            ctr.setColors(this.state.x - 1, this.state.y - 1, this.state.imageData, this.state.ppt, (result) => {});
+            ctr.setColors(this.state.x - 1, this.state.y - 1, pixelData, this.state.ppt, (result) => {});
         }
     }
 
-    getImageDataOfRect(data, xx, yy) {
-            let retData = [];
-            for (let y = yy * 10; y < (yy + 1) * 10; y++)
-                for (let x = xx * 10; x < (xx + 1) * 10; x++)
-                    for (let i = 0; i < 4; i++) {
-                        retData.push(data[y * 40 + x * 4 + i]);
-                    }
-            return retData;
+    getImageDataFromRect(data, xx, yy, w, h) {
+        let pixelW = w * 10;
+        let pixelH = h * 10;
+        let pixelX = xx * 10;
+        let pixelY = yy * 10;
+        let retData = [];
+        for (let y = 0; y < 10; y++) {
+            retData = retData.concat(Array.from(data.slice(((pixelY + y) * pixelW * 4) + (pixelX * 4), ((pixelY + y) * pixelW * 4) + ((pixelX + 10) * 4))));
         }
+        console.info(retData)
+        return retData;
+    }
 
     toggleModal(set = null) {
         let res = set != null ? set : !this.state.isOpen;
@@ -389,16 +383,14 @@ class SetPixelColorForm extends Component {
     }
 
     clearCanvas() {
-        let ctxID = this.state.ctxLrg.createImageData(100, 100);
-        for (let i = 0; i < 40000; i++) {
+        let editor = this.getEditorSize();
+
+        let ctxID = this.state.ctxLrg.createImageData(editor.w, editor.h);
+        for (let i = 0; i < editor.size; i++) {
             ctxID.data[i] = 0;
         }
         this.state.ctxLrg.putImageData(ctxID, 0, 0);
-        this.state.ctxSml.putImageData(ctxID, 0, 0, 0, 0, 10, 10);
-
-        this.setState({
-            imageData: this.state.ctxSml.getImageData(0, 0, Const.PROPERTY_LENGTH, Const.PROPERTY_LENGTH).data,
-        });
+        this.state.ctxSml.putImageData(ctxID, 0, 0, 0, 0, editor.w / 10, editor.h / 10);
     }
 
     loadCanvas() {

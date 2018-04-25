@@ -19,7 +19,7 @@ class PropertySalesLog extends Component {
     }
 
     componentDidMount() {
-        ctr.watchEventLogs(EVENTS.PropertyBought, {}, (handle) => {
+        ctr.watchEventLogs(EVENTS.PropertyBought, 50000, {}, (handle) => {
             let eventHandle = handle;
             this.setState({
                 eventHandle,
@@ -42,6 +42,8 @@ class PropertySalesLog extends Component {
                     transaction: log.transactionHash,
                 };
                 old.unshift(newData);
+                if (old.length > 20)
+                    old.pop();
                 this.setState({ changeLog: old, isLoading: false });
             });
         });

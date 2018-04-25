@@ -20,7 +20,7 @@ class PropertySalesLogYou extends Component {
     }
 
     componentDidMount() {
-        ctr.watchEventLogs(EVENTS.PropertyBought, {newOwner: ctr.account}, (handle) => {
+        ctr.watchEventLogs(EVENTS.PropertyBought, 50000, {newOwner: ctr.account}, (handle) => {
             let eventHandle1 = handle;
             this.setState({eventHandle1});
             handle.watch((error, log) => {
@@ -40,11 +40,13 @@ class PropertySalesLogYou extends Component {
                     transaction: log.transactionHash,
                 };
                 old.unshift(newData);
+                if (old.length > 20)
+                    old.pop();
                 this.setState({ changeLog: old, isLoading: false });
             });
         });
 
-        ctr.watchEventLogs(EVENTS.PropertyBought, {oldOwner: ctr.account}, (handle) => {
+        ctr.watchEventLogs(EVENTS.PropertyBought, 50000, {oldOwner: ctr.account}, (handle) => {
             let eventHandle2 = handle;
             this.setState({
                 eventHandle2,
@@ -67,6 +69,8 @@ class PropertySalesLogYou extends Component {
                     transaction: log.transactionHash,
                 };
                 old.unshift(newData);
+                if (old.length > 20)
+                    old.pop();
                 this.setState({ changeLog: old, isLoading: false });
             });
         });

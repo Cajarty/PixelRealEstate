@@ -31,7 +31,7 @@ class PropertiesForSale extends Component {
         this.props.isLoading(true);
 
         //fix updates to be better, add params
-        ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (eventHandle) => {
+        ctr.watchEventLogs(EVENTS.PropertySetForSale, 1000000, {}, (eventHandle) => {
             this.setState({eventHandle});
             eventHandle.watch((error, log) => {
                 this.reorderItems();

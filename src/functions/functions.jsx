@@ -43,11 +43,11 @@ export const NumberAbbreviated = (number) => {
 
 export const TimeSince = (date, to = false) => {
     let seconds = Math.floor((new Date() - date) / 1000);
-    let interval = Math.floor(seconds / 31536000);
 
     if (to)
         seconds = Math.abs(seconds);
 
+    let interval = Math.floor(seconds / 31536000);
     if (interval > 1) {
         return interval + " years";
     }

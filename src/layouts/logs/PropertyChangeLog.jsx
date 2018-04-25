@@ -19,7 +19,7 @@ class PropertyChangeLog extends Component {
     }
 
     componentDidMount() {
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (handle) => {
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, 50000, {}, (handle) => {
             let eventHandle = handle;
             this.setState({
                 eventHandle,
@@ -41,6 +41,8 @@ class PropertyChangeLog extends Component {
                     transaction: log.transactionHash,
                 };
                 old.unshift(newData);
+                if (old.length > 20)
+                    old.pop();
                 this.setState({ changeLog: old, isLoading: false });
             });
         });

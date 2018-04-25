@@ -19,7 +19,7 @@ class PropertyChangeLogYou extends Component {
     }
 
     componentDidMount() {
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {lastUpdaterPayee: ctr.account}, (handle) => {
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, 50000, {lastUpdaterPayee: ctr.account}, (handle) => {
             let eventHandle = handle;
             this.setState({
                 eventHandle,
@@ -40,6 +40,8 @@ class PropertyChangeLogYou extends Component {
                     transaction: log.transactionHash,
                 };
                 old.unshift(newData);
+                if (old.length > 20)
+                    old.pop();
                 this.setState({ changeLog: old, isLoading: false });
             });
         });

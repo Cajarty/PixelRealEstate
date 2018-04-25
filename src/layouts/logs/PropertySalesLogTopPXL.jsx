@@ -19,7 +19,7 @@ class PropertySalesLogTopPXL extends Component {
     }
 
     componentDidMount() {
-        ctr.watchEventLogs(EVENTS.PropertyBought, {}, (handle) => {
+        ctr.watchEventLogs(EVENTS.PropertyBought, 50000, {}, (handle) => {
             let eventHandle = handle;
             this.setState({
                 eventHandle,
@@ -45,6 +45,8 @@ class PropertySalesLogTopPXL extends Component {
                         transaction: log.transactionHash,
                     };
                     old.unshift(newData);
+                    if (old.length > 20)
+                        old.pop();
                     this.setState({ changeLog: old, isLoading: false });
                 } else {
                     for (let i = Math.min(old.length - 1, 9); i >= 0; i--) {

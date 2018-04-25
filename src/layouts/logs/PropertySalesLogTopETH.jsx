@@ -19,61 +19,65 @@ class PropertySalesLogTopETH extends Component {
     }
 
     componentDidMount() {
-        ctr.watchEventLogs(EVENTS.PropertyBought, 50000, {}, (handle) => {
-            let eventHandle = handle;
-            this.setState({
-                eventHandle,
-                loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
-            });
-            eventHandle.watch((error, log) => {
-                let old = this.state.changeLog;
-                let PXLPrice = Func.BigNumberToNumber(log.args.PXLAmount);
-                let ETHPrice = Func.BigNumberToNumber(log.args.ethAmount);
-                let timeSold = Func.BigNumberToNumber(log.args.timestamp);
-                if (ETHPrice == 0)
-                    return;
-                if (old.length == 0) {
-                    let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                    let newData = {
-                        x: id.x,
-                        y: id.y,
-                        PXLPrice,
-                        ETHPrice,
-                        oldOwner: log.args.oldOwner == ctr.account ? "You" : (log.args.oldOwner === Struct.NOBODY ? 'PixelProperty' : log.args.oldOwner),
-                        newOwner: log.args.newOwner == ctr.account ? "You" : log.args.newOwner,
-                        timeSold: timeSold * 1000,
-                        transaction: log.transactionHash,
-                    };
-                    old.unshift(newData);
-                    if (old.length > 20)
-                        old.pop();
-                    this.setState({ changeLog: old, isLoading: false });
-                } else {
-                    for (let i = Math.min(old.length - 1, 9); i >= 0; i--) {
-                        if (ETHPrice <= old[i].ETHPrice || (i == 0 && ETHPrice > old[i].ETHPrice)) {
-                            if (i < 9) {
-                                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                                let newData = {
-                                    x: id.x,
-                                    y: id.y,
-                                    PXLPrice,
-                                    ETHPrice,
-                                    oldOwner: log.args.oldOwner == ctr.account ? "You" : (log.args.oldOwner === Struct.NOBODY ? 'PixelProperty' : log.args.oldOwner),
-                                    newOwner: log.args.newOwner == ctr.account ? "You" : log.args.newOwner,
-                                    timeSold: timeSold * 1000,
-                                    transaction: log.transactionHash,
-                                };
-                                if (ETHPrice <= old[i].ETHPrice)
-                                    old.splice(i + 1, 0, newData);
-                                else
-                                    old.splice(i, 0, newData);
-                                old.splice(10);
-                                this.setState({ changeLog: old });
+        GFD.listen('userExists', 'Log-PSLTETH', (loggedIn) => {
+            if (!loggedIn)
+                return;
+            ctr.watchEventLogs(EVENTS.PropertyBought, 50000, {}, (handle) => {
+                let eventHandle = handle;
+                this.setState({
+                    eventHandle,
+                    loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
+                });
+                eventHandle.watch((error, log) => {
+                    let old = this.state.changeLog;
+                    let PXLPrice = Func.BigNumberToNumber(log.args.PXLAmount);
+                    let ETHPrice = Func.BigNumberToNumber(log.args.ethAmount);
+                    let timeSold = Func.BigNumberToNumber(log.args.timestamp);
+                    if (ETHPrice == 0)
+                        return;
+                    if (old.length == 0) {
+                        let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
+                        let newData = {
+                            x: id.x,
+                            y: id.y,
+                            PXLPrice,
+                            ETHPrice,
+                            oldOwner: log.args.oldOwner == ctr.account ? "You" : (log.args.oldOwner === Struct.NOBODY ? 'PixelProperty' : log.args.oldOwner),
+                            newOwner: log.args.newOwner == ctr.account ? "You" : log.args.newOwner,
+                            timeSold: timeSold * 1000,
+                            transaction: log.transactionHash,
+                        };
+                        old.unshift(newData);
+                        if (old.length > 20)
+                            old.pop();
+                        this.setState({ changeLog: old, isLoading: false });
+                    } else {
+                        for (let i = Math.min(old.length - 1, 9); i >= 0; i--) {
+                            if (ETHPrice <= old[i].ETHPrice || (i == 0 && ETHPrice > old[i].ETHPrice)) {
+                                if (i < 9) {
+                                    let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
+                                    let newData = {
+                                        x: id.x,
+                                        y: id.y,
+                                        PXLPrice,
+                                        ETHPrice,
+                                        oldOwner: log.args.oldOwner == ctr.account ? "You" : (log.args.oldOwner === Struct.NOBODY ? 'PixelProperty' : log.args.oldOwner),
+                                        newOwner: log.args.newOwner == ctr.account ? "You" : log.args.newOwner,
+                                        timeSold: timeSold * 1000,
+                                        transaction: log.transactionHash,
+                                    };
+                                    if (ETHPrice <= old[i].ETHPrice)
+                                        old.splice(i + 1, 0, newData);
+                                    else
+                                        old.splice(i, 0, newData);
+                                    old.splice(10);
+                                    this.setState({ changeLog: old });
+                                }
+                                return;
                             }
-                            return;
                         }
                     }
-                }
+                });
             });
         });
     }
@@ -87,6 +91,7 @@ class PropertySalesLogTopETH extends Component {
     componentWillUnmount() {
         this.state.eventHandle != null && this.state.eventHandle.stopWatching();
         this.state.loadTimeout != null && clearTimeout(this.state.loadTimeout);
+        GFD.closeAll('Log-PSLTETH');
     }
 
     render() {

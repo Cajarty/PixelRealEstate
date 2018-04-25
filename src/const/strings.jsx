@@ -28,6 +28,14 @@ export const TUTORIAL_START_DIALOG = ["Pixel Property is easy to use. Just in ca
 
 export const CHANGELOG = [
     {
+        date: new Date('2018-4-24'),
+        title: 'Ease of Use Updates #2',
+        messages: 
+        ['Multi property uploading! Up to a max of 5x5 properties (50 pixels x 50 pixels).', 
+        'Interface simplified.',
+        'Support for smaller monitors.'],
+    },
+    {
         date: new Date('2018-4-13'),
         title: 'Ease of Use Updates',
         messages: 

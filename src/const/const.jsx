@@ -6,7 +6,7 @@ export const PROPERTY_LENGTH = 10;
 export const PROPERTY_SIZE = 100;
 export const WEI_IN_ETH = 1000000000000000000;
 
-export const VirtualRealEstate = ['0x0b91f37c52c3c71f097409e03bc4171eb7b50615', '0x1fb6ce46917543cad5f61cd995fa26d889716e5b'];
+export const VirtualRealEstate = ['0xbc512650375fc2560addf36a74adb3a0f88cc6b5','0x0b91f37c52c3c71f097409e03bc4171eb7b50615', '0x1fb6ce46917543cad5f61cd995fa26d889716e5b'];
 export const PXLProperty = ['0x4be75a8a3b769fdea12a00a7cc99a039163ba352'];
 
 export const TOS_VERSION = 1;

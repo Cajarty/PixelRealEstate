@@ -360,8 +360,8 @@ export class Contract {
     setupContracts() {
         this.PXLPP.deployed().then((PXLPPInstance) => {
             this.VRE.deployed().then((VREInstance) => {
-                VREInstance.setPXLPropertyContract(PXLPPInstance.address, {from: this.account}).then((r) => {console.info(r)}).catch((e) => {console.info(e)});
                 PXLPPInstance.setPixelPropertyContract(VREInstance.address, {from: this.account}).then((r) => {console.info(r)}).catch((e) => {console.info(e)});
+                VREInstance.setPXLPropertyContract(PXLPPInstance.address, {from: this.account}).then((r) => {console.info(r)}).catch((e) => {console.info(e)});
             });
         });
     }

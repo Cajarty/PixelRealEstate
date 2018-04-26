@@ -24,6 +24,7 @@ export const LISTENERS = {
     Alert: 'Alert',
     ShowForSale: 'ShowForSale',
     ServerDataManagerInit: 'ServerDataManagerInit',
+    PendingSetPixelUpdate: 'PendingSetPixelUpdate',
 }; 
 
 export class Contract {
@@ -483,6 +484,7 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return callback(false);
         this.getVREInstance().then((i) => {
+            callback('pending');
             return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), PPT, {from: this.account });
         }).then(() => {
             callback(true);

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {Contract, ctr} from '../../contract/contract.jsx';
+import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Const from '../../const/const.jsx';
 import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
@@ -349,19 +349,25 @@ class SetPixelColorForm extends Component {
     setPixels() {
         let editor = this.getEditorSize();
         let pixelData = this.state.ctxSml.getImageData(0, 0, editor.w / 10, editor.h / 10).data;
-        console.info(pixelData)
         if (this.state.multiRect) {
             let xx = 0;
             for (let x = this.state.select.x1; x <= this.state.select.x2; x++) {
                 let yy = 0;
                 for (let y = this.state.select.y1; y <= this.state.select.y2; y++) {
-                    ctr.setColors(x - 1, y - 1, this.getImageDataFromRect(pixelData, xx, yy, this.state.select.w, this.state.select.h), this.state.ppt, (result) => {});
+                    let pixelDataSection = this.getImageDataFromRect(pixelData, xx, yy, this.state.select.w, this.state.select.h);
+                    ctr.setColors(x - 1, y - 1, pixelDataSection, this.state.ppt, (result) => {
+                        if (result === 'pending')
+                            ctr.sendResults(LISTENERS.PendingSetPixelUpdate, {x: x - 1, y: y - 1, pixelData: pixelDataSection});
+                    });
                     yy++;
                 }
                 xx++;
             }
         } else {
-            ctr.setColors(this.state.x - 1, this.state.y - 1, pixelData, this.state.ppt, (result) => {});
+            ctr.setColors(this.state.x - 1, this.state.y - 1, pixelData, this.state.ppt, (result) => {
+                if (result === 'pending')
+                    ctr.sendResults(LISTENERS.PendingSetPixelUpdate, {x: this.state.x - 1, y: this.state.y - 1, pixelData});
+            });
         }
     }
 

@@ -8,6 +8,8 @@ contract VirtualRealEstate {
     address owner;
     PXLProperty pxlProperty;
     
+    bool initialPropertiesReserved;
+    
     mapping (uint16 => bool) hasBeenSet;
     
     // The amount in % for which a user is paid
@@ -71,10 +73,22 @@ contract VirtualRealEstate {
         systemPXLStepTally = 0;
         systemETHStepCount = 1;
         systemPXLStepCount = 1;
+        initialPropertiesReserved = false;
     }
     
     function setPXLPropertyContract(address pxlPropertyContract) public ownerOnly() {
         pxlProperty = PXLProperty(pxlPropertyContract);
+        if (!initialPropertiesReserved) {
+            uint16 xReserved = 75;
+            uint16 yReserved = 10;
+            for(uint16 x = 0; x < 5; ++x) {
+                for(uint16 y = 0; y < 2; ++y) {
+                    uint16 propertyID = (yReserved + y) * 100 + (xReserved + x);
+                    _transferProperty(propertyID, owner, 0, 0, 0, 0);
+                }
+            }
+            initialPropertiesReserved = true;
+        }
     }
     
     /* USER FUNCTIONS */

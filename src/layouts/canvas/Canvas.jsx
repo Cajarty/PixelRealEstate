@@ -169,6 +169,10 @@ class Canvas extends Component {
             });
         });
 
+        ctr.listenForResults(LISTENERS.PendingSetPixelUpdate, 'Canvas', (data) => {
+            this.setCanvasProperty(data.x, data.y, data.pixelData, true);
+        });
+
         ctr.listenForResults(LISTENERS.ShowForSale, 'Canvas', (data) => {
             if (data.show)
                 this.showPropertiesForSale();
@@ -253,11 +257,12 @@ class Canvas extends Component {
         this.state.ctx.putImageData(ctxID, (x1 * 10) - 2, (y1 * 10) - 2);
     }
 
-    setCanvasProperty(x, y, rgbArr) {
+    setCanvasProperty(x, y, rgbArr, isPending = false) {
         let ctxID = this.state.ctx.createImageData(10, 10);
         for (let i = 0; i < rgbArr.length; i++) {
-            ctxID.data[i] = rgbArr[i];
+            ctxID.data[i] = (isPending && i % 4 == 3) ? 80 : rgbArr[i];
         }
+        //if pending show loading icon
         this.state.ctx.putImageData(ctxID, x * 10, y * 10);
     }
 

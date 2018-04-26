@@ -5,6 +5,14 @@ var bigInt = require("big-integer");
 var BigNumber = require('bignumber.js');
 var utf8 = require("utf8");
 
+export const HBITS = 5;
+export const HNUMBER = 32;
+export const SBITS = 4;
+export const SNUMBER = 16;
+export const LBITS = 3;
+export const LNUMBER = 8;
+export const CONTRACT_DATA_ARRAY_SIZE = 5;
+
 export const PAGES = {
     TOP: {query: 'html'},
     BROWSE: {query: '.lowerSegment.one'},
@@ -210,21 +218,20 @@ export const Base64ToImageData = ( /*obj[0..999][0..500]*/ data) => {
     return result;
 }
 
-export const ContractDataToRGBAArray = (/*uint256[10]*/ contractDataArray) => {
+export const ContractDataToRGBAArray = (/*uint256[5]*/ contractDataArray) => {
     let result = [];
-    let contractDataArraySize = 10;
-    let pixelsPerBigInt = 10;
+    let pixelsPerBigInt = Math.floor(256 / (HBITS + SBITS + LBITS));
      
-    for(let i = contractDataArraySize - 1; i >= 0; i--) {
-        let uint256 = bigInt(contractDataArray[i].toString(10), 10); //Big ass number
+    for(let i = CONTRACT_DATA_ARRAY_SIZE - 1; i >= 0; i--) {
+        let uint256 = bigInt(contractDataArray[i].toString(10), 10);
         for (let j = 0; j < pixelsPerBigInt; j++) {
-            result.unshift(255);
-            result.unshift(uint256.and(255).toJSNumber());
-            uint256 = uint256.shiftRight(8); 
-            result.unshift(uint256.and(255).toJSNumber());
-            uint256 = uint256.shiftRight(8);
-            result.unshift(uint256.and(255).toJSNumber());
-            uint256 = uint256.shiftRight(8);
+            result.unshift(HNUMBER);
+            result.unshift(uint256.and(HNUMBER).toJSNumber());
+            uint256 = uint256.shiftRight(HBITS); 
+            result.unshift(uint256.and(SNUMBER).toJSNumber());
+            uint256 = uint256.shiftRight(SBITS);
+            result.unshift(uint256.and(LNUMBER).toJSNumber());
+            uint256 = uint256.shiftRight(LBITS);
         }
     }
     return result;
@@ -234,12 +241,13 @@ export const ContractDataToRGBAArray = (/*uint256[10]*/ contractDataArray) => {
 export const RGBArrayToContractData = (rgbArray) => {
     let result = [];
     let counter = 0;
-    for(let i = 0; i < 10; i++) { //Foreach uint256 in uint256[10]
+    let pixelsPerBigInt = Math.floor(256 / (HBITS + SBITS + LBITS));
+    for(let i = 0; i < CONTRACT_DATA_ARRAY_SIZE; i++) { //Foreach uint256 in uint256[10]
         let innerResult = new bigInt("0", 10);
-        for(let j = 0; j < 10; j++) { //Foreach 24 bits for the uint256
+        for(let j = 0; j < pixelsPerBigInt; j++) { //Foreach h, s, l bits for the uint256
             let binary = RGBToBinary(rgbArray[counter++], rgbArray[counter++], rgbArray[counter++]);
             counter++;
-            innerResult = innerResult.shiftLeft(24);
+            innerResult = innerResult.shiftLeft(pixelsPerBigInt);
             innerResult = innerResult.or(binary);
         }
         result.push(new BigNumber(innerResult.toString(), 10));
@@ -249,18 +257,21 @@ export const RGBArrayToContractData = (rgbArray) => {
 
 export const RGBToBinary = (r, g, b) => {
     let v = r;
-    v = v << 8;
+    v = v << SBITS;
     v = v | g;
-    v = v << 8;
+    v = v << LBITS;
     v = v | b;
     return v;
 }
 
 export const BinaryToRGB = (value) => {
-    let obj = { r: 16711680, g: 65280, b: 255 };
-    obj.b = obj.b & value;
-    obj.g = (obj.g & value) >> 8;
-    obj.r = (obj.r & value) >> 16;
+    let obj = { r: 0, g: 0, b: 0 };
+    obj.b = LNUMBER;
+    obj.g = Math.pow(2, SBITS + LBITS) - obj.b;
+    obj.r = Math.pow(2, HBITS + SBITS + LBITS) - (obj.g + obj.b);
+
+    obj.g = (obj.g & value) >> HBITS;
+    obj.r = (obj.r & value) >> HBITS + SBITS;
     return obj;
 }
 
@@ -270,3 +281,76 @@ export const calculateEarnings = (lastUpdate, maxEarnings) => {
     let current = Math.min(now, maxTime);
     return Math.floor((current - (lastUpdate * 1000)) / 60000);
 }
+
+
+/**
+ * Converts an RGB color value to HSL. Conversion formula
+ * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+ * Assumes r, g, and b are contained in the set [0, 255] and
+ * returns h, s, and l in the set [0, 1].
+ *
+ * @param   Number  r       The red color value
+ * @param   Number  g       The green color value
+ * @param   Number  b       The blue color value
+ * @return  Array           The HSL representation
+ */
+export const RGBtoHSL = (r, g, b) => {
+    r /= 255, g /= 255, b /= 255;
+  
+    var max = Math.max(r, g, b), min = Math.min(r, g, b);
+    var h, s, l = (max + min) / 2;
+  
+    if (max == min) {
+      h = s = 0; // achromatic
+    } else {
+      var d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+  
+      h /= 6;
+    }
+  
+    return [ h, s, l ];
+  }
+  
+  /**
+   * Converts an HSL color value to RGB. Conversion formula
+   * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+   * Assumes h, s, and l are contained in the set [0, 1] and
+   * returns r, g, and b in the set [0, 255].
+   *
+   * @param   Number  h       The hue
+   * @param   Number  s       The saturation
+   * @param   Number  l       The lightness
+   * @return  Array           The RGB representation
+   */
+export const HSLtoRGB = (h, s, l) => {
+    var r, g, b;
+  
+    if (s == 0) {
+      r = g = b = l; // achromatic
+    } else {
+      function hue2rgb(p, q, t) {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+      }
+  
+      var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      var p = 2 * l - q;
+  
+      r = hue2rgb(p, q, h + 1/3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1/3);
+    }
+  
+    return [ r * 255, g * 255, b * 255 ];
+  }

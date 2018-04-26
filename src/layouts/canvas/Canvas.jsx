@@ -34,7 +34,7 @@ class Canvas extends Component {
         ctx.imageSmoothingEnabled = false;
         ctx.webkitImageSmoothingEnabled = false;
         this.setState({ ctx });
-        this.canvas.onmousemove = (e) => {          
+        this.canvas.onmousemove = (e) => {
             let rect = this.canvas.getBoundingClientRect();
             let x = Math.floor((e.clientX - rect.left) * (100 / rect.width));
             if (x != GFD.getData('hoverX')) {
@@ -209,22 +209,22 @@ class Canvas extends Component {
     }
 
     updateSelectRect(x1, y1, x2, y2) {
-        this.colorizePointer(this.oldSelect.x1, this.oldSelect.y1, this.oldSelect.x2, this.oldSelect.y2, 255);
+        this.colorizePointer(this.oldSelect.x1, this.oldSelect.y1, this.oldSelect.x2, this.oldSelect.y2, 10);
         this.oldSelect = {x1, y1, x2, y2};
-        this.colorizePointer(x1, y1, x2, y2, 100);
+        this.colorizePointer(x1, y1, x2, y2, .1);
     }
 
     setCanvasPointer(x, y) {
         if (x == -1 || y == -1) {
-            this.colorizePointer(this.oldPointerX, this.oldPointerY, this.oldPointerX, this.oldPointerY, 255);
+            this.colorizePointer(this.oldPointerX, this.oldPointerY, this.oldPointerX, this.oldPointerY, 10);
             this.oldPointerX = this.oldPointerY = -1;
             return;
         }
         if (x == this.oldPointerX && y == this.oldPointerY) {
             return;
         }
-        this.colorizePointer(this.oldPointerX, this.oldPointerY, this.oldPointerX, this.oldPointerY, 255);
-        this.colorizePointer(x, y, x, y, 100);
+        this.colorizePointer(this.oldPointerX, this.oldPointerY, this.oldPointerX, this.oldPointerY, 10);
+        this.colorizePointer(x, y, x, y, .1);
         this.oldPointerX = x;
         this.oldPointerY = y;
     }
@@ -251,7 +251,7 @@ class Canvas extends Component {
         for (let i = 3; i < ctxID.data.length; i+=4) {
             let idx = (i - 3) / 4;
             if (idx < wp * 2 || idx >= (wp * hp) - (wp * 2) || idx % wp < 2 || idx % wp >= wp - 2) {
-                ctxID.data[i] = alpha;
+                ctxID.data[i] *= alpha;
             }
         }
         this.state.ctx.putImageData(ctxID, (x1 * 10) - 2, (y1 * 10) - 2);

@@ -79,13 +79,11 @@ contract VirtualRealEstate {
     function setPXLPropertyContract(address pxlPropertyContract) public ownerOnly() {
         pxlProperty = PXLProperty(pxlPropertyContract);
         if (!initialPropertiesReserved) {
-            uint16 xReserved = 75;
-            uint16 yReserved = 10;
-            for(uint16 x = 0; x < 5; ++x) {
-                for(uint16 y = 0; y < 2; ++y) {
-                    uint16 propertyID = (yReserved + y) * 100 + (xReserved + x);
-                    _transferProperty(propertyID, owner, 0, 0, 0, 0);
-                }
+            uint16 xReserved = 45;
+            uint16 yReserved = 0;
+            for(uint16 x = 0; x < 10; ++x) {
+                uint16 propertyID = (yReserved) * 100 + (xReserved + x);
+                _transferProperty(propertyID, owner, 0, 0, 0, 0);
             }
             initialPropertiesReserved = true;
         }

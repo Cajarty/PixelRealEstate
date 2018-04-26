@@ -1,2 +1,2 @@
-kill -9 43560
-kill -9 43576
+kill -9
+kill -9

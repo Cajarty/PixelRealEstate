@@ -203,16 +203,16 @@ contract('VirtualRealEstate', function(accounts) {
   it("VirtualRealEstate Deployment", function() {
     return VirtualRealEstate.deployed().then(function(instance) {
       pixelPropertyInstance = instance;
-      return pixelPropertyInstance.setPXLPropertyContract(pxlPropertyInstance.address);
-    }).then(function(result) {
       return pxlPropertyInstance.setPixelPropertyContract(pixelPropertyInstance.address);
+    }).then(function(result) {
+      return pixelPropertyInstance.setPXLPropertyContract(pxlPropertyInstance.address);
     });
   });
 
   //####PURCHASE, SELLING & TRANSFERING####
  it("User0 can purchase a property at default price in ETH", function() {
    return VirtualRealEstate.deployed().then(function(instance) {
-     return pixelPropertyInstance.buyPropertyInETH(0, { from: accounts[1], value: 10000 }); 
+     return pixelPropertyInstance.buyPropertyInETH(0, { from: accounts[1], value: 19500000000000000 }); 
    }).then(function(result) {
      return pixelPropertyInstance.getPropertyData(0, { from: accounts[1] });
    }).then(function(propertyData) {
@@ -224,17 +224,17 @@ contract('VirtualRealEstate', function(accounts) {
  it("User0 can purchase multiple default properties (1-3) in ETH",  function() {
    return VirtualRealEstate.deployed().then(function(instance) {
      pixelPropertyInstance = instance;
-     return pixelPropertyInstance.buyPropertyInETH(1, { from: accounts[1], value: 11000 });
+     return pixelPropertyInstance.buyPropertyInETH(1, { from: accounts[1], value: 19500000000000000 });
    }).then(function(result) {
      return pixelPropertyInstance.getPropertyData(1, { from: accounts[1] });
    }).then(function(propertyData){
      assert.equal(propertyData[0], accounts[1], "Should be owned by account 1" );
-     return pixelPropertyInstance.buyPropertyInETH(2, { from: accounts[1], value: 13000 });
+     return pixelPropertyInstance.buyPropertyInETH(2, { from: accounts[1], value: 19500000000000000 });
    }).then(function(result) {
      return pixelPropertyInstance.getPropertyData(2, { from: accounts[1] });
    }).then(function(propertyData){
      assert.equal(propertyData[0], accounts[1], "Should be owned by account 1" );
-     return pixelPropertyInstance.buyPropertyInETH(3, { from: accounts[1], value: 15000 });
+     return pixelPropertyInstance.buyPropertyInETH(3, { from: accounts[1], value: 19500000000000000 });
    }).then(function(result) {
      return pixelPropertyInstance.getPropertyData(3, { from: accounts[1] });
    }).then(function(propertyData){
@@ -397,21 +397,21 @@ contract('VirtualRealEstate', function(accounts) {
  it("You can change the colours for free", function() {
    return VirtualRealEstate.deployed().then(function(instance) {
      pixelPropertyInstance = instance;
-     return pixelPropertyInstance.setColors(10, [5, 7234, 5, 5, 5, 5, 2341, 5, 5, 11234], 0, { from: accounts[2] });
+     return pixelPropertyInstance.setColors(10, [5, 7234, 5, 5, 55], 0, { from: accounts[2] });
    }).then(function(setColors) {
      return pxlPropertyInstance.getPropertyColors(10, { from: accounts[0] });
    }).then(function(coloursReturned) {
      assert.equal(coloursReturned[0].toNumber(), 5, "Should return 5 from the array of 5's" );
      assert.equal(coloursReturned[1].toNumber(), 7234, "Should return 5 from the array of 5's" );
-     assert.equal(coloursReturned[6].toNumber(), 2341, "Should return 5 from the array of 5's" );
-     assert.equal(coloursReturned[9].toNumber(), 11234, "Should return 5 from the array of 5's" );
+     assert.equal(coloursReturned[3].toNumber(), 5, "Should return 5 from the array of 5's" );
+     assert.equal(coloursReturned[4].toNumber(), 55, "Should return 5 from the array of 5's" );
    });
    //NO-CHANGE
  });
  it("Changing the colour pays out 1 coins per second since last change to the last colour changer and 1 to the owner of the property", function() {
    return VirtualRealEstate.deployed().then(function(instance) {
      pixelPropertyInstance = instance;
-     return pixelPropertyInstance.setColors(75, [0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0], 0, { from: accounts[4] });
+     return pixelPropertyInstance.setColors(75, [0, 0, 0, 0, 0], 0, { from: accounts[4] });
    }).then(function(setColors) {
      return pxlPropertyInstance.getPropertyColors(75, { from: accounts[3] });
    }).then(function(coloursReturned) {
@@ -422,7 +422,7 @@ contract('VirtualRealEstate', function(accounts) {
        }, 4001);
      });
    }).then(function(s) {
-     return pixelPropertyInstance.setColors(75, [5, 5, 5, 5, 5, 5, 5, 5 ,5 ,5], 0, { from: accounts[6] });
+     return pixelPropertyInstance.setColors(75, [5, 5, 5, 5, 5], 0, { from: accounts[6] });
    }).then(function(setColors) {
      return pxlPropertyInstance.getPropertyColors(75, { from: accounts[0] });
    }).then(function(coloursReturned) {
@@ -446,7 +446,7 @@ contract('VirtualRealEstate', function(accounts) {
      return pxlPropertyInstance.balanceOf(accounts[0], {from: accounts[0]});
    }).then(function(balance) {
      user0Balance = balance;
-     return pixelPropertyInstance.setColors(25, [1,2,3,4,5,6,7,8,9,10], 10, {from: accounts[0]});
+     return pixelPropertyInstance.setColors(25, [1,2,3,4,5], 10, {from: accounts[0]});
    }).then(function(s) {
      return pxlPropertyInstance.balanceOf(accounts[0], {from: accounts[0]});
    }).then(function(balance) {
@@ -545,8 +545,8 @@ contract('VirtualRealEstate', function(accounts) {
    }).then(function(s) {
     return pxlPropertyInstance.balanceOf(accounts[0], { from: accounts[0] });
   }).then(function(balance)  {
-     privPubAfterSet = balance.toNumber(); // Balance before making it public.
-     assert.equal(privPubBeforeSet, privPubAfterSet - 1, "Should have burned one coin when setting it private");
+     privPubAfterSet = balance.toNumber();
+     assert.equal(privPubBeforeSet, privPubAfterSet + 1, "Should have burned one coin when setting it private");
      return pixelPropertyInstance.getPropertyData(0, { from: accounts[0] });
    }).then(function(propertyData) {
      assert.equal(propertyData[4], true, "Should be in private mode");

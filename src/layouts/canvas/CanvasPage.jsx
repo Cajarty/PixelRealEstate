@@ -60,7 +60,7 @@ class CanvasPage extends Component {
             this.setState({PPCOwned: balance, loadingPPC: false});
         });
 
-        ctr.watchEventLogs(EVENTS.Transfer, {}, (handle) => {
+        ctr.watchEventLogs(EVENTS.Transfer, 1000000, {}, (handle) => {
             let eventHandleTransfer = handle;
             this.setState({eventHandleTransfer});
             eventHandleTransfer.watch((error, log) => {
@@ -82,7 +82,7 @@ class CanvasPage extends Component {
             });
         });
 
-        ctr.watchEventLogs(EVENTS.PropertyBought, {newOwner: ctr.account}, (handle) => {
+        ctr.watchEventLogs(EVENTS.PropertyBought, 1000000, {newOwner: ctr.account}, (handle) => {
             let eventHandleBought = handle;
             this.setState({eventHandleBought});
             eventHandleBought.watch((error, log) => {
@@ -93,7 +93,7 @@ class CanvasPage extends Component {
             });
         });
 
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {lastUpdaterPayee: ctr.account}, (handle) => {
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, 1000000, {lastUpdaterPayee: ctr.account}, (handle) => {
             let eventHandleUpdate = handle;
             this.setState({eventHandleUpdate});
             eventHandleUpdate.watch((error, log) => {

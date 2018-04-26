@@ -19,29 +19,35 @@ class PropertyChangeLog extends Component {
     }
 
     componentDidMount() {
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (handle) => {
-            let eventHandle = handle;
-            this.setState({
-                eventHandle,
-                loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
-            });
-        
-            eventHandle.watch((error, log) => {
-                let old = this.state.changeLog;
-                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                let last = Func.BigNumberToNumber(log.args.lastUpdate);
-                let reserved = Func.BigNumberToNumber(log.args.becomePublic);
-                let maxEarnings = Math.pow((reserved - last) / 30, 2);
-                let newData = {
-                    x: id.x,
-                    y: id.y,
-                    lastChange: last * 1000,
-                    payout: Func.calculateEarnings(last, maxEarnings),
-                    maxPayout: maxEarnings,
-                    transaction: log.transactionHash,
-                };
-                old.unshift(newData);
-                this.setState({ changeLog: old, isLoading: false });
+        GFD.listen('userExists', 'Log-PCL', (loggedIn) => {
+            if (!loggedIn)
+                return;
+            ctr.watchEventLogs(EVENTS.PropertyColorUpdate, 50000, {}, (handle) => {
+                let eventHandle = handle;
+                this.setState({
+                    eventHandle,
+                    loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
+                });
+            
+                eventHandle.watch((error, log) => {
+                    let old = this.state.changeLog;
+                    let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
+                    let last = Func.BigNumberToNumber(log.args.lastUpdate);
+                    let reserved = Func.BigNumberToNumber(log.args.becomePublic);
+                    let maxEarnings = Math.pow((reserved - last) / 30, 2);
+                    let newData = {
+                        x: id.x,
+                        y: id.y,
+                        lastChange: last * 1000,
+                        payout: Func.calculateEarnings(last, maxEarnings),
+                        maxPayout: maxEarnings,
+                        transaction: log.transactionHash,
+                    };
+                    old.unshift(newData);
+                    if (old.length > 20)
+                        old.pop();
+                    this.setState({ changeLog: old, isLoading: false });
+                });
             });
         });
     }
@@ -50,6 +56,7 @@ class PropertyChangeLog extends Component {
         GFD.setData('x', x);
         GFD.setData('y', y);
         Func.ScrollTo(Func.PAGES.TOP);
+        GFD.closeAll('Log-PCL');
     }
 
     componentWillUnmount() {

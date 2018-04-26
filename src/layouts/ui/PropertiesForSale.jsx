@@ -29,16 +29,18 @@ class PropertiesForSale extends Component {
 
     componentDidMount() {
         this.props.isLoading(true);
-
-        //fix updates to be better, add params
-        ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (eventHandle) => {
-            this.setState({eventHandle});
-            eventHandle.watch((error, log) => {
-                this.reorderItems();
-                this.forceUpdate();
+        GFD.listen('userExists', 'Log-PFS', (loggedIn) => {
+            if (!loggedIn)
+                return;
+            ctr.watchEventLogs(EVENTS.PropertySetForSale, 1000000, {}, (eventHandle) => {
+                this.setState({eventHandle});
+                eventHandle.watch((error, log) => {
+                    this.reorderItems();
+                    this.forceUpdate();
+                });
             });
-        });
-        this.reorderItems();
+            this.reorderItems();
+        })
     }
 
     reorderItems(column = this.state.column, ascending = this.state.ascending) {
@@ -63,6 +65,7 @@ class PropertiesForSale extends Component {
         if (this.state.eventHandle != null)
             this.state.eventHandle.stopWatching();
         this.newestSort = new Date().getTime();
+        GFD.closeAll('Log-PFS');
     }
 
     handleInput(key, value) {

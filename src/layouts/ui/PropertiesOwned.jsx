@@ -27,18 +27,24 @@ class PropertiesOwned extends Component {
     componentDidMount() {
         this.props.isLoading(true);
 
-        //add right owner
-        ctr.watchEventLogs(EVENTS.PropertyBought, {}, (eventHandle) => {
-            this.setState({eventHandle});
-            eventHandle.watch((error, log) => {
-                this.reorderItems();
-                this.forceUpdate();
+        GFD.listen('userExists', 'Log-OP', (loggedIn) => {
+            if (!loggedIn)
+                return;
+            //add right owner
+            ctr.watchEventLogs(EVENTS.PropertyBought, 1000000, {}, (eventHandle) => {
+                this.setState({eventHandle});
+                eventHandle.watch((error, log) => {
+                    this.reorderItems();
+                    this.forceUpdate();
+                });
             });
+            this.reorderItems();
         });
-        this.reorderItems();
     }
 
     reorderItems(column = this.state.column, ascending = this.state.ascending) {
+
+        console.info(SDM.ownedProperties)
 
         this.newestSort = new Date().getTime();
         let promise = SDM.orderPropertyListAsync(SDM.ownedProperties, column, ascending);
@@ -60,6 +66,7 @@ class PropertiesOwned extends Component {
         if (this.state.eventHandle != null)
             this.state.eventHandle.stopWatching();
         this.newestSort = new Date().getTime();
+        GFD.closeAll('Log-OP');
     }
 
     handleInput(key, value) {

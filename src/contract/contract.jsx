@@ -139,20 +139,20 @@ export class Contract {
 
     /*
     Requests all events of event type EVENT.
+    event = event type
+    blocks = how many blocks to look back
+    params = {}. for narrowing serach results
     */
-    getEventLogs(event, params = {}, callback) {
+    getEventLogs(event, blocks = 1000000, params = {}, callback) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return;
-
-        let filter = {fromBlock: 'latest', toBlock: 'latest'};
 
         window.web3.eth.getBlock('latest').then((latestBlock) => {
 
             // VRE DApp Events
             this.VRE.deployed().then((i) => {
-
                 let filter = {
-                    fromBlock: latestBlock.number - 1000000, 
+                    fromBlock: latestBlock.number - blocks, 
                     toBlock: 'latest',
                     address: Const.VirtualRealEstate,
                 };
@@ -200,8 +200,9 @@ export class Contract {
 
     /*
     Requests all events of event type EVENT.
+    block = how many blocks to look back
     */
-    watchEventLogs(event, params, callback) {
+    watchEventLogs(event, block, params, callback) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return;
 
@@ -211,7 +212,7 @@ export class Contract {
             this.VRE.deployed().then((i) => {
 
                 let filter = {
-                    fromBlock: latestBlock.number - 1000000, 
+                    fromBlock: latestBlock.number - block, 
                     toBlock: 'latest',
                     address: Const.VirtualRealEstate,
                 };

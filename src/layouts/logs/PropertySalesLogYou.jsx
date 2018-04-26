@@ -20,54 +20,62 @@ class PropertySalesLogYou extends Component {
     }
 
     componentDidMount() {
-        ctr.watchEventLogs(EVENTS.PropertyBought, {newOwner: ctr.account}, (handle) => {
-            let eventHandle1 = handle;
-            this.setState({eventHandle1});
-            handle.watch((error, log) => {
-                let old = this.state.changeLog;
-                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                let PXLPrice = Func.BigNumberToNumber(log.args.PXLAmount);
-                let ETHPrice = Func.BigNumberToNumber(log.args.ethAmount);
-                let timeSold = Func.BigNumberToNumber(log.args.timestamp);
-                let newData = {
-                    x: id.x,
-                    y: id.y,
-                    PXLPrice,
-                    ETHPrice,
-                    oldOwner: log.args.oldOwner == ctr.account ? "You" : (log.args.oldOwner === Struct.NOBODY ? 'PixelProperty' : log.args.oldOwner),
-                    newOwner: log.args.newOwner == ctr.account ? "You" : log.args.newOwner,
-                    timeSold: timeSold * 1000,
-                    transaction: log.transactionHash,
-                };
-                old.unshift(newData);
-                this.setState({ changeLog: old, isLoading: false });
+        GFD.listen('userExists', 'Log-PSLY', (loggedIn) => {
+            if (!loggedIn)
+                return;
+            ctr.watchEventLogs(EVENTS.PropertyBought, 50000, {newOwner: ctr.account}, (handle) => {
+                let eventHandle1 = handle;
+                this.setState({eventHandle1});
+                handle.watch((error, log) => {
+                    let old = this.state.changeLog;
+                    let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
+                    let PXLPrice = Func.BigNumberToNumber(log.args.PXLAmount);
+                    let ETHPrice = Func.BigNumberToNumber(log.args.ethAmount);
+                    let timeSold = Func.BigNumberToNumber(log.args.timestamp);
+                    let newData = {
+                        x: id.x,
+                        y: id.y,
+                        PXLPrice,
+                        ETHPrice,
+                        oldOwner: log.args.oldOwner == ctr.account ? "You" : (log.args.oldOwner === Struct.NOBODY ? 'PixelProperty' : log.args.oldOwner),
+                        newOwner: log.args.newOwner == ctr.account ? "You" : log.args.newOwner,
+                        timeSold: timeSold * 1000,
+                        transaction: log.transactionHash,
+                    };
+                    old.unshift(newData);
+                    if (old.length > 20)
+                        old.pop();
+                    this.setState({ changeLog: old, isLoading: false });
+                });
             });
-        });
 
-        ctr.watchEventLogs(EVENTS.PropertyBought, {oldOwner: ctr.account}, (handle) => {
-            let eventHandle2 = handle;
-            this.setState({
-                eventHandle2,
-                loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
-            });
-            handle.watch((error, log) => {
-                let old = this.state.changeLog;
-                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                let PXLPrice = Func.BigNumberToNumber(log.args.PXLAmount);
-                let ETHPrice = Func.BigNumberToNumber(log.args.ethAmount);
-                let timeSold = Func.BigNumberToNumber(log.args.timestamp);
-                let newData = {
-                    x: id.x,
-                    y: id.y,
-                    PXLPrice,
-                    ETHPrice,
-                    oldOwner: log.args.oldOwner == ctr.account ? "You" : (log.args.oldOwner === Struct.NOBODY ? 'PixelProperty' : log.args.oldOwner),
-                    newOwner: log.args.newOwner == ctr.account ? "You" : log.args.newOwner,
-                    timeSold: timeSold * 1000,
-                    transaction: log.transactionHash,
-                };
-                old.unshift(newData);
-                this.setState({ changeLog: old, isLoading: false });
+            ctr.watchEventLogs(EVENTS.PropertyBought, 50000, {oldOwner: ctr.account}, (handle) => {
+                let eventHandle2 = handle;
+                this.setState({
+                    eventHandle2,
+                    loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
+                });
+                handle.watch((error, log) => {
+                    let old = this.state.changeLog;
+                    let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
+                    let PXLPrice = Func.BigNumberToNumber(log.args.PXLAmount);
+                    let ETHPrice = Func.BigNumberToNumber(log.args.ethAmount);
+                    let timeSold = Func.BigNumberToNumber(log.args.timestamp);
+                    let newData = {
+                        x: id.x,
+                        y: id.y,
+                        PXLPrice,
+                        ETHPrice,
+                        oldOwner: log.args.oldOwner == ctr.account ? "You" : (log.args.oldOwner === Struct.NOBODY ? 'PixelProperty' : log.args.oldOwner),
+                        newOwner: log.args.newOwner == ctr.account ? "You" : log.args.newOwner,
+                        timeSold: timeSold * 1000,
+                        transaction: log.transactionHash,
+                    };
+                    old.unshift(newData);
+                    if (old.length > 20)
+                        old.pop();
+                    this.setState({ changeLog: old, isLoading: false });
+                });
             });
         });
     }
@@ -82,6 +90,7 @@ class PropertySalesLogYou extends Component {
         this.state.eventHandle1.stopWatching();
         this.state.eventHandle2.stopWatching();
         this.state.loadTimeout != null && clearTimeout(this.state.loadTimeout);
+        GFD.closeAll('Log-PSLY');
     }
 
     render() {

@@ -28,6 +28,12 @@ export const TUTORIAL_START_DIALOG = ["Pixel Property is easy to use. Just in ca
 
 export const CHANGELOG = [
     {
+        date: new Date('2018-4-25'),
+        title: 'General Fixes & Updates',
+        messages: 
+        ['Loading property log data correctly. Minor speed improvements.'],
+    },
+    {
         date: new Date('2018-4-24'),
         title: 'Ease of Use Updates #2',
         messages: 

@@ -34,7 +34,7 @@ contract VirtualRealEstate {
     uint16 systemPXLStepCount;
 
     /* ### Events ### */
-    event PropertyColorUpdate(uint16 indexed property, uint256[10] colors, uint256 lastUpdate, address indexed lastUpdaterPayee, uint256 becomePublic, uint256 indexed rewardedCoins);
+    event PropertyColorUpdate(uint16 indexed property, uint256[5] colors, uint256 lastUpdate, address indexed lastUpdaterPayee, uint256 becomePublic, uint256 indexed rewardedCoins);
     event PropertyBought(uint16 indexed property, address indexed newOwner, uint256 ethAmount, uint256 PXLAmount, uint256 timestamp, address indexed oldOwner);
     event SetUserHoverText(address indexed user, uint256[2] newHoverText);
     event SetUserSetLink(address indexed user, uint256[2] newLink);
@@ -114,13 +114,13 @@ contract VirtualRealEstate {
     }
     
     // Update the 10x10 image data for a Property, triggering potential payouts if it succeeds
-    function setColors(uint16 propertyID, uint256[10] newColors, uint256 PXLToSpend) public validPropertyID(propertyID) returns(bool) {
+    function setColors(uint16 propertyID, uint256[5] newColors, uint256 PXLToSpend) public validPropertyID(propertyID) returns(bool) {
         uint256 projectedPayout = getProjectedPayout(propertyID);
         if (_tryTriggerPayout(propertyID, PXLToSpend)) {
             pxlProperty.setPropertyColors(propertyID, newColors);
             var (lastUpdater, becomePublic) = pxlProperty.getPropertyLastUpdaterBecomePublic(propertyID);
             PropertyColorUpdate(propertyID, newColors, now, lastUpdater, becomePublic, projectedPayout);
-            // The first user to set a Properties color ever is awarded extra PXL due to eating the extra GAS cost of creating the uint256[10]
+            // The first user to set a Properties color ever is awarded extra PXL due to eating the extra GAS cost of creating the uint256[5]
             if (!hasBeenSet[propertyID]) {
                 pxlProperty.rewardPXL(msg.sender, 25);
                 hasBeenSet[propertyID] = true;

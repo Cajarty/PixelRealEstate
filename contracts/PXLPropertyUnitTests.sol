@@ -245,8 +245,8 @@ contract PXLProperty_PixelPropertyAccess_UnitTests {
     //Needed for moderation test
     function setPropertyPrivateModeToBan(uint16 propertyID) public {
         pxlProperty.setPropertyPrivateMode(propertyID, true);
-        uint256[10] memory newColors;
-        for(uint256 i = 0; i < 10; i++) {
+        uint256[5] memory newColors;
+        for(uint256 i = 0; i < 5; i++) {
             newColors[i] = 777;
         }
         pxlProperty.setPropertyColors(propertyID, newColors);
@@ -263,17 +263,17 @@ contract PXLProperty_PropertyDAppAccess_UnitTests {
     }
     
     function setPropertyColors_Test() public returns(bool) {
-        uint256[10] memory defaultColors = pxlProperty.getPropertyColors(PROPERTY_1);
-        assert(defaultColors[0] == 0 && defaultColors[5] == 0 && defaultColors[9] == 0); // There is no colors
-        uint256[10] memory newColors;
-        newColors[5] = 10;
-        newColors[9] = 99;
+        uint256[5] memory defaultColors = pxlProperty.getPropertyColors(PROPERTY_1);
+        assert(defaultColors[0] == 0 && defaultColors[2] == 0 && defaultColors[4] == 0); // There is no colors
+        uint256[5] memory newColors;
+        newColors[2] = 10;
+        newColors[4] = 99;
         pxlProperty.setPropertyColors(PROPERTY_1, newColors);
-        assert(pxlProperty.getPropertyColors(PROPERTY_1)[5] == 10); // We can set the colors
-        assert(pxlProperty.getPropertyColors(PROPERTY_1)[9] == 99);
-        newColors[5] = 66;
+        assert(pxlProperty.getPropertyColors(PROPERTY_1)[2] == 10); // We can set the colors
+        assert(pxlProperty.getPropertyColors(PROPERTY_1)[4] == 99);
+        newColors[2] = 66;
         pxlProperty.setPropertyColors(PROPERTY_1, newColors);
-        assert(pxlProperty.getPropertyColors(PROPERTY_1)[5] == 66); // We can update the colors
+        assert(pxlProperty.getPropertyColors(PROPERTY_1)[2] == 66); // We can update the colors
         return true;
     }
     

@@ -31,6 +31,7 @@ import Tutorial from '../Tutorial';
 import WelcomeSidebar from '../ui/WelcomeSidebar';
 import {FB, FireBase} from '../../const/firebase';
 import GetStarted from '../GetStarted';
+import * as Func from '../../functions/functions';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -208,7 +209,7 @@ class CanvasPage extends Component {
                                         <ItemGroup>
                                             <Item className='pixelsOwnedItem'>
                                                 <ItemImage size='mini' src={this.state.loadingPPC ? Assets.LOADING : Assets.TOKEN}  />
-                                                <ItemContent verticalAlign='middle'>{this.state.PPCOwned} </ItemContent>
+                                                <ItemContent verticalAlign='middle'>{Func.NumberWithCommas(this.state.PPCOwned)} </ItemContent>
                                             </Item>
                                         </ItemGroup>
                                         <Divider/>

@@ -92,7 +92,7 @@ contract VirtualRealEstate {
     }
     
     // If a Property is private which has expired, make it public
-    function tryForcePublic(uint16 propertyID) public validPropertyID(propertyID) {
+    function tryForcePublic(uint16 propertyID) public validPropertyID(propertyID) { 
         var (isInPrivateMode, becomePublic) = pxlProperty.getPropertyPrivateModeBecomePublic(propertyID);
         if (isInPrivateMode && becomePublic < now) {
             pxlProperty.setPropertyPrivateMode(propertyID, false);
@@ -141,14 +141,14 @@ contract VirtualRealEstate {
             require(propertyIsInPrivateMode || propertyBecomePublic <= now || propertyLastUpdater == msg.sender ); 
             require(numMinutesPrivate > 0);
             require(pxlProperty.balanceOf(msg.sender) >= numMinutesPrivate);
-            pxlProperty.burnPXL(msg.sender, numMinutesPrivate);
             // Determines when the Property becomes public, one payout interval per coin burned
             whenToBecomePublic = now + PROPERTY_GENERATION_PAYOUT_INTERVAL * numMinutesPrivate;
 
             rewardedAmount = getProjectedPayout(propertyIsInPrivateMode, propertyLastUpdate, propertyEarnUntil);
             if (rewardedAmount > 0 && propertyLastUpdater != 0) {
-                pxlProperty.rewardPXL(propertyLastUpdater, rewardedAmount);
-                pxlProperty.rewardPXL(msg.sender, rewardedAmount);
+                pxlProperty.burnPXLRewardPXLx2(msg.sender, numMinutesPrivate, propertyLastUpdater, rewardedAmount, msg.sender, rewardedAmount);
+            } else {
+                pxlProperty.burnPXL(msg.sender, numMinutesPrivate);
             }
 
         } else {
@@ -217,8 +217,7 @@ contract VirtualRealEstate {
         address originalOwner = propertyOwner;
         if (propertyOwner == 0) {
             // Turn it into a user-owned at system price with contract owner as owner
-            pxlProperty.setPropertySalePrice(propertyID, systemSalePricePXL);
-            pxlProperty.setPropertyOwner(propertyID, owner);
+            pxlProperty.setPropertyOwnerSalePrice(propertyID, owner, systemSalePricePXL);
             propertyOwner = owner;
             propertySalePrice = systemSalePricePXL;
             // Increase system PXL price
@@ -322,8 +321,8 @@ contract VirtualRealEstate {
             pxlProperty.burnPXLRewardPXLx2(msg.sender, pxlToSpend, propertyLastUpdater, projectedAmount, propertyOwner, projectedAmount);
             
             //BecomePublic = (N+1)/2 minutes of user-private mode
-            //EarnUntil = (N+1)^2 coins earned max/minutes we can earn from
-            pxlProperty.setPropertyBecomePublicEarnUntil(propertyID, now + (pxlSpent * PROPERTY_GENERATION_PAYOUT_INTERVAL / 2), now + (pxlSpent) * (pxlSpent) * PROPERTY_GENERATION_PAYOUT_INTERVAL);
+            //EarnUntil = (N+1)*5 coins earned max/minutes we can earn from
+            pxlProperty.setPropertyBecomePublicEarnUntil(propertyID, now + (pxlSpent * PROPERTY_GENERATION_PAYOUT_INTERVAL / 2), now + (pxlSpent * 5 * PROPERTY_GENERATION_PAYOUT_INTERVAL));
         } else {
             return false;
         }

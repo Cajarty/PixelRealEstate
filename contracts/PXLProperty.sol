@@ -181,6 +181,11 @@ contract PXLProperty is StandardToken {
         properties[propertyID].flag = flag;
     }
     
+    function setPropertyOwnerSalePrice(uint16 propertyID, address owner, uint256 salePrice) public pixelPropertyAccess() {
+        properties[propertyID].owner = owner;
+        properties[propertyID].salePrice = salePrice;
+    }
+    
     /* ### PixelProperty PXL Functions ### */
     function rewardPXL(address rewardedUser, uint256 amount) public pixelPropertyAccess() {
         require(rewardedUser != 0);

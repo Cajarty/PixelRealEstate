@@ -165,7 +165,7 @@ class PixelDescriptionBox extends Component {
         if (noMetaMask)
             return;
         GFD.close('noMetaMask', 'DescBox');
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, 1000000, {}, (evH1) => {
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (evH1) => {
             this.setState({evH1});
             evH1.watch((error, log) => {
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
@@ -178,7 +178,7 @@ class PixelDescriptionBox extends Component {
             });
         });
 
-        ctr.watchEventLogs(EVENTS.PropertyBought, 1000000, {}, (evH2) => {
+        ctr.watchEventLogs(EVENTS.PropertyBought, {}, (evH2) => {
             this.setState({evH2});
             evH2.watch((error, log) => {
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
@@ -189,7 +189,7 @@ class PixelDescriptionBox extends Component {
             });
         });
 
-        ctr.watchEventLogs(EVENTS.PropertySetForSale, 1000000, {}, (evH3) => {
+        ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (evH3) => {
             this.setState({evH3});
             evH3.watch((error, log) => {
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));

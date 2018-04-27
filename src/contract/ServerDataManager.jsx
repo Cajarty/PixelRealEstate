@@ -87,7 +87,7 @@ export class ServerDataManager {
 
     setupEvents() {
 
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, 1000000, {}, (handle) => {
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (handle) => {
             this.evHndl[EVENTS.PropertyColorUpdate] = handle;
             this.evHndl[EVENTS.PropertyColorUpdate].watch((error, log) => {
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
@@ -97,7 +97,7 @@ export class ServerDataManager {
             });
         });
 
-        ctr.watchEventLogs(EVENTS.PropertyBought, 1000000, {}, (handle) => {
+        ctr.watchEventLogs(EVENTS.PropertyBought, {}, (handle) => {
             this.evHndl[EVENTS.PropertyBought] = handle;
             this.evHndl[EVENTS.PropertyBought].watch((error, log) => {
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
@@ -121,7 +121,7 @@ export class ServerDataManager {
         //     });
         // });
 
-        ctr.watchEventLogs(EVENTS.PropertySetForSale, 1000000, {}, (handle) => {
+        ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (handle) => {
             this.evHndl[EVENTS.PropertySetForSale] = handle;
             this.evHndl[EVENTS.PropertySetForSale].watch((error, log) => {
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
@@ -130,7 +130,7 @@ export class ServerDataManager {
             });
         });
 
-        ctr.watchEventLogs(EVENTS.DelistProperty, 1000000, {}, (handle) => {
+        ctr.watchEventLogs(EVENTS.DelistProperty, {}, (handle) => {
             this.evHndl[EVENTS.DelistProperty] = handle;
             this.evHndl[EVENTS.DelistProperty].watch((error, log) => {
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
@@ -139,7 +139,7 @@ export class ServerDataManager {
             });
         });
 
-        ctr.watchEventLogs(EVENTS.SetPropertyPublic, 1000000, {}, (handle) => {
+        ctr.watchEventLogs(EVENTS.SetPropertyPublic, {}, (handle) => {
             this.evHndl[EVENTS.SetPropertyPublic] = handle;
             this.evHndl[EVENTS.SetPropertyPublic].watch((error, log) => {
                 console.info(log);
@@ -150,7 +150,7 @@ export class ServerDataManager {
             });
         });
 
-        ctr.watchEventLogs(EVENTS.SetPropertyPrivate, 1000000, {}, (handle) => {
+        ctr.watchEventLogs(EVENTS.SetPropertyPrivate, {}, (handle) => {
             this.evHndl[EVENTS.SetPropertyPrivate] = handle;
             this.evHndl[EVENTS.SetPropertyPrivate].watch((error, log) => {
                 console.info(log);
@@ -161,7 +161,7 @@ export class ServerDataManager {
             });
         });
 
-        ctr.watchEventLogs(EVENTS.Bid, 1000000, {}, (handle) => {
+        ctr.watchEventLogs(EVENTS.Bid, {}, (handle) => {
             this.evHndl[EVENTS.Bid] = handle;
             this.evHndl[EVENTS.Bid].watch((error, log) => {
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));

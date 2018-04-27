@@ -32,7 +32,7 @@ class PropertiesForSale extends Component {
         GFD.listen('userExists', 'Log-PFS', (loggedIn) => {
             if (!loggedIn)
                 return;
-            ctr.watchEventLogs(EVENTS.PropertySetForSale, 1000000, {}, (eventHandle) => {
+            ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (eventHandle) => {
                 this.setState({eventHandle});
                 eventHandle.watch((error, log) => {
                     this.reorderItems();

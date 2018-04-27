@@ -22,7 +22,7 @@ class PropertyChangeLog extends Component {
         GFD.listen('userExists', 'Log-PCL', (loggedIn) => {
             if (!loggedIn)
                 return;
-            ctr.watchEventLogs(EVENTS.PropertyColorUpdate, 50000, {}, (handle) => {
+            ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (handle) => {
                 let eventHandle = handle;
                 this.setState({
                     eventHandle,

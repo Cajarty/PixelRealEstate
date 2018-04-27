@@ -22,7 +22,7 @@ class PropertySalesLogTopPXL extends Component {
         GFD.listen('userExists', 'Log-PSLTPXL', (loggedIn) => {
             if (!loggedIn)
                 return;
-            ctr.watchEventLogs(EVENTS.PropertyBought, 50000, {}, (handle) => {
+            ctr.watchEventLogs(EVENTS.PropertyBought, {}, (handle) => {
                 let eventHandle = handle;
                 this.setState({
                     eventHandle,

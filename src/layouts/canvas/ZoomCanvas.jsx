@@ -71,7 +71,7 @@ class ZoomCanvas extends Component {
                         this.setCanvasProperty(this.state.queuedUpdates[i].x, this.state.queuedUpdates[i].y, this.state.queuedUpdates[i].colors);
                     }
 
-                    ctr.watchEventLogs(EVENTS.PropertyColorUpdate, 1000000, {}, (eventHandle) => {
+                    ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (eventHandle) => {
                         this.setState({eventHandle});
                         eventHandle.watch((error, log) => {
                             let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));

@@ -154,7 +154,7 @@ class Canvas extends Component {
     }
 
     setup() {
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, 1000000, {}, (eventHandle) => {
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (eventHandle) => {
             this.setState({eventHandle});
             eventHandle.watch((error, log) => {
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));

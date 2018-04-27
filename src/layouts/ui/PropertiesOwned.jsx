@@ -31,7 +31,7 @@ class PropertiesOwned extends Component {
             if (!loggedIn)
                 return;
             //add right owner
-            ctr.watchEventLogs(EVENTS.PropertyBought, 1000000, {}, (eventHandle) => {
+            ctr.watchEventLogs(EVENTS.PropertyBought, {}, (eventHandle) => {
                 this.setState({eventHandle});
                 eventHandle.watch((error, log) => {
                     this.reorderItems();

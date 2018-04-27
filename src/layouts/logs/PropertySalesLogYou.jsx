@@ -23,7 +23,7 @@ class PropertySalesLogYou extends Component {
         GFD.listen('userExists', 'Log-PSLY', (loggedIn) => {
             if (!loggedIn)
                 return;
-            ctr.watchEventLogs(EVENTS.PropertyBought, 50000, {newOwner: ctr.account}, (handle) => {
+            ctr.watchEventLogs(EVENTS.PropertyBought, {newOwner: ctr.account}, (handle) => {
                 let eventHandle1 = handle;
                 this.setState({eventHandle1});
                 handle.watch((error, log) => {
@@ -49,7 +49,7 @@ class PropertySalesLogYou extends Component {
                 });
             });
 
-            ctr.watchEventLogs(EVENTS.PropertyBought, 50000, {oldOwner: ctr.account}, (handle) => {
+            ctr.watchEventLogs(EVENTS.PropertyBought, {oldOwner: ctr.account}, (handle) => {
                 let eventHandle2 = handle;
                 this.setState({
                     eventHandle2,

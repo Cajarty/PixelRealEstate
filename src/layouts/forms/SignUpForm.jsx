@@ -6,7 +6,7 @@ import { Slider } from 'react-semantic-ui-range';
 import * as Strings from '../../const/strings';
 import Info from '../ui/Info';
 import {TUTORIAL_STATE} from '../../functions/GlobalState';
-import { Form, Button, Message } from 'semantic-ui-react';
+import { Form, Button, Message, ModalActions, Modal, ModalContent, ModalHeader } from 'semantic-ui-react';
 import {FB, FireBase} from '../../const/firebase';
 import * as EVENTS from '../../const/events';
 import * as Const from '../../const/const';
@@ -42,38 +42,50 @@ class SignUpForm extends Component {
     }
 
     render() {
-        return (
-            <Form>
-                <Message>
-                    Please enter your email address and a username for PixelProperty.
-                </Message>
-                <Form.Field>
-                    <label>Wallet Address</label>
-                    <input disabled value={this.state.wallet} onChange={() => {}}/>
-                </Form.Field>
-                <Form.Field>
-                    <label>Email Address</label>
-                    <input 
-                        placeholder='example@pixelproperty.io' 
-                        value={this.state.email} 
-                        onChange={(e) => this.updateEmail(e.target.value)}
-                    />
-                </Form.Field>
-                <Form.Field>
-                    <label>Username</label>
-                    <input 
-                        placeholder='PixelProperty' 
-                        value={this.state.username} 
-                        onChange={(e) => this.updateUsername(e.target.value)}
-                    />
-                </Form.Field>
-                <Message color='orange'>
-                    Make sure to keep a backup of your wallet and private key. 
-                    We can't help you regain access if it's lost.
-                </Message>
-                <Button secondary onClick={() => this.props.cancel()} >Cancel</Button>
-                <Button type='submit' onClick={() => this.signUp()} >Submit</Button>
-            </Form>
+        return ( 
+            <Modal
+                size='tiny'
+                open={this.props.open}
+                closeOnEscape={false}
+                closeOnRootNodeClick={false}
+            >
+                <ModalContent>  
+                    <ModalHeader>Sign Up</ModalHeader>
+                    <Form>
+                        <Message>
+                            Please enter your email address and a username for PixelProperty.
+                        </Message>
+                        <Form.Field>
+                            <label>Wallet Address</label>
+                            <input disabled value={this.state.wallet} onChange={() => {}}/>
+                        </Form.Field>
+                        <Form.Field>
+                            <label>Email Address</label>
+                            <input 
+                                placeholder='example@pixelproperty.io' 
+                                value={this.state.email} 
+                                onChange={(e) => this.updateEmail(e.target.value)}
+                            />
+                        </Form.Field>
+                        <Form.Field>
+                            <label>Username</label>
+                            <input 
+                                placeholder='PixelProperty' 
+                                value={this.state.username} 
+                                onChange={(e) => this.updateUsername(e.target.value)}
+                            />
+                        </Form.Field>
+                        <Message color='orange'>
+                            Make sure to keep a backup of your wallet and private key. 
+                            We can't help you regain access if it's lost.
+                        </Message>
+                    </Form>
+                </ModalContent>
+                <ModalActions>
+                    <Button secondary onClick={() => this.props.cancel()} >Cancel</Button>
+                    <Button type='submit' onClick={() => this.signUp()} >Submit</Button>
+                </ModalActions>
+            </Modal>
         );
     }
 }

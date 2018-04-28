@@ -10,6 +10,7 @@ import { Form, Button, Message } from 'semantic-ui-react';
 import {FB, FireBase} from '../../const/firebase';
 import * as EVENTS from '../../const/events';
 import * as Const from '../../const/const';
+import ErrorBox from '../ErrorBox';
 
 class SignUpForm extends Component {
     constructor(props) {
@@ -67,6 +68,7 @@ class SignUpForm extends Component {
                         onChange={(e) => this.updateUsername(e.target.value)}
                     />
                 </Form.Field>
+                <ErrorBox/> 
                 <Message color='orange'>
                     Make sure to keep a backup of your wallet and private key. 
                     We can't help you regain access if it's lost.

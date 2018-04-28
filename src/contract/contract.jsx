@@ -187,7 +187,7 @@ export class Contract {
         this.PXLPP.deployed().then((i) => {
 
             let filter = {
-                fromBlock: latestBlock.number - 1000000, 
+                fromBlock: this.startLoadBlock, 
                 toBlock: 'latest',
                 address: Const.PXLProperty,
             };
@@ -244,7 +244,7 @@ export class Contract {
         this.PXLPP.deployed().then((i) => {
 
             let filter = {
-                fromBlock: latestBlock.number - 1000000, 
+                fromBlock: this.startLoadBlock, 
                 toBlock: 'latest',
                 address: Const.PXLProperty,
             };

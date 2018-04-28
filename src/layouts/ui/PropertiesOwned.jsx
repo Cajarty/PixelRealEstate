@@ -44,8 +44,6 @@ class PropertiesOwned extends Component {
 
     reorderItems(column = this.state.column, ascending = this.state.ascending) {
 
-        console.info(SDM.ownedProperties)
-
         this.newestSort = new Date().getTime();
         let promise = SDM.orderPropertyListAsync(SDM.ownedProperties, column, ascending);
 

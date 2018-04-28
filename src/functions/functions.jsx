@@ -187,20 +187,18 @@ export const VisitPage = (path) => {
 
 export const ContractDataToRGBAArray = (/*uint256[5]*/ contractDataArray) => {
     let result = [];
-     
     for(let i = CONTRACT_DATA_ARRAY_SIZE - 1; i >= 0; i--) {
         let uint256 = bigInt(contractDataArray[i].toString(10), 10);
         for (let j = 0; j < COLORS_PER_256; j++) {
             result.unshift(255);
-            result.unshift(uint256.and(LNUMBER - 1).toJSNumber() / LNUMBER);
+            let lNumerator = uint256.and(LNUMBER - 1).toJSNumber();
             uint256 = uint256.shiftRight(LBITS); 
-            result.unshift(uint256.and(SNUMBER - 1).toJSNumber() / SNUMBER);
+            let sNumerator = uint256.and(SNUMBER - 1).toJSNumber();
             uint256 = uint256.shiftRight(SBITS);
-            result.unshift(uint256.and(HNUMBER - 1).toJSNumber() / HNUMBER);
+            let hNumerator = uint256.and(HNUMBER - 1).toJSNumber();
             uint256 = uint256.shiftRight(HBITS);
-            let rgb = HSLtoRGB(result[0], result[1], result[2]);
-            for (let f = 0; f < 3; f++)
-                result[f] = rgb[f];
+            let rgb = HSLtoRGB(hNumerator / HNUMBER, sNumerator / SNUMBER, lNumerator / LNUMBER);
+            result.unshift(rgb[0], rgb[1], rgb[2]);
         }
     }
     return result;

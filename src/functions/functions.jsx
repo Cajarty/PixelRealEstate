@@ -319,5 +319,5 @@ export const HSLtoRGB = (h, s, l) => {
       b = hue2rgb(p, q, h - 1/3);
     }
   
-    return [ r * 255, g * 255, b * 255 ];
+    return [ Math.round(r * 255), Math.round(g * 255), Math.round(b * 255) ];
   }

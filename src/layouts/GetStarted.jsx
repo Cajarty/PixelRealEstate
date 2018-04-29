@@ -81,7 +81,7 @@ class GetStarted extends Component {
                     <ModalContent>  
                         <Message>
                             We currently use the Rinkeby network to test Pixel Property. Open MetaMask
-                            and change the network. MetaMask is at the top right of your browser.
+                            and change the network. MetaMask is at the top right of your browser window.
                         </Message>
                         <Image 
                             rounded bordered
@@ -95,38 +95,31 @@ class GetStarted extends Component {
                         <Button secondary onClick={() => this.props.changeMode()}>Cancel</Button>
                     </ModalActions>
                 </Modal>
+                {console.info(ctr.account)}
                 <Modal
                     size='tiny'
-                    open={!this.state.noMetaMask && this.state.network === Const.NETWORK_RINKEBY && !this.state.userExists}
+                    open={!this.state.noMetaMask && this.state.network === Const.NETWORK_RINKEBY && ctr.account === null}
                     closeOnEscape={false}
                     closeOnRootNodeClick={false}
                 >
-                    <ModalHeader>Sign Up</ModalHeader>
+                    <ModalHeader>Sign In to MetaMask</ModalHeader>
                     <ModalContent>  
-                        <SignUpForm cancel={() => this.props.changeMode()}/>
+                        <Message>
+                            Please login to your MetaMask wallet! Open MetaMask and enter your wallet password.
+                            MetaMask is at the top right of your browser window.
+                        </Message>
                     </ModalContent>
+                    <ModalActions>
+                        <Button secondary onClick={() => this.props.changeMode()}>Cancel</Button>
+                    </ModalActions>
                 </Modal>
+                <SignUpForm
+                    open={!this.state.noMetaMask && this.state.network === Const.NETWORK_RINKEBY && ctr.account !== null && !this.state.userExists}
+                    onCancel={() => this.props.changeMode()}
+                />
             </div>
         );
     }
 }
 
 export default GetStarted
-
-
-/*
-     <Modal size='mini' 
-                open={this.props.open}
-                trigger={this.props.trigger}
-                closeOnEscape={false}
-                closeOnRootNodeClick={false}
-            >
-                <ModalHeader>Getting Started</ModalHeader>
-                <ModalContent>
-                    <Info messages={Strings.TUTORIAL_START_DIALOG} size='small'/>
-                    <Button primary fluid onClick={() => {this.startTutorial()}}>Start the Tutorial</Button>
-                    <Divider/>
-                    <Button secondary fluid onClick={() => {this.changeMode()}}>I'm a Returning User</Button>
-                </ModalContent>
-            </Modal>
-*/

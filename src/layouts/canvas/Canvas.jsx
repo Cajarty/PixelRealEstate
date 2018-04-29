@@ -77,7 +77,6 @@ class Canvas extends Component {
                 x2: Math.max(select.x1, select.x2), 
                 y2: Math.max(select.y1, select.y2), 
             };
-            if (select.x1 != newSelect.x1 || select.y1 != newSelect.y1 || select.x2 != newSelect.x2 || select.y2 != newSelect.y2)
             GFD.setData('select', newSelect);
             this.setCanvasPointer(x, y);
         };

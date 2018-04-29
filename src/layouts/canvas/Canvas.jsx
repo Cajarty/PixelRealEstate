@@ -72,10 +72,10 @@ class Canvas extends Component {
                 }
             }
             let newSelect = {
-                x1: Math.min(select.x1, select.x2), 
-                y1: Math.min(select.y1, select.y2), 
-                x2: Math.max(select.x1, select.x2), 
-                y2: Math.max(select.y1, select.y2), 
+                x1: select.x1,
+                y1: select.y1,
+                x2: select.x2, 
+                y2: select.y2, 
             };
             GFD.setData('select', newSelect);
             this.setCanvasPointer(x, y);

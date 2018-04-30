@@ -67,6 +67,7 @@ class ZoomCanvas extends Component {
                     this.setState({loaded: true});
                 }
                 if (GFD.getData('ServerDataManagerInit') > 1) {
+                    console.info('SDM inner code for zoom canvas', this.state.queuedUpdates)
                     for (let i in this.state.queuedUpdates) {
                         this.setCanvasProperty(this.state.queuedUpdates[i].x, this.state.queuedUpdates[i].y, this.state.queuedUpdates[i].colors);
                     }
@@ -74,6 +75,7 @@ class ZoomCanvas extends Component {
                     ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (eventHandle) => {
                         this.setState({eventHandle});
                         eventHandle.watch((error, log) => {
+                            //console.info('zoom event');
                             let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
                             let colors = Func.ContractDataToRGBAArray(log.args.colors);
                             if (this.state.loaded) {

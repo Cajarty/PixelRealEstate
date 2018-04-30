@@ -67,15 +67,16 @@ export default class ClickLoader extends Component {
     }
 
     componentWillUnmount() {
-        this.clearClickAttempt();
+        this.clearClickAttempt(true);
     }
 
-    clearClickAttempt() {
+    clearClickAttempt(unmounting = false) {
         if (this.state.clickTimeout != null)
             clearTimeout(this.state.clickTimeout);
         if (this.state.loaderTimeout != null)
             clearTimeout(this.state.loaderTimeout);
-        this.setState({startClickTime: 0, show: false, loaderValue: 0, loadedLink: false});
+        if (!unmounting)
+            this.setState({startClickTime: 0, show: false, loaderValue: 0, loadedLink: false});
     }
 
     updateLoaderPosition(x, y) {

@@ -153,6 +153,14 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return;
 
+        if (this.startLoadBlock <= 0) {
+            window.web3.eth.getBlock('latest').then((latestBlock) => {
+                this.startLoadBlock = latestBlock.number - 1000;
+                this.getEventLogs(event, params, callback);
+            });
+            return;
+        }
+
         // VRE DApp Events
         this.VRE.deployed().then((i) => {
             let filter = {
@@ -209,8 +217,18 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return;
 
+        if (this.startLoadBlock <= 0) {
+            window.web3.eth.getBlock('latest').then((latestBlock) => {
+                this.startLoadBlock = latestBlock.number - 1000;
+                this.watchEventLogs(event, params, callback);
+            });
+            return;
+        }
+
         // VRE DApp Events
         this.VRE.deployed().then((i) => {
+
+            console.info(this.startLoadBlock)
 
             let filter = {
                 fromBlock: this.startLoadBlock, 
@@ -545,7 +563,7 @@ export class Contract {
                 return callback(r);
             });
         }).catch((e) => {
-            console.log(e);
+            console.error(e);
         });
     }
 
@@ -554,10 +572,11 @@ export class Contract {
             return callback(false);
         this.getPXLPPInstance().then((i) => {
             return i.getOwnerHoverText.call(address).then((r) => {
-                return callback(Func.BigIntsToString(r));
+                if (r !== null)
+                    return callback(Func.BigIntsToString(r));
             });
         }).catch((e) => {
-            console.log(e);
+            console.error(e);
         });
     }
 
@@ -566,10 +585,11 @@ export class Contract {
             return callback(false);
         this.getPXLPPInstance().then((i) => {
             return i.getOwnerLink.call(address).then((r) => {
-                return callback(Func.BigIntsToString(r));
+                if (r !== null)
+                    return callback(Func.BigIntsToString(r));
             });
         }).catch((e) => {
-            console.log(e);
+            console.error(e);
         });
     }
 

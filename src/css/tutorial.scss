@@ -13,7 +13,8 @@
     &.step0 {}
     &.step1 {
         top: 20px;
-        width: 25vw;
+        width: 20vw;
+        max-width: 25vw;
         left: auto;
         right: 20px;
         margin: 0;
@@ -27,11 +28,11 @@
     }
     &.step3 {}
     &.step4 {
-        width: 35vw;
-        right: 20px;
-        left: auto;
+        width: 80vw;
+        left: 10vw;
+        right: 10vw;
         margin: 0;
-        top: 50%;
+        top: 12.5%;
         transform: translateY(-50%);
     }
     &.step5 {
@@ -66,9 +67,9 @@
         }
     }
     &.step4 {
-        right: auto;
+        right: 5%;
         left: 5%;
-        transform: translateX(50%);
+        transform: translate(60%, 17.5%);
     }
     &.step5 {
         right: auto;

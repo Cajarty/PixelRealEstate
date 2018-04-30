@@ -10,6 +10,7 @@ import { Form, Button, Message, ModalActions, Modal, ModalContent, ModalHeader }
 import {FB, FireBase} from '../../const/firebase';
 import * as EVENTS from '../../const/events';
 import * as Const from '../../const/const';
+import ErrorBox from '../ErrorBox';
 
 class SignUpForm extends Component {
     constructor(props) {

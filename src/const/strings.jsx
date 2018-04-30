@@ -69,7 +69,7 @@ export const TUTORIAL = [
     ['Use these inspector buttons to interact with the currently inspected property. Some Properties have different actions depending on their current state.', 'Click on “Update Image” to learn how to upload artwork.'],
     ['Updating the artwork of a Property will temporarily lock it in place as private. After the private mode is up, the artwork will stay until a user changes it again. Longer lasting artwork is awarded more PXL.'],
     ['PXL allows you to purchase Properties on the canvas.', 'Properties you own can be used to earn passive PXL, or kept private for only your artwork. Owners are also able to advertise a website and phrase of their choosing on all their Properties.'],
-    ['Looks like you’re ready to start!', 'If looking for more info, each inspector action explains what they do in more detail. Additional details are on our [Getting Started] page.'],
-    ['Looks like you’re almost ready! In order to begin, you must have the [MetaMask Browser Extension] setup.', 'MetaMask secures your PixelProperty data by storing your sensitive info in an encrypted storage.', 'If looking for more info, each inspector action explains what they do in more detail. Additional details are on our [Getting Started] page.']
+    ['Looks like you’re ready to start!', 'If looking for more info, each inspector action explains what they do in more detail. Additional details are on our <a href="https://pixelproperty.io/faq.html">Frequently Asked Questions</a> page.'],
+    ['Looks like you’re almost ready! In order to begin, you must have the <a href="https://metamask.io/">MetaMask Browser Extension</a> setup.', 'MetaMask secures your PixelProperty data by storing your sensitive info in an encrypted storage.', 'If looking for more info, each inspector action explains what they do in more detail. Additional details are on our <a href="https://pixelproperty.io/faq.html">Frequently Asked Questions</a> page.']
 ];
 

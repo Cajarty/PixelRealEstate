@@ -90,7 +90,7 @@ contract VirtualRealEstate {
     }
 
     function getSaleInformation() public view ownerOnly() returns(uint8, uint8, uint16, uint16, uint16, uint16) {
-        return (systemPixelIncreasePercent, systemPriceIncreaseStep, systemETHStepTally, systemPXLStepTally, systemETHStepCount, systemPXLStepCount)
+        return (systemPixelIncreasePercent, systemPriceIncreaseStep, systemETHStepTally, systemPXLStepTally, systemETHStepCount, systemPXLStepCount);
     }
     
     /* USER FUNCTIONS */
@@ -135,7 +135,7 @@ contract VirtualRealEstate {
     //Wrapper to call setColors 4 times in one call. Reduces overhead, however still duplicate work everywhere to ensure
     function setColorsX4(uint16[4] propertyIDs, uint256[20] newColors, uint256 PXLToSpendEach) public validPropertyID(propertyIDs[3]) returns(bool[4]) {
         bool[4] results;
-        for(int i = 0; i < 4; i++) {
+        for(uint256 i = 0; i < 4; i++) {
             results[i] = setColors(propertyIDs[i], [newColors[i * 5], newColors[i * 5 + 1], newColors[i * 5 + 2], newColors[i * 5 + 3], newColors[i * 5 + 4]], PXLToSpendEach);
         }
         return results;
@@ -144,7 +144,7 @@ contract VirtualRealEstate {
     //Wrapper to call setColors 8 times in one call. Reduces overhead, however still duplicate work everywhere to ensure
     function setColorsX8(uint16[8] propertyIDs, uint256[40] newColors, uint256 PXLToSpendEach) public validPropertyID(propertyIDs[3]) returns(bool[8]) {
         bool[8] results;
-        for(int i = 0; i < 8; i++) {
+        for(uint256 i = 0; i < 8; i++) {
             results[i] = setColors(propertyIDs[i], [newColors[i * 5], newColors[i * 5 + 1], newColors[i * 5 + 2], newColors[i * 5 + 3], newColors[i * 5 + 4]], PXLToSpendEach);
         }
         return results;

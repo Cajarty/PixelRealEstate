@@ -188,7 +188,7 @@ export const VisitPage = (path) => {
 export const ContractDataToRGBAArray = (/*uint256[5]*/ contractDataArray) => {
     let result = [];
     for(let i = CONTRACT_DATA_ARRAY_SIZE - 1; i >= 0; i--) {
-        let uint256 = bigInt(contractDataArray[i].toString(10), 10);
+        let uint256 = bigInt(contractDataArray[i].toString(2), 2);
         for (let j = 0; j < COLORS_PER_256; j++) {
             result.unshift(255);
             let lNumerator = uint256.and(LNUMBER - 1).toJSNumber();

@@ -37,7 +37,7 @@ class Tutorial extends Component {
                     <Header icon='help circle' content='Tutorial' />
                     <ModalContent>
                         {Strings.TUTORIAL[this.state.tutorialState.index].map((str, i) => (
-                            <p key={i}>{str}</p>
+                            <div key={i}>{str}</div>
                         ))}
                     </ModalContent>
                     <ModalActions>

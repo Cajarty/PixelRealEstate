@@ -15,7 +15,7 @@ export const CLOSE = BASE_PATH + 'icons/close.svg';
 export const LOADING = BASE_PATH + 'icons/loading.gif';
 export const TOKEN = BASE_PATH + 'icons/token.png';
 
-export const LOGO = BASE_PATH + 'icons/PixelProperty.svg';
+export const LOGO = BASE_PATH + 'icons/PixelProperty_beta.svg';
 export const METAMASK_DOWNLOAD = BASE_PATH + 'img/download-metamask.png';
 export const RINKEBY_NETWORK = BASE_PATH + 'img/rinkebyNetwork.png';
 export const MAIN_NETWORK = BASE_PATH + 'img/mainNetwork.png';

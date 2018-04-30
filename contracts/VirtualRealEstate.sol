@@ -19,7 +19,7 @@ contract VirtualRealEstate {
     // The point in time when the initial grace period is over, and users get the default values based on coins burned
     uint256 GRACE_PERIOD_END_TIMESTAMP;
     // The amount of time required for a Property to generate tokens for payouts
-    uint256 PROPERTY_GENERATION_PAYOUT_INTERVAL = (1 minutes); //Generation amount
+    uint256 PROPERTY_GENERATION_PAYOUT_INTERVAL = (1 seconds); //Generation amount
     
     uint256 ownerEth = 0; // Amount of ETH the contract owner is entitled to withdraw (only Root account can do withdraws)
     
@@ -88,6 +88,10 @@ contract VirtualRealEstate {
             initialPropertiesReserved = true;
         }
     }
+
+    function getSaleInformation() public view ownerOnly() returns(uint8, uint8, uint16, uint16, uint16, uint16) {
+        return (systemPixelIncreasePercent, systemPriceIncreaseStep, systemETHStepTally, systemPXLStepTally, systemETHStepCount, systemPXLStepCount)
+    }
     
     /* USER FUNCTIONS */
     
@@ -126,6 +130,24 @@ contract VirtualRealEstate {
             return true;
         }
         return false;
+    }
+
+    //Wrapper to call setColors 4 times in one call. Reduces overhead, however still duplicate work everywhere to ensure
+    function setColorsX4(uint16[4] propertyIDs, uint256[20] newColors, uint256 PXLToSpendEach) public validPropertyID(propertyIDs[3]) returns(bool[4]) {
+        bool[4] results;
+        for(int i = 0; i < 4; i++) {
+            results[i] = setColors(propertyIDs[i], [newColors[i * 5], newColors[i * 5 + 1], newColors[i * 5 + 2], newColors[i * 5 + 3], newColors[i * 5 + 4]], PXLToSpendEach);
+        }
+        return results;
+    }
+
+    //Wrapper to call setColors 8 times in one call. Reduces overhead, however still duplicate work everywhere to ensure
+    function setColorsX8(uint16[8] propertyIDs, uint256[40] newColors, uint256 PXLToSpendEach) public validPropertyID(propertyIDs[3]) returns(bool[8]) {
+        bool[8] results;
+        for(int i = 0; i < 8; i++) {
+            results[i] = setColors(propertyIDs[i], [newColors[i * 5], newColors[i * 5 + 1], newColors[i * 5 + 2], newColors[i * 5 + 3], newColors[i * 5 + 4]], PXLToSpendEach);
+        }
+        return results;
     }
     
     // Update a row of image data for a Property, triggering potential payouts if it succeeds

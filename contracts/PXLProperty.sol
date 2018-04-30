@@ -28,7 +28,7 @@ contract PXLProperty is StandardToken {
     
     /* Accesser Addresses & Levels */
     address pixelPropertyContract; // Only contract that has control over PXL creation and Property ownership
-    mapping (address => uint8) regulators; // Mapping of users/contracts to their control levels
+    mapping (address => uint8) public regulators; // Mapping of users/contracts to their control levels
     
     // Mapping of PropertyID to Property
     mapping (uint16 => Property) public properties;
@@ -111,11 +111,17 @@ contract PXLProperty is StandardToken {
     
     /* ### PropertyDapp Functions ### */
     function setPropertyColors(uint16 propertyID, uint256[5] colors) public propertyDAppAccess() {
-        properties[propertyID].colors = colors;
+        for(uint256 i = 0; i < 5; i++) {
+            if (properties[propertyID].colors[i] != colors[i]) {
+                properties[propertyID].colors[i] = colors[i];
+            }
+        }
     }
     
     function setPropertyRowColor(uint16 propertyID, uint8 row, uint256 rowColor) public propertyDAppAccess() {
-        properties[propertyID].colors[row] = rowColor;
+        if (properties[propertyID].colors[row] != rowColor) {
+            properties[propertyID].colors[row] = rowColor;
+        }
     }
     
     function setOwnerHoverText(address textOwner, uint256[2] hoverText) public propertyDAppAccess() {
@@ -130,19 +136,27 @@ contract PXLProperty is StandardToken {
     
     /* ### PixelProperty Property Functions ### */
     function setPropertyPrivateMode(uint16 propertyID, bool isInPrivateMode) public pixelPropertyAccess() {
-        properties[propertyID].isInPrivateMode = isInPrivateMode;
+        if (properties[propertyID].isInPrivateMode != isInPrivateMode) {
+            properties[propertyID].isInPrivateMode = isInPrivateMode;
+        }
     }
     
     function setPropertyOwner(uint16 propertyID, address propertyOwner) public pixelPropertyAccess() {
-        properties[propertyID].owner = propertyOwner;
+        if (properties[propertyID].owner != propertyOwner) {
+            properties[propertyID].owner = propertyOwner;
+        }
     }
     
     function setPropertyLastUpdater(uint16 propertyID, address lastUpdater) public pixelPropertyAccess() {
-        properties[propertyID].lastUpdater = lastUpdater;
+        if (properties[propertyID].lastUpdater != lastUpdater) {
+            properties[propertyID].lastUpdater = lastUpdater;
+        }
     }
     
     function setPropertySalePrice(uint16 propertyID, uint256 salePrice) public pixelPropertyAccess() {
-        properties[propertyID].salePrice = salePrice;
+        if (properties[propertyID].salePrice != salePrice) {
+            properties[propertyID].salePrice = salePrice;
+        }
     }
     
     function setPropertyLastUpdate(uint16 propertyID, uint256 lastUpdate) public pixelPropertyAccess() {
@@ -158,14 +172,18 @@ contract PXLProperty is StandardToken {
     }
     
     function setPropertyPrivateModeEarnUntilLastUpdateBecomePublic(uint16 propertyID, bool privateMode, uint256 earnUntil, uint256 lastUpdate, uint256 becomePublic) public pixelPropertyAccess {
-        properties[propertyID].isInPrivateMode = privateMode;
+        if (properties[propertyID].isInPrivateMode != privateMode) {
+            properties[propertyID].isInPrivateMode = privateMode;
+        }
         properties[propertyID].earnUntil = earnUntil;
         properties[propertyID].lastUpdate = lastUpdate;
         properties[propertyID].becomePublic = becomePublic;
     }
     
     function setPropertyLastUpdaterLastUpdate(uint16 propertyID, address lastUpdater, uint256 lastUpdate) public pixelPropertyAccess() {
-        properties[propertyID].lastUpdater = lastUpdater;
+        if (properties[propertyID].lastUpdater != lastUpdater) {
+            properties[propertyID].lastUpdater = lastUpdater;
+        }
         properties[propertyID].lastUpdate = lastUpdate;
     }
     
@@ -175,15 +193,27 @@ contract PXLProperty is StandardToken {
     }
     
     function setPropertyOwnerSalePricePrivateModeFlag(uint16 propertyID, address owner, uint256 salePrice, bool privateMode, uint8 flag) public pixelPropertyAccess() {
-        properties[propertyID].owner = owner;
-        properties[propertyID].salePrice = salePrice;
-        properties[propertyID].isInPrivateMode = privateMode;
-        properties[propertyID].flag = flag;
+        if (properties[propertyID].owner != owner) {
+            properties[propertyID].owner = owner;
+        }
+        if (properties[propertyID].salePrice != salePrice) {
+            properties[propertyID].salePrice = salePrice;
+        }
+        if (properties[propertyID].isInPrivateMode != privateMode) {
+            properties[propertyID].isInPrivateMode = privateMode;
+        }
+        if (properties[propertyID].flag != flag) {
+            properties[propertyID].flag = flag;
+        }
     }
     
     function setPropertyOwnerSalePrice(uint16 propertyID, address owner, uint256 salePrice) public pixelPropertyAccess() {
-        properties[propertyID].owner = owner;
-        properties[propertyID].salePrice = salePrice;
+        if (properties[propertyID].owner != owner) {
+            properties[propertyID].owner = owner;
+        }
+        if (properties[propertyID].salePrice != salePrice) {
+            properties[propertyID].salePrice = salePrice;
+        }
     }
     
     /* ### PixelProperty PXL Functions ### */

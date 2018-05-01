@@ -411,12 +411,4 @@ contract VirtualRealEstate {
     function isInGracePeriod() public view returns(bool) {
         return now <= GRACE_PERIOD_END_TIMESTAMP;
     }
-    
-    ////////////////////////////////////////////////
-    ///TODO: TESTING ONLY: REMOVE BEFORE RELEASE:///
-    ////////////////////////////////////////////////
-    function addCoin(address user, uint256 amount) public ownerOnly() {
-        require(msg.sender == owner);
-        pxlProperty.rewardPXL(user, amount);
-    }
 }

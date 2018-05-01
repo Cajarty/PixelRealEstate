@@ -31,11 +31,12 @@ class WelcomeSidebar extends Component {
 
     componentWillMount() {
         this.timerUpdate();
-        this.setState({timerUpdater: setInterval(() => this.timerUpdate(), 1000)});
+        this.timerUpdater = setInterval(() => this.timerUpdate(), 1000);
     }
 
     componentWillUnmount() {
-
+        if (this.timerUpdater != null)
+            clearInterval(this.timerUpdater);
     }
 
     timerUpdate() {

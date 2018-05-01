@@ -578,8 +578,6 @@ export class Contract {
             return i.getOwnerHoverText.call(address).then((r) => {
                 return callback(Func.BigIntsToString(r));
             });
-        }).catch((e) => {
-            console.error(e);
         });
     }
 

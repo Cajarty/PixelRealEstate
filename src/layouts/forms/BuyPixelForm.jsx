@@ -166,7 +166,7 @@ class BuyPixelForm extends Component {
                         </div>
                         :
                         <div>
-                            <Label>ETH<LabelDetail>{Func.WeiToEth( Func.WeiToEth(this.state.ETHToPay) )}</LabelDetail></Label>
+                            <Label>ETH<LabelDetail>{Func.WeiToEth(this.state.ETHToPay)}</LabelDetail></Label>
                             <Label style={{float: 'right'}}>PXL<LabelDetail>{Func.NumberWithCommas(this.state.PPCToPay)}</LabelDetail></Label>
                             <FormInput
                                 className='buySlider'

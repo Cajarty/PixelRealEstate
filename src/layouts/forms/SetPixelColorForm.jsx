@@ -319,7 +319,7 @@ class SetPixelColorForm extends Component {
             img.onload = () => {
                 this.drawImages(img);
             }
-            img.src = event.target.result;
+            img.src = e.target.result;
         };
         reader.readAsDataURL(files[0]);
     }

@@ -33,7 +33,7 @@ class PropertyChangeLogYou extends Component {
                     let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
                     let last = Func.BigNumberToNumber(log.args.lastUpdate);
                     let reserved = Func.BigNumberToNumber(log.args.becomePublic);
-                    let maxEarnings = Math.pow((reserved - last) / 30, 2);
+                    let maxEarnings = ((reserved - last) / 30) * 5;
                     let newData = {
                         x: id.x,
                         y: id.y,

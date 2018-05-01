@@ -32,7 +32,7 @@ class PropertyChangeLogTop extends Component {
                     let old = this.state.changeLog;
                     let last = Func.BigNumberToNumber(log.args.lastUpdate);
                     let reserved = Func.BigNumberToNumber(log.args.becomePublic);
-                    let maxEarnings = Math.pow((reserved - last) / 30, 2);
+                    let maxEarnings = ((reserved - last) / 30) * 5;
                     let payout = Func.calculateEarnings(last, maxEarnings);
                     if (old.length == 0) {
                         let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));

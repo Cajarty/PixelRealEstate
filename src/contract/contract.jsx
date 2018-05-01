@@ -572,8 +572,7 @@ export class Contract {
             return callback(false);
         this.getPXLPPInstance().then((i) => {
             return i.getOwnerHoverText.call(address).then((r) => {
-                if (r !== null)
-                    return callback(Func.BigIntsToString(r));
+                return callback(Func.BigIntsToString(r));
             });
         }).catch((e) => {
             console.error(e);
@@ -585,8 +584,7 @@ export class Contract {
             return callback(false);
         this.getPXLPPInstance().then((i) => {
             return i.getOwnerLink.call(address).then((r) => {
-                if (r !== null)
-                    return callback(Func.BigIntsToString(r));
+                return callback(Func.BigIntsToString(r));
             });
         }).catch((e) => {
             console.error(e);

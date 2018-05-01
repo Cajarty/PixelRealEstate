@@ -58,6 +58,16 @@ export class ServerDataManager {
         this.allProperties = {};
         this.forSaleProperties = {};
         this.ownedProperties = {};
+
+        this.topTenPayouts = {};
+        this.recentPayouts = {};
+        this.yourPayouts = {};
+        
+        this.topTenPXLTrades = {};
+        this.topTenETHTrades = {};
+        this.recentTrades = {};
+        this.yourTrades = {};
+
         this.bids = {};
 
         this.useLocalFile = false; //not supported yet

@@ -128,7 +128,7 @@ class PixelDescriptionBox extends Component {
                 let ppcp = data.PPCPrice;
                 let reserved = data.becomePublic;
                 let lastUpdate = data.lastUpdate;
-                let maxEarnings = Math.pow((reserved - lastUpdate) / 30, 2);
+                let maxEarnings = ((reserved - lastUpdate) / 30) * 5;
                 this.setState({
                     owner: data.owner,
                     isForSale: ppcp != 0,
@@ -272,7 +272,7 @@ class PixelDescriptionBox extends Component {
             let ppcp = Func.BigNumberToNumber(data[2]);
             let reserved = Func.BigNumberToNumber(data[5]);
             let lastUpdate = Func.BigNumberToNumber(data[3]);
-            let maxEarnings = Math.pow((reserved - lastUpdate) / 30, 2);
+            let maxEarnings = ((reserved - lastUpdate) / 30) * 5;
             this.setState({
                 owner: data[0],
                 isForSale: ppcp != 0,

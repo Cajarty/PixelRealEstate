@@ -132,8 +132,8 @@ class PixelDescriptionBox extends Component {
                 this.setState({
                     owner: data.owner,
                     isForSale: ppcp != 0,
-                    ETHPrice: Func.NumberWithCommas( Func.WeiToEth( ethp ) ),
-                    PPCPrice: Func.NumberWithCommas (ppcp ),
+                    ETHPrice: ethp ,
+                    PPCPrice: ppcp,
                     lastUpdate,
                     isInPrivate: data.isInPrivate,
                     reserved,
@@ -276,8 +276,8 @@ class PixelDescriptionBox extends Component {
             this.setState({
                 owner: data[0],
                 isForSale: ppcp != 0,
-                ETHPrice: Func.NumberWithCommas( Func.WeiToEth( ethp ) ),
-                PPCPrice: Func.NumberWithCommas( ppcp ),
+                ETHPrice: ethp,
+                PPCPrice: ppcp,
                 lastUpdate,
                 isInPrivate: data[4],
                 reserved,
@@ -334,9 +334,9 @@ class PixelDescriptionBox extends Component {
     getPriceFormat() {
         // if (this.state.ETHPrice == 0 && this.state.PPCPrice == 0) 
         //     return "Not for sale"
-        let s = this.state.ETHPrice == 0 ? '' : this.state.ETHPrice + ' ETH';
+        let s = this.state.ETHPrice == 0 ? '' : Func.WeiToEth( this.state.ETHPrice ) + ' ETH';
         s += this.state.ETHPrice != 0 && this.state.PPCPrice != 0 ? ' - ' : '';
-        s += this.state.PPCPrice == 0 ? '' : this.state.PPCPrice + ' PXL';
+        s += this.state.PPCPrice == 0 ? '' : Func.NumberWithCommas( this.state.PPCPrice ) + ' PXL';
         return s;
     }
 

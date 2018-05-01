@@ -73,7 +73,7 @@ export class FireBase {
     }
 
     checkUsernameExists(username, callback) {
-        firebase.database().ref('Usernames/' + username).once('value').then((snap) => {
+        firebase.database().ref('Usernames/' + username.toLowerCase()).once('value').then((snap) => {
             return callback(snap.exists());
         });
     }
@@ -126,7 +126,7 @@ export class FireBase {
                                         tosVersion,
                                     }).then(() => {
                                         firebase.database().ref('/Emails/' + email.replace(/\./g, ',')).set(true);
-                                        firebase.database().ref('/Usernames/' + username).set(true);
+                                        firebase.database().ref('/Usernames/' + username.toLowerCase()).set(username);
                                         this.signIn();
                                         GFD.setData('tutorialStateIndex', 1);
                                     }).catch((error) => {

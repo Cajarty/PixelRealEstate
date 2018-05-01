@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
+import * as Const from '../../const/const';
 import * as Func from '../../functions/functions';
 import Info from '../ui/Info';
 import {GFD, GlobalState} from '../../functions/GlobalState';
@@ -20,6 +21,7 @@ class MakePrivateForm extends Component {
             becomePublicYet: false, //has public timestamp run out?
             minutesPrivate: 0,
             tokenCost: 0,
+            pendingState: Const.FORM_STATE.IDLE,
         };
     }
 
@@ -34,6 +36,7 @@ class MakePrivateForm extends Component {
     }
 
     componentDidMountOpen() {
+        this.setState({pendingState: Const.FORM_STATE.IDLE});
         GFD.listen('x', 'ChangePropertyMode', (x) => {
             this.setState({x});
         })
@@ -78,8 +81,10 @@ class MakePrivateForm extends Component {
             ctr.sendResults(LISTENERS.Alert, {result: false, message: "Property is temorarily reserved by a user."});
             return;
         }
-        ctr.setPropertyMode(x, y, true, this.state.minutesPrivate, () => {
-            console.info("Mode toggled, confirmed through a transaction");
+        this.setState({pendingState: Const.FORM_STATE.PENDING});
+        ctr.setPropertyMode(x, y, true, this.state.minutesPrivate, (result) => {
+            if (this.state.pendingState !== Const.FORM_STATE.IDLE)
+                this.setState({pendingState: result ? Const.FORM_STATE.COMPLETE : Const.FORM_STATE.FAILED});
         })
     }
 
@@ -197,6 +202,7 @@ class MakePrivateForm extends Component {
                 }
             </ModalContent>
             <ModalActions>
+                <Label className={this.state.pendingState.name} color={this.state.pendingState.color}>{this.state.pendingState.message}</Label>
                 <Button primary disabled={this.state.isPrivate || this.state.becomePublicYet} onClick={() => this.setPropertyMode()}>Set Private</Button>
             </ModalActions>
             </Modal>

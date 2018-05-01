@@ -4,9 +4,11 @@ import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import { Slider } from 'react-semantic-ui-range';
 import * as Strings from '../../const/strings';
+import * as Const from '../../const/const';
 import Info from '../ui/Info';
 import {TUTORIAL_STATE} from '../../functions/GlobalState';
 import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon, Segment, Message } from 'semantic-ui-react';
+import { ENGINE_METHOD_DIGESTS } from 'constants';
 
 class BuyPixelForm extends Component {
     constructor(props) {
@@ -20,6 +22,7 @@ class BuyPixelForm extends Component {
             ETHToPay: 0,
             PPCToPay: 0,
             isOpen: false,
+            pendingState: Const.FORM_STATE.IDLE,
         };
     }
 
@@ -55,6 +58,7 @@ class BuyPixelForm extends Component {
 
     componentDidUnmountOpen() {
         GFD.closeAll('buyPixel');
+        this.setState({pendingState: Const.FORM_STATE.IDLE});
     }
 
     componentDidUpdate(pP, pS) {
@@ -73,9 +77,11 @@ class BuyPixelForm extends Component {
     }
 
     buyProperty() {
+        this.setState({pendingState: Const.FORM_STATE.PENDING});
         if (this.state.x >= 1 && this.state.x <= 100 && this.state.y >= 1 && this.state.y <= 100) {
             ctr.buyProperty(this.state.x - 1, this.state.y - 1, this.state.ETHToPay, this.state.PPCToPay, (result) => {
-                this.toggleModal(!result);
+                if (this.state.pendingState !== Const.FORM_STATE.IDLE)
+                    this.setState({pendingState: result ? Const.FORM_STATE.COMPLETE : Const.FORM_STATE.FAILED});
             });
         }
     }
@@ -184,6 +190,7 @@ class BuyPixelForm extends Component {
                 </ModalContent>
 
                 {this.props.tutorialState.index != 5 && <ModalActions>
+                <Label className={this.state.pendingState.name} color={this.state.pendingState.color}>{this.state.pendingState.message}</Label>
                     <Button primary onClick={() => this.buyProperty()}>Buy Property</Button>
                 </ModalActions>}
             </Modal>

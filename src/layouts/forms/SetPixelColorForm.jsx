@@ -7,7 +7,7 @@ import { ChromePicker } from 'react-color';
 import * as Assets from '../../const/assets';
 import Info from '../ui/Info';
 import * as Strings from '../../const/strings';
-import { Modal, ModalContent, ModalHeader, Button, Divider, Input, Popup, Label, ModalActions, Icon, Segment, Grid, GridColumn, GridRow, ButtonGroup, Message } from 'semantic-ui-react';
+import { Modal, ModalContent, ModalHeader, Button, Divider, Input, List, Popup, Label, ModalActions, Icon, Segment, Grid, GridColumn, GridRow, ButtonGroup, Message, Loader } from 'semantic-ui-react';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
 import {TUTORIAL_STATE} from '../../functions/GlobalState';
 
@@ -42,6 +42,7 @@ class SetPixelColorForm extends Component {
                   },
             drawMode: DrawMode.PIXEL,
             isOpen: false,
+            pendingState: Const.FORM_STATE.IDLE,
         };
     }
     
@@ -57,6 +58,7 @@ class SetPixelColorForm extends Component {
 
     componentDidUnmountOpen() {
         GFD.closeAll('UpdatePixel');
+        this.setState({pendingState: Const.FORM_STATE.IDLE});
         this.state.canvasLrg.onmousedown = null;
         this.state.canvasLrg.onmouseup = null;
         this.state.canvasLrg.onmousemove = null;
@@ -349,6 +351,7 @@ class SetPixelColorForm extends Component {
     setPixels() {
         let editor = this.getEditorSize();
         let pixelData = this.state.ctxSml.getImageData(0, 0, editor.w / 10, editor.h / 10).data;
+        this.setState({pendingState: Const.FORM_STATE.PENDING});
         if (this.state.multiRect) {
             let xx = 0;
             for (let x = this.state.select.x1; x <= this.state.select.x2; x++) {
@@ -358,6 +361,8 @@ class SetPixelColorForm extends Component {
                     ctr.setColors(x - 1, y - 1, pixelDataSection, this.state.ppt, (result) => {
                         if (result === 'pending')
                             ctr.sendResults(LISTENERS.PendingSetPixelUpdate, {x: x - 1, y: y - 1, pixelData: pixelDataSection});
+                        if (this.state.pendingState !== Const.FORM_STATE.IDLE && result !== 'pending')
+                            this.setState({pendingState: result ? Const.FORM_STATE.COMPLETE : Const.FORM_STATE.FAILED});
                     });
                     yy++;
                 }
@@ -367,6 +372,8 @@ class SetPixelColorForm extends Component {
             ctr.setColors(this.state.x - 1, this.state.y - 1, pixelData, this.state.ppt, (result) => {
                 if (result === 'pending')
                     ctr.sendResults(LISTENERS.PendingSetPixelUpdate, {x: this.state.x - 1, y: this.state.y - 1, pixelData});
+                if (this.state.pendingState !== Const.FORM_STATE.IDLE && result !== 'pending')
+                    this.setState({pendingState: result ? Const.FORM_STATE.COMPLETE : Const.FORM_STATE.FAILED});
             });
         }
     }
@@ -648,7 +655,9 @@ class SetPixelColorForm extends Component {
                         </GridRow>
                     </Grid>
                 </ModalContent>
-                {this.props.tutorialState.index != 4 && <ModalActions>
+                {this.props.tutorialState.index != 4 && 
+                <ModalActions>
+                    <Label className={this.state.pendingState.name} color={this.state.pendingState.color}>{this.state.pendingState.message}</Label>
                     <Button primary onClick={() => this.setPixels()}>Change Image</Button>
                 </ModalActions>}
             </Modal>

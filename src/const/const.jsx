@@ -11,6 +11,28 @@ export const PXLProperty = ['0x72a192d7d07f876c0edb6fce79798d5b569dde60', '0x4be
 
 export const TOS_VERSION = 1;
 
+export const FORM_STATE = {
+    IDLE: {
+        name: 'IDLE',
+        color: 'green',
+        message: '',
+    }, 
+    PENDING: {
+        name: 'PENDING',
+        color: 'green',
+        message: 'Transaction sent...',
+    }, 
+    COMPLETE: {
+        name: 'COMPLETE',
+        color: 'green',
+        message: 'Transaction complete!',
+    },
+    FAILED: {
+        name: 'FAILED',
+        color: 'red',
+        message: 'Transaction failed!',
+    },
+};
 
 export const NETWORK_DEV = -1;
 export const NETWORK_MAIN = 1;

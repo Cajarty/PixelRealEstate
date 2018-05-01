@@ -4,6 +4,7 @@ import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import * as Strings from '../../const/strings';
+import * as Const from '../../const/const';
 import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon, Message} from 'semantic-ui-react';
 
 class CancelSaleForm extends Component {
@@ -14,6 +15,7 @@ class CancelSaleForm extends Component {
             y: '',
             valuePrice: 0,
             isOpen: false,
+            pendingState: Const.FORM_STATE.IDLE,
         };
     }
 
@@ -63,8 +65,10 @@ class CancelSaleForm extends Component {
     }
 
     delistProperty() {
+        this.setState({pendingState: Const.FORM_STATE.PENDING});
         ctr.delistProperty(this.state.x - 1, this.state.y - 1, (result) => {
-            this.toggleModal(!result);
+            if (this.state.pendingState !== Const.FORM_STATE.IDLE)
+                this.setState({pendingState: result ? Const.FORM_STATE.COMPLETE : Const.FORM_STATE.FAILED});
         });
     }
 
@@ -82,6 +86,7 @@ class CancelSaleForm extends Component {
                 <p>Are you sure you want stop offering Property ({this.state.x}, {this.state.y}) for Sale?</p>
             </ModalContent>
             <ModalActions>
+                <Label className={this.state.pendingState.name} color={this.state.pendingState.color}>{this.state.pendingState.message}</Label>
                 <Button onClick={() => this.toggleModal(false)}>Cancel</Button>
                 <Button primary onClick={() => this.delistProperty()}>Delist Property</Button>
             </ModalActions>

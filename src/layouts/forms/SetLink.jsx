@@ -1,21 +1,32 @@
 import React, { Component } from 'react'
 import {Contract, ctr} from '../../contract/contract.jsx';
+import * as Const from '../../const/const';
 import * as Func from '../../functions/functions.jsx';
 import * as Strings from '../../const/strings';
 import Info from '../ui/Info';
-import {Modal, ModalActions, ModalHeader, ModalContent, Input, Button, Divider, Message} from 'semantic-ui-react';
+import {Modal, ModalActions, ModalHeader, ModalContent, Input, Button, Divider, Message, Label} from 'semantic-ui-react';
 
 class SetHoverText extends Component {
     constructor(props) {
         super(props);
         this.state = {
             linkText: '',
+            pendingState: Const.FORM_STATE.IDLE,
         };
     }
 
     componentDidMount() {
+        this.setState({pendingState: Const.FORM_STATE.IDLE});
         ctr.getLink(ctr.account, (data) => {
             this.setState({linkText: data});
+        });
+    }
+
+    setLink() {
+        this.setState({pendingState: Const.FORM_STATE.PENDING});
+        ctr.setHoverText(this.state.linkText, (result) => {
+            if (this.state.pendingState !== Const.FORM_STATE.IDLE)
+                this.setState({pendingState: result ? Const.FORM_STATE.COMPLETE : Const.FORM_STATE.FAILED});
         });
     }
 
@@ -46,6 +57,7 @@ class SetHoverText extends Component {
                     />
                 </ModalContent>
                 <ModalActions>
+                    <Label className={this.state.pendingState.name} color={this.state.pendingState.color}>{this.state.pendingState.message}</Label>
                     <Button primary onClick={() => ctr.setLink('http://' + this.state.linkText.replace(/(^\w+:|^)\/\//, ''))}>Set Link</Button>
                 </ModalActions>
             </Modal>

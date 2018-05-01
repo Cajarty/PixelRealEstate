@@ -3,6 +3,7 @@ import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import Info from '../ui/Info';
+import * as Const from '../../const/const';
 import * as Strings from '../../const/strings';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 import {Segment, ModalContent, Divider, Modal, Grid, Label, Input, Container, Icon, Button, Popup, ModalActions, ModalHeader, Message} from 'semantic-ui-react';
@@ -18,6 +19,7 @@ class MakePublicForm extends Component {
             isPrivate: false,
             minutesPrivate: 0,
             tokenCost: 0,
+            pendingState: Const.FORM_STATE.IDLE,
         };
     }
 
@@ -32,6 +34,7 @@ class MakePublicForm extends Component {
     }
 
     componentDidMountOpen() {
+        this.setState({pendingState: Const.FORM_STATE.IDLE});
         GFD.listen('x', 'ChangePropertyMode', (x) => {
             this.setState({x});
         })
@@ -74,8 +77,10 @@ class MakePublicForm extends Component {
             ctr.sendResults(LISTENERS.Alert, {result: false, message: "Property is already in private mode."});
             return;
         }
-        ctr.setPropertyMode(x, y, true, this.state.minutesPrivate, () => {
-            console.info("Mode toggled, confirmed through a transaction");
+        this.setState({pendingState: Const.FORM_STATE.PENDING});
+        ctr.setPropertyMode(x, y, true, this.state.minutesPrivate, (result) => {
+            if (this.state.pendingState !== Const.FORM_STATE.IDLE)
+                this.setState({pendingState: result ? Const.FORM_STATE.COMPLETE : Const.FORM_STATE.FAILED});
         })
     }
 
@@ -149,33 +154,6 @@ class MakePublicForm extends Component {
                         onChange={(e) => this.setY(e.target.value)}
                     />
                 </div>
-                <Divider horizontal>Duration</Divider>
-
-                <Grid columns={3}>
-                    <Grid.Row>
-                        <Grid.Column width={7}>
-                        <Input 
-                            fluid labelPosition='right' 
-                            label='PXL' placeholder='0' 
-                            onChange={(e) => this.changeTokens(e.target.value)}
-                            value={this.state.tokenCost}
-                            />
-                        </Grid.Column>
-                        <Grid.Column width={2}>
-                        <Container textAlign='center' fluid style={{lineHeight: '200%'}}>
-                        <Icon name='exchange'/>
-                        </Container>
-                        </Grid.Column>
-                        <Grid.Column width={7}>
-                        <Input 
-                            fluid label='Minutes' 
-                            placeholder='0' 
-                            onChange={(e) => this.changeTime(e.target.value)} 
-                            value={this.state.minutesPrivate}
-                        />
-                        </Grid.Column>
-                    </Grid.Row>
-                </Grid>
                 {this.state.isPrivate || this.state.becomePublic != 0 ?
                     <div>
                         <Divider/>
@@ -189,6 +167,7 @@ class MakePublicForm extends Component {
                 }
             </ModalContent>
             <ModalActions>
+                <Label className={this.state.pendingState.name} color={this.state.pendingState.color}>{this.state.pendingState.message}</Label>
                 <Button primary onClick={() => ctr.setPropertyMode()}>Set Private</Button>
             </ModalActions>
             </Modal>

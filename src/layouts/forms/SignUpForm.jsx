@@ -6,7 +6,7 @@ import { Slider } from 'react-semantic-ui-range';
 import * as Strings from '../../const/strings';
 import Info from '../ui/Info';
 import {TUTORIAL_STATE} from '../../functions/GlobalState';
-import { Form, Button, Message, ModalActions, Modal, ModalContent, ModalHeader, Checkbox } from 'semantic-ui-react';
+import { Form, Button, Message, ModalActions, Modal, ModalContent, ModalHeader, Checkbox, Label } from 'semantic-ui-react';
 import {FB, FireBase} from '../../const/firebase';
 import * as EVENTS from '../../const/events';
 import * as Const from '../../const/const';
@@ -43,7 +43,7 @@ class SignUpForm extends Component {
     signUp() {
         let errors = [];
         if (!this.state.agreeTos)
-            errors.push('Please agree to the TOS first!');
+            errors.push('Please agree to the Terms of Service & Privacy Policy.');
 
         this.setState({errors});
         if (errors.length > 0)
@@ -89,7 +89,13 @@ class SignUpForm extends Component {
                             />
                         </Form.Field>
                         <Form.Field>
-                            <Checkbox checked={this.state.agreeTos} onChange={(e, data) => {this.setState({agreeTos: data.checked})}} label='I agree to the Terms and Conditions' />
+                            <Checkbox 
+                                checked={this.state.agreeTos} 
+                                onChange={(e, data) => {this.setState({agreeTos: data.checked})}} 
+                                label={{
+                                    children: <div>I agree to the <a href='https://www.pixelproperty.io/terms-of-service.html' target='_blank'>Terms of Service</a> & <a href='https://www.pixelproperty.io/privacy-policy.html' target='_blank'>Privacy Policy</a></div>
+                                }}
+                            />
                         </Form.Field>
                         {this.state.errors.length > 0 &&
                             <Message color='red'>
@@ -99,7 +105,7 @@ class SignUpForm extends Component {
                             </Message>
                         }
                         <Message color='orange'>
-                            Make sure to keep a backup of your wallet and private key. 
+                            Make sure to keep a backup of your wallet seed words and private keys. 
                             We can't help you regain access if it's lost.
                         </Message>
                     </Form>

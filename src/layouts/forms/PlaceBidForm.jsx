@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
+import * as Const from '../../const/const';
 import Info from '../ui/Info';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import * as Strings from '../../const/strings';
@@ -14,6 +15,7 @@ class PlaceBidForm extends Component {
             y: '',
             valueBid: 0,
             isOpen: false,
+            pendingState: Const.FORM_STATE.IDLE,
         };
     }
 
@@ -55,6 +57,7 @@ class PlaceBidForm extends Component {
         if (value >= GFD.getData('balance')) {
             value = GFD.getData('balance') - 1;
         }
+        this.setState({pendingState: Const.FORM_STATE.PENDING});
         this.setState({valueBid: value});
     }
 
@@ -140,6 +143,7 @@ class PlaceBidForm extends Component {
                    
             </ModalContent>
             <ModalActions>
+                <Label className={this.state.pendingState.name} color={this.state.pendingState.color}>{this.state.pendingState.message}</Label>
                 <Button primary onClick={() => ctr.makeBid(this.state.x - 1, this.state.y - 1, parseInt(this.state.valueBid))}>Place Bid</Button>
             </ModalActions>
         </Modal>

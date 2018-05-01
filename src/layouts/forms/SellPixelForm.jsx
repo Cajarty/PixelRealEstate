@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions';
 import Info from '../ui/Info';
+import * as Const from '../../const/const';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import * as Strings from '../../const/strings';
 import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon, Message } from 'semantic-ui-react';
@@ -14,6 +15,7 @@ class SellPixelForm extends Component {
             y: '',
             valuePrice: 0,
             isOpen: false,
+            pendingState: Const.FORM_STATE.IDLE,
         };
     }
 
@@ -70,8 +72,10 @@ class SellPixelForm extends Component {
 
     sellProperty() {
         if (this.state.x >= 1 && this.state.x <= 100 && this.state.y >= 1 && this.state.y <= 100) {
+            this.setState({pendingState: Const.FORM_STATE.PENDING});
             ctr.sellProperty(this.state.x - 1, this.state.y - 1, this.state.valuePrice, (result) => {
-                this.toggleModal(!result);
+                if (this.state.pendingState !== Const.FORM_STATE.IDLE)
+                    this.setState({pendingState: result ? Const.FORM_STATE.COMPLETE : Const.FORM_STATE.FAILED});
             });
         }
     }
@@ -142,6 +146,7 @@ class SellPixelForm extends Component {
                     </Input>
             </ModalContent>
             <ModalActions>
+                <Label className={this.state.pendingState.name} color={this.state.pendingState.color}>{this.state.pendingState.message}</Label>
                 <Button primary onClick={() => this.sellProperty()}>Sell Property</Button>
             </ModalActions>
         </Modal>

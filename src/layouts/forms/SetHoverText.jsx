@@ -1,3 +1,4 @@
+import * as Const from '../../const/const';
 import React, { Component } from 'react'
 import {Contract, ctr} from '../../contract/contract.jsx';
 import * as Func from '../../functions/functions.jsx';
@@ -11,12 +12,22 @@ class SetHoverText extends Component {
         super(props);
         this.state = {
             hoverText: '',
+            pendingState: Const.FORM_STATE.IDLE,
         };
     }
 
     componentDidMount() {
+        this.setState({pendingState: Const.FORM_STATE.IDLE});
         ctr.getHoverText(ctr.account, (data) => {
             this.setState({hoverText: data});
+        });
+    }
+
+    setHoverText() {
+        this.setState({pendingState: Const.FORM_STATE.PENDING});
+        ctr.setHoverText(this.state.hoverText, (result) => {
+            if (this.state.pendingState !== Const.FORM_STATE.IDLE)
+                this.setState({pendingState: result ? Const.FORM_STATE.COMPLETE : Const.FORM_STATE.FAILED});
         });
     }
 
@@ -52,7 +63,8 @@ class SetHoverText extends Component {
                     />
                 </ModalContent>
                 <ModalActions>
-                    <Button primary onClick={() => ctr.setHoverText(this.state.hoverText)}>Set Hover Text</Button>
+                    <Label className={this.state.pendingState.name} color={this.state.pendingState.color}>{this.state.pendingState.message}</Label>
+                    <Button primary onClick={() => this.setHoverText()}>Set Hover Text</Button>
                 </ModalActions>
             </Modal>
         );

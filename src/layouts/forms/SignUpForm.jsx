@@ -6,7 +6,7 @@ import { Slider } from 'react-semantic-ui-range';
 import * as Strings from '../../const/strings';
 import Info from '../ui/Info';
 import {TUTORIAL_STATE} from '../../functions/GlobalState';
-import { Form, Button, Message, ModalActions, Modal, ModalContent, ModalHeader } from 'semantic-ui-react';
+import { Form, Button, Message, ModalActions, Modal, ModalContent, ModalHeader, Checkbox, Label } from 'semantic-ui-react';
 import {FB, FireBase} from '../../const/firebase';
 import * as EVENTS from '../../const/events';
 import * as Const from '../../const/const';
@@ -19,6 +19,8 @@ class SignUpForm extends Component {
             wallet: '',
             email: '',
             username: '',
+            agreeTos: false,
+            errors: [],
         };
     }
 
@@ -39,7 +41,17 @@ class SignUpForm extends Component {
     }
 
     signUp() {
-        FB.signUp(this.state.wallet, this.state.username, this.state.email, Const.TOS_VERSION);
+        let errors = [];
+        if (!this.state.agreeTos)
+            errors.push('Please agree to the Terms of Service & Privacy Policy.');
+
+        this.setState({errors});
+        if (errors.length > 0)
+            return;
+        FB.signUp(this.state.wallet, this.state.username, this.state.email, Const.TOS_VERSION, (result, messages) => {
+            if (!result)
+                this.setState({errors: errors.concat(messages)});
+        });
     }
 
     render() {
@@ -76,14 +88,30 @@ class SignUpForm extends Component {
                                 onChange={(e) => this.updateUsername(e.target.value)}
                             />
                         </Form.Field>
+                        <Form.Field>
+                            <Checkbox 
+                                checked={this.state.agreeTos} 
+                                onChange={(e, data) => {this.setState({agreeTos: data.checked})}} 
+                                label={{
+                                    children: <div>I agree to the <a href='https://www.pixelproperty.io/terms-of-service.html' target='_blank'>Terms of Service</a> & <a href='https://www.pixelproperty.io/privacy-policy.html' target='_blank'>Privacy Policy</a></div>
+                                }}
+                            />
+                        </Form.Field>
+                        {this.state.errors.length > 0 &&
+                            <Message color='red'>
+                                {this.state.errors.map((error, i) => 
+                                    <div key={i}>{error}</div>
+                                )}
+                            </Message>
+                        }
                         <Message color='orange'>
-                            Make sure to keep a backup of your wallet and private key. 
+                            Make sure to keep a backup of your wallet seed words and private keys. 
                             We can't help you regain access if it's lost.
                         </Message>
                     </Form>
                 </ModalContent>
                 <ModalActions>
-                    <Button secondary onClick={() => this.props.cancel()} >Cancel</Button>
+                    <Button secondary onClick={() => this.props.onCancel()} >Cancel</Button>
                     <Button type='submit' onClick={() => this.signUp()} >Submit</Button>
                 </ModalActions>
             </Modal>

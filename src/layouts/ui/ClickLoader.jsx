@@ -68,6 +68,7 @@ export default class ClickLoader extends Component {
 
     componentWillUnmount() {
         this.clearClickAttempt(true);
+        GFD.closeAll('clickLoader');
     }
 
     clearClickAttempt(unmounting = false) {

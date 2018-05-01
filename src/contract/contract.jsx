@@ -438,34 +438,39 @@ export class Contract {
         this.getVREInstance().then((i) => {
             return i.setPropertyMode(this.toID(parseInt(x), parseInt(y)), isPrivate, minutesPrivate, {from: this.account });
         }).then((r) => {
-            return callback(r);
+            return callback(true);
         }).catch((e) => {
+            return callback(false);
             console.log(e);
         });
     }
 
     //array of 2 32 bytes of string
-    setHoverText(text) {
+    setHoverText(text, callback) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return;
         this.getVREInstance().then((i) => {
             return i.setHoverText(Func.StringToBigInts(text), {from: this.account});
         }).then(function() {
+            callback(true);
             console.info("Hover text set!");
         }).catch((e) => {
+            callback(false);
             console.log(e);
         });
     }
 
     //array of 2 32 bytes
-    setLink(text) {
+    setLink(text, callback) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return;
         this.getVREInstance().then((i) => {
             return i.setLink(Func.StringToBigInts(text), {from: this.account });
         }).then(function() {
+            callback(true);
             console.info("Property link updated!");
         }).catch((e) => {
+            callback(false);
             console.log(e);
         });
     }

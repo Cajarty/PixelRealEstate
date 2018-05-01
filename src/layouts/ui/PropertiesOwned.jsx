@@ -145,7 +145,7 @@ class PropertiesOwned extends Component {
                         </Table.Cell>
                         <Table.Cell>
                             {!child.isForSale ? 'No' : 
-                                (child.PPCPrice + ' PXL')
+                                (Func.NumberWithCommas(child.PPCPrice) + ' PXL')
                             }
                         </Table.Cell>
                         <Table.Cell>

@@ -145,10 +145,10 @@ class PropertiesForSale extends Component {
                             {child.y + 1}
                         </Table.Cell>
                         <Table.Cell>
-                            {child.PPCPrice}
+                            {Func.NumberWithCommas( child.PPCPrice )}
                         </Table.Cell>
                         <Table.Cell>
-                            {child.ETHPrice}
+                            {Func.WeiToEth( child.ETHPrice )}
                         </Table.Cell>
                         <Table.Cell>
                             {child.owner}

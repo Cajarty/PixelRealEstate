@@ -60,7 +60,6 @@ typings/
 .DS_Store
 
 # Compiled contracts
-build/contracts/
 
 #ganache-cli outputs
 /logs/

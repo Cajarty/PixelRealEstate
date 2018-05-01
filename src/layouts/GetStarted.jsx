@@ -73,7 +73,7 @@ class GetStarted extends Component {
                 </Modal>
                 <Modal
                     size='small'
-                    open={!this.state.noMetaMask && this.state.network != Const.NETWORK_RINKEBY}
+                    open={!this.state.noMetaMask && this.state.network != Const.NETWORK_MAIN}
                     closeOnEscape={false}
                     closeOnRootNodeClick={false}
                 >
@@ -87,7 +87,7 @@ class GetStarted extends Component {
                             rounded bordered
                             size='large'
                             className='downloadImage'
-                            src={Assets.RINKEBY_NETWORK}
+                            src={Assets.MAIN_NETWORK}
                             target='_blank'
                         />
                     </ModalContent>
@@ -97,7 +97,7 @@ class GetStarted extends Component {
                 </Modal>
                 <Modal
                     size='tiny'
-                    open={!this.state.noMetaMask && this.state.network === Const.NETWORK_RINKEBY && ctr.account === null}
+                    open={!this.state.noMetaMask && this.state.network === Const.NETWORK_MAIN && ctr.account === null}
                     closeOnEscape={false}
                     closeOnRootNodeClick={false}
                 >
@@ -113,7 +113,7 @@ class GetStarted extends Component {
                     </ModalActions>
                 </Modal>
                 <SignUpForm
-                    open={!this.state.noMetaMask && this.state.network === Const.NETWORK_RINKEBY && ctr.account !== null && !this.state.userExists}
+                    open={!this.state.noMetaMask && this.state.network === Const.NETWORK_MAIN && ctr.account !== null && !this.state.userExists}
                     onCancel={() => this.props.changeMode()}
                 />
             </div>

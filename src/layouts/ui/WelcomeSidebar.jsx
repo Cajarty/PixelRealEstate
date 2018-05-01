@@ -50,7 +50,7 @@ class WelcomeSidebar extends Component {
         let seconds = Math.floor(timeLeft / 1000);
         this.setState({
             releaseCounter: Func.TimeSince(RELEASE_DATE, true),
-            freeSetCounter: '3 Days',
+            freeSetCounter: Func.TimeSince(FREE_SET_PERIOD, true),
             days, hours, minutes, seconds
         })
     }
@@ -59,24 +59,12 @@ class WelcomeSidebar extends Component {
         return (
             <Segment className='WelcomeSidebar' compact >
                 <Header style={{textAlign: 'center'}} size='large'>
-                    PixelProperty Launch
+                    PixelProperty
                 </Header>
                 <Statistic.Group style={stats}>
                     <Statistic style={stats}>
-                        <Statistic.Value>{this.state.days}</Statistic.Value>
-                        <Statistic.Label>d a y s</Statistic.Label>
-                    </Statistic>
-                    <Statistic style={stats}>
-                        <Statistic.Value>{this.state.hours}</Statistic.Value>
-                        <Statistic.Label>h o u r s</Statistic.Label>
-                    </Statistic>
-                    <Statistic style={stats}>
-                        <Statistic.Value>{this.state.minutes}</Statistic.Value>
-                        <Statistic.Label>m i n u t e s</Statistic.Label>
-                    </Statistic>
-                    <Statistic style={stats}>
-                        <Statistic.Value>{this.state.seconds}</Statistic.Value>
-                        <Statistic.Label>s e c o n d s</Statistic.Label>
+                        <Statistic.Value>{this.state.freeSetCounter}</Statistic.Value>
+                        <Statistic.Label>b o n u s  -  P X L</Statistic.Label>
                     </Statistic>
                 </Statistic.Group>
             </Segment>

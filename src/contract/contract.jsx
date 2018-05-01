@@ -78,7 +78,7 @@ export class Contract {
 
 
                 this.updateNetwork((id) => {
-                    if (id === Const.NETWORK_RINKEBY) {
+                    if (id === Const.NETWORK_MAIN) {
                         this.getAccounts();
         
                         this.break = false;
@@ -152,7 +152,7 @@ export class Contract {
     params = {}. for narrowing serach results
     */
     getEventLogs(event, params, callback, blocks = 0) {
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return;
 
         if (this.startLoadBlock <= 0) {
@@ -216,7 +216,7 @@ export class Contract {
     block = how many blocks to look back
     */
     watchEventLogs(event, params, callback, blocks = 0) {
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return;
 
         if (this.startLoadBlock <= 0) {
@@ -313,8 +313,8 @@ export class Contract {
                 callback(Const.NETWORK_ROPSTEN);
                 break
               case 4:
-                GFD.setData('network', Const.NETWORK_RINKEBY);
-                callback(Const.NETWORK_RINKEBY);
+                GFD.setData('network', Const.NETWORK_MAIN);
+                callback(Const.NETWORK_MAIN);
                 break
               case 42:
                 GFD.setData('network', Const.NETWORK_KOVAN);
@@ -384,7 +384,7 @@ export class Contract {
     }
 
     buyProperty(x, y, eth, ppc, callback) {
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return callback(false);
         this.getVREInstance().then((i) => {
             if (eth == 0)
@@ -411,7 +411,7 @@ export class Contract {
     }
 
     sellProperty(x, y, price, callback) {
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return;
         this.getVREInstance().then((i) => {
             return i.listForSale.estimateGas(this.toID(parseInt(x), parseInt(y)), price, {from: this.account }).then((gas) => {
@@ -428,7 +428,7 @@ export class Contract {
     }
 
     delistProperty(x, y, callback) {
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return callback(false);
         this.getVREInstance().then((i) => {
             i.delist.estimateGas(this.toID(parseInt(x), parseInt(y)), {from: this.account }).then((gas) => {
@@ -445,7 +445,7 @@ export class Contract {
     }
 
     setPropertyMode(x, y, isPrivate, minutesPrivate, callback) {
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return callback(false);
         this.getVREInstance().then((i) => {
             return i.setPropertyMode.estimateGas(this.toID(parseInt(x), parseInt(y)), isPrivate, minutesPrivate, {from: this.account }).then((gas) => {
@@ -461,7 +461,7 @@ export class Contract {
 
     //array of 2 32 bytes of string
     setHoverText(text, callback) {
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return;
         this.getVREInstance().then((i) => {
             return i.setHoverText.estimateGas(Func.StringToBigInts(text), {from: this.account}).then((gas) => {
@@ -478,7 +478,7 @@ export class Contract {
 
     //array of 2 32 bytes
     setLink(text, callback) {
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return;
         this.getVREInstance().then((i) => {
             return i.setLink.estimateGas(Func.StringToBigInts(text), {from: this.account }).then((gas) => {
@@ -494,7 +494,7 @@ export class Contract {
     }
 
     transferProperty(x, y, newOwner, callback) { 
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return callback(false);
         this.getVREInstance().then((i) => {
             return i.transferProperty.estimateGas(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account}).then((gas) => {
@@ -508,7 +508,7 @@ export class Contract {
     }
 
     makeBid(x, y, bid, callback) {
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return callback(false);
         this.getVREInstance().then((i) => {
             return i.makeBid.estimateGas(this.toID(x, y), bid, {from: this.account }).then((gas) => {
@@ -524,7 +524,7 @@ export class Contract {
     }
 
     setColors(x, y, data, PPT, callback) {
-        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return callback(false);
         this.getVREInstance().then((i) => {
             callback('pending');

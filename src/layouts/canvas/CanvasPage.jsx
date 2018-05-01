@@ -199,7 +199,7 @@ class CanvasPage extends Component {
                 <SegmentGroup horizontal className='mainSegmentGroup'> 
                     <Segment className='left'>
                                 <div id='logo' className='logo'>
-                                    <img src={Assets.LOGO}/>
+                                    <img src={Assets.LOGO_BETA}/>
                                 </div>
                                 <Divider/>
                                 <ZoomCanvas/>

@@ -58,6 +58,19 @@ export class ServerDataManager {
         this.allProperties = {};
         this.forSaleProperties = {};
         this.ownedProperties = {};
+
+        //stored event data, not listened to as its updated once from the server, then we update it.
+        this.eventData = {
+            topTenPayouts: [],
+            recentPayouts: [],
+            yourPayouts: [], //not used due to server limitations
+        
+            topTenPXLTrades: [],
+            topTenETHTrades: [],
+            recentTrades: [],
+            yourTrades: [], //not used due to server limitations
+        };
+
         this.bids = {};
 
         this.useLocalFile = false; //not supported yet
@@ -65,6 +78,7 @@ export class ServerDataManager {
         //for network requests
         this.cancelDataRequestToken = null;
         this.cancelImageRequestToken = null;
+        this.cancelEventDataToken = null;
 
         this.evHndl = {
             [EVENTS.PropertyColorUpdate]: null,
@@ -79,9 +93,10 @@ export class ServerDataManager {
         };
     }
 
-    destructor() {
+    closeEvents() {
         Object.keys(this.evHndl).map((key, i) => {
-            this.evHndl[key].stopWatching();
+            if (this.evHndl[key] !== null)
+                this.evHndl[key].stopWatching();
         });
     }
 
@@ -125,7 +140,7 @@ export class ServerDataManager {
             this.evHndl[EVENTS.PropertySetForSale] = handle;
             this.evHndl[EVENTS.PropertySetForSale].watch((error, log) => {
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                this.updateProperty(id.x, id.y, {isForSale: true});
+                this.updateProperty(id.x, id.y, {isForSale: true, PPCPrice: Func.BigNumberToNumber(log.args.forSalePrice)});
                 this.organizeProperty(id.x, id.y);
             });
         });
@@ -134,7 +149,7 @@ export class ServerDataManager {
             this.evHndl[EVENTS.DelistProperty] = handle;
             this.evHndl[EVENTS.DelistProperty].watch((error, log) => {
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                this.updateProperty(id.x, id.y, {isForSale: false});
+                this.updateProperty(id.x, id.y, {isForSale: false, PPCPrice: 0});
                 this.organizeProperty(id.x, id.y);
             });
         });
@@ -145,7 +160,7 @@ export class ServerDataManager {
                 console.info(log);
                 throw 'Need to update the correct data here.';
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                this.updateProperty(id.x, id.y, {isForSale: false});
+                this.updateProperty(id.x, id.y, {isInPrivate: false, becomePublic: 0});
                 this.organizeProperty(id.x, id.y);
             });
         });
@@ -156,7 +171,7 @@ export class ServerDataManager {
                 console.info(log);
                 throw 'Need to update the correct data here.';
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                this.updateProperty(id.x, id.y, {isForSale: false});
+                this.updateProperty(id.x, id.y, {isInPrivate: true, becomePublic: Func.BigNumberToNumber(log.args.numMinutesPrivate)});
                 this.organizeProperty(id.x, id.y);
             });
         });
@@ -180,9 +195,12 @@ export class ServerDataManager {
     init() {
         this.requestServerImage((imageResult) => {
             this.requestServerData((dataResult) => {
-                this.setupEvents();
-                GFD.setData('ServerDataManagerInit', 2);
-                ctr.sendResults(LISTENERS.ServerDataManagerInit, {imageLoaded: imageResult, dataLoaded: dataResult});
+                this.requestServerEvents((eventsResult) => {
+                    this.closeEvents();
+                    this.setupEvents();
+                    GFD.setData('ServerDataManagerInit', 2);
+                    ctr.sendResults(LISTENERS.ServerDataManagerInit, {imageLoaded: imageResult, dataLoaded: dataResult});
+                });
             });
         });
     }
@@ -190,8 +208,10 @@ export class ServerDataManager {
     initNoMetaMask() {
         this.requestServerImage((imageResult) => {
             this.requestServerData((dataResult) => {
-                GFD.setData('ServerDataManagerInit', 1);
-                ctr.sendResults(LISTENERS.ServerDataManagerInit, {imageLoaded: imageResult, dataLoaded: dataResult});
+                this.requestServerEvents((eventsResult) => {
+                    GFD.setData('ServerDataManagerInit', 1);
+                    ctr.sendResults(LISTENERS.ServerDataManagerInit, {imageLoaded: imageResult, dataLoaded: dataResult});
+                })
             });
         });
     }
@@ -227,6 +247,21 @@ export class ServerDataManager {
                         resultCallback(true);
                     };
                     image.src = "data:image/png;base64," + new Buffer(result.data, 'binary').toString('base64');
+                } else {
+                    resultCallback(false);
+                }
+            });
+        }
+    }
+
+    requestServerEvents(resultCallback) {
+        if (this.useLocalFile) {
+
+        } else {
+            ax.get('/getEventData', {cancelToken: this.cancelEventDataToken}).then((result) => {
+                if (result.status == 200 && typeof result.data === 'object') {
+                    this.eventData = result.data;
+                    resultCallback(true);
                 } else {
                     resultCallback(false);
                 }

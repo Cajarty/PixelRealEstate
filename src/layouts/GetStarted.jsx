@@ -95,7 +95,6 @@ class GetStarted extends Component {
                         <Button secondary onClick={() => this.props.changeMode()}>Cancel</Button>
                     </ModalActions>
                 </Modal>
-                {console.info(ctr.account)}
                 <Modal
                     size='tiny'
                     open={!this.state.noMetaMask && this.state.network === Const.NETWORK_RINKEBY && ctr.account === null}

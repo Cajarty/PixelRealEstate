@@ -4,6 +4,7 @@ import * as Func from '../../functions/functions.jsx';
 import {Contract, ctr } from '../../contract/contract.jsx';
 import {GridColumn, Grid, GridRow, Label, LabelDetail, Loader} from 'semantic-ui-react';
 import * as EVENTS from '../../const/events';
+import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
 import * as Struct from '../../const/structs';
 
 
@@ -23,6 +24,9 @@ class PropertySalesLogYou extends Component {
         GFD.listen('userExists', 'Log-PSLY', (loggedIn) => {
             if (!loggedIn)
                 return;
+            if (SDM.eventData.yourTrades.length > 0) {
+                this.setState({changeLog: SDM.eventData.yourTrades, isLoading: false});
+            }
             ctr.watchEventLogs(EVENTS.PropertyBought, {newOwner: ctr.account}, (handle) => {
                 let eventHandle1 = handle;
                 this.setState({eventHandle1});
@@ -47,7 +51,7 @@ class PropertySalesLogYou extends Component {
                         old.pop();
                     this.setState({ changeLog: old, isLoading: false });
                 });
-            });
+            }, 10000);
 
             ctr.watchEventLogs(EVENTS.PropertyBought, {oldOwner: ctr.account}, (handle) => {
                 let eventHandle2 = handle;
@@ -76,7 +80,7 @@ class PropertySalesLogYou extends Component {
                         old.pop();
                     this.setState({ changeLog: old, isLoading: false });
                 });
-            });
+            }, 10000);
         });
     }
 
@@ -95,7 +99,7 @@ class PropertySalesLogYou extends Component {
 
     render() {
         if (this.state.changeLog.length == 0 && !this.state.isLoading)
-            return (<h3 className='noContent'>None Yet!</h3>);
+            return (<h3 className='noContent'>No recent trades</h3>);
         if (this.state.isLoading)
             return(<Loader size='small' active/>);
         return (
@@ -129,8 +133,8 @@ class PropertySalesLogYou extends Component {
                         <GridColumn verticalAlign='middle' width={1}>{log.y + 1}</GridColumn>
                         <GridColumn verticalAlign='middle' width={3}>{
                             <div>
-                                {log.PXLPrice > 0 && <Label>PXL<LabelDetail>{log.PXLPrice}</LabelDetail></Label>}
-                                {log.ETHPrice > 0 && <Label>ETH<LabelDetail>{log.ETHPrice}</LabelDetail></Label>}
+                                {log.PXLPrice > 0 && <Label>PXL<LabelDetail>{Func.NumberWithCommas(log.PXLPrice)}</LabelDetail></Label>}
+                                {log.ETHPrice > 0 && <Label>ETH<LabelDetail>{Func.WeiToEth(log.ETHPrice)}</LabelDetail></Label>}
                             </div>
                         }</GridColumn>
                         <GridColumn verticalAlign='middle' width={4}>{log.oldOwner}</GridColumn>

@@ -5,6 +5,7 @@ import { Contract, ctr } from '../../contract/contract.jsx';
 import {GridColumn, Grid, GridRow, Loader} from 'semantic-ui-react';
 import { PanelPropertyCanvas } from '../ui/Panel';
 import {GFD, GlobalState } from '../../functions/GlobalState';
+import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
 
 
 class PropertyChangeLogTop extends Component {
@@ -22,6 +23,9 @@ class PropertyChangeLogTop extends Component {
         GFD.listen('userExists', 'Log-PCLT', (loggedIn) => {
             if (!loggedIn)
                 return;
+            if (SDM.eventData.topTenPayouts.length > 0) {
+                this.setState({changeLog: SDM.eventData.topTenPayouts, isLoading: false});
+            }
             ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (handle) => {
                 let eventHandle = handle;
                 this.setState({
@@ -29,43 +33,34 @@ class PropertyChangeLogTop extends Component {
                     loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
                 });
                 eventHandle.watch((error, log) => {
-                    let old = this.state.changeLog;
+                    let old = SDM.eventData.topTenPayouts;
                     let last = Func.BigNumberToNumber(log.args.lastUpdate);
                     let reserved = Func.BigNumberToNumber(log.args.becomePublic);
-                    let maxEarnings = Math.pow((reserved - last) / 30, 2);
+                    let maxEarnings = ((reserved - last) / 30) * 5;
                     let payout = Func.calculateEarnings(last, maxEarnings);
+                    let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
+                    let newData = {
+                        x: id.x,
+                        y: id.y,
+                        lastChange: last * 1000,
+                        payout,
+                        maxPayout: maxEarnings,
+                        transaction: log.transactionHash,
+                    };
                     if (old.length == 0) {
-                        let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                        let newData = {
-                            x: id.x,
-                            y: id.y,
-                            lastChange: last * 1000,
-                            payout,
-                            maxPayout: maxEarnings,
-                            transaction: log.transactionHash,
-                        };
                         old.unshift(newData);
-                        if (old.length > 20)
-                            old.pop();
+                        SDM.eventData.topTenPayouts = old;
                         this.setState({ changeLog: old, isLoading: false });
                     } else {
                         for (let i = Math.min(old.length - 1, 9); i >= 0; i--) {
                             if (payout <= old[i].payout || (i == 0 && payout > old[i].payout)) {
                                 if (i < 9) {
-                                    let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                                    let newData = {
-                                        x: id.x,
-                                        y: id.y,
-                                        lastChange: last * 1000,
-                                        payout,
-                                        maxPayout: maxEarnings,
-                                        transaction: log.transactionHash,
-                                    };
                                     if (payout <= old[i].payout)
                                         old.splice(i + 1, 0, newData);
                                     else
                                         old.splice(i, 0, newData);
                                     old.splice(10);
+                                    SDM.eventData.topTenPayouts = old;
                                     this.setState({ changeLog: old });
                                 }
                                 return;

@@ -128,6 +128,7 @@ export class FireBase {
                                         firebase.database().ref('/Emails/' + email.replace(/\./g, ',')).set(true);
                                         firebase.database().ref('/Usernames/' + username).set(true);
                                         this.signIn();
+                                        GFD.setData('tutorialStateIndex', 1);
                                     }).catch((error) => {
                                         console.info(error);
                                     });

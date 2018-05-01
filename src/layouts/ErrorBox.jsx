@@ -19,7 +19,7 @@ class ErrorBox extends Component {
     }
 
     componentWillUnmount() {
-        ctr.stopListeningForResults(LISTENERS.Error);
+        ctr.stopListeningForResults(LISTENERS.Error, 'error');
     }
 
     removeHideError(errorId) {

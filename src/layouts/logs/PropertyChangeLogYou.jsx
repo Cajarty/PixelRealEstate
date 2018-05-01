@@ -5,6 +5,7 @@ import { Contract, ctr } from '../../contract/contract.jsx';
 import {GridColumn, Grid, GridRow, Loader} from 'semantic-ui-react';
 import { PanelPropertyCanvas } from '../ui/Panel';
 import {GFD, GlobalState } from '../../functions/GlobalState';
+import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
 
 
 class PropertyChangeLogYou extends Component {
@@ -22,6 +23,9 @@ class PropertyChangeLogYou extends Component {
         GFD.listen('userExists', 'Log-PCLY', (loggedIn) => {
             if (!loggedIn)
                 return;
+            if (SDM.eventData.yourPayouts.length > 0) {
+                this.setState({changeLog: SDM.eventData.yourPayouts, isLoading: false});
+            }
             ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {lastUpdaterPayee: ctr.account}, (handle) => {
                 let eventHandle = handle;
                 this.setState({
@@ -33,7 +37,7 @@ class PropertyChangeLogYou extends Component {
                     let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
                     let last = Func.BigNumberToNumber(log.args.lastUpdate);
                     let reserved = Func.BigNumberToNumber(log.args.becomePublic);
-                    let maxEarnings = Math.pow((reserved - last) / 30, 2);
+                    let maxEarnings = ((reserved - last) / 30) * 5;
                     let newData = {
                         x: id.x,
                         y: id.y,
@@ -47,7 +51,7 @@ class PropertyChangeLogYou extends Component {
                         old.pop();
                     this.setState({ changeLog: old, isLoading: false });
                 });
-            });
+            }, 10000);
         });
     }
 
@@ -65,7 +69,7 @@ class PropertyChangeLogYou extends Component {
 
     render() {
         if (this.state.changeLog.length == 0 && !this.state.isLoading)
-            return (<h3 className='noContent'>None Yet!</h3>);
+            return (<h3 className='noContent'>No recent payouts</h3>);
         if (this.state.isLoading)
             return(<Loader size='small' active/>);
         return (

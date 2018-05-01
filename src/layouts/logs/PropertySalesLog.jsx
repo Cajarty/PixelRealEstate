@@ -3,6 +3,7 @@ import {GFD, GlobalState } from '../../functions/GlobalState';
 import * as Func from '../../functions/functions.jsx';
 import {Contract, ctr } from '../../contract/contract.jsx';
 import {GridColumn, Grid, GridRow, Label, LabelDetail, Loader} from 'semantic-ui-react';
+import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
 import * as EVENTS from '../../const/events';
 import * as Struct from '../../const/structs';
 
@@ -22,6 +23,9 @@ class PropertySalesLog extends Component {
         GFD.listen('userExists', 'Log-PSL', (loggedIn) => {
             if (!loggedIn)
                 return;
+            if (SDM.eventData.recentTrades.length > 0) {
+                this.setState({changeLog: SDM.eventData.recentTrades, isLoading: false});
+            }
             ctr.watchEventLogs(EVENTS.PropertyBought, {}, (handle) => {
                 let eventHandle = handle;
                 this.setState({
@@ -29,7 +33,7 @@ class PropertySalesLog extends Component {
                     loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
                 });
                 handle.watch((error, log) => {
-                    let old = this.state.changeLog;
+                    let old = SDM.eventData.recentTrades;
                     let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
                     let PXLPrice = Func.BigNumberToNumber(log.args.PXLAmount);
                     let ETHPrice = Func.BigNumberToNumber(log.args.ethAmount);
@@ -47,6 +51,7 @@ class PropertySalesLog extends Component {
                     old.unshift(newData);
                     if (old.length > 20)
                         old.pop();
+                    SDM.eventData.recentTrades = old;
                     this.setState({ changeLog: old, isLoading: false });
                 });
             });
@@ -101,8 +106,8 @@ class PropertySalesLog extends Component {
                         <GridColumn verticalAlign='middle' width={1}>{log.y + 1}</GridColumn>
                         <GridColumn verticalAlign='middle' width={3}>{
                             <div>
-                                {log.PXLPrice > 0 && <Label>PXL<LabelDetail>{log.PXLPrice}</LabelDetail></Label>}
-                                {log.ETHPrice > 0 && <Label>ETH<LabelDetail>{log.ETHPrice}</LabelDetail></Label>}
+                                {log.PXLPrice > 0 && <Label>PXL<LabelDetail>{Func.NumberWithCommas(log.PXLPrice)}</LabelDetail></Label>}
+                                {log.ETHPrice > 0 && <Label>ETH<LabelDetail>{Func.WeiToEth(log.ETHPrice)}</LabelDetail></Label>}
                             </div>
                         }</GridColumn>
                         <GridColumn verticalAlign='middle' width={4}>{log.oldOwner}</GridColumn>

@@ -128,7 +128,7 @@ class PixelDescriptionBox extends Component {
                 let ppcp = data.PPCPrice;
                 let reserved = data.becomePublic;
                 let lastUpdate = data.lastUpdate;
-                let maxEarnings = Math.pow((reserved - lastUpdate) / 30, 2);
+                let maxEarnings = ((reserved - lastUpdate) / 30) * 5;
                 this.setState({
                     owner: data.owner,
                     isForSale: ppcp != 0,
@@ -272,7 +272,7 @@ class PixelDescriptionBox extends Component {
             let ppcp = Func.BigNumberToNumber(data[2]);
             let reserved = Func.BigNumberToNumber(data[5]);
             let lastUpdate = Func.BigNumberToNumber(data[3]);
-            let maxEarnings = Math.pow((reserved - lastUpdate) / 30, 2);
+            let maxEarnings = ((reserved - lastUpdate) / 30) * 5;
             this.setState({
                 owner: data[0],
                 isForSale: ppcp != 0,
@@ -286,12 +286,10 @@ class PixelDescriptionBox extends Component {
                 earnings: Func.calculateEarnings(lastUpdate, maxEarnings),
             });
             ctr.getHoverText(data[0], (data) => {
-                if (data != null && data.length > 0)
-                    this.setState({hoverText: data});
+                this.setState({hoverText: (data != null && data.length > 0 ? data : null)});
             });
             ctr.getLink(data[0], (data) => {
-                if (data != null && data.length > 0)
-                    this.setState({link: data});
+                    this.setState({link: (data != null && data.length > 0 ? data : null)});
             });
             ctr.getBalance((balance) => {
                 this.setState({PPCOwned: balance});
@@ -552,7 +550,7 @@ class PixelDescriptionBox extends Component {
                                 />}
                                 value={this.state.isInPrivate ? 'Yes' : 'No'}
                             />}
-                            {this.state.owner !== NOBODY &&
+                            {this.state.owner !== NOBODY && this.state.hoverText !== null &&
                             <Input
                                 label={<Popup
                                     trigger={<Label><Icon className='uniform' name='comment'/></Label>}
@@ -564,7 +562,7 @@ class PixelDescriptionBox extends Component {
                                 className='oneColumn'
                                 value={this.state.hoverText != '' ? this.state.hoverText : "None Set"}
                             />}
-                            {this.state.owner !== NOBODY &&
+                            {this.state.owner !== NOBODY && this.state.link !== null &&
                             <Input
                                 className='oneColumn combined'
                                 fluid disabled

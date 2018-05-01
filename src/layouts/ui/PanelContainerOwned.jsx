@@ -44,7 +44,7 @@ class PanelContainerOwned extends PanelContainer {
                                             <ListHeader>For Sale</ListHeader>
                                             <ListContent>{!child.isForSale ? 'No' : 
                                                 <div>
-                                                    {child.PPCPrice ? child.PPCPrice : null}
+                                                    {child.PPCPrice ? Func.NumberWithCommas(child.PPCPrice) : null}
                                                 </div>
                                         }</ListContent>
                                         </ListItem>

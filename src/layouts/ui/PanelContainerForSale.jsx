@@ -4,6 +4,7 @@ import PanelContainer from './PanelContainer';
 import Timestamp from 'react-timestamp';
 import Hours from '../ui/Hours';
 import {SegmentGroup, Segment, Label, LabelDetail, Divider, Grid, GridRow, GridColumn, List, ListItem, ListContent, ListHeader, Button } from 'semantic-ui-react';
+import * as Func from '../../functions/functions';
 
 class PanelContainerForSale extends PanelContainer {
     constructor(props) {
@@ -35,12 +36,12 @@ class PanelContainerForSale extends PanelContainer {
                                     </ListItem>
                                     <ListItem>
                                         <ListHeader>PXL</ListHeader>
-                                        <ListContent>{child.PPCPrice}</ListContent>
+                                        <ListContent>{Func.NumberWithCommas(child.PPCPrice)}</ListContent>
                                     </ListItem>
                                     {child.ETHPrice != 0 && 
                                         <ListItem>
                                         <ListHeader>ETH</ListHeader>
-                                        <ListContent>{child.ETHPrice}</ListContent>
+                                        <ListContent>{Func.NumberWithCommas(child.ETHPrice)}</ListContent>
                                         </ListItem>
                                     }
                                 </List>

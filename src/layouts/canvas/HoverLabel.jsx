@@ -12,6 +12,7 @@ import * as EVENTS from '../../const/events';
 import {Contract, ctr} from '../../contract/contract';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 import {LabelDetail, Label} from 'semantic-ui-react';
+import * as Func from '../../functions/functions.jsx';
 
 class HoverLabel extends Component {
     constructor(props) {
@@ -73,8 +74,8 @@ class HoverLabel extends Component {
                     if (data.isForSale) {
                         this.setState({show: true, labelContent: 
                             <div>
-                                <Label>PXL<LabelDetail>{data.PPCPrice}</LabelDetail></Label>
-                                <Label>ETH<LabelDetail>{data.ETHPrice}</LabelDetail></Label>
+                                <Label>PXL<LabelDetail>{Func.NumberWithCommas(data.PPCPrice)}</LabelDetail></Label>
+                                <Label>ETH<LabelDetail>{Func.NumberWithCommas(data.ETHPrice)}</LabelDetail></Label>
                             </div>
                         });
                     } else {

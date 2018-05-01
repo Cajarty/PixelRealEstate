@@ -57,7 +57,7 @@ class WelcomeSidebar extends Component {
     render() {
         return (
             <Segment className='WelcomeSidebar' compact >
-                <Header size='large'>
+                <Header style={{textAlign: 'center'}} size='large'>
                     PixelProperty Launch
                 </Header>
                 <Statistic.Group style={stats}>

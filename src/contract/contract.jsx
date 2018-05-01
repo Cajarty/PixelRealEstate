@@ -86,6 +86,7 @@ export class Contract {
                             this.VRE.deployed().then((VREInstance) => {
                                 this.VREInstance = VREInstance;
                                 this.PXLPPInstance = PXLPPInstance;
+                                SDM.init();
                                 window.web3.eth.getBlock('latest').then((latestBlock) => {
                                     this.startLoadBlock = latestBlock.number - 1;
                                 });

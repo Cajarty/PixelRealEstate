@@ -319,7 +319,7 @@ class SetPixelColorForm extends Component {
             img.onload = () => {
                 this.drawImages(img);
             }
-            img.src = e.target.result;
+            img.src = event.target.result;
         };
         reader.readAsDataURL(files[0]);
     }
@@ -387,7 +387,6 @@ class SetPixelColorForm extends Component {
         for (let y = 0; y < 10; y++) {
             retData = retData.concat(Array.from(data.slice(((pixelY + y) * pixelW * 4) + (pixelX * 4), ((pixelY + y) * pixelW * 4) + ((pixelX + 10) * 4))));
         }
-        console.info(retData)
         return retData;
     }
 

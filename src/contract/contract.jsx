@@ -36,6 +36,7 @@ export class Contract {
         this.PXLPP = contract(PXLProperty);
 
         this.startLoadBlock = 0;
+        this.gasBuffer = 0; //extra gas added onto calculation.
 
         this.VREInstance = null;
         this.PXLPPInstance = null;
@@ -387,11 +388,18 @@ export class Contract {
             return callback(false);
         this.getVREInstance().then((i) => {
             if (eth == 0)
-                return i.buyPropertyInPXL(this.toID(x, y), ppc, {from: this.account });
+
+                return i.buyPropertyInPXL.estimateGas(this.toID(x, y), ppc, {from: this.account }).then((gas) => {
+                    return i.buyPropertyInPXL(this.toID(x, y), ppc, {from: this.account, gas: gas + this.gasBuffer });
+                })
             else if (ppc == 0)
-                return i.buyPropertyInETH(this.toID(x, y), { value: eth, from: this.account });
+                return i.buyPropertyInETH(this.toID(x, y), { value: eth, from: this.account}).then((gas) => {
+                    return i.buyPropertyInETH(this.toID(x, y), { value: eth, from: this.account, gas: gas + this.gasBuffer });
+                })
             else 
-                return i.buyProperty(this.toID(x, y), ppc, {value: eth, from: this.account});
+                return i.buyProperty(this.toID(x, y), ppc, {value: eth, from: this.account}).then((gas) => {
+                    return i.buyProperty(this.toID(x, y), ppc, {value: eth, from: this.account, gas: gas + this.gasBuffer});
+                })
         }).then(() => {
             callback(true);
             this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " purchase complete."});
@@ -406,14 +414,16 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return;
         this.getVREInstance().then((i) => {
-            return i.listForSale(this.toID(parseInt(x), parseInt(y)), price, {from: this.account });
-        }).then(() => {
-            callback(true);
-            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " listed for sale."});
-        }).catch((e) => {
-            callback(false);
-            console.log(e);
-            this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to put property " + (x + 1) + "x" + (y + 1) + " on market."});
+            return i.listForSale.estimateGas(this.toID(parseInt(x), parseInt(y)), price, {from: this.account }).then((gas) => {
+                return i.listForSale(this.toID(parseInt(x), parseInt(y)), price, {from: this.account, gas: gas + this.gasBuffer });
+            }).then(() => {
+                callback(true);
+                this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " listed for sale."});
+            }).catch((e) => {
+                callback(false);
+                console.log(e);
+                this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to put property " + (x + 1) + "x" + (y + 1) + " on market."});
+            });
         });
     }
 
@@ -421,14 +431,16 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return callback(false);
         this.getVREInstance().then((i) => {
-            return i.delist(this.toID(parseInt(x), parseInt(y)), {from: this.account });
-        }).then(() => {
-            callback(true);
-            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " listed for sale."});
-        }).catch((e) => {
-            console.log(e);
-            callback(false);
-            this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to put property " + (x + 1) + "x" + (y + 1) + " on market."});
+            i.delist.estimateGas(this.toID(parseInt(x), parseInt(y)), {from: this.account }).then((gas) => {
+                return i.delist(this.toID(parseInt(x), parseInt(y)), {from: this.account, gas: gas + this.gasBuffer });
+            }).then(() => {
+                callback(true);
+                this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " listed for sale."});
+            }).catch((e) => {
+                console.log(e);
+                callback(false);
+                this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to put property " + (x + 1) + "x" + (y + 1) + " on market."});
+            });
         });
     }
 
@@ -436,12 +448,14 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return callback(false);
         this.getVREInstance().then((i) => {
-            return i.setPropertyMode(this.toID(parseInt(x), parseInt(y)), isPrivate, minutesPrivate, {from: this.account });
-        }).then((r) => {
-            return callback(true);
-        }).catch((e) => {
-            return callback(false);
-            console.log(e);
+            return i.setPropertyMode.estimateGas(this.toID(parseInt(x), parseInt(y)), isPrivate, minutesPrivate, {from: this.account }).then((gas) => {
+                return i.setPropertyMode(this.toID(parseInt(x), parseInt(y)), isPrivate, minutesPrivate, {from: this.account, gas: gas + this.gasBuffer });
+            }).then((r) => {
+                return callback(true);
+            }).catch((e) => {
+                return callback(false);
+                console.log(e);
+            });
         });
     }
 
@@ -450,13 +464,15 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return;
         this.getVREInstance().then((i) => {
-            return i.setHoverText(Func.StringToBigInts(text), {from: this.account});
-        }).then(function() {
-            callback(true);
-            console.info("Hover text set!");
-        }).catch((e) => {
-            callback(false);
-            console.log(e);
+            return i.setHoverText.estimateGas(Func.StringToBigInts(text), {from: this.account}).then((gas) => {
+                return i.setHoverText(Func.StringToBigInts(text), {from: this.account, gas: gas + this.gasBuffer});
+            }).then(function() {
+                callback(true);
+                console.info("Hover text set!");
+            }).catch((e) => {
+                callback(false);
+                console.log(e);
+            });
         });
     }
 
@@ -465,13 +481,15 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return;
         this.getVREInstance().then((i) => {
-            return i.setLink(Func.StringToBigInts(text), {from: this.account });
-        }).then(function() {
-            callback(true);
-            console.info("Property link updated!");
-        }).catch((e) => {
-            callback(false);
-            console.log(e);
+            return i.setLink.estimateGas(Func.StringToBigInts(text), {from: this.account }).then((gas) => {
+                return i.setLink(Func.StringToBigInts(text), {from: this.account, gas: gas + this.gasBuffer });
+            }).then(function() {
+                callback(true);
+                console.info("Property link updated!");
+            }).catch((e) => {
+                callback(false);
+                console.log(e);
+            });
         });
     }
 
@@ -479,8 +497,10 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return callback(false);
         this.getVREInstance().then((i) => {
-            return i.transferProperty(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account}).then((r) => {
-                return callback(true);
+            return i.transferProperty.estimateGas(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account}).then((gas) => {
+                return i.transferProperty(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account, gas: gas + this.gasBuffer}).then((r) => {
+                    return callback(true);
+                });
             });
         }).catch((e) => {
             return callback(false);
@@ -491,13 +511,15 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return callback(false);
         this.getVREInstance().then((i) => {
-            return i.makeBid(this.toID(x, y), bid, {from: this.account });
-        }).then(() => {
-            callback(true);
-            this.sendResults(LISTENERS.Alert, {result: true, message: "Bid for " + (x + 1) + "x" + (y + 1) + " sent to owner."});
-        }).catch((e) => {
-            callback(false);
-            this.sendResults(LISTENERS.Alert, {result: false, message: "Error placing bid."});
+            return i.makeBid.estimateGas(this.toID(x, y), bid, {from: this.account }).then((gas) => {
+                return i.makeBid(this.toID(x, y), bid, {from: this.account, gas: gas + this.gasBuffer });
+            }).then(() => {
+                callback(true);
+                this.sendResults(LISTENERS.Alert, {result: true, message: "Bid for " + (x + 1) + "x" + (y + 1) + " sent to owner."});
+            }).catch((e) => {
+                callback(false);
+                this.sendResults(LISTENERS.Alert, {result: false, message: "Error placing bid."});
+            });
         });
     }
 
@@ -506,13 +528,15 @@ export class Contract {
             return callback(false);
         this.getVREInstance().then((i) => {
             callback('pending');
-            return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), PPT, {from: this.account });
-        }).then(() => {
-            callback(true);
-            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " pixels changed."});
-        }).catch((e) => {
-            callback(false);
-            this.sendResults(LISTENERS.Alert, {result: false, message: "Error uploading pixels."});
+            return i.setColors.estimateGas(this.toID(x, y), Func.RGBArrayToContractData(data), PPT, {from: this.account }).then((gas) => {
+                return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), PPT, {from: this.account, gas: gas + this.gasBuffer});
+            }).then(() => {
+                callback(true);
+                this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " pixels changed."});
+            }).catch((e) => {
+                callback(false);
+                this.sendResults(LISTENERS.Alert, {result: false, message: "Error uploading pixels."});
+            });
         });
     }
 

@@ -89,9 +89,10 @@ export class ServerDataManager {
         };
     }
 
-    destructor() {
+    closeEvents() {
         Object.keys(this.evHndl).map((key, i) => {
-            this.evHndl[key].stopWatching();
+            if (this.evHndl[key] !== null)
+                this.evHndl[key].stopWatching();
         });
     }
 
@@ -190,6 +191,8 @@ export class ServerDataManager {
     init() {
         this.requestServerImage((imageResult) => {
             this.requestServerData((dataResult) => {
+                console.info(ctr.account)
+                this.closeEvents();
                 this.setupEvents();
                 GFD.setData('ServerDataManagerInit', 2);
                 ctr.sendResults(LISTENERS.ServerDataManagerInit, {imageLoaded: imageResult, dataLoaded: dataResult});
@@ -214,6 +217,7 @@ export class ServerDataManager {
 
         } else {
             ax.get('/getPropertyData', {cancelToken: this.cancelDataRequestToken}).then((result) => {
+                console.info('daters', result)
                 if (result.status == 200 && typeof result.data === 'object') {
                     this.allProperties = result.data;
                     this.organizeAllProperties();
@@ -282,6 +286,7 @@ export class ServerDataManager {
                         this.organizeProperty(x, y);
                 }
         }
+        console.info(this.ownedProperties, ctr.account)
     }
 
     /*

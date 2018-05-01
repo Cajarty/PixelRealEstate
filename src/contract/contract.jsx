@@ -86,7 +86,6 @@ export class Contract {
                             this.VRE.deployed().then((VREInstance) => {
                                 this.VREInstance = VREInstance;
                                 this.PXLPPInstance = PXLPPInstance;
-                                SDM.init();
                                 window.web3.eth.getBlock('latest').then((latestBlock) => {
                                     this.startLoadBlock = latestBlock.number - 1000;
                                 });
@@ -139,6 +138,7 @@ export class Contract {
             if (this.account !== this.accounts[0].toLowerCase()) {
                 this.account = this.accounts[0].toLowerCase();
                 this.sendEvent(EVENTS.AccountChange, this.account);
+                SDM.init();
             }
         });
     }
@@ -227,8 +227,6 @@ export class Contract {
 
         // VRE DApp Events
         this.VRE.deployed().then((i) => {
-
-            console.info(this.startLoadBlock)
 
             let filter = {
                 fromBlock: this.startLoadBlock, 

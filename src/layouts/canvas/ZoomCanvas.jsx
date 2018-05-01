@@ -67,7 +67,6 @@ class ZoomCanvas extends Component {
                     this.setState({loaded: true});
                 }
                 if (GFD.getData('ServerDataManagerInit') > 1) {
-                    console.info('SDM inner code for zoom canvas', this.state.queuedUpdates)
                     for (let i in this.state.queuedUpdates) {
                         this.setCanvasProperty(this.state.queuedUpdates[i].x, this.state.queuedUpdates[i].y, this.state.queuedUpdates[i].colors);
                     }

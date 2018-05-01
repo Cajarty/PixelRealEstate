@@ -5,6 +5,7 @@ import { Contract, ctr } from '../../contract/contract.jsx';
 import {GridColumn, Grid, GridRow, Dimmer, Loader} from 'semantic-ui-react';
 import { PanelPropertyCanvas } from '../ui/Panel';
 import {GFD, GlobalState } from '../../functions/GlobalState';
+import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
 
 
 class PropertyChangeLog extends Component {
@@ -22,6 +23,9 @@ class PropertyChangeLog extends Component {
         GFD.listen('userExists', 'Log-PCL', (loggedIn) => {
             if (!loggedIn)
                 return;
+            if (SDM.eventData.recentPayouts.length > 0) {
+                this.setState({changeLog: SDM.eventData.recentPayouts, isLoading: false});
+            }
             ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (handle) => {
                 let eventHandle = handle;
                 this.setState({
@@ -30,7 +34,7 @@ class PropertyChangeLog extends Component {
                 });
             
                 eventHandle.watch((error, log) => {
-                    let old = this.state.changeLog;
+                    let old = SDM.eventData.recentPayouts;
                     let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
                     let last = Func.BigNumberToNumber(log.args.lastUpdate);
                     let reserved = Func.BigNumberToNumber(log.args.becomePublic);
@@ -46,6 +50,7 @@ class PropertyChangeLog extends Component {
                     old.unshift(newData);
                     if (old.length > 20)
                         old.pop();
+                    SDM.eventData.recentPayouts = old;
                     this.setState({ changeLog: old, isLoading: false });
                 });
             });

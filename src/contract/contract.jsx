@@ -87,7 +87,7 @@ export class Contract {
                                 this.VREInstance = VREInstance;
                                 this.PXLPPInstance = PXLPPInstance;
                                 window.web3.eth.getBlock('latest').then((latestBlock) => {
-                                    this.startLoadBlock = latestBlock.number - 1000;
+                                    this.startLoadBlock = latestBlock.number - 1;
                                 });
                             });
                         });
@@ -149,14 +149,14 @@ export class Contract {
     blocks = how many blocks to look back
     params = {}. for narrowing serach results
     */
-    getEventLogs(event, params = {}, callback) {
+    getEventLogs(event, params, callback, blocks = 0) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return;
 
         if (this.startLoadBlock <= 0) {
             window.web3.eth.getBlock('latest').then((latestBlock) => {
-                this.startLoadBlock = latestBlock.number - 1000;
-                this.getEventLogs(event, params, callback);
+                this.startLoadBlock = latestBlock.number;
+                this.getEventLogs(event, params, callback, blocks);
             });
             return;
         }
@@ -164,7 +164,7 @@ export class Contract {
         // VRE DApp Events
         this.VRE.deployed().then((i) => {
             let filter = {
-                fromBlock: this.startLoadBlock, 
+                fromBlock: this.startLoadBlock - blocks, 
                 toBlock: 'latest',
                 address: Const.VirtualRealEstate,
             };
@@ -213,14 +213,14 @@ export class Contract {
     Requests all events of event type EVENT.
     block = how many blocks to look back
     */
-    watchEventLogs(event, params, callback) {
+    watchEventLogs(event, params, callback, blocks = 0) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_RINKEBY)
             return;
 
         if (this.startLoadBlock <= 0) {
             window.web3.eth.getBlock('latest').then((latestBlock) => {
-                this.startLoadBlock = latestBlock.number - 1000;
-                this.watchEventLogs(event, params, callback);
+                this.startLoadBlock = latestBlock.number;
+                this.watchEventLogs(event, params, callback, blocks);
             });
             return;
         }
@@ -229,7 +229,7 @@ export class Contract {
         this.VRE.deployed().then((i) => {
 
             let filter = {
-                fromBlock: this.startLoadBlock, 
+                fromBlock: this.startLoadBlock - blocks, 
                 toBlock: 'latest',
                 address: Const.VirtualRealEstate,
             };

@@ -3,6 +3,7 @@ import {GFD, GlobalState } from '../../functions/GlobalState';
 import * as Func from '../../functions/functions.jsx';
 import {Contract, ctr } from '../../contract/contract.jsx';
 import {GridColumn, Grid, GridRow, Label, LabelDetail, Loader} from 'semantic-ui-react';
+import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
 import * as EVENTS from '../../const/events';
 import * as Struct from '../../const/structs';
 
@@ -22,6 +23,9 @@ class PropertySalesLogTopETH extends Component {
         GFD.listen('userExists', 'Log-PSLTETH', (loggedIn) => {
             if (!loggedIn)
                 return;
+            if (SDM.eventData.topTenETHTrades.length > 0) {
+                this.setState({changeLog: SDM.eventData.topTenETHTrades, isLoading: false});
+            }
             ctr.watchEventLogs(EVENTS.PropertyBought, {}, (handle) => {
                 let eventHandle = handle;
                 this.setState({
@@ -29,48 +33,39 @@ class PropertySalesLogTopETH extends Component {
                     loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
                 });
                 eventHandle.watch((error, log) => {
-                    let old = this.state.changeLog;
+                    let old = SDM.eventData.topTenETHTrades;
                     let PXLPrice = Func.BigNumberToNumber(log.args.PXLAmount);
                     let ETHPrice = Func.BigNumberToNumber(log.args.ethAmount);
                     let timeSold = Func.BigNumberToNumber(log.args.timestamp);
                     if (ETHPrice == 0)
                         return;
+                    let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
+                    let newData = {
+                        x: id.x,
+                        y: id.y,
+                        PXLPrice,
+                        ETHPrice,
+                        oldOwner: log.args.oldOwner == ctr.account ? "You" : (log.args.oldOwner === Struct.NOBODY ? 'PixelProperty' : log.args.oldOwner),
+                        newOwner: log.args.newOwner == ctr.account ? "You" : log.args.newOwner,
+                        timeSold: timeSold * 1000,
+                        transaction: log.transactionHash,
+                    };
                     if (old.length == 0) {
-                        let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                        let newData = {
-                            x: id.x,
-                            y: id.y,
-                            PXLPrice,
-                            ETHPrice,
-                            oldOwner: log.args.oldOwner == ctr.account ? "You" : (log.args.oldOwner === Struct.NOBODY ? 'PixelProperty' : log.args.oldOwner),
-                            newOwner: log.args.newOwner == ctr.account ? "You" : log.args.newOwner,
-                            timeSold: timeSold * 1000,
-                            transaction: log.transactionHash,
-                        };
                         old.unshift(newData);
                         if (old.length > 20)
                             old.pop();
+                        SDM.eventData.topTenETHTrades = old;
                         this.setState({ changeLog: old, isLoading: false });
                     } else {
                         for (let i = Math.min(old.length - 1, 9); i >= 0; i--) {
                             if (ETHPrice <= old[i].ETHPrice || (i == 0 && ETHPrice > old[i].ETHPrice)) {
                                 if (i < 9) {
-                                    let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                                    let newData = {
-                                        x: id.x,
-                                        y: id.y,
-                                        PXLPrice,
-                                        ETHPrice,
-                                        oldOwner: log.args.oldOwner == ctr.account ? "You" : (log.args.oldOwner === Struct.NOBODY ? 'PixelProperty' : log.args.oldOwner),
-                                        newOwner: log.args.newOwner == ctr.account ? "You" : log.args.newOwner,
-                                        timeSold: timeSold * 1000,
-                                        transaction: log.transactionHash,
-                                    };
                                     if (ETHPrice <= old[i].ETHPrice)
                                         old.splice(i + 1, 0, newData);
                                     else
                                         old.splice(i, 0, newData);
                                     old.splice(10);
+                                    SDM.eventData.topTenETHTrades = old;
                                     this.setState({ changeLog: old });
                                 }
                                 return;

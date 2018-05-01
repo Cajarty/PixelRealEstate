@@ -5,6 +5,7 @@ import {Contract, ctr } from '../../contract/contract.jsx';
 import {GridColumn, Grid, GridRow, Label, LabelDetail, Loader} from 'semantic-ui-react';
 import * as EVENTS from '../../const/events';
 import * as Struct from '../../const/structs';
+import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
 
 
 class PropertySalesLogTopPXL extends Component {
@@ -22,6 +23,9 @@ class PropertySalesLogTopPXL extends Component {
         GFD.listen('userExists', 'Log-PSLTPXL', (loggedIn) => {
             if (!loggedIn)
                 return;
+            if (SDM.eventData.topTenPXLTrades.length > 0) {
+                this.setState({changeLog: SDM.eventData.topTenPXLTrades, isLoading: false});
+            }
             ctr.watchEventLogs(EVENTS.PropertyBought, {}, (handle) => {
                 let eventHandle = handle;
                 this.setState({
@@ -29,48 +33,39 @@ class PropertySalesLogTopPXL extends Component {
                     loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
                 });
                 eventHandle.watch((error, log) => {
-                    let old = this.state.changeLog;
+                    let old = SDM.eventData.topTenPXLTrades;
                     let PXLPrice = Func.BigNumberToNumber(log.args.PXLAmount);
                     let ETHPrice = Func.BigNumberToNumber(log.args.ethAmount);
                     let timeSold = Func.BigNumberToNumber(log.args.timestamp);
                     if (PXLPrice == 0)
                         return;
+                    let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
+                    let newData = {
+                        x: id.x,
+                        y: id.y,
+                        PXLPrice,
+                        ETHPrice,
+                        oldOwner: log.args.oldOwner == ctr.account ? "You" : (log.args.oldOwner === Struct.NOBODY ? 'PixelProperty' : log.args.oldOwner),
+                        newOwner: log.args.newOwner == ctr.account ? "You" : log.args.newOwner,
+                        timeSold: timeSold * 1000,
+                        transaction: log.transactionHash,
+                    };
                     if (old.length == 0) {
-                        let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                        let newData = {
-                            x: id.x,
-                            y: id.y,
-                            PXLPrice,
-                            ETHPrice,
-                            oldOwner: log.args.oldOwner == ctr.account ? "You" : (log.args.oldOwner === Struct.NOBODY ? 'PixelProperty' : log.args.oldOwner),
-                            newOwner: log.args.newOwner == ctr.account ? "You" : log.args.newOwner,
-                            timeSold: timeSold * 1000,
-                            transaction: log.transactionHash,
-                        };
                         old.unshift(newData);
                         if (old.length > 20)
                             old.pop();
+                        SDM.eventData.topTenPXLTrades = old;
                         this.setState({ changeLog: old, isLoading: false });
                     } else {
                         for (let i = Math.min(old.length - 1, 9); i >= 0; i--) {
                             if (PXLPrice <= old[i].PXLPrice || (i == 0 && PXLPrice > old[i].PXLPrice)) {
                                 if (i < 9) {
-                                    let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                                    let newData = {
-                                        x: id.x,
-                                        y: id.y,
-                                        PXLPrice,
-                                        ETHPrice,
-                                        oldOwner: log.args.oldOwner == ctr.account ? "You" : (log.args.oldOwner === Struct.NOBODY ? 'PixelProperty' : log.args.oldOwner),
-                                        newOwner: log.args.newOwner == ctr.account ? "You" : log.args.newOwner,
-                                        timeSold: timeSold * 1000,
-                                        transaction: log.transactionHash,
-                                    };
                                     if (PXLPrice <= old[i].PXLPrice)
                                         old.splice(i + 1, 0, newData);
                                     else
                                         old.splice(i, 0, newData);
                                     old.splice(10);
+                                    SDM.eventData.topTenPXLTrades = old;
                                     this.setState({ changeLog: old});
                                 }
                                 return;
@@ -124,6 +119,7 @@ class PropertySalesLogTopPXL extends Component {
                         Tx
                     </GridColumn>
                 </GridRow>
+                {console.info(this.state.changeLog)}
                 {this.state.changeLog.map((log) => (
                     <GridRow  className='gridItem' onClick={() => this.setLocation(log.x + 1, log.y + 1) } key={log.transaction} columns={5} textAlign='center'> 
                         <GridColumn verticalAlign='middle' width={1}>{log.x + 1}</GridColumn>

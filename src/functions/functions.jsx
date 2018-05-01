@@ -85,7 +85,7 @@ export const Clamp = (min, max, value) => {
 
 export const StringToBigInts = (string) => {
     let result = [];
-    let innerResult = new bigInt("0", 10);
+    let innerResult = bigInt("0", 10);
     for(let i = 0; i < 32; i++) {
       let binary = 32;
       if (i < string.length) {
@@ -95,7 +95,7 @@ export const StringToBigInts = (string) => {
       innerResult = innerResult.or(binary);
     }
     result.push(new BigNumber(innerResult.toString(), 10));
-    innerResult = new bigInt("0", 10);
+    innerResult = bigInt("0", 10);
     for(let i = 32; i < 64; i++) {
       let binary = 32;
       if (i < string.length) {
@@ -112,7 +112,7 @@ export const BigIntsToString = (bigInts) => {
     let result = [];
     bigInts.reverse();
     for(let i = 0; i < 2; i++) {
-        let uint256 = new bigInt(bigInts[i].toString(10), 10);
+        let uint256 = bigInt(bigInts[i].toString(10), 10);
         if (uint256 != 0) {
             for(let j = 0; j < 32; j++) {
                 let ascii = uint256.and(255).toJSNumber();
@@ -209,7 +209,7 @@ export const RGBArrayToContractData = (rgbArray) => {
     let result = [];
     let counter = 0;
     for(let i = 0; i < CONTRACT_DATA_ARRAY_SIZE; i++) { //Foreach uint256 in uint256[10]
-        let innerResult = new bigInt("0", 10);
+        let innerResult = bigInt("0", 10);
         for(let j = 0; j < COLORS_PER_256; j++) { //Foreach h, s, l bits for the uint256
             let hsl = RGBtoHSL(rgbArray[counter], rgbArray[counter + 1], rgbArray[counter + 2]);
             let binary = RGBToBinary(Math.round(Math.min(hsl[0] * HNUMBER, HNUMBER - 1)), Math.round(Math.min(hsl[1] * SNUMBER, SNUMBER - 1)), Math.round(Math.min(hsl[2] * LNUMBER, LNUMBER - 1)));

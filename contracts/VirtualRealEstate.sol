@@ -13,13 +13,13 @@ contract VirtualRealEstate {
     mapping (uint16 => bool) hasBeenSet;
     
     // The amount in % for which a user is paid
-    uint8 USER_BUY_CUT_PERCENT = 98;
+    uint8 constant USER_BUY_CUT_PERCENT = 98;
     // Maximum amount of generated PXL a property can give away per minute
-    uint8 PROPERTY_GENERATES_PER_MINUTE = 1;
+    uint8 constant PROPERTY_GENERATES_PER_MINUTE = 1;
     // The point in time when the initial grace period is over, and users get the default values based on coins burned
     uint256 GRACE_PERIOD_END_TIMESTAMP;
     // The amount of time required for a Property to generate tokens for payouts
-    uint256 PROPERTY_GENERATION_PAYOUT_INTERVAL = (1 minutes); //Generation amount
+    uint256 constant PROPERTY_GENERATION_PAYOUT_INTERVAL = (1 minutes); //Generation amount
     
     uint256 ownerEth = 0; // Amount of ETH the contract owner is entitled to withdraw (only Root account can do withdraws)
     
@@ -66,7 +66,6 @@ contract VirtualRealEstate {
         owner = msg.sender; // Default the owner to be whichever Ethereum account created the contract
         systemSalePricePXL = 1000; //Initial PXL system price
         systemSalePriceETH = 19500000000000000; //Initial ETH system price
-        GRACE_PERIOD_END_TIMESTAMP = now + 3 days; // Give all users extra functionality for the first three days
         systemPriceIncreaseStep = 10;
         systemPixelIncreasePercent = 5;
         systemETHStepTally = 0;
@@ -86,6 +85,7 @@ contract VirtualRealEstate {
                 _transferProperty(propertyID, owner, 0, 0, 0, 0);
             }
             initialPropertiesReserved = true;
+            GRACE_PERIOD_END_TIMESTAMP = now + 3 days; // Extends the three 
         }
     }
 

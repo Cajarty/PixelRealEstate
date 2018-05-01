@@ -171,7 +171,7 @@ contract PXLProperty is StandardToken {
         properties[propertyID].earnUntil = earnUntil;
     }
     
-    function setPropertyPrivateModeEarnUntilLastUpdateBecomePublic(uint16 propertyID, bool privateMode, uint256 earnUntil, uint256 lastUpdate, uint256 becomePublic) public pixelPropertyAccess {
+    function setPropertyPrivateModeEarnUntilLastUpdateBecomePublic(uint16 propertyID, bool privateMode, uint256 earnUntil, uint256 lastUpdate, uint256 becomePublic) public pixelPropertyAccess() {
         if (properties[propertyID].isInPrivateMode != privateMode) {
             properties[propertyID].isInPrivateMode = privateMode;
         }

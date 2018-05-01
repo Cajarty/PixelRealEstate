@@ -67,6 +67,7 @@ class WelcomeSidebar extends Component {
                         <Statistic.Label>b o n u s  -  P X L</Statistic.Label>
                     </Statistic>
                 </Statistic.Group>
+                <Message color='orange'>We are currently experiencing a slow network; PixelProperty.io may have missing information until then.</Message>
             </Segment>
         );
     }

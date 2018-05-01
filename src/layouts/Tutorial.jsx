@@ -42,7 +42,7 @@ class Tutorial extends Component {
                     </ModalContent>
                     <ModalActions>
                         <Button basic inverted onClick={() => this.tutorialGoBack()}>
-                        <Icon name='arrow left' /> {this.state.tutorialState.index == 1 ? 'Cancel' : 'Back'}
+                        <Icon name='arrow left' /> {this.state.tutorialState.index == 1 ? 'Quit Tutorial' : 'Back'}
                         </Button>
                         {this.state.tutorialState.showNext && <Button color='green' inverted onClick={() => this.tutorialGoNext()}>
                         <Icon name='arrow right' /> Next

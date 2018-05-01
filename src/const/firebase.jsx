@@ -78,26 +78,26 @@ export class FireBase {
         });
     }
 
-    signUp(wallet, username, email, tosVersion) {
+    signUp(wallet, username, email, tosVersion, callback) {
         this.checkUserExists(wallet, (userExists, user) => {
             if (userExists) {
-                return {result: true, message: "User already signed up!"}
+                return callback(true, ["User already signed up!"]);
             } else {
                 if (tosVersion < Const.TOS_VERSION) 
-                    return {result: false, message: 'Please agree to the Terms of Service first.'};
+                    return callback(false, ['Please agree to the Terms of Service first.']);
                 
                 if (!this.isEmailValid(email))
-                    return {result: false, message: 'Invalid email format.'};
+                    return callback(false, ['Invalid email format.']);
 
                 if (!this.isUsernameValid(username))
-                    return {result: false, message: "Invalid username format. Please only user letters, numbers, '-', and '_'. Maximum length is 20 characters."};
+                    return callback(false, ["Invalid username format.", "Please only user letters, numbers, '-', and '_'.", "Maximum length is 20 characters."]);
                  
                 this.checkEmailExists(email, (exists) => {
                     if (exists)
-                        return {result: false, message: "Email address already in use."};
+                        return callback(false, ["Email address already in use."]);
                     this.checkUsernameExists(username, (existsUser) => {
                         if (existsUser) {
-                            return {result: false, message: "Username already in use."};
+                            return callback(false, ["Username already in use."]);
                         } else {
                             let params = [
                                 {

@@ -10,7 +10,7 @@ export const TUTORIAL_STATE = {
     CANVAS: {
         index: 1,
         className: ' tutorialStep step1',
-        showNext: false,
+        showNext: true,
     },
     DESCBOXDETAILS: {
         index: 2,
@@ -20,7 +20,7 @@ export const TUTORIAL_STATE = {
     DESCBOXACTIONS: {
         index: 3,
         className: ' tutorialStep step3',
-        showNext: false,
+        showNext: true,
     },
     UPDATEFORM: {
         index: 4,
@@ -97,9 +97,13 @@ export class GlobalState {
                             newIndex = TUTORIAL_STATE.CANVAS.index;
                         break;
                     case TUTORIAL_STATE.CANVAS.index:
-                        if (move > 0)
+                        if (move > 0) {
+                            if (this.state.x == null || this.state.y == null) {
+                                this.setData('x', Math.floor(Math.random() * 100));
+                                this.setData('y', Math.floor(Math.random() * 100));
+                            }
                             newIndex = TUTORIAL_STATE.DESCBOXDETAILS.index;
-                        else
+                        } else
                             newIndex = TUTORIAL_STATE.NONE.index
                         break;
                     case TUTORIAL_STATE.DESCBOXDETAILS.index:

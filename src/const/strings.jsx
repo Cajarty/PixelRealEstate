@@ -54,7 +54,7 @@ export const CHANGELOG = [
         messages: 
         ['Live on the Rinkeby test network!', 
         'Change your MetaMask network from "Main" to "Rinkeby" to begin testing.', 
-        <div>You'll need funds from the Rinkeby faucet at: <a href="https://www.rinkeby.io/#faucet" target='blank'>Rinkeby.io</a></div>],
+        <div>You'll need funds from the Rinkeby faucet at: <a href="https://www.rinkeby.io/#faucet" target='_blank'>Rinkeby.io</a></div>],
     }
 ];
 
@@ -64,12 +64,12 @@ export const ADDRESSES = [
 
 export const TUTORIAL = [
     [''],
-    ['Welcome to pixel property!', 'This is the Pixel Canvas, live from Ethereum! Click on a Property it to find out more about it.', 'Click the Canvas to Contine...'],
+    ['Welcome to pixel property!', 'This is the Pixel Canvas, live from Ethereum! Clicking on a Property will display its details.'],
     ['You selected a Property!', 'When clicking the canvas, the inspector will display all details about the Property. These include who owns it, if it’s for sale & how much, if it’s currently editable, and the expected PXLs earned by the last artist.'],
     ['Use these inspector buttons to interact with the currently inspected property. Some Properties have different actions depending on their current state.', 'Click on “Update Image” to learn how to upload artwork.'],
     ['Updating the artwork of a Property will temporarily lock it in place as private. After the private mode is up, the artwork will stay until a user changes it again. Longer lasting artwork is awarded more PXL.'],
     ['PXL allows you to purchase Properties on the canvas.', 'Properties you own can be used to earn passive PXL, or kept private for only your artwork. Owners are also able to advertise a website and phrase of their choosing on all their Properties.'],
-    ['Looks like you’re ready to start!', 'If looking for more info, each inspector action explains what they do in more detail. Additional details are on our <a href="https://pixelproperty.io/faq.html">Frequently Asked Questions</a> page.'],
-    ['Looks like you’re almost ready! In order to begin, you must have the <a href="https://metamask.io/">MetaMask Browser Extension</a> setup.', 'MetaMask secures your PixelProperty data by storing your sensitive info in an encrypted storage.', 'If looking for more info, each inspector action explains what they do in more detail. Additional details are on our <a href="https://pixelproperty.io/faq.html">Frequently Asked Questions</a> page.']
+    ['Looks like you’re ready to start!', 'If looking for more info, each inspector action explains what they do in more detail.', <div>Additional details are on our <a target='_blank' href="https://pixelproperty.io/faq.html">Frequently Asked Questions</a> page.</div>],
+    [<div>Looks like you’re almost ready! In order to begin, you must have the <a target='_blank' href="https://metamask.io/">MetaMask Browser Extension</a> setup.</div>, 'MetaMask secures your PixelProperty data by storing your sensitive info in an encrypted storage.', 'If looking for more info, each inspector action explains what they do in more detail. Additional details are on our <a href="https://pixelproperty.io/faq.html">Frequently Asked Questions</a> page.']
 ];
 

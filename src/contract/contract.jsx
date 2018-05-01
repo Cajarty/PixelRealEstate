@@ -393,11 +393,11 @@ export class Contract {
                     return i.buyPropertyInPXL(this.toID(x, y), ppc, {from: this.account, gas: gas + this.gasBuffer });
                 })
             else if (ppc == 0)
-                return i.buyPropertyInETH(this.toID(x, y), { value: eth, from: this.account}).then((gas) => {
+                return i.buyPropertyInETH.estimateGas(this.toID(x, y), { value: eth, from: this.account}).then((gas) => {
                     return i.buyPropertyInETH(this.toID(x, y), { value: eth, from: this.account, gas: gas + this.gasBuffer });
                 })
             else 
-                return i.buyProperty(this.toID(x, y), ppc, {value: eth, from: this.account}).then((gas) => {
+                return i.buyProperty.estimateGas(this.toID(x, y), ppc, {value: eth, from: this.account}).then((gas) => {
                     return i.buyProperty(this.toID(x, y), ppc, {value: eth, from: this.account, gas: gas + this.gasBuffer});
                 })
         }).then(() => {

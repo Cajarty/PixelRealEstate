@@ -75,7 +75,7 @@ class HoverLabel extends Component {
                         this.setState({show: true, labelContent: 
                             <div>
                                 <Label>PXL<LabelDetail>{Func.NumberWithCommas(data.PPCPrice)}</LabelDetail></Label>
-                                <Label>ETH<LabelDetail>{Func.NumberWithCommas(data.ETHPrice)}</LabelDetail></Label>
+                                <Label>ETH<LabelDetail>{Func.WeiToEth(data.ETHPrice)}</LabelDetail></Label>
                             </div>
                         });
                     } else {

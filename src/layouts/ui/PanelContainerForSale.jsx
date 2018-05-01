@@ -41,7 +41,7 @@ class PanelContainerForSale extends PanelContainer {
                                     {child.ETHPrice != 0 && 
                                         <ListItem>
                                         <ListHeader>ETH</ListHeader>
-                                        <ListContent>{Func.NumberWithCommas(child.ETHPrice)}</ListContent>
+                                        <ListContent>{Func.WeiToEth(child.ETHPrice)}</ListContent>
                                         </ListItem>
                                     }
                                 </List>

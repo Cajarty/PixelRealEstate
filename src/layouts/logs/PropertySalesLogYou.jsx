@@ -134,7 +134,7 @@ class PropertySalesLogYou extends Component {
                         <GridColumn verticalAlign='middle' width={3}>{
                             <div>
                                 {log.PXLPrice > 0 && <Label>PXL<LabelDetail>{Func.NumberWithCommas(log.PXLPrice)}</LabelDetail></Label>}
-                                {log.ETHPrice > 0 && <Label>ETH<LabelDetail>{Func.NumberWithCommas(log.ETHPrice)}</LabelDetail></Label>}
+                                {log.ETHPrice > 0 && <Label>ETH<LabelDetail>{Func.WeiToEth(log.ETHPrice)}</LabelDetail></Label>}
                             </div>
                         }</GridColumn>
                         <GridColumn verticalAlign='middle' width={4}>{log.oldOwner}</GridColumn>

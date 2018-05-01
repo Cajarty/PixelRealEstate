@@ -28,7 +28,7 @@ export const ScrollTo = (page) => {
 }
 
 export const WeiToEth = (wei) => {
-    return wei / 1000000000000000000.0;
+    return  (wei / 1000000000000000000.0).toFixed(7);
 }
 
 export const NumberWithCommas = (number) => {

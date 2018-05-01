@@ -178,7 +178,7 @@ contract VirtualRealEstate {
             require(numMinutesPrivate > 0);
             require(pxlProperty.balanceOf(msg.sender) >= numMinutesPrivate);
             // Determines when the Property becomes public, one payout interval per coin burned
-            whenToBecomePublic = now + PROPERTY_GENERATION_PAYOUT_INTERVAL * numMinutesPrivate;
+            whenToBecomePublic = (now < propertyBecomePublic ? propertyBecomePublic : now) + PROPERTY_GENERATION_PAYOUT_INTERVAL * numMinutesPrivate;
 
             rewardedAmount = getProjectedPayout(propertyIsInPrivateMode, propertyLastUpdate, propertyEarnUntil);
             if (rewardedAmount > 0 && propertyLastUpdater != 0) {

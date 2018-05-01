@@ -347,11 +347,11 @@ contract VirtualRealEstate {
         //If if its in free-use mode
         } else if (propertyBecomePublic <= now || propertyLastUpdater == msg.sender) {
             uint256 pxlSpent = pxlToSpend + 1; //All pxlSpent math uses N+1, so built in for convenience
-            if (pxlToSpend < 2 && isInGracePeriod()) { //If first 3 days and we spent <2 coins, treat it as if we spent 2
+            if (isInGracePeriod() && pxlToSpend < 2) { //If first 3 days and we spent <2 coins, treat it as if we spent 2
                 pxlSpent = 3; //We're treating it like 2, but it's N+1 in the math using this
             }
             
-            uint256 projectedAmount = getProjectedPayout(propertyIsInPrivateMode, propertyLastUpdate, propertyEarnUntil );
+            uint256 projectedAmount = getProjectedPayout(propertyIsInPrivateMode, propertyLastUpdate, propertyEarnUntil);
             pxlProperty.burnPXLRewardPXLx2(msg.sender, pxlToSpend, propertyLastUpdater, projectedAmount, propertyOwner, projectedAmount);
             
             //BecomePublic = (N+1)/2 minutes of user-private mode

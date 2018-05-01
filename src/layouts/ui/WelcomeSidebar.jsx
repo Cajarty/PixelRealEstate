@@ -7,7 +7,7 @@ import { Segment, Header, Image , Button, Message, Form, List, Divider, Statisti
 import * as Assets from '../../const/assets';
 import SignUpForm from '../forms/SignUpForm';
 
-const _rel = 1525190400000;
+const _rel = 1525194000000;
 const RELEASE_DATE = new Date(_rel);
 const FREE_SET_PERIOD = new Date(_rel + (3*24*60*60*1000));
 

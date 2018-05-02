@@ -20,8 +20,8 @@ class PropertySalesLogTopETH extends Component {
     }
 
     componentDidMount() {
-        GFD.listen('userExists', 'Log-PSLTETH', (loggedIn) => {
-            if (!loggedIn)
+        GFD.listen('ServerDataManagerInit', 'Log-PSLTETH', (initVersion) => {
+            if (initVersion < 2)
                 return;
             if (SDM.eventData.topTenETHTrades.length > 0) {
                 this.setState({changeLog: SDM.eventData.topTenETHTrades, isLoading: false});

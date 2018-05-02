@@ -20,8 +20,8 @@ class PropertyChangeLogTop extends Component {
     }
 
     componentDidMount() {
-        GFD.listen('userExists', 'Log-PCLT', (loggedIn) => {
-            if (!loggedIn)
+        GFD.listen('ServerDataManagerInit', 'Log-PCLT', (initVersion) => {
+            if (initVersion < 2)
                 return;
             if (SDM.eventData.topTenPayouts.length > 0) {
                 this.setState({changeLog: SDM.eventData.topTenPayouts, isLoading: false});

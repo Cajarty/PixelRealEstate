@@ -20,8 +20,8 @@ class PropertySalesLogTopPXL extends Component {
     }
 
     componentDidMount() {
-        GFD.listen('userExists', 'Log-PSLTPXL', (loggedIn) => {
-            if (!loggedIn)
+        GFD.listen('ServerDataManagerInit', 'Log-PSLTPXL', (initVersion) => {
+            if (initVersion < 2)
                 return;
             if (SDM.eventData.topTenPXLTrades.length > 0) {
                 this.setState({changeLog: SDM.eventData.topTenPXLTrades, isLoading: false});

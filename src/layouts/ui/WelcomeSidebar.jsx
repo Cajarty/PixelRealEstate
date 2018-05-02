@@ -6,6 +6,7 @@ import * as Strings from '../../const/strings';
 import { Segment, Header, Image , Button, Message, Form, List, Divider, Statistic} from 'semantic-ui-react';
 import * as Assets from '../../const/assets';
 import SignUpForm from '../forms/SignUpForm';
+import browser from 'browser-detect';
 
 const _rel = 1525194000000;
 const RELEASE_DATE = new Date(_rel);
@@ -26,12 +27,16 @@ class WelcomeSidebar extends Component {
             days: 0,
             hours: 0,
             minutes: 0,
+            browser: {name: ''}
         };
     }
 
     componentWillMount() {
         this.timerUpdate();
         this.timerUpdater = setInterval(() => this.timerUpdate(), 1000);
+        this.setState({
+            browser: browser(),
+        });
     }
 
     componentWillUnmount() {
@@ -67,7 +72,15 @@ class WelcomeSidebar extends Component {
                         <Statistic.Label>b o n u s  -  P X L</Statistic.Label>
                     </Statistic>
                 </Statistic.Group>
-                <Message color='orange'>We are currently experiencing a slow network; PixelProperty.io may have missing information until then.</Message>
+                {null && <Message color='orange'>
+                    We are currently experiencing a slow network; PixelProperty.io may have missing information until then.
+                </Message>}
+                {console.info(this.state.browser)}
+                {(this.state.browser.name !== 'chrome') &&
+                    <Message color='red'>
+                        It is recommended to use Chrome while PixelProperty is in Beta. We apologize for the inconvenience.
+                    </Message>
+                }
             </Segment>
         );
     }

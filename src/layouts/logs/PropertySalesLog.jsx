@@ -20,8 +20,8 @@ class PropertySalesLog extends Component {
     }
 
     componentDidMount() {
-        GFD.listen('userExists', 'Log-PSL', (loggedIn) => {
-            if (!loggedIn)
+        GFD.listen('ServerDataManagerInit', 'Log-PSL', (initVersion) => {
+            if (initVersion < 2)
                 return;
             if (SDM.eventData.recentTrades.length > 0) {
                 this.setState({changeLog: SDM.eventData.recentTrades, isLoading: false});

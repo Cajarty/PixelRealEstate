@@ -20,8 +20,8 @@ class PropertyChangeLogYou extends Component {
     }
 
     componentDidMount() {
-        GFD.listen('userExists', 'Log-PCLY', (loggedIn) => {
-            if (!loggedIn)
+        GFD.listen('ServerDataManagerInit', 'Log-PCLY', (initVersion) => {
+            if (initVersion < 2)
                 return;
             if (SDM.eventData.yourPayouts.length > 0) {
                 this.setState({changeLog: SDM.eventData.yourPayouts, isLoading: false});

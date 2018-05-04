@@ -31,7 +31,7 @@ class SetPixelColorForm extends Component {
             select: {x1: -1, y1: -1, x2: -1, y2: -1, w: 0, h: 0},
             multiRect: false,
             ppt: '0',
-            maxPayout: 15, //change this too
+            maxPayout: 5,
             ctxLrg: null,
             ctxSml: null,
             canvasLrg: null,
@@ -83,8 +83,7 @@ class SetPixelColorForm extends Component {
     handlePrice(key, value) {
         let obj = {maxPayout: 0};
         obj[key] = isNaN(parseInt(value)) ? '' : Math.max(0, parseInt(value));
-        console.info('take out this math, max of 2, to max of 1 (free) for may 4th 10am, and the comment in state', obj)
-        obj.maxPayout = (Math.max(obj[key] === '' ? 0 : obj[key], 2) + 1) * 5;
+        obj.maxPayout = ((obj[key] === '' ? 0 : obj[key]) + 1) * 5;
         this.setState(obj);
     }
 

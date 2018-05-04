@@ -67,12 +67,12 @@ class WelcomeSidebar extends Component {
                     <Header style={{textAlign: 'center'}} size='large'>
                         PixelProperty
                     </Header>
-                    <Statistic.Group style={stats}>
+                    {null && <Statistic.Group style={stats}>
                         <Statistic style={stats}>
                             <Statistic.Value>{this.state.freeSetCounter}</Statistic.Value>
                             <Statistic.Label>b o n u s  -  P X L</Statistic.Label>
                         </Statistic>
-                    </Statistic.Group>
+                    </Statistic.Group>}
                     {null && <Message color='orange'>
                         We are currently experiencing a slow network; PixelProperty.io may have missing information until then.
                     </Message>}

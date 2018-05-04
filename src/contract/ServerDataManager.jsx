@@ -116,7 +116,7 @@ export class ServerDataManager {
             this.evHndl[EVENTS.PropertyBought] = handle;
             this.evHndl[EVENTS.PropertyBought].watch((error, log) => {
                 let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                this.updateProperty(id.x, id.y, {owner: log.args.newOwner});
+                this.updateProperty(id.x, id.y, {owner: log.args.newOwner, isForSale: false,});
                 this.organizeProperty(id.x, id.y);
             });
         });

@@ -31,6 +31,7 @@ class GetStarted extends Component {
         });
 
         GFD.listen('network', 'getStarted', (network) => {
+            console.info(network)
             this.setState({network});
         });
 
@@ -80,8 +81,7 @@ class GetStarted extends Component {
                     <ModalHeader>Switch Networks</ModalHeader>
                     <ModalContent>  
                         <Message>
-                            We currently use the Rinkeby network to test Pixel Property. Open MetaMask
-                            and change the network. MetaMask is at the top right of your browser window.
+                            We're on the main network! Please open MetaMask and change the network to "Main Network". MetaMask is at the top right of your browser window.
                         </Message>
                         <Image 
                             rounded bordered

@@ -9,6 +9,7 @@ import Info from '../ui/Info';
 import {TUTORIAL_STATE} from '../../functions/GlobalState';
 import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon, Segment, Message } from 'semantic-ui-react';
 import { ENGINE_METHOD_DIGESTS } from 'constants';
+import PXLBalanceItem from '../ui/PXLBalanceItem';
 
 class BuyPixelForm extends Component {
     constructor(props) {
@@ -159,6 +160,7 @@ class BuyPixelForm extends Component {
                             onChange={(e) => this.setY(e.target.value)}
                         />
                         </div>
+                        <PXLBalanceItem/>
                         <Divider horizontal>Price</Divider>
                         {this.state.ETHPrice == 0 ?
                         <div style={{textAlign: 'center'}}>

@@ -28,6 +28,21 @@ export const TUTORIAL_START_DIALOG = ["Pixel Property is easy to use. Just in ca
 
 export const CHANGELOG = [
     {
+        date: new Date('2018-5-3'),
+        title: 'Beta Updates #1',
+        messages: 
+        ['Transactions taking a longer time do not report errors.',
+        'Estimated gas is better calculated.'],
+    },
+    {
+        date: new Date('2018-5-1'),
+        title: 'Beta Release!',
+        messages: 
+        ['PixelProperty is released to the Ethereum network.',
+        'Event and log server storage and other client improvements.',
+        'Refresh button on PXL balance.'],
+    },
+    {
         date: new Date('2018-4-25'),
         title: 'General Fixes & Updates',
         messages: 
@@ -50,11 +65,11 @@ export const CHANGELOG = [
     },
     {
         date: new Date('2018-4-10'),
-        title: 'Beta Testing',
+        title: 'Pre-Release Testing',
         messages: 
         ['Live on the Rinkeby test network!', 
         'Change your MetaMask network from "Main" to "Rinkeby" to begin testing.', 
-        <div>You'll need funds from the Rinkeby faucet at: <a href="https://www.rinkeby.io/#faucet" target='_blank'>Rinkeby.io</a></div>],
+        <p>You'll need funds from the Rinkeby faucet at: <a href="https://www.rinkeby.io/#faucet" target='_blank'>Rinkeby.io</a></p>],
     }
 ];
 

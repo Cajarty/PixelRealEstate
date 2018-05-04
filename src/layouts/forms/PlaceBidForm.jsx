@@ -6,6 +6,7 @@ import Info from '../ui/Info';
 import {GFD, GlobalState} from '../../functions/GlobalState';
 import * as Strings from '../../const/strings';
 import {Divider, ModalDescription, Input, Popup, Label, Modal, ModalHeader, ModalContent, ModalActions, Button, FormInput, LabelDetail, Icon, Message} from 'semantic-ui-react';
+import PXLBalanceItem from '../ui/PXLBalanceItem';
 
 class PlaceBidForm extends Component {
     constructor(props) {
@@ -110,6 +111,7 @@ class PlaceBidForm extends Component {
                         onChange={(e) => this.setY(e.target.value)}
                     />
                     </div>
+                    <PXLBalanceItem/>
                     <Divider horizontal>PXL Bid</Divider>
                     <Input 
                     fluid

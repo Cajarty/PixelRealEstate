@@ -618,8 +618,4 @@ class PixelDescriptionBox extends Component {
     }
 }
 
-/*
-Addd actions to the grid
-*/
-
 export default PixelDescriptionBox

@@ -10,6 +10,7 @@ import * as Strings from '../../const/strings';
 import { Modal, ModalContent, ModalHeader, Button, Divider, Input, List, Popup, Label, ModalActions, Icon, Segment, Grid, GridColumn, GridRow, ButtonGroup, Message, Loader } from 'semantic-ui-react';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
 import {TUTORIAL_STATE} from '../../functions/GlobalState';
+import PXLBalanceItem from '../ui/PXLBalanceItem';
 
 const PREVIEW_WIDTH = 100;
 const PREVIEW_HEIGHT = 100;
@@ -30,6 +31,7 @@ class SetPixelColorForm extends Component {
             select: {x1: -1, y1: -1, x2: -1, y2: -1, w: 0, h: 0},
             multiRect: false,
             ppt: '0',
+            maxPayout: 15, //change this too
             ctxLrg: null,
             ctxSml: null,
             canvasLrg: null,
@@ -79,8 +81,10 @@ class SetPixelColorForm extends Component {
     }
 
     handlePrice(key, value) {
-        let obj = {};
-        obj[key] = parseInt(value) < 0 ? 0 : parseInt(value);
+        let obj = {maxPayout: 0};
+        obj[key] = isNaN(parseInt(value)) ? '' : Math.max(0, parseInt(value));
+        console.info('take out this math, max of 2, to max of 1 (free) for may 4th 10am, and the comment in state', obj)
+        obj.maxPayout = (Math.max(obj[key] === '' ? 0 : obj[key], 2) + 1) * 5;
         this.setState(obj);
     }
 
@@ -435,6 +439,11 @@ class SetPixelColorForm extends Component {
             >
             <ModalHeader>Update Property Image</ModalHeader>
             <ModalContent>     
+                {this.state.multiRect && 
+                    <Message color='orange'>
+                        Multi-Property uploading is currently experemental. Expect upload delays on larger uploads.
+                    </Message>
+                }
                 <Grid>
                     <GridRow columns={2} stretched>
                         <GridColumn width={7}>
@@ -624,6 +633,9 @@ class SetPixelColorForm extends Component {
                                                         value={this.state.multiRect ? this.state.select.y1 + ' - ' + this.state.select.y2 : this.state.y} 
                                                         onChange={(e) => this.setY(e.target.value)}
                                                     />
+                                                    </GridRow>
+                                                <GridRow>
+                                                    <PXLBalanceItem/>
                                                 </GridRow>
                                                 <GridRow>
                                                     <Input 
@@ -645,6 +657,12 @@ class SetPixelColorForm extends Component {
                                                         />
                                                         <Label>PXL</Label>
                                                     </Input>
+                                                </GridRow>
+                                                <GridRow>
+                                                    {' = ' + Func.NumberWithCommas(this.state.maxPayout) + 'PXL earned maximum per Property'}
+                                                </GridRow>
+                                                <GridRow>
+                                                    {'+25 PXL for initial Property upload'}
                                                 </GridRow>
                                             </GridColumn>
                                         </GridRow>

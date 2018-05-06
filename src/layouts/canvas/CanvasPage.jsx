@@ -34,6 +34,7 @@ import WelcomeSidebar from '../ui/WelcomeSidebar';
 import { FB, FireBase } from '../../const/firebase';
 import GetStarted from '../GetStarted';
 import * as Func from '../../functions/functions';
+import ViewTimelapse from '../forms/ViewTimelapse';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -268,6 +269,8 @@ class CanvasPage extends Component {
                                     checked={this.state.showPopertiesForSale}
                                     onChange={(e, data) => { this.toggleForSaleProperties(e, data) }}
                                 />
+                                <Divider />
+                                <ViewTimelapse/>
                             </div>
                         }
                         <GetStarted

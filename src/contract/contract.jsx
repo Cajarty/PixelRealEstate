@@ -151,23 +151,15 @@ export class Contract {
     blocks = how many blocks to look back
     params = {}. for narrowing serach results
     */
-    getEventLogs(event, params, callback, blocks = 0) {
+    getEventLogs(event, params, callback, startBlock = 0, endBlock = 1) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return;
-
-        if (this.startLoadBlock <= 0) {
-            window.web3.eth.getBlock('latest').then((latestBlock) => {
-                this.startLoadBlock = latestBlock.number;
-                this.getEventLogs(event, params, callback, blocks);
-            });
-            return;
-        }
 
         // VRE DApp Events
         this.VRE.deployed().then((i) => {
             let filter = {
-                fromBlock: this.startLoadBlock - blocks, 
-                toBlock: 'latest',
+                fromBlock: startBlock, 
+                toBlock: endBlock,
                 address: Const.VirtualRealEstate,
             };
 
@@ -600,6 +592,10 @@ export class Contract {
     // ----------------------------------         GETTERS         ----------------------------------------------
     // ---------------------------------------------------------------------------------------------------------
     // ---------------------------------------------------------------------------------------------------------
+    getCurrentBlock(callback, pending = false) {
+        window.web3.eth.getBlock(pending ? 'pending' : 'latest', false, callback);
+    }
+
     getBalance(callback) {
         if (GFD.getData('noMetaMask'))
             return callback(0);

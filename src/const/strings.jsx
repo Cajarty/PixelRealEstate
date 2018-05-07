@@ -19,7 +19,8 @@ export const FORM_SET_TEXT = ["Sets a phrase for all your owned Properties.",
     "Users will see this phrase when inspecting one of your Properties. The maximum length is 64 characters."];
 export const FORM_SET_IMAGE = ["Updates the artwork of this property and earns you PXL.", 
     "If the Property has an owner, the owner will be paid an equal amount of PXL as the user. Spending additional PXL will increase the maximum payout and reserve time of this Property."];
-export const FORM_TRANSFER = ["Transfer this Property to another address.", 
+export const FORM_TRANSFER = ['Send PXL from your address to another address.'];
+export const FORM_TRANSFER_PROPERTY = ["Transfer this Property to another address.", 
     "Make sure the recipient address is correct, or the Property is unclaimable."];
 export const FORM_BID = ["Place a bid offer on this Property.", 
     "Bids cost 1 PXL, but does not offer any PXL to the Property owner. Bids only notify the owner of your potential offer, trades must still be done through the market."];

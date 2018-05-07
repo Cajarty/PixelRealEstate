@@ -119,7 +119,6 @@ class PropertySalesLogTopPXL extends Component {
                         Tx
                     </GridColumn>
                 </GridRow>
-                {console.info(this.state.changeLog)}
                 {this.state.changeLog.map((log) => (
                     <GridRow  className='gridItem' onClick={() => this.setLocation(log.x + 1, log.y + 1) } key={log.transaction} columns={5} textAlign='center'> 
                         <GridColumn verticalAlign='middle' width={1}>{log.x + 1}</GridColumn>

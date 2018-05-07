@@ -12,6 +12,7 @@ import {SDM, ServerDataManager} from '../contract/ServerDataManager';
 // Import our contract artifacts and turn them into usable abstractions.
 import VirtualRealEstate from '../../build/contracts/VirtualRealEstate.json'
 import PXLProperty from '../../build/contracts/PXLProperty.json'
+import StandardToken from '../../build/contracts/StandardToken.json'
 
 
 export const ERROR_TYPE = {
@@ -34,12 +35,14 @@ export class Contract {
         this.account = null;
         this.VRE = contract(VirtualRealEstate);
         this.PXLPP = contract(PXLProperty);
+        this.ST = contract(StandardToken);
 
         this.startLoadBlock = 0;
         this.gasBuffer = 1.1; //extra gas added onto calculation.
 
         this.VREInstance = null;
         this.PXLPPInstance = null;
+        this.STInstance = null;
 
         this.propertyTradeLog = [];
 
@@ -75,6 +78,7 @@ export class Contract {
                 window.web3 = new Web3(window.web3.currentProvider);
                 this.VRE.setProvider(window.web3.currentProvider);
                 this.PXLPP.setProvider(window.web3.currentProvider);
+                this.ST.setProvider(window.web3.currentProvider);
 
 
                 this.updateNetwork((id) => {
@@ -284,6 +288,13 @@ export class Contract {
             return new Promise((res, rej) => {res(this.VREInstance);});
         else
             return this.VRE.deployed();
+    }
+
+    getSTInstance() {
+        if (this.STInstance)
+            return new Promise((res, rej) => {res(this.STInstance);});
+        else
+            return this.ST.deployed();
     }
 
     getPXLPPInstance() {
@@ -514,6 +525,10 @@ export class Contract {
     transferProperty(x, y, newOwner, callback) { 
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return callback(false);
+        if (!this.isAddress(newOwner)) {
+            this.sendResults(LISTENERS.Alert, {result: false, message: "Not a valid address! Aborting."});
+            return callback(false);
+        }
         this.getVREInstance().then((i) => {
             return i.transferProperty.estimateGas(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account}).then((gas) => {
                 return i.transferProperty(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account, gas: Math.ceil(gas * this.gasBuffer)}).then((r) => {
@@ -574,6 +589,29 @@ export class Contract {
         });
     }
 
+    sendPXL(PXL, address, callback) {
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
+            return callback(false);
+        if (!this.isAddress(address)) {
+            this.sendResults(LISTENERS.Alert, {result: false, message: "Not a valid address! Aborting."});
+            return callback(false);
+        }
+        this.getSTInstance().then((i) => {
+            i.transfer(address, PXL, {from: this.account}).then(() => {
+                callback(true);
+                this.sendResults(LISTENERS.Alert, {result: true, message: PXL + " PXL sent to address " + address + "."});
+            }).catch((e) => {
+                if (!e.toString().includes("wasn't processed in")) {
+                    callback(false);
+                    this.sendResults(LISTENERS.Alert, {result: false, message: "Error sending PXL to " + address + "."});
+                } else {
+                    console.info('Timed out.')
+                }
+                callback(true);
+            });
+        });
+    }
+
     // ---------------------------------------------------------------------------------------------------------
     // ---------------------------------------------------------------------------------------------------------
     // ----------------------------------         SETTERS         ----------------------------------------------
@@ -594,6 +632,10 @@ export class Contract {
     // ---------------------------------------------------------------------------------------------------------
     getCurrentBlock(callback, pending = false) {
         window.web3.eth.getBlock(pending ? 'pending' : 'latest', false, callback);
+    }
+
+    isAddress(address) {
+        return window.web3.utils.isAddress(address);
     }
 
     getBalance(callback) {

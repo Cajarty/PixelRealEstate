@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import * as Assets from '../../const/assets';
 import {Contract, ctr} from '../../contract/contract.jsx';
-import { Item, ItemGroup, ItemImage , ItemContent, Button} from 'semantic-ui-react';
+import { Item, ItemGroup, ItemImage , ItemContent, Button, ButtonGroup} from 'semantic-ui-react';
 import * as Func from '../../functions/functions.jsx';
 import {GFD, GlobalState, TUTORIAL_STATE} from '../../functions/GlobalState';
+import SendPXL from '../forms/SendPXL';
 
 class PXLBalanceItem extends Component {
     constructor(props) {
@@ -38,7 +39,17 @@ class PXLBalanceItem extends Component {
             <Item className='pixelsOwnedItem'>
                 <ItemImage size='mini' src={this.state.loadingPPC ? Assets.LOADING : Assets.TOKEN} />
                 <ItemContent verticalAlign='middle'>{Func.NumberWithCommas(this.state.PPCOwned)} </ItemContent>
-                <Item.Extra><Button compact className='buttonRefreshBalance' icon='refresh' floated='right' onClick={() => this.updateBalance()}/></Item.Extra>
+                <Item.Extra style={{margin: 0}}>
+                    <Button.Group floated='right' className='buttonRefreshBalance'>
+                        {this.props.showSend && 
+                            <SendPXL/>
+                        }
+                        <Button 
+                            icon='refresh' 
+                            onClick={() => this.updateBalance()}
+                        ></Button>
+                    </Button.Group>
+                </Item.Extra>
             </Item>
         </ItemGroup>
         );

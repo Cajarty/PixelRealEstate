@@ -35,6 +35,7 @@ import { FB, FireBase } from '../../const/firebase';
 import GetStarted from '../GetStarted';
 import * as Func from '../../functions/functions';
 import ViewTimelapse from '../forms/ViewTimelapse';
+import PXLBalanceItem from '../ui/PXLBalanceItem';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -73,20 +74,12 @@ class CanvasPage extends Component {
             }
         });
 
-        ctr.getBalance((balance) => {
-            GFD.setData('balance', balance);
-            this.setState({ PPCOwned: balance, loadingPPC: false });
-        });
-
         ctr.watchEventLogs(EVENTS.Transfer, {}, (handle) => {
             let eventHandleTransfer = handle;
             this.setState({ eventHandleTransfer });
             eventHandleTransfer.watch((error, log) => {
                 if (log.args._from === ctr.account || log.args._to === ctr.account) {
-                    this.setState({ loadingPPC: true });
-                    ctr.getBalance((balance) => {
-                        this.setState({ PPCOwned: balance, loadingPPC: false });
-                    });
+                    this.updateBalance();
                 }
             });
         });
@@ -94,20 +87,14 @@ class CanvasPage extends Component {
         ctr.listenForEvent(EVENTS.AccountChange, 'CanvasPagePPCListener', (data) => {
             FB.signIn();
             ctr.updateNetwork();
-            this.setState({ loadingPPC: true });
-            ctr.getBalance((balance) => {
-                this.setState({ PPCOwned: balance, loadingPPC: false });
-            });
+            this.updateBalance();
         });
 
         ctr.watchEventLogs(EVENTS.PropertyBought, { newOwner: ctr.account }, (handle) => {
             let eventHandleBought = handle;
             this.setState({ eventHandleBought });
             eventHandleBought.watch((error, log) => {
-                this.setState({ loadingPPC: true });
-                ctr.getBalance((balance) => {
-                    this.setState({ PPCOwned: balance, loadingPPC: false });
-                });
+                this.updateBalance();
             });
         });
 
@@ -115,14 +102,12 @@ class CanvasPage extends Component {
             let eventHandleUpdate = handle;
             this.setState({ eventHandleUpdate });
             eventHandleUpdate.watch((error, log) => {
-                this.setState({ loadingPPC: true });
-                ctr.getBalance((balance) => {
-                    this.setState({ PPCOwned: balance, loadingPPC: false });
-                });
+                this.updateBalance();
             });
         });
         GFD.listen('advancedMode', 'CanvasPage', (advancedMode) => {
-            this.setState({ advancedMode })
+            this.setState({ advancedMode });
+            this.updateBalance();
         });
         this.updateScreen();
         window.onresize = (ev) => this.updateScreen;
@@ -214,25 +199,13 @@ class CanvasPage extends Component {
         return (
             <div>
                 <SegmentGroup horizontal className='mainSegmentGroup'>
-                    <Segment className='left'>
+                    <Segment className='leftContainer'>
                         <div id='logo' className='logo'>
                             <img src={Assets.LOGO_BETA} />
                         </div>
                         <Divider />
                         <ZoomCanvas />
                         <Divider />
-                        {this.state.advancedMode &&
-                            <div>
-                                <ItemGroup>
-                                    <Item className='pixelsOwnedItem'>
-                                        <ItemImage size='mini' src={this.state.loadingPPC ? Assets.LOADING : Assets.TOKEN} />
-                                        <ItemContent verticalAlign='middle'>{Func.NumberWithCommas(this.state.PPCOwned)} </ItemContent>
-                                        <Item.Extra><Button compact className='buttonRefreshBalance' icon='refresh' floated='right' onClick={() => this.updateBalance()} /></Item.Extra>
-                                    </Item>
-                                </ItemGroup>
-                                <Divider />
-                            </div>
-                        }
                         <Button onClick={() => this.visitPortfolio()} fluid>Visit PixelProperty.io</Button>
                         <a
                             href='https://pixelproperty.io/'
@@ -256,12 +229,19 @@ class CanvasPage extends Component {
                         {this.state.advancedMode &&
                             <div>
                                 <Grid columns='2' divided>
-                                    <GridColumn stretched>
-                                        <SetHoverText />
-                                    </GridColumn>
-                                    <GridColumn stretched>
-                                        <SetLink />
-                                    </GridColumn>
+                                    <GridRow>
+                                        <GridColumn width={16}>
+                                            <PXLBalanceItem showSend/>
+                                        </GridColumn>
+                                    </GridRow>
+                                    <GridRow>
+                                        <GridColumn stretched width={8}>
+                                            <SetHoverText />
+                                        </GridColumn>
+                                        <GridColumn stretched width={8}>
+                                            <SetLink />
+                                        </GridColumn>
+                                    </GridRow>
                                 </Grid>
                                 <Divider />
                                 <Checkbox
@@ -278,12 +258,12 @@ class CanvasPage extends Component {
                             changeMode={() => { this.changeMode() }}
                         />
                     </Segment>
-                    <Segment id='step1' className={'center' + TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 1)}>
+                    <Segment id='step1' className={'centerContainer ' + TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 1)}>
                         <HoverLabel showPrices={this.state.showPopertiesForSale} />
                         {this.state.tutorialState.index == 0 && <ClickLoader />}
                         <Canvas />
                     </Segment>
-                    <Segment id={(this.state.tutorialState.index == 3 ? 'hiddenForward' : '')} className={'right' + TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 2) + (this.state.tutorialState.index == 3 ? ' hiddenForward' : '')}>
+                    <Segment id={(this.state.tutorialState.index == 3 ? 'hiddenForward' : '')} className={'rightContainer ' + TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 2) + (this.state.tutorialState.index == 3 ? ' hiddenForward' : '')}>
                         {this.state.advancedMode ?
                             <PixelDescriptionBox />
                             :

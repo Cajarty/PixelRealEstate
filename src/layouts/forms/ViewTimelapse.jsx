@@ -28,7 +28,7 @@ class ViewTimelapse extends Component {
             y1: 1,
             y2: 100,
             gifLoading: 0, //0 to 1 of gifLoaded
-            gif: null, //the gif
+            GIF: null, //the gif
             gifCanvasCtx: null, //the ctx of the canvas used to make the gif
         };
     }
@@ -55,7 +55,11 @@ class ViewTimelapse extends Component {
         ctx.canvas.height = h * 10;
         ctx.imageSmoothingEnabled = false;
         ctx.webkitImageSmoothingEnabled = false;
-        this.setState({ gifCanvasCtx: ctx });
+        this.setState({ 
+            gifCanvasCtx: ctx,
+            GIF: null,
+            gifLoading: 0,
+         });
 
         let GIF = new GIFEncoder(w * 10, h * 10);
         GIF.setDelay(this.state.frameDelay);
@@ -68,7 +72,7 @@ class ViewTimelapse extends Component {
                 let id = ctr.fromID(Func.BigNumberToNumber(preLogs[i].args.property));
                 if (id.x < x1 || id.y < y1 || id.x > x2 - 1 || id.y > y2 - 1)
                     continue;
-                this.addFrame(ctx, id.x - (x1 - 1), id.y - (y1 - 1), Func.ContractDataToRGBAArray(preLogs[i].args.colors));
+                this.addCanvasFrame(ctx, id.x - (x1 - 1), id.y - (y1 - 1), Func.ContractDataToRGBAArray(preLogs[i].args.colors));
             }
 
 
@@ -77,26 +81,39 @@ class ViewTimelapse extends Component {
                 if (logsLength < 1)
                     return;
                 GIF.start();
-                for (let i = 0; i < logsLength; i++) {
-                    let id = ctr.fromID(Func.BigNumberToNumber(logs[i].args.property));
-                    this.setState({gifLoading: (i + 1) / logsLength});
-                    if (id.x > x2 - 1 || id.y > y2 - 1)
-                        continue;
-                    this.addFrame(ctx, id.x - (x1 - 1), id.y - (y1 - 1), Func.ContractDataToRGBAArray(logs[i].args.colors));
-                    GIF.addFrame(ctx);
+
+                let i = 0;
+                let loadFrame = (resolve, reject) => {
+                    setTimeout(() => {
+                        if (i >= logsLength)
+                            return resolve({promise: null});
+                        let id = ctr.fromID(Func.BigNumberToNumber(logs[i].args.property));
+                        if (id.x > x2 - 1 || id.y > y2 - 1)
+                            return resolve({promise: new Promise(loadFrame)});
+                        this.addCanvasFrame(ctx, id.x - (x1 - 1), id.y - (y1 - 1), Func.ContractDataToRGBAArray(logs[i].args.colors));
+                        GIF.addFrame(ctx);
+                        return resolve({promise: new Promise(loadFrame)});
+                    }, 20);
                 }
-
-                GIF.finish();
-
-                save(GIF.out.getData(), 'timelapse.gif', (err, data) => {
-                    if (err) throw err;
-                })
+        
+                let handleResults = (results) => {
+                    i++;
+                    this.setState({gifLoading: i / logsLength});
+                    if (results.promise != null)
+                        results.promise.then(handleResults);
+                    else {
+                        GIF.finish();
+                        this.setState({GIF});
+                    }
+                };
+        
+                new Promise(loadFrame).then(handleResults);
 
             }, this.state.blockFrom, this.state.blockTo);
         }, this.state.startBlock, this.state.blockFrom - 1);
     }
 
-    addFrame(ctx, x, y, rgbArr) {
+    addCanvasFrame(ctx, x, y, rgbArr) {
         let ctxID = ctx.createImageData(10, 10);
         for (let i = 0; i < rgbArr.length; i++) {
             ctxID.data[i] = rgbArr[i];
@@ -105,7 +122,11 @@ class ViewTimelapse extends Component {
     }
 
     downloadGIF() {
-
+        if (this.state.gifLoading < 1 || this.state.GIF == null)
+            return;
+        save(this.state.GIF.out.getData(), 'timelapse.gif', (err, data) => {
+            if (err) throw err;
+        })
     }
 
     setSingleState(key, value, min = 0, max = 2147483647) {
@@ -117,12 +138,11 @@ class ViewTimelapse extends Component {
     render() {
         const blocks = this.state.blockTo - this.state.blockFrom;
         const load = this.state.gifLoading;
+        console.info(load)
         return (
             <Modal size='small' 
-                open={this.state.isOpen} 
                 closeIcon 
                 trigger={<Button fluid>View Timelapse</Button>}
-                onClose={() => this.toggleModal(false)}
             >
             <ModalHeader>View Timelapse</ModalHeader>
             <ModalContent>
@@ -136,12 +156,12 @@ class ViewTimelapse extends Component {
                         <GridColumn width={8}>
                             <div className='gif text'>
                                 {load <= 0 && 'Click "Build GIF" to create a timelapse.'}
-                                {load > 0 && load < 100 && 'GIF is building... (' + Math.round(load * 100) + '%)'}
+                                {load > 0 && load < 1 && 'GIF is building... (' + Math.round(load * 100) + '%)'}
                             </div>
-                            <Image className='gif image' size='large' src={this.state.gifLoading >= 1 ? this.state.gif : Assets.PLACEHOLDER_GIF}/>
+                            <Image className='gif image' as='img' size='large' src={this.state.gifLoading >= 1 && this.state.GIF != null ? this.state.GIF.out.getData() : Assets.PLACEHOLDER_GIF}/>
                         </GridColumn>
                         <GridColumn className='gif' width={8}>
-                        <Grid stretched compact>
+                        <Grid stretched>
                             <GridRow>
                                 <GridColumn width={16}>
                                     <Input
@@ -268,7 +288,7 @@ class ViewTimelapse extends Component {
                                 </GridColumn>
                                 <GridColumn width={8}>
                                     <Button 
-                                        disabled={this.state.gifLoading != 1}
+                                        disabled={this.state.GIF == null}
                                         onClick={() => this.downloadGIF()}
                                     >Download GIF</Button>
                                 </GridColumn>
@@ -278,9 +298,6 @@ class ViewTimelapse extends Component {
                     </GridRow>
                 </Grid>
             </ModalContent>
-            <ModalActions>
-                <Button onClick={() => this.toggleModal(false)}>Close</Button>
-            </ModalActions>
         </Modal>
         );
     }

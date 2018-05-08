@@ -29,6 +29,13 @@ export const TUTORIAL_START_DIALOG = ["Pixel Property is easy to use. Just in ca
 
 export const CHANGELOG = [
     {
+        date: new Date('2018-5-7'),
+        title: 'Send PXL & GIF Generator',
+        messages: 
+        ['Send PXL to another Ethereum address easily.',
+        'Anyone can now generate a GIF of PixelProperty in any location over any timespan!'],
+    },
+    {
         date: new Date('2018-5-3'),
         title: 'Beta Updates #1',
         messages: 

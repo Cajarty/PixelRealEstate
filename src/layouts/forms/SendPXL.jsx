@@ -86,7 +86,7 @@ class SendPXL extends Component {
                     {( !ctr.isAddress(this.state.address)
                     || this.state.PXL > this.state.PXLOwned) && 
                     <Message error>
-                        {!ctr.isAddress(this.state.address) && 'This is not a valid Ethereum address.'}
+                        {!ctr.isAddress(this.state.address) && 'Please enter a valid Ethereum address.'}
                         
                         {this.state.PXL > this.state.PXLOwned && <p><br/>You do not have enough PXL!</p>}
                     </Message>}

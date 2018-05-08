@@ -473,7 +473,8 @@ div.hoverLabel.ui {
 }
 
 .message {
-    .changeLogList {
+    .changeLogList,
+    &.message {
         overflow-y: auto;
         background: linear-gradient(to bottom right, lighten($color3, 10%), darken($color3, 5%)) !important;
     }

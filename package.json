@@ -54,6 +54,7 @@
         "big-integer": "^1.6.27",
         "bignumber.js": "^5.0.0",
         "browser-detect": "^0.2.27",
+        "ccapture.js": "github:aceslowman/ccapture.js#npm-fix",
         "eth-sig-util": "^1.4.2",
         "firebase": "^4.12.1",
         "gifencoder": "^1.1.0",
@@ -87,7 +88,8 @@
         "semantic-ui-react": "^0.78.3",
         "utf8": "^3.0.0",
         "web3": "^1.0.0-beta.33",
-        "web3-requestmanager": "^1.0.0-beta.14"
+        "web3-requestmanager": "^1.0.0-beta.14",
+        "webp-converter": "^2.1.6"
     },
     "scripts": {
         "start": "node scripts/start.js",

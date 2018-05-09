@@ -29,6 +29,12 @@ export const TUTORIAL_START_DIALOG = ["Pixel Property is easy to use. Just in ca
 
 export const CHANGELOG = [
     {
+        date: new Date('2018-5-8'),
+        title: 'Bugfixes',
+        messages: 
+        ['Hotfix for users who do not have MetaMask sometimes freezing.'],
+    },
+    {
         date: new Date('2018-5-7'),
         title: 'Send PXL & GIF Generator',
         messages: 

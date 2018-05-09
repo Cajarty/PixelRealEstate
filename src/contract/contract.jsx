@@ -635,6 +635,8 @@ export class Contract {
     }
 
     isAddress(address) {
+        if (GFD.getData('ServerDataManagerInit') < 2)
+            return false;
         return window.web3.utils.isAddress(address);
     }
 

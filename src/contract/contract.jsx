@@ -393,20 +393,27 @@ export class Contract {
             if (eth == 0)
                 return i.buyPropertyInPXL.estimateGas(this.toID(x, y), ppc, {from: this.account }).then((gas) => {
                     return i.buyPropertyInPXL(this.toID(x, y), ppc, {from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
+                }).catch((e) => {
+                    console.info(e);
                 })
             else if (ppc == 0)
-                return i.buyPropertyInETH.estimateGas(this.toID(x, y), { value: eth, from: this.account}).then((gas) => {
-                    return i.buyPropertyInETH(this.toID(x, y), { value: eth, from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
+                return i.buyPropertyInETH.estimateGas(this.toID(x, y), { value: eth + 10, from: this.account}).then((gas) => {
+                    return i.buyPropertyInETH(this.toID(x, y), { value: eth + 10, from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
+                }).catch((e) => {
+                    console.info(e);
                 })
             else 
-                return i.buyProperty.estimateGas(this.toID(x, y), ppc, {value: eth, from: this.account}).then((gas) => {
-                    return i.buyProperty(this.toID(x, y), ppc, {value: eth, from: this.account, gas: Math.ceil(gas * this.gasBuffer)});
+                return i.buyProperty.estimateGas(this.toID(x, y), ppc, {value: eth + 10, from: this.account}).then((gas) => {
+                    return i.buyProperty(this.toID(x, y), ppc, {value: eth + 10, from: this.account, gas: Math.ceil(gas * this.gasBuffer)});
+                }).catch((e) => {
+                    console.info(e);
                 })
         }).then(() => {
             callback(true);
             this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " purchase complete."});
         }).catch((e) => {
             if (!e.toString().includes("wasn't processed in")) {
+                console.info(e);
                 callback(false);
                 this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to purchase property " + (x + 1) + "x" + (y + 1) + "."});
             } else {
@@ -668,7 +675,7 @@ export class Contract {
     getForSalePrices(x, y, callback) {
         if (GFD.getData('noMetaMask'))
             return callback(false);
-    this.getVREInstance().then((i) => {
+        this.getVREInstance().then((i) => {
             return i.getForSalePrices.call(this.toID(x, y)).then((r) => {
                 return callback(r);
             });

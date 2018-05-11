@@ -395,18 +395,24 @@ export class Contract {
                     return i.buyPropertyInPXL(this.toID(x, y), ppc, {from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
                 }).catch((e) => {
                     console.info(e);
+                    callback(false);
+                    return;
                 })
             else if (ppc == 0)
                 return i.buyPropertyInETH.estimateGas(this.toID(x, y), { value: eth + 10, from: this.account}).then((gas) => {
                     return i.buyPropertyInETH(this.toID(x, y), { value: eth + 10, from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
                 }).catch((e) => {
                     console.info(e);
+                    callback(false);
+                    return;
                 })
             else 
                 return i.buyProperty.estimateGas(this.toID(x, y), ppc, {value: eth + 10, from: this.account}).then((gas) => {
                     return i.buyProperty(this.toID(x, y), ppc, {value: eth + 10, from: this.account, gas: Math.ceil(gas * this.gasBuffer)});
                 }).catch((e) => {
                     console.info(e);
+                    callback(false);
+                    return;
                 })
         }).then(() => {
             callback(true);

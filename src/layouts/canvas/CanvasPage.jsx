@@ -117,6 +117,75 @@ class CanvasPage extends Component {
         }
     }
 
+    getLogs() {
+        console.info('getting logs')
+        let allPayees = {};
+        ctr.getEventLogs(EVENTS.PropertyColorUpdate, {}, (error, logs) => {
+            let i = 0;
+            let recall = () => {
+                console.info('log', i, ' of ', logs.length)
+                if (++i < logs.length)
+                    this.getLogs2(allPayees, logs[i]).then(recall);
+                else
+                    this.getLogs3(allPayees)
+            }
+            this.getLogs2(allPayees, logs[i]).then(recall);
+        },0, 10000000);
+    }
+
+    getLogs2(allPayees, log) {
+        return new Promise((res, rej) => {
+            let payee = log.args.lastUpdaterPayee;
+            ctr.getBalanceOf(payee, (bal) => {
+                allPayees[payee] = {
+                    balance: bal, 
+                    owned: [],
+                };
+            })
+            res();
+        })
+    }
+
+    getLogs3(allPayees) {
+        let y = 0;
+
+        console.info('getting props')
+
+        let recall = () => {
+            y++;
+            console.info('Properties (y): ', y)
+            if (y >= 99)
+                console.info(allPayees);
+            else
+                getProp().then(recall);
+        }
+
+        let getProp = () => {
+            return new Promise((res, rej) => {
+                let count = 0;
+                for (let x = 0; x < 100; x++) {
+                    ctr.getPropertyData(x, y, (data) => {
+                        let owner = data[0];
+                        if (owner !== '0x0000000000000000000000000000000000000000') {
+                            let lastUpdate = Func.BigNumberToNumber(data[3]);
+                            let reserved = Func.BigNumberToNumber(data[5]);
+                            let maxEarnings = ((reserved - lastUpdate) / 30) * 5;
+                            let earnings = Func.calculateEarnings(lastUpdate, maxEarnings);
+                            if (allPayees[owner] == null)
+                                allPayees[owner] = {balance: 0, owned: []};
+                                allPayees[owner].owned.push({x, y});
+                        }
+                        count++;
+                        if (count >= 100)
+                            res();
+                    });
+                }
+            });
+        }
+
+        getProp().then(recall);
+    }
+
     updateScreen() {
         let width = document.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
         GFD.setData('screenWidth', width);

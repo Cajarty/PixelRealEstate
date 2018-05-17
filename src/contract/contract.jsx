@@ -666,6 +666,19 @@ export class Contract {
         });
     }
 
+    getBalanceOf(address, callback) {
+        if (GFD.getData('noMetaMask'))
+            return callback(0);
+        this.getPXLPPInstance().then((i) => {
+            i.balanceOf(address, { from: this.account }).then((r) => {
+                callback(Func.BigNumberToNumber(r));
+            });
+        }).catch((e) => {
+            console.info(e);
+            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to retrieve PPC balance."});
+        });
+    }
+
     getSystemSalePrices(callback) {
         if (GFD.getData('noMetaMask'))
             return callback(null);

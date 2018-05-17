@@ -473,9 +473,10 @@ div.hoverLabel.ui {
 }
 
 .message {
-    background: linear-gradient(to bottom right, lighten($color3, 10%), darken($color3, 5%)) !important;
-    .changeLogList {
+    .changeLogList,
+    &.message {
         overflow-y: auto;
+        background: linear-gradient(to bottom right, lighten($color3, 10%), darken($color3, 5%)) !important;
     }
 }
 
@@ -502,7 +503,28 @@ For transaction pending labels to notify the user on the status of their transac
     @include animation(fadein, .8s);
 }
 
-.ui.button.icon.buttonRefreshBalance {
-    width: 32px !important;
-    margin: auto 6px !important;
+.ui.buttons.buttonRefreshBalance {
+    margin-top: 2px !important;
+}
+
+.gif {
+    &.text {
+        text-align: center;
+        margin: auto;
+        vertical-align: middle;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-left: -50%;
+        margin-top: -50%;
+        width: 100%;
+        height: 100%;
+        z-index: 21000;
+    }
+    &.image {
+        width: 100%;
+        height: auto;
+        margin: auto;
+    }
+    .ui.input {}
 }

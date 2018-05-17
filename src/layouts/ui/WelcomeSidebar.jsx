@@ -76,7 +76,6 @@ class WelcomeSidebar extends Component {
                     {null && <Message color='orange'>
                         We are currently experiencing a slow network; PixelProperty.io may have missing information until then.
                     </Message>}
-                    {console.info(this.state.browser)}
                     {(this.state.browser.name !== 'chrome') &&
                         <Message color='red'>
                             It is recommended to use Chrome while PixelProperty is in Beta. We apologize for the inconvenience.

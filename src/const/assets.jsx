@@ -20,6 +20,7 @@ export const LOGO_BETA = BASE_PATH + 'icons/PixelProperty_beta.svg';
 export const METAMASK_DOWNLOAD = BASE_PATH + 'img/download-metamask.png';
 export const RINKEBY_NETWORK = BASE_PATH + 'img/rinkebyNetwork.png';
 export const MAIN_NETWORK = BASE_PATH + 'img/mainNetwork.png';
+export const PLACEHOLDER_GIF = BASE_PATH + 'img/placeholder_gif.svg';
 
 
 export const CANVAS_IMAGE = '/assets/canvas/canvas.png';

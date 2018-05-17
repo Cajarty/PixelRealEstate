@@ -12,6 +12,7 @@ import {SDM, ServerDataManager} from '../contract/ServerDataManager';
 // Import our contract artifacts and turn them into usable abstractions.
 import VirtualRealEstate from '../../build/contracts/VirtualRealEstate.json'
 import PXLProperty from '../../build/contracts/PXLProperty.json'
+import StandardToken from '../../build/contracts/StandardToken.json'
 
 
 export const ERROR_TYPE = {
@@ -34,12 +35,14 @@ export class Contract {
         this.account = null;
         this.VRE = contract(VirtualRealEstate);
         this.PXLPP = contract(PXLProperty);
+        this.ST = contract(StandardToken);
 
         this.startLoadBlock = 0;
         this.gasBuffer = 1.1; //extra gas added onto calculation.
 
         this.VREInstance = null;
         this.PXLPPInstance = null;
+        this.STInstance = null;
 
         this.propertyTradeLog = [];
 
@@ -75,6 +78,7 @@ export class Contract {
                 window.web3 = new Web3(window.web3.currentProvider);
                 this.VRE.setProvider(window.web3.currentProvider);
                 this.PXLPP.setProvider(window.web3.currentProvider);
+                this.ST.setProvider(window.web3.currentProvider);
 
 
                 this.updateNetwork((id) => {
@@ -151,23 +155,15 @@ export class Contract {
     blocks = how many blocks to look back
     params = {}. for narrowing serach results
     */
-    getEventLogs(event, params, callback, blocks = 0) {
+    getEventLogs(event, params, callback, startBlock = 0, endBlock = 1) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return;
-
-        if (this.startLoadBlock <= 0) {
-            window.web3.eth.getBlock('latest').then((latestBlock) => {
-                this.startLoadBlock = latestBlock.number;
-                this.getEventLogs(event, params, callback, blocks);
-            });
-            return;
-        }
 
         // VRE DApp Events
         this.VRE.deployed().then((i) => {
             let filter = {
-                fromBlock: this.startLoadBlock - blocks, 
-                toBlock: 'latest',
+                fromBlock: startBlock, 
+                toBlock: endBlock,
                 address: Const.VirtualRealEstate,
             };
 
@@ -294,6 +290,13 @@ export class Contract {
             return this.VRE.deployed();
     }
 
+    getSTInstance() {
+        if (this.STInstance)
+            return new Promise((res, rej) => {res(this.STInstance);});
+        else
+            return this.ST.deployed();
+    }
+
     getPXLPPInstance() {
         if (this.PXLPPInstance)
             return new Promise((res, rej) => {res(this.PXLPPInstance);});
@@ -390,20 +393,33 @@ export class Contract {
             if (eth == 0)
                 return i.buyPropertyInPXL.estimateGas(this.toID(x, y), ppc, {from: this.account }).then((gas) => {
                     return i.buyPropertyInPXL(this.toID(x, y), ppc, {from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
+                }).catch((e) => {
+                    console.info(e);
+                    callback(false);
+                    return;
                 })
             else if (ppc == 0)
-                return i.buyPropertyInETH.estimateGas(this.toID(x, y), { value: eth, from: this.account}).then((gas) => {
-                    return i.buyPropertyInETH(this.toID(x, y), { value: eth, from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
+                return i.buyPropertyInETH.estimateGas(this.toID(x, y), { value: eth + 10, from: this.account}).then((gas) => {
+                    return i.buyPropertyInETH(this.toID(x, y), { value: eth + 10, from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
+                }).catch((e) => {
+                    console.info(e);
+                    callback(false);
+                    return;
                 })
             else 
-                return i.buyProperty.estimateGas(this.toID(x, y), ppc, {value: eth, from: this.account}).then((gas) => {
-                    return i.buyProperty(this.toID(x, y), ppc, {value: eth, from: this.account, gas: Math.ceil(gas * this.gasBuffer)});
+                return i.buyProperty.estimateGas(this.toID(x, y), ppc, {value: eth + 10, from: this.account}).then((gas) => {
+                    return i.buyProperty(this.toID(x, y), ppc, {value: eth + 10, from: this.account, gas: Math.ceil(gas * this.gasBuffer)});
+                }).catch((e) => {
+                    console.info(e);
+                    callback(false);
+                    return;
                 })
         }).then(() => {
             callback(true);
             this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " purchase complete."});
         }).catch((e) => {
             if (!e.toString().includes("wasn't processed in")) {
+                console.info(e);
                 callback(false);
                 this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to purchase property " + (x + 1) + "x" + (y + 1) + "."});
             } else {
@@ -522,6 +538,10 @@ export class Contract {
     transferProperty(x, y, newOwner, callback) { 
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return callback(false);
+        if (!this.isAddress(newOwner)) {
+            this.sendResults(LISTENERS.Alert, {result: false, message: "Not a valid address! Aborting."});
+            return callback(false);
+        }
         this.getVREInstance().then((i) => {
             return i.transferProperty.estimateGas(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account}).then((gas) => {
                 return i.transferProperty(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account, gas: Math.ceil(gas * this.gasBuffer)}).then((r) => {
@@ -582,6 +602,29 @@ export class Contract {
         });
     }
 
+    sendPXL(PXL, address, callback) {
+        if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
+            return callback(false);
+        if (!this.isAddress(address)) {
+            this.sendResults(LISTENERS.Alert, {result: false, message: "Not a valid address! Aborting."});
+            return callback(false);
+        }
+        this.getSTInstance().then((i) => {
+            i.transfer(address, PXL, {from: this.account}).then(() => {
+                callback(true);
+                this.sendResults(LISTENERS.Alert, {result: true, message: PXL + " PXL sent to address " + address + "."});
+            }).catch((e) => {
+                if (!e.toString().includes("wasn't processed in")) {
+                    callback(false);
+                    this.sendResults(LISTENERS.Alert, {result: false, message: "Error sending PXL to " + address + "."});
+                } else {
+                    console.info('Timed out.')
+                }
+                callback(true);
+            });
+        });
+    }
+
     // ---------------------------------------------------------------------------------------------------------
     // ---------------------------------------------------------------------------------------------------------
     // ----------------------------------         SETTERS         ----------------------------------------------
@@ -600,6 +643,16 @@ export class Contract {
     // ----------------------------------         GETTERS         ----------------------------------------------
     // ---------------------------------------------------------------------------------------------------------
     // ---------------------------------------------------------------------------------------------------------
+    getCurrentBlock(callback, pending = false) {
+        window.web3.eth.getBlock(pending ? 'pending' : 'latest', false, callback);
+    }
+
+    isAddress(address) {
+        if (GFD.getData('ServerDataManagerInit') < 2)
+            return false;
+        return window.web3.utils.isAddress(address);
+    }
+
     getBalance(callback) {
         if (GFD.getData('noMetaMask'))
             return callback(0);
@@ -628,7 +681,7 @@ export class Contract {
     getForSalePrices(x, y, callback) {
         if (GFD.getData('noMetaMask'))
             return callback(false);
-    this.getVREInstance().then((i) => {
+        this.getVREInstance().then((i) => {
             return i.getForSalePrices.call(this.toID(x, y)).then((r) => {
                 return callback(r);
             });

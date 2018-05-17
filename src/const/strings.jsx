@@ -30,6 +30,13 @@ export const TUTORIAL_START_DIALOG = ["Pixel Property is easy to use. Just in ca
 export const CHANGELOG = [
     {
         date: new Date('2018-5-8'),
+        title: 'PXL Token Update',
+        messages: 
+        ['Token contract updates to be compliant with other Ethereum services.',
+        'IMPORTANT! Old artwork on the canvas previous to this update will not trigger PXL payouts until the art is changed.'],
+    },
+    {
+        date: new Date('2018-5-8'),
         title: 'Bugfixes',
         messages: 
         ['Hotfix for users who do not have MetaMask sometimes freezing.'],

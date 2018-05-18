@@ -155,6 +155,25 @@ class Canvas extends Component {
                 return;
             this.updateSelectRect(select.x1 - 1, select.y1 - 1, select.x2 - 1, select.y2 - 1);
         });
+
+        GFD.listen('x', 'canvasBox', (x) => {
+            let select = GFD.state.select;
+            let y = GFD.getData('y');
+            select.x1 = x;
+            select.y1 = y;
+            select.x2 = x;
+            select.y2 = y;
+            GFD.setData('select', select);
+        });
+        GFD.listen('y', 'canvasBox', (y) => {
+            let select = GFD.state.select;
+            let x = GFD.getData('x');
+            select.x1 = x;
+            select.y1 = y;
+            select.x2 = x;
+            select.y2 = y;
+            GFD.setData('select', select);
+        });
     }
 
     setup() {

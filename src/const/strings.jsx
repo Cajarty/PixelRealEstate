@@ -29,7 +29,7 @@ export const TUTORIAL_START_DIALOG = ["Pixel Property is easy to use. Just in ca
 
 export const CHANGELOG = [
     {
-        date: new Date('2018-5-8'),
+        date: new Date('2018-5-16'),
         title: 'PXL Token Update',
         messages: 
         ['Token contract updates to be compliant with other MyEtherDelta and other Ethereum services.',

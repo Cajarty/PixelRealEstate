@@ -32,8 +32,8 @@ export const CHANGELOG = [
         date: new Date('2018-5-8'),
         title: 'PXL Token Update',
         messages: 
-        ['Token contract updates to be compliant with other Ethereum services.',
-        'IMPORTANT! Old artwork on the canvas previous to this update will not trigger PXL payouts until the art is changed.'],
+        ['Token contract updates to be compliant with other MyEtherDelta and other Ethereum services.',
+        <div style={{display: 'inline'}}><span style={{color: 'red'}}>IMPORTANT! </span>Old artwork on the canvas previous to this update will not trigger PXL payouts until the art is changed.</div>],
     },
     {
         date: new Date('2018-5-8'),
@@ -90,7 +90,7 @@ export const CHANGELOG = [
         messages: 
         ['Live on the Rinkeby test network!', 
         'Change your MetaMask network from "Main" to "Rinkeby" to begin testing.', 
-        <p>You'll need funds from the Rinkeby faucet at: <a href="https://www.rinkeby.io/#faucet" target='_blank'>Rinkeby.io</a></p>],
+        <p style={{display: 'inline'}}>You'll need funds from the Rinkeby faucet at: <a href="https://www.rinkeby.io/#faucet" target='_blank'>Rinkeby.io</a></p>],
     }
 ];
 

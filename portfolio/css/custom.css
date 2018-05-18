@@ -121,6 +121,9 @@ strong {
 .white {
     color: white;
 }
+#wrapper-canvas img:hover {
+    opacity: .8;
+}
 
 /*****************
     2. title page

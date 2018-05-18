@@ -22,7 +22,7 @@ import Info from '../ui/Info';
 import {
     Segment, SegmentGroup, Button, Divider, Label,
     LabelDetail, Input, Icon, Item, ItemContent, ItemImage,
-    ItemGroup, Tab, Header, Grid, Sidebar, MenuItem, TabPane, Menu, Checkbox, Popup, Modal, ModalContent, ModalHeader, GridRow, GridColumn
+    ItemGroup, Tab, Header, Grid, Sidebar, MenuItem, TabPane, Menu, Checkbox, Popup, Modal, ModalContent, ModalHeader, GridRow, GridColumn, ButtonGroup
 } from 'semantic-ui-react';
 import SetHoverText from '../forms/SetHoverText';
 import SetLink from '../forms/SetLink';
@@ -204,6 +204,10 @@ class CanvasPage extends Component {
         this.portfolioLink.click();
     }
 
+    visitTelegram() {
+        this.telegramLink.click();
+    }
+
     changeMode(newMode = !this.state.advancedMode) {
         if (newMode)
             ctr.getAccounts();
@@ -275,13 +279,28 @@ class CanvasPage extends Component {
                         <Divider />
                         <ZoomCanvas />
                         <Divider />
-                        <Button onClick={() => this.visitPortfolio()} fluid>Visit PixelProperty.io</Button>
-                        <a
-                            href='https://pixelproperty.io/'
-                            target='_blank'
-                            className='hideElement'
-                            ref={(portfolioLink) => { this.portfolioLink = portfolioLink; }}
-                        />
+                        <Grid>
+                            <GridRow fluid width={16}>
+                                <GridColumn width={8}>
+                                    <Button onClick={() => this.visitPortfolio()} fluid>PixelProperty.io</Button>
+                                    <a
+                                        href='https://pixelproperty.io/'
+                                        target='_blank'
+                                        className='hideElement'
+                                        ref={(portfolioLink) => { this.portfolioLink = portfolioLink; }}
+                                    />
+                                </GridColumn>
+                                <GridColumn width={8}>
+                                    <Button style={{width: '100%'}} onClick={() => this.visitTelegram()} content='Telegram' icon='telegram' labelPosition='right' />
+                                    <a
+                                        href='https://web.telegram.org/#/im?p=@pixelpropertyio'
+                                        target='_blank'
+                                        className='hideElement'
+                                        ref={(telegramLink) => { this.telegramLink = telegramLink; }}
+                                    />
+                                </GridColumn>
+                            </GridRow>
+                        </Grid>
                         <Divider />
 
                         {!this.state.advancedMode &&

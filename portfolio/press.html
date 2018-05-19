@@ -16,8 +16,122 @@
     </head>
     <body>
 
+        <!--header-->
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top sticky-navigation">
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="ion-grid icon-sm"></span>
+                </button>
+            <span class="white font-pixel"><a class="nav-link page-scroll active" style="color:white;" href="index.html">PIXEL PROPERTY</a></span>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav ml-auto font-roboto">
+                    <li class="nav-item mr-3">
+                        <a class="nav-link page-scroll font-roboto" href="https://canvas.pixelproperty.io"><span class="font-pixel">CANVAS</span></a>
+                    </li>
+                    <li class="nav-item mr-3">
+                        <a class="nav-link page-scroll" href="features.html">DETAILS</a>
+                    </li>
+                    <li class="nav-item mr-3">
+                        <a class="nav-link page-scroll" href="faq.html">FAQ</a>
+                    </li>
+                    <li class="nav-item mr-3">
+                        <a class="nav-link page-scroll" href="team.html">ABOUT US</a>
+                    </li>
+                    <li class="nav-item mr-3">
+                        <a class="nav-link page-scroll" href="whitepaper.html">WHITE PAPER</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <section class="bg-white iphone-mt" id="features" style="padding-top:120px;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-10 col-sm-10 mx-auto wow fadeIn div-justify">
+                        <h4 class="text-primary font-pixel mt-3 text-center">The Evolving Blockchain Canvas</h4>
+                        <p class="pt-3">
+                            <strong>[BURNABY, April 25th, 2018]</strong> - Imagine a community-run canvas of pixels, powered by people coming together to draw, create, advertise, and share. Always changing and evolving with the taste and style of the community pushing it forward. Anyone can share their art, advertise their websites, or simply own a section of the evolving canvas. This is our vision for PixelProperty.
+                        </p>
+                        <p>
+                            PixelProperty will be the world's first physical art canvas built using blockchain technology. The digital canvas will be divided into ten thousand regions known as Properties, which will allow users to showcase their displays and promote themselves. Artists and advertisers alike will be rewarded in cryptocurrency for sharing and contributing to the canvas’ organic growth.
+                        </p>
+                        <p>
+                            <i>“PixelProperty intends to be the most exclusive digital Property available by integrating the evolving canvas with a physical billboard to reach millions of people.”</i>
+                            <br/>
+                            - Jaegar Sarauer
+                        </p>
+                        <p>
+                            PixelProperty users may draw pictures or upload images as contributions to the online canvas, hosted at <a href="https://pixelproperty.io/">https://pixelproperty.io</a>, allowing users to share their art with the world. PixelProperty welcomes all visual expressions, from an individual's art to an organization’s visual display.
+                        </p>
+                        <p>
+                            Owning Properties gives users more control over their area of the canvas. They can utilize their Properties to share their websites and messages, allowing them to be effectively used for personal expression or marketing. Owners are rewarded for sharing Properties publically with artists, or can choose to keep their Properties private, giving them full control for more focused marketing. Properties are tradable on the built-in Property market, allowing ownership to easily change hands.
+                        </p>
+                        <p>
+                            The evolving canvas rewards users in a new cryptocurrency, PixelPropertyToken. These rewards can be spent to access more features, purchase Properties and more effectively advertise users or their contributions.
+                        </p>
+                        <p>
+                            <i>“Our desire was to create a product which gamifies imagery with rewards, creating a fun mashup of digital art, community and advertising.”</i>
+                            <br/>
+                            - Carson Roscoe
+                        </p>
+                        <p>
+                            PixelProperty is the first of its kind, attempting to not only bring a visual representation to blockchain assets, but also take it one step further, showcasing a physical representation of these blockchain assets to the real world.
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-10 col-sm-10 mx-auto wow fadeIn">
+                        <h4 class="text-primary font-pixel mt-3 text-center">About Cajarty</h4>
+                        <p class="pt-3">
+                            Cajarty Computing LTD. is a Burnaby based Canadian software development company, with their first product releasing soon: <a href="https://pixelproperty.io/">PixelProperty</a>. Cajarty and The PixelProperty Team are both run by three Canadian entrepreneurs: Carson Roscoe, Jaegar Sarauer, and Arthur Pankiewicz.
+                        </p>
+                        <p>
+                            Two of the lead members, Roscoe and Sarauer, are undergoing separate year-long blockchain research projects at British Columbia Institute of Technology as the final task in achieving their software development degrees. Roscoe currently documents the progress of his blockchain research on Steemit. A fun fact about Sarauer is that he had been on the set of Dragons Den, a CBC Television show, for a previous entrepreneurial adventure when he was twelve years old. Pankiewicz is currently working as a professional software developer and full stack web developer.
+                        </p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-sm-12 text-center">
+                        <input id="contact-btn" type="button" value="Reach Out To Us" class="btn btn-primary page-scroll" />
+                    </div>
+                </div>
+            </div>
+            <div class="container mt-5">
+                <div style="display:none;" id="div-form">
+                    <form>
+                        <div class="form-group col-md-6 offset-md-3 col-sm-12">
+                            <label for="name"><span class='red'>*</span> Name</label>
+                            <input type="text" class="form-control" id="name" />
+                        </div>
+                        <div class="form-group col-md-6 offset-md-3 col-sm-12">
+                            <label for="email"><span class='red'>*</span> Email</label>
+                            <input type="email" class="form-control" id="email2" />
+                            <input type="email" class="form-control" id="email" style="display:none;" />
+                        </div>
+                        <div class="form-group col-md-6 offset-md-3 col-sm-12">
+                            <label for="subject"><span class='red'>*</span> Subject</label>
+                            <input type="text" class="form-control" id="subject" />
+                        </div>
+                        <div class="form-group col-md-8 offset-md-2 col-sm-12">
+                            <label for="message"><span class='red'>*</span> Message</label>
+                            ​<textarea class="form-control" id="message" rows="10"></textarea>
+                        </div>
+                    </form>
+                    <div class="row">
+                        <div class="col-sm-12 text-center mt-3">
+                            <input id="send-btn" class="btn btn-primary" type="button" value="Send" />
+                        </div>
+                        <div id="div-success" class="col-sm-12 text-center" style="display:none;">
+                            <span class="font-pixel" style="color:green;">SUCCESS!</span>
+                        </div>
+                        <div id="div-fail" class="col-sm-12 text-center" style="display:none;">
+                            <span class="font-pixel red">ERROR:</span><span class='red'> Something went wrong, please try again later!</span>
+                        </div>
+                    </div>
+                </div>
+        </section>
+
         <!-- for press  -->
-        <section class="bg-white" id="for-press">
+        <!-- <section class="bg-white" id="for-press">
 
             <a href="index.html" class="btn btn-primary back-btn"><i class="fa fa-chevron-left"></i></a>
 
@@ -93,6 +207,46 @@
                     </div>
                 </div>
             </div>
+        </section> -->
+
+         <!--footer-->
+        <section class="bg-footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 offset-md-3 col-sm-12 col-xs-12 text-center wow fadeIn">
+                        <!-- <h1 class="footer-title font-pixel">PIXEL PROPERTY</h1> -->
+                        <p class="icon-links">
+                            <a href="https://twitter.com/pixelpropertyio" target="_blank"><i class="fa fa-twitter fa-2x mr-3" aria-hidden="true"></i></a>
+                            <a href="https://www.facebook.com/pixelpropertyio" target="_blank"><i class="fa fa-facebook fa-2x mr-3" aria-hidden="true"></i></a>
+                            <a href="https://www.instagram.com/pixelpropertyio" target="_blank"><i class="fa fa-instagram fa-2x mr-3" aria-hidden="true"></i></a>
+                            <a href="https://www.steemit.com/@pixelproperty" target="_blank"><i class="fa fa-steemit fa-2x mr-3" aria-hidden="true"></i></a>
+                            <a href="https://www.reddit.com/r/pixelproperty" target="_blank"><i class="fa fa-reddit fa-2x mr-3" aria-hidden="true"></i></a>
+                            <a href="https://t.me/pixelpropertyio" target="_blank"><i class="fa fa-telegram fa-2x mr-3" aria-hidden="true"></i></a>
+                        </p>
+                        <a href="https://www.stateofthedapps.com/dapps/pixel-property" target="_blank"><img class="mt-3" src="img/stateofthedapps.png" /></a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 pt-5 mx-auto text-center wow fadeIn">
+                        <a href="press.html" style="color:white !important;" class="page-scroll">FOR PRESS</a>
+                        &nbsp;<span style="color:white;">|</span>&nbsp;
+                        <a href="features.html" class="page-scroll">DETAILS</a>
+                        &nbsp;<span style="color:white;">|</span>&nbsp;
+                        <a href="faq.html" class="page-scroll">FAQ</a>
+                        &nbsp;<span style="color:white;">|</span>&nbsp;
+                        <a href="team.html" class="page-scroll">ABOUT US</a>
+                        &nbsp;<span style="color:white;">|</span>&nbsp;
+                        <a href="whitepaper.html" class="page-scroll">WHITE PAPER</a>
+                        <!-- &nbsp;<span style="color:white;">|</span>&nbsp; -->
+                        <!-- <a href="press.html" class="page-scroll">ROAD MAP</a> -->
+                    </div>
+                    <div class="col-sm-12 pt-3 mx-auto text-center wow fadeIn">
+                        <a href="terms-of-service.html" class="page-scroll">TERMS OF USE</a>
+                        &nbsp;<span style="color:white;">|</span>&nbsp;
+                        <a href="privacy-policy.html" class="page-scroll">PRIVACY POLICY</a>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
@@ -104,7 +258,7 @@
         <script src="js/jquery.svg.min.js"></script>
         <script src="js/jquery.svganim.min.js"></script>
         <script src="js/debug.addIndicators.min.js"></script>
-        <!-- <script src="js/scripts.js"></script> -->
+        <script src="js/scripts.js"></script>
         <!-- <script src="js/pixel.js"></script> -->
         <script src="js/press.js"></script>
     </body>

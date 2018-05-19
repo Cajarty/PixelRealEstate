@@ -6,6 +6,61 @@
 *****************/
 
 /*****************
+    0. color overrides
+
+    dark            23B5D3
+    light           98DFEA   
+    offwhite        EAE5E7   
+    weird white     BAA7B0
+    black           071013
+
+*****************/
+
+.text-primary {
+    color: #23B5D3 !important;
+}
+.bg-texture {
+    background: #23B5D3 !important;
+}
+.nav-bar {
+    background: #23B5D3 !important;
+}
+.card .card-body .icon-box {
+    color: #98DFEA;
+}
+a {
+    color: #071013
+}
+a:hover {
+    color: #EAE5E7
+}
+/*.icon-links > a {
+    color: #98DFEA;
+}*/
+.bg-footer a {
+    color: #98DFEA !important;
+}
+.bg-footer a:hover {
+    color: #EAE5E7 !important;
+}
+.list-default > li::before {
+    color: #98DFEA;
+}
+strong {
+    color: #071013;
+}
+.btn-primary {
+    background-color: #98DFEA !important;
+    border-color: #98DFEA !important;
+}
+.btn-white {
+    color: #23B5D3 !important;
+}
+.card a:hover {
+    color: #98DFEA !important;
+}
+
+/*****************
     1. general
 *****************/
 @font-face {
@@ -16,13 +71,32 @@
     font-family: 'Roboto-Regular';
     src: url('../fonts/Roboto-Regular.ttf');
 }
+.bg-texture {
+    /*background: #89cff0;*/
+}
+.list-default > li::before,
+.card .card-body .icon-box,
+.text-primary {
+    /*color: #89cff0 !important;*/
+}
+.btn-primary {
+    /*background-color: orange !important;*/
+    /*border-color: orange !important;*/
+}
 .btn-white,
 .btn-primary {
     /*color: black !important;*/
 }
-.btn-primary:hover,
+.btn-primary:hover, 
 .btn-white:hover {
     color: black !important;
+}
+.card-body:hover {
+    cursor: pointer;
+}
+.div-justify {
+    text-align: justify;
+    text-justify: inter-word;
 }
 .font-pixel {
     font-family: 'Unibody8Pro-Bold';
@@ -46,6 +120,9 @@
 }
 .white {
     color: white;
+}
+#wrapper-canvas img:hover {
+    opacity: .8;
 }
 
 /*****************
@@ -114,6 +191,13 @@
 
 .icon-links-dark > a > i:hover {
     color: black;
+    /*color: orange;*/
+}
+a {
+    /*color: orange !important;*/
+}
+.btn-white {
+    /*color: orange !important;*/
 }
 .img-fadeIn {
     -webkit-filter: blur(7px);
@@ -241,7 +325,7 @@
     }
     #main-info {
         padding-top: 60px !important;
-        top: 30% !important;
+        top: 35% !important;
         text-align: center;
     }
     .mobile-title {
@@ -258,6 +342,21 @@
     }
     .text-primary  {
         font-size: 1.1em !important;
+    }
+}
+
+@media only screen and (max-width: 667px) {
+    .iphone-mt {
+        margin-top: 5em !important;
+    }
+    .iphone-mt-large {
+        margin-top: 6em !important;
+    }
+    .mt-5 {
+        margin-top: 1em !important;
+    }
+    .iphone-mt-small {
+        margin-top: 1em !important;
     }
 }
 /**

@@ -7,6 +7,7 @@ contract PXLPropertyGiveawayDistributor {
     PXLProperty pxlProperty;
     VirtualRealEstate virtualRealEstate;
     
+    event PXLGiveaway(address[] recipients, uint256[] recipientsTokens);
     event PXLGiveaway(address[] recipients, uint256 tokensPerRecipient);
     event PropertyGiveaway(address recipient, uint16 propertyID);
     
@@ -27,14 +28,24 @@ contract PXLPropertyGiveawayDistributor {
         {
             pxlProperty.transfer(recipients[i], tokensPerRecipient);
         }
-        PXLGiveaway(recipients, tokensPerRecipient);
+        emit PXLGiveaway(recipients, tokensPerRecipient);
+    }
+    
+    function distributePXL(address[] recipients, uint256[] recipientsTokens) public ownerOnly() {
+        require(recipients.length == recipientsTokens.length);
+        for(uint256 i = 0; i < recipients.length; i++)
+        {
+            pxlProperty.transfer(recipients[i], recipientsTokens[i]);
+        }
+        emit PXLGiveaway(recipients, recipientsTokens);
     }
     
     function distributeProperties(address[] recipients, uint16[] propertyIDs) public ownerOnly() {
+        require(recipients.length == propertyIDs.length);
         for(uint256 i = 0; i < recipients.length; i++)
         {
             virtualRealEstate.transferProperty(propertyIDs[i], recipients[i]);
-            PropertyGiveaway(recipients[i], propertyIDs[i]);
+            emit PropertyGiveaway(recipients[i], propertyIDs[i]);
         }
     }
     
@@ -46,7 +57,7 @@ contract PXLPropertyGiveawayDistributor {
         virtualRealEstate.transferProperty(propertyID, recipient);
     }
     
-    function migrate(address newOwner) ownerOnly() {
+    function migrate(address newOwner) public ownerOnly() {
         owner = newOwner;
     }
 }

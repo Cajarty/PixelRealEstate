@@ -21,7 +21,7 @@ import PropertySalesLogTopETH from '../logs/PropertySalesLogTopETH';
 import Info from '../ui/Info';
 import {
     Segment, SegmentGroup, Button, Divider, Label,
-    LabelDetail, Input, Icon, Item, ItemContent, ItemImage,
+    LabelDetail, Input, Icon, Item, ItemContent, ItemImage, Message, List,
     ItemGroup, Tab, Header, Grid, Sidebar, MenuItem, TabPane, Menu, Checkbox, Popup, Modal, ModalContent, ModalHeader, GridRow, GridColumn, ButtonGroup
 } from 'semantic-ui-react';
 import SetHoverText from '../forms/SetHoverText';
@@ -31,6 +31,8 @@ import PropertiesForSale from '../ui/PropertiesForSale';
 import PropertyChangeLogTop from '../logs/PropertyChangeLogTop';
 import Tutorial from '../Tutorial';
 import WelcomeSidebar from '../ui/WelcomeSidebar';
+import ChangeLog from '../ui/ChangeLog';
+import Chat from '../ui/Chat';
 import { FB, FireBase } from '../../const/firebase';
 import GetStarted from '../GetStarted';
 import * as Func from '../../functions/functions';
@@ -256,6 +258,27 @@ class CanvasPage extends Component {
                     /></TabPane>
             }];
 
+            let chatAndLog = [
+                {
+                    menuItem: 'Chat',
+                    render: () => <TabPane
+                        as='div'
+                        className='topPane'
+                    >
+                        <Chat style={{height: '434px'}}/>
+                    </TabPane>
+                },
+                {
+                    menuItem: 'Change Log',
+                    render: () => <TabPane
+                        as='div'
+                        className='topPane'
+                        loading={this.state.tab2Loading}
+                    >
+                        <ChangeLog/>
+                    </TabPane>
+                }];
+
         let payoutPanes = [
             { menuItem: 'Top 10', render: () => <TabPane className='middlePane' attached={false}><PropertyChangeLogTop /></TabPane> },
             { menuItem: 'Recent', render: () => <TabPane className='middlePane' attached={false}><PropertyChangeLog /></TabPane> },
@@ -311,7 +334,7 @@ class CanvasPage extends Component {
                                 fluid
                                 size={this.state.advancedMode ? 'medium' : 'massive'}
                             >
-                                {this.state.advancedMode ? 'Viewing Mode' : 'Get Started'}
+                                {this.state.advancedMode ? 'Viewing Mode' : <div>Advanced Mode</div>}
                             </Button>}
                         {!this.state.advancedMode && <Divider />}
                         {this.state.advancedMode &&
@@ -359,12 +382,26 @@ class CanvasPage extends Component {
                         }
                     </Segment>
                 </SegmentGroup>
-                <Segment className={(this.state.advancedMode ? 'lowerSegment one' : 'lowerSegment one hideElement')}>
-                    <div>
-                        <Header>Property Browse</Header>
-                        <Tab menu={{ secondary: true, pointing: true }} panes={browsePanes} />
-                    </div>
-                </Segment>
+                <Grid 
+                    stretched
+                    className={(this.state.advancedMode ? 'chatAndBrowseSegment' : 'chatAndBrowseSegment hideElement')}
+                >
+                    <GridRow
+                    style={{ margin: 0}} 
+                    >
+                        <GridColumn width={6}>
+                            <Segment className='chatAndLogs'>
+                                <Tab menu={{ secondary: true, pointing: true }} panes={chatAndLog} />
+                            </Segment>
+                        </GridColumn>
+                        <GridColumn width={10} style={{paddingLeft: 0}}>
+                            <Segment className='browse'>
+                                <Header>Property Browse</Header>
+                                <Tab menu={{ secondary: true, pointing: true }} panes={browsePanes} />
+                            </Segment>
+                        </GridColumn>
+                    </GridRow>
+                </Grid>
                 <Segment className={(this.state.advancedMode ? 'lowerSegment two' : 'lowerSegment two hideElement')}>
                     <div>
                         <Header>Payout History</Header>

@@ -180,6 +180,15 @@
     max-height: 800px;
 }
 
+.chatAndBrowseSegment {
+    margin: -1rem 0 0 0 !important;
+    .chatAndLogs {
+        .topPane {
+            height: 434px !important;
+        }
+    }
+}
+
 #footer.footer {
     margin: 0px 1rem 0px 1rem !important;
     position: relative;

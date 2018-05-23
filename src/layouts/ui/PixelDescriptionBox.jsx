@@ -102,6 +102,8 @@ class PixelDescriptionBox extends Component {
         })
 
         GFD.listen('x', 'pixelBrowse', (x) => {
+            if (!GFD.getData('noMetaMask'))
+                this.loadProperty(x - 1, GFD.getData('y') - 1);
             this.setState({x});
         })
         GFD.listen('y', 'pixelBrowse', (y) => {

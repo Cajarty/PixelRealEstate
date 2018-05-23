@@ -303,7 +303,7 @@ class CanvasPage extends Component {
                         <ZoomCanvas />
                         <Divider />
                         <Grid>
-                            <GridRow fluid width={16}>
+                            <GridRow width={16}>
                                 <GridColumn width={8}>
                                     <Button onClick={() => this.visitPortfolio()} fluid>PixelProperty.io</Button>
                                     <a

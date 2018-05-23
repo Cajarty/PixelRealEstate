@@ -17,6 +17,9 @@ export const FORM_SET_LINK = ["Sets a visitable link for all your owned Properti
     "Users can click on your properties to visit this website. The maximum length is 64 characters."];
 export const FORM_SET_TEXT = ["Sets a phrase for all your owned Properties.", 
     "Users will see this phrase when inspecting one of your Properties. The maximum length is 64 characters."];
+export const FORM_SET_IMAGE_SIMPLE = [
+    "Updates the artwork of this Property.", "Reserved Properties cannot be drawn on until they are public again."
+];
 export const FORM_SET_IMAGE = ["Updates the artwork of this property and earns you PXL.", 
     "If the Property has an owner, the owner will be paid an equal amount of PXL as the user. Spending additional PXL will increase the maximum payout and reserve time of this Property."];
 export const FORM_TRANSFER = ['Send PXL from your address to another address.'];

@@ -61,9 +61,8 @@ export class Contract {
         Object.keys(LISTENERS).map((index) => {
             this.listeners[index] = {};
         });
-        
-        this.setup();
 
+        this.setup();
     }
 
     // ---------------------------------------------------------------------------------------------------------
@@ -73,14 +72,15 @@ export class Contract {
     // ---------------------------------------------------------------------------------------------------------
 
     setup() {
-        let success = () => {
+        window.addEventListener('load', (ev) => {
             if (typeof web3 !== 'undefined') {
                 window.web3 = new Web3(window.web3.currentProvider);
+                console.info('Web3 & MetaMask.');            
+                
                 this.VRE.setProvider(window.web3.currentProvider);
                 this.PXLPP.setProvider(window.web3.currentProvider);
                 this.ST.setProvider(window.web3.currentProvider);
-
-
+    
                 this.updateNetwork((id) => {
                     if (id === Const.NETWORK_MAIN) {
                         this.getAccounts();
@@ -97,7 +97,7 @@ export class Contract {
                                 });
                             });
                         });
-
+    
                         this.getAccountsInterval = setInterval(() => this.getAccounts(), 1000);
                         GFD.setData('noMetaMask', false);
                     } else {
@@ -105,15 +105,12 @@ export class Contract {
                         GFD.setData('noMetaMask', false);
                     }
                 })
+            } else {
+                console.info('No MetaMask.');
+                GFD.setData('noMetaMask', true);
+                SDM.initNoMetaMask();
             }
-        }
-
-        if (typeof web3 !== 'undefined') {
-            success();
-        } else {
-            GFD.setData('noMetaMask', true);
-            SDM.initNoMetaMask();
-        }
+        });
     }
 
     getAccounts() {

@@ -19,7 +19,7 @@ export class Axios {
             timeout: 10000,
             headers: {
                 'Accept': 'application/jsonp',
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/json',
             }
         });
 
@@ -60,12 +60,8 @@ export class Axios {
     /*
     Sends post request, returns a promise.
     */
-    post(url, dataObject = {}, cancelToken) {
-        if (typeof (dataObject) === Object)
-            throw new Error('Incorrect request data.');
-        return this.axios.post(url, this.toFormData(dataObject), {
-            cancelToken: cancelToken,
-        });
+    post(url, dataObject, cancelToken) {
+        return this.axios.post(url, dataObject);
     }
 
     /*

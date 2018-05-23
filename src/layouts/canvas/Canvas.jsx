@@ -150,6 +150,11 @@ class Canvas extends Component {
             }
         });
 
+        GFD.listen('imagePNG', 'canvasBox', (PNG) => {
+            if (PNG != null)
+                this.setCanvasWithImage(PNG);
+        })
+
         GFD.listen('select', 'canvasBox', (select) => {
             if (select.x1 == -1 || select.y1 == -1 || select.x2 == -1 || select.y2 == -1)
                 return;

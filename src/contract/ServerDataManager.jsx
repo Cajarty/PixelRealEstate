@@ -79,6 +79,7 @@ export class ServerDataManager {
         this.cancelDataRequestToken = null;
         this.cancelImageRequestToken = null;
         this.cancelEventDataToken = null;
+        this.cancelSendSimplePixels = null;
 
         this.evHndl = {
             [EVENTS.PropertyColorUpdate]: null,
@@ -192,12 +193,19 @@ export class ServerDataManager {
         });
     }
 
+    setupImageUpdater() {
+        setInterval(() => {this.requestServerImage(() => {
+
+        })}, 15000);
+    }
+
     init() {
         this.requestServerImage((imageResult) => {
             this.requestServerData((dataResult) => {
                 this.requestServerEvents((eventsResult) => {
                     this.closeEvents();
                     this.setupEvents();
+                    this.setupImageUpdater();
                     GFD.setData('ServerDataManagerInit', 2);
                     ctr.sendResults(LISTENERS.ServerDataManagerInit, {imageLoaded: imageResult, dataLoaded: dataResult});
                 });
@@ -209,6 +217,7 @@ export class ServerDataManager {
         this.requestServerImage((imageResult) => {
             this.requestServerData((dataResult) => {
                 this.requestServerEvents((eventsResult) => {
+                    this.setupImageUpdater();
                     GFD.setData('ServerDataManagerInit', 1);
                     ctr.sendResults(LISTENERS.ServerDataManagerInit, {imageLoaded: imageResult, dataLoaded: dataResult});
                 })
@@ -244,6 +253,7 @@ export class ServerDataManager {
                     let image = new Image();
                     image.onload = () => {
                         this.imagePNG = image;
+                        GFD.setData('imagePNG', image);
                         resultCallback(true);
                     };
                     image.src = "data:image/png;base64," + new Buffer(result.data, 'binary').toString('base64');
@@ -288,6 +298,7 @@ export class ServerDataManager {
                 PPCPrice: ppcp,
                 lastUpdate: Func.BigNumberToNumber(data[3]),
                 isInPrivate: data[4],
+                reserved: Func.BigNumberToNumber(data[5]),
             };
             this.updateProperty(x, y, update);
             callback(update);
@@ -374,7 +385,17 @@ export class ServerDataManager {
         this.allProperties[x][y] = property;
     }
 
-
+    /*
+    Uploads artwork to the server as if it was the contract.
+    For use with updating only the server's cached images,
+    for Simple users.
+    */
+    setSimpleColors(x, y, data, callback) {
+        callback('pending');
+        ax.post('/setColors', {x, y, data}, {cancelToken: this.cancelSendSimplePixels}).then((result) => {
+            callback(true);
+        });
+    }
 
     orderPropertyList(objList, column, ascending) {
         return new Promise((resolve) => {

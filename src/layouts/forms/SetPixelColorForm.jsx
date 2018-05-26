@@ -7,7 +7,7 @@ import { ChromePicker } from 'react-color';
 import * as Assets from '../../const/assets';
 import Info from '../ui/Info';
 import * as Strings from '../../const/strings';
-import { Modal, ModalContent, ModalHeader, Button, Divider, Input, List, Popup, Label, ModalActions, Icon, Segment, Grid, GridColumn, GridRow, ButtonGroup, Message, Loader, Image } from 'semantic-ui-react';
+import { Modal, ModalContent, ModalHeader, Button, Divider, Input, List, Popup, Label, ModalActions, Icon, Segment, Grid, GridColumn, GridRow, ButtonGroup, Message, Loader, ImageComponent } from 'semantic-ui-react';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
 import {TUTORIAL_STATE} from '../../functions/GlobalState';
 import PXLBalanceItem from '../ui/PXLBalanceItem';

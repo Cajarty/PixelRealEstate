@@ -32,6 +32,13 @@ export const TUTORIAL_START_DIALOG = ["Pixel Property is easy to use. Just in ca
 
 export const CHANGELOG = [
     {
+        date: new Date('2018-5-26'),
+        title: 'Free Drawing!',
+        messages: 
+        ["We've introduced Simple users, which allows for anyone to draw without an account or MetaMask!",
+        "Features are limited for Simple users as they do not interact with Ethereum."],
+    },
+    {
         date: new Date('2018-5-16'),
         title: 'PXL Token Update',
         messages: 

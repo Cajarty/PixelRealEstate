@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import {Contract, ctr, LISTENERS} from '../contract/contract.jsx';
-import {Modal, Button, ModalHeader, ModalContent, ModalActions, Icon, Divider, Image, Message} from 'semantic-ui-react';
+import {Modal, Button, ModalHeader, ModalContent, ModalActions, Icon, Divider, Image, Message, List} from 'semantic-ui-react';
 import * as Strings from '../const/strings';
 import * as Const from '../const/const';
 import * as Func from '../functions/functions';
@@ -14,6 +14,7 @@ class GetStarted extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            continueAdvancedMode: false, //user sees first modal explaining advanced mode and clicks yes.
             noMetaMask: true, //metamask is installed
             network: Const.NETWORK_DEV, //network.
             userExists: false, //the user exists.
@@ -22,7 +23,12 @@ class GetStarted extends Component {
 
     reloadForMetaMask() {
         localStorage.setItem('startInAdvancedMode', true);
+        localStorage.setItem('hideAdvancedModeDialog', true);
         location.reload();
+    }
+
+    chooseAdvancedMode() {
+        this.setState({continueAdvancedMode: true})
     }
 
     componentDidMount() {
@@ -31,13 +37,19 @@ class GetStarted extends Component {
         });
 
         GFD.listen('network', 'getStarted', (network) => {
-            console.info(network)
             this.setState({network});
         });
 
         GFD.listen('userExists', 'getStarted', (userExists) => {
             this.setState({userExists});
         });
+        if (localStorage.getItem('hideAdvancedModeDialog')) {
+            this.setState({continueAdvancedMode: true})
+        }
+    }
+
+    componentWillUnmount() {
+        GFD.closeAll('getStarted');
     }
 
     render() {
@@ -47,15 +59,85 @@ class GetStarted extends Component {
             <div>
                 <Modal
                     size='small'
-                    open={this.state.noMetaMask}
+                    open={(this.state.noMetaMask || ctr.account === null) && !this.state.continueAdvancedMode}
+                    closeOnEscape={false}
+                    closeOnRootNodeClick={false}
+                    className='becomeAdvanced'
+                >
+                    <ModalHeader>Advanced User Sign Up</ModalHeader>
+                    <ModalContent>  
+                        <Message success>
+                            The PixelProperty canvas is a cryptocollectable! 
+                            
+                            This means advanced users are able to own and trade parts of PixelProperty. 
+                            
+                            Sign up for free now to store and trade your crypto assets securely.
+                        </Message>
+                        <Message warning>
+                            <h2>Simple Users</h2>
+                            <br/>
+                            <List>
+                                <List.Item>
+                                    <List.Icon name='check' />
+                                    <List.Content>
+                                    <List.Header>Free Drawing</List.Header>
+                                    <List.Description>Draw anywhere that isn't reserved by an Advanced User.</List.Description>
+                                    </List.Content>
+                                </List.Item>
+                            </List>
+                        </Message>
+                        <Message success>
+                            <h2>Advanced Users</h2>
+                            <br/>
+                            <List>
+                                <List.Item>
+                                    <List.Icon name='check' />
+                                    <List.Content>
+                                        <List.Header>Blockchain Verified Drawing</List.Header>
+                                        <List.Description>Earn PXL Token for drawing. Draw priority over simple users.</List.Description>
+                                    </List.Content>
+                                </List.Item>
+                                <List.Item>
+                                    <List.Icon name='check' />
+                                    <List.Content>
+                                        <List.Header>Trade Properties with PXL</List.Header>
+                                        <List.Description>Allows extra content control & passive PXL generation.</List.Description>
+                                    </List.Content>
+                                </List.Item>
+                                <List.Item>
+                                    <List.Icon name='check' />
+                                    <List.Content>
+                                        <List.Header>Community</List.Header>
+                                        <List.Description>Chat with other users and share your portfolio.</List.Description>
+                                    </List.Content>
+                                </List.Item>
+                                <List.Item>
+                                    <List.Icon name='minus' />
+                                    <List.Content>
+                                        <List.Header>Requires ETH</List.Header>
+                                        <List.Description>Fee for drawing and trading across the Ethereum network.</List.Description>
+                                    </List.Content>
+                                </List.Item>
+                            </List>
+                        </Message>
+                    </ModalContent>
+                    <ModalActions>
+                        <Button secondary onClick={() => this.props.changeMode()}>Cancel</Button>
+                        <Button primary onClick={() => this.chooseAdvancedMode()}>Start Now</Button>
+                    </ModalActions>
+                </Modal>
+                <Modal
+                    size='small'
+                    open={this.state.noMetaMask && this.state.continueAdvancedMode}
                     closeOnEscape={false}
                     closeOnRootNodeClick={false}
                 >
                     <ModalHeader>Get MetaMask</ModalHeader>
                     <ModalContent>  
                         <Message>
-                            Looks like you're missing MetaMask! You'll need MetaMask to use the canvas.
-                            Click below to install the browser extension.
+                            Looks like you're missing MetaMask! 
+                            <br/>
+                            You'll need MetaMask to use the canvas in Advanced Mode. Click below to learn more & install the browser extension.
                         </Message>
                         <Image 
                             rounded bordered
@@ -74,7 +156,7 @@ class GetStarted extends Component {
                 </Modal>
                 <Modal
                     size='small'
-                    open={!this.state.noMetaMask && this.state.network != Const.NETWORK_MAIN}
+                    open={!this.state.noMetaMask && this.state.network != Const.NETWORK_MAIN && this.state.continueAdvancedMode}
                     closeOnEscape={false}
                     closeOnRootNodeClick={false}
                 >
@@ -97,7 +179,7 @@ class GetStarted extends Component {
                 </Modal>
                 <Modal
                     size='tiny'
-                    open={!this.state.noMetaMask && this.state.network === Const.NETWORK_MAIN && ctr.account === null}
+                    open={!this.state.noMetaMask && this.state.network === Const.NETWORK_MAIN && ctr.account === null && this.state.continueAdvancedMode}
                     closeOnEscape={false}
                     closeOnRootNodeClick={false}
                 >
@@ -113,7 +195,7 @@ class GetStarted extends Component {
                     </ModalActions>
                 </Modal>
                 <SignUpForm
-                    open={!this.state.noMetaMask && this.state.network === Const.NETWORK_MAIN && ctr.account !== null && !this.state.userExists}
+                    open={!this.state.noMetaMask && this.state.network === Const.NETWORK_MAIN && ctr.account !== null && !this.state.userExists && this.state.continueAdvancedMode}
                     onCancel={() => this.props.changeMode()}
                 />
             </div>

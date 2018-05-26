@@ -39,13 +39,21 @@ class ViewTimelapse extends Component {
     }
 
     componentDidMount() {
-        ctr.getCurrentBlock((error, block) => {
-            this.setState({
-                blockTo: block.number,
-                blockFrom: block.number - 1000,
-                endBlock: block.number,
-            });
-        });
+        GFD.listen('ServerDataManagerInit', 'ViewTimelapse', (ServerDataManagerInit) => {
+            if (ServerDataManagerInit >= 2) {
+                ctr.getCurrentBlock((error, block) => {
+                    this.setState({
+                        blockTo: block.number,
+                        blockFrom: block.number - 1000,
+                        endBlock: block.number,
+                    });
+                });
+            }
+        })
+    }
+
+    componentWillUnmount() {
+        GFD.closeAll('ViewTimelapse');
     }
 
     stopBuildingGIF(force = false) {

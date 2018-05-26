@@ -473,16 +473,24 @@ div.hoverLabel.ui {
 }
 
 .message {
-    .changeLogList,
-    &.message {
+    &.changeLogList {
         overflow-y: auto;
-        background: $color3 !important;
+        background: $color1;
     }
 }
 
 .ui.image.downloadImage {
-    background-color: lighten($color3, 10%);
+    background-color: lighten($color4, 10%);
     margin: auto;
+}
+
+.becomeAdvanced {
+    .ui.list {
+        margin: 0;
+    }
+    h2 {
+        margin: 0;
+    }
 }
 
 canvas {

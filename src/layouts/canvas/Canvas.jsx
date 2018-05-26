@@ -293,6 +293,16 @@ class Canvas extends Component {
         }
         //if pending show loading icon
         this.state.ctx.putImageData(ctxID, x * 10, y * 10);
+
+        let select = GFD.getData('select');
+        let hoverX = GFD.getData('hoverX');
+        let hoverY = GFD.getData('hoverY');
+        if ((x >= select.x1 - 1 || x <= select.x2 + 1) && (y >= select.y1 - 1 || y <= select.y2 + 1))
+            GFD.setData('select', select);
+        if ((x >= hoverX - 1 || x <= hoverX + 1) && (y >= hoverY - 1 || y <= hoverY + 1)) {
+            GFD.setData('hoverX', hoverX);
+            GFD.setData('hoverY', hoverY);
+        }
     }
 
     setCanvasWithImage(img) {
@@ -302,6 +312,8 @@ class Canvas extends Component {
         for (let y = 0; y < 1000; y++) {
             SDM.pixelData[y] = pxlData.slice(y * 4000, (y + 1) * 4000);
         }
+        GFD.setData('select', GFD.getData('select'));
+        this.setCanvasPointer(GFD.getData('hoverX'), GFD.getData('hoverY'));
     }
 
     setCanvas(rgbArr) {

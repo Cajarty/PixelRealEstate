@@ -95,7 +95,6 @@ class PixelDescriptionBoxSimple extends Component {
         });
 
         GFD.listen('x', 'pixelBrowse', (x) => {
-            this.loadProperty(x - 1, GFD.getData('y') - 1);
             this.setState({x});
         })
         GFD.listen('y', 'pixelBrowse', (y) => {
@@ -113,53 +112,7 @@ class PixelDescriptionBoxSimple extends Component {
         })
 
         this.setState({timerUpdater: setInterval(() => this.timerUpdate(), 60000)});
-
-        if (GFD.getData('noMetaMask')) {
-            GFD.listen('noMetaMask', 'DescBox', this.setup);
-            return;
-        }
-        this.setup(false);
     }
-
-    setup(noMetaMask) {            
-        if (noMetaMask)
-            return;
-        GFD.close('noMetaMask', 'DescBox');
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (evH1) => {
-            this.setState({evH1});
-            evH1.watch((error, log) => {
-                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                let xx = GFD.getData('x') - 1
-                let yy = GFD.getData('y') - 1;
-                if (id.x == xx && id.y == yy) {
-                    let colors = Func.ContractDataToRGBAArray(log.args.colors);
-                    this.loadProperty(id.x, id.y, colors);
-                }
-            });
-        });
-
-        ctr.watchEventLogs(EVENTS.PropertyBought, {}, (evH2) => {
-            this.setState({evH2});
-            evH2.watch((error, log) => {
-                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                let xx = GFD.getData('x') - 1
-                let yy = GFD.getData('y') - 1;
-                if (id.x == xx && id.y == yy)
-                    this.loadProperty(xx, yy);
-            });
-        });
-
-        ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (evH3) => {
-            this.setState({evH3});
-            evH3.watch((error, log) => {
-                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                let xx = GFD.getData('x') - 1
-                let yy = GFD.getData('y') - 1;
-                if (id.x == xx && id.y == yy)
-                    this.loadProperty(xx, yy);
-            });
-        });
-    };
 
     timerUpdate(lastUpdate = this.state.lastUpdate, reserved = this.state.reserved) {
         let lastUpdateFormatted = Func.TimeSince(lastUpdate * 1000) + " ago";
@@ -237,24 +190,7 @@ class PixelDescriptionBoxSimple extends Component {
             reserved,
         });
         this.timerUpdate(lastUpdate, reserved);
-        // ctr.getPropertyData(x, y, (data) => {  
-        //     let ethp = Func.BigNumberToNumber(data[1]);
-        //     let ppcp = Func.BigNumberToNumber(data[2]);
-        //     let reserved = Func.BigNumberToNumber(data[5]);
-        //     let lastUpdate = Func.BigNumberToNumber(data[3]);
-        //     let maxEarnings = ((reserved - lastUpdate) / 30) * 5;
-        //     this.setState({
-        //         owner: data[0],
-        //         isForSale: ppcp != 0,
-        //         ETHPrice: ethp,
-        //         PPCPrice: ppcp,
-        //         lastUpdate,
-        //         isInPrivate: data[4],
-        //         reserved,
-        //         latestBid: Func.BigNumberToNumber(data[6]),
-        //         maxEarnings,
-        //         earnings: Func.calculateEarnings(lastUpdate, maxEarnings),
-        //     });
+        
         //     ctr.getHoverText(data[0], (data) => {
         //         this.setState({hoverText: (data != null && data.length > 0 ? data : null)});
         //     });
@@ -266,13 +202,8 @@ class PixelDescriptionBoxSimple extends Component {
         //     });
         //     this.timerUpdate(lastUpdate, reserved);
         // });
-        // if (canvasData === null) {
-        //     ctr.getPropertyColors(x, y, (x, y, canvasData) => {
-        //         this.setCanvas(canvasData);
-        //     });
-        // } else {
-        //     this.setCanvas(canvasData);
-        // }
+        this.setCanvas(SDM.getPropertyImage(x, y));
+        
         this.stopTokenEarnedInterval();
         this.startTokenEarnedInterval();
     }

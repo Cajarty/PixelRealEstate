@@ -9,7 +9,7 @@ export default class Chat extends Component {
     render() {
         return (
             <Message className='message' id='message'>
-                Nothing yet
+                Coming soon!
             </Message>
         );
     }

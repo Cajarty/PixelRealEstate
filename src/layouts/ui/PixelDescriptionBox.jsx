@@ -297,8 +297,12 @@ class PixelDescriptionBox extends Component {
             this.timerUpdate(lastUpdate, reserved);
         });
         if (canvasData === null) {
-            ctr.getPropertyColors(x, y, (x, y, canvasData) => {
-                this.setCanvas(canvasData);
+            ctr.getPropertyColors(x, y, (x, y, canvasData, isUnset) => {
+                if (isUnset) {
+                    this.setCanvas(SDM.getPropertyImage(x, y));
+                } else {
+                    this.setCanvas(canvasData);
+                }
             });
         } else {
             this.setCanvas(canvasData);

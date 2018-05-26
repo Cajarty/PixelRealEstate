@@ -119,6 +119,8 @@ class SetPixelColorForm extends Component {
                 this.attemptDraw(ev);
         };
         GFD.listen('select', 'UpdatePixel', (select) => {
+            if (select.x1 == this.state.select.x1 && select.x2 == this.state.select.x2 && select.y1 == this.state.select.y1 && select.y2 == this.state.select.y2)
+                return;
             let multiRect = select.x2 != -1 && select.y2 != -1 && (select.x1 != select.x2 || select.y1 != select.y2);
             select.w = Math.abs(select.x2 - select.x1) + 1;
             select.h = Math.abs(select.y2 - select.y1) + 1;
@@ -475,12 +477,7 @@ class SetPixelColorForm extends Component {
                 className={TUTORIAL_STATE.getClassName(this.props.tutorialState.index, 4) + ' actions'}
             >
             <ModalHeader>Update Property Image</ModalHeader>
-            <ModalContent>     
-                {this.state.multiRect && this.state.SDMInit >= 2 &&
-                    <Message color='orange'>
-                        Multi-Property uploading is currently experemental. Expect upload delays on larger uploads.
-                    </Message>
-                }
+            <ModalContent>
                 <Grid>
                     <GridRow columns={2} stretched>
                         <GridColumn width={7}>
@@ -737,7 +734,7 @@ class SetPixelColorForm extends Component {
                 <ModalActions>
                     <Label className={this.state.pendingState.name} color={this.state.pendingState.color}>{this.state.pendingState.message}</Label>
                     <Button secondary onClick={() => this.toggleModal(false)}>Cancel</Button>
-                    <Button secondary={this.state.SDMInit >= 2}  primary={this.state.SDMInit == 1} onClick={() => this.setPixelsSimple()}>{'Change Image' + (this.state.SDMInit >= 2 ? ' (Simple)' : '')}</Button>
+                    <Button primary={this.state.SDMInit == 1} onClick={() => this.setPixelsSimple()}>{'Change Image' + (this.state.SDMInit >= 2 ? ' (Simple)' : '')}</Button>
                     {this.state.SDMInit >= 2 && <Button primary onClick={() => this.setPixels()}>Change Image (Advanced)</Button>}
                 </ModalActions>}
             </Modal>

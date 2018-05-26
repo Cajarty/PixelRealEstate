@@ -739,7 +739,10 @@ export class Contract {
             return callback(false);
         this.getPXLPPInstance().then((i) => {
             return i.getPropertyColors.call(this.toID(x, y)).then((r) => {
-                callback(x, y, Func.ContractDataToRGBAArray(r));
+                if (r[0] == 0 && r[1] == 0 && r[2] == 0 && r[3] == 0 && r[4] == 0)
+                    callback(x, y, Func.ContractDataToRGBAArray(r), true);
+                else
+                    callback(x, y, Func.ContractDataToRGBAArray(r), false);
             });
         }).catch((e) => {
             console.log(e);

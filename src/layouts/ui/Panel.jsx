@@ -48,7 +48,7 @@ export class PanelPropertyCanvas extends Component {
     }
 
     componentDidMount() {
-        let ctx = this.canvas.getContext("2d");
+        let ctx = this.canvas.getContext("2d", {alpha: false});
         ctx.imageSmoothingEnabled = false;
         ctx.webkitImageSmoothingEnabled = false;
         ctx.scale(this.props.width / 10, this.props.width / 10);
@@ -87,7 +87,7 @@ export class PanelPropertyCanvas extends Component {
     setCanvas(rgbArr, canvas = this.canvas) {
         let ctx = this.state.ctx;
         if (ctx == null) {
-            ctx = canvas.getContext("2d");
+            ctx = canvas.getContext("2d", {alpha: false});
         }
 
         if (canvas == null)

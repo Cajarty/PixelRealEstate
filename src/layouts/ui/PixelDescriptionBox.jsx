@@ -83,10 +83,10 @@ class PixelDescriptionBox extends Component {
     }
 
     componentDidMount() {
-        let ctx = this.canvas.getContext('2d');
+        let ctx = this.canvas.getContext('2d', {alpha: false});
         ctx.imageSmoothingEnabled = false;
         ctx.webkitImageSmoothingEnabled = false;
-        let dataCtx = this.dataCanvas.getContext('2d');
+        let dataCtx = this.dataCanvas.getContext('2d', {alpha: false});
         dataCtx.imageSmoothingEnabled = false;
         dataCtx.webkitImageSmoothingEnabled = false;
         this.setState({

@@ -38,6 +38,7 @@ import GetStarted from '../GetStarted';
 import * as Func from '../../functions/functions';
 import ViewTimelapse from '../forms/ViewTimelapse';
 import PXLBalanceItem from '../ui/PXLBalanceItem';
+import PixelDescriptionBoxSimple from '../ui/PixelDescriptionBoxSimple';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -309,10 +310,11 @@ class CanvasPage extends Component {
                         <Canvas />
                     </Segment>
                     <Segment id={(this.state.tutorialState.index == 3 ? 'hiddenForward' : '')} className={'rightContainer ' + TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 2) + (this.state.tutorialState.index == 3 ? ' hiddenForward' : '')}>
+                        <WelcomeSidebar />
                         {this.state.advancedMode ?
                             <PixelDescriptionBox />
                             :
-                            <WelcomeSidebar />
+                            <PixelDescriptionBoxSimple/>
                         }
                     </Segment>
                 </SegmentGroup>

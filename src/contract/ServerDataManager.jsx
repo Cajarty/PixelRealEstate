@@ -73,8 +73,6 @@ export class ServerDataManager {
 
         this.bids = {};
 
-        this.useLocalFile = false; //not supported yet
-
         //for network requests
         this.cancelDataRequestToken = null;
         this.cancelImageRequestToken = null;
@@ -92,6 +90,8 @@ export class ServerDataManager {
             [EVENTS.SetPropertyPrivate]: null,
             [EVENTS.Bid]: null,
         };
+
+        this.imageUpdaterHandle = null;
     }
 
     closeEvents() {
@@ -194,34 +194,41 @@ export class ServerDataManager {
     }
 
     setupImageUpdater() {
-        setInterval(() => {this.requestServerImage(() => {
+        if (this.imageUpdaterHandle != null)
+            clearInterval(this.imageUpdaterHandle);
 
+        this.imageUpdaterHandle = setInterval(() => {this.requestServerImage((result) => {
+            
         })}, 15000);
     }
 
     init() {
         this.requestServerImage((imageResult) => {
-            this.requestServerData((dataResult) => {
-                this.requestServerEvents((eventsResult) => {
-                    this.closeEvents();
-                    this.setupEvents();
-                    this.setupImageUpdater();
-                    GFD.setData('ServerDataManagerInit', 2);
-                    ctr.sendResults(LISTENERS.ServerDataManagerInit, {imageLoaded: imageResult, dataLoaded: dataResult});
+            this.setupImageUpdater();
+            if (imageResult) {
+                this.requestServerData((dataResult) => {
+                    this.requestServerEvents((eventsResult) => {
+                        this.closeEvents();
+                        this.setupEvents();
+                        GFD.setData('ServerDataManagerInit', 2);
+                        ctr.sendResults(LISTENERS.ServerDataManagerInit, {imageLoaded: imageResult, dataLoaded: dataResult});
+                    });
                 });
-            });
+            }
         });
     }
 
     initNoMetaMask() {
         this.requestServerImage((imageResult) => {
-            this.requestServerData((dataResult) => {
-                this.requestServerEvents((eventsResult) => {
-                    this.setupImageUpdater();
-                    GFD.setData('ServerDataManagerInit', 1);
-                    ctr.sendResults(LISTENERS.ServerDataManagerInit, {imageLoaded: imageResult, dataLoaded: dataResult});
-                })
-            });
+            this.setupImageUpdater();
+            if (imageResult) {
+                this.requestServerData((dataResult) => {
+                    this.requestServerEvents((eventsResult) => {
+                        GFD.setData('ServerDataManagerInit', 1);
+                        ctr.sendResults(LISTENERS.ServerDataManagerInit, {imageLoaded: imageResult, dataLoaded: dataResult});
+                    })
+                });
+            }
         });
     }
 
@@ -229,54 +236,58 @@ export class ServerDataManager {
     Returns true/false on success/fail of the load.
     */
     requestServerData(resultCallback) {
-        if (this.useLocalFile) {
-
-        } else {
-            ax.get('/getPropertyData', {cancelToken: this.cancelDataRequestToken}).then((result) => {
-                if (result.status == 200 && typeof result.data === 'object') {
-                    this.allProperties = result.data;
-                    this.organizeAllProperties();
-                    resultCallback(true);
-                } else {
-                    resultCallback(false);
-                }
-            });
-        }
+        ax.get('/getPropertyData', {cancelToken: this.cancelDataRequestToken}).then((result) => {
+            if (result.status == 200 && typeof result.data === 'object') {
+                this.allProperties = result.data;
+                this.organizeAllProperties();
+                resultCallback(true);
+            } else {
+                resultCallback(false);
+            }
+        });
     }
 
     requestServerImage(resultCallback) {
-        if (this.useLocalFile) {
+        ax.get('/getImage.png', {cancelToken: this.cancelImageRequestToken, responseType: 'arraybuffer'}).then((result) => {
+            if (result.status == 200) {
+                GFD.setData('useLocalData', false);
+                let image = new Image();
+                image.onload = () => {
+                    this.imagePNG = image;
+                    GFD.setData('imagePNG', image);
+                    resultCallback(true);
+                };
+                image.src = "data:image/png;base64," + new Buffer(result.data, 'binary').toString('base64');
+            } else {
+                GFD.setData('useLocalData', true);
+                resultCallback(false);
+            }
+        }).catch((e) => {
+            console.error(e);
+            GFD.setData('useLocalData', true);
+            this.requestCachedImage(resultCallback);
+        })
+    }
 
-        } else {
-            ax.get('/getImage.png', {cancelToken: this.cancelImageRequestToken, responseType: 'arraybuffer'}).then((result) => {
-                if (result.status == 200) {
-                    let image = new Image();
-                    image.onload = () => {
-                        this.imagePNG = image;
-                        GFD.setData('imagePNG', image);
-                        resultCallback(true);
-                    };
-                    image.src = "data:image/png;base64," + new Buffer(result.data, 'binary').toString('base64');
-                } else {
-                    resultCallback(false);
-                }
-            });
-        }
+    requestCachedImage(resultCallback) {
+        let image = new Image();
+        image.onload = () => {
+            this.imagePNG = image;
+            GFD.setData('imagePNG', image);
+            resultCallback(true);
+        };
+        image.src = Assets.CANVAS_IMAGE;
     }
 
     requestServerEvents(resultCallback) {
-        if (this.useLocalFile) {
-
-        } else {
-            ax.get('/getEventData', {cancelToken: this.cancelEventDataToken}).then((result) => {
-                if (result.status == 200 && typeof result.data === 'object') {
-                    this.eventData = result.data;
-                    resultCallback(true);
-                } else {
-                    resultCallback(false);
-                }
-            });
-        }
+        ax.get('/getEventData', {cancelToken: this.cancelEventDataToken}).then((result) => {
+            if (result.status == 200 && typeof result.data === 'object') {
+                this.eventData = result.data;
+                resultCallback(true);
+            } else {
+                resultCallback(false);
+            }
+        });
     }
 
     insertPropertyImage(xx, yy, RGBArray) {

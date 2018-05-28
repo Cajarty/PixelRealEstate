@@ -28,7 +28,9 @@ class WelcomeSidebar extends Component {
             days: 0,
             hours: 0,
             minutes: 0,
-            browser: {name: ''}
+            browser: {name: ''},
+            useLocalData: false,
+            advancedMode: false,
         };
     }
 
@@ -38,11 +40,20 @@ class WelcomeSidebar extends Component {
         this.setState({
             browser: browser(),
         });
+        GFD.listen('useLocalData', 'welcomeSidebar', (useLocalData) => {
+            if (this.state.useLocalData && !useLocalData)
+                location.reload();
+            this.setState({useLocalData});
+        })
+        GFD.listen('advancedMode', 'welcomeSidebar', (advancedMode) => {
+            this.setState({advancedMode});
+        })
     }
 
     componentWillUnmount() {
         if (this.timerUpdater != null)
             clearInterval(this.timerUpdater);
+        GFD.closeAll('welcomeSidebar');
     }
 
     timerUpdate() {
@@ -64,12 +75,16 @@ class WelcomeSidebar extends Component {
     render() {
         return (
             <div>
-                {(this.state.browser.name !== 'chrome') &&
+                {(this.state.browser.name !== 'chrome') && !this.state.advancedMode &&
                     <Message color='red'>
                         It is recommended to use Chrome while PixelProperty is in Beta. We apologize for the inconvenience.
                     </Message>
                 }
-                <PixelDescriptionBoxSimple/>
+                {this.state.useLocalData && 
+                    <Message color='red'>
+                        Sorry! We're currently doing maintenance, some features of the canvas will not be useable.
+                    </Message>
+                }
             </div>
         );
     }

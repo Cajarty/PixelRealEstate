@@ -38,7 +38,54 @@
             enable_page_level_ads: true
         });
     </script>-->
+    <style>
+    .glowing-btn {
+        background-color: #FFDF00;
+        border: none;
+        color: #FFFFFF;
+        cursor: pointer;
+        display: inline-block;
+        /*padding: 5px 10px;*/
+        margin-left: 5px;
+        text-align: center;
+        text-decoration: none;
+        -webkit-animation: glowing 1500ms infinite;
+        -moz-animation: glowing 1500ms infinite;
+        -o-animation: glowing 1500ms infinite;
+        animation: glowing 1500ms infinite;
+    }
+    @-webkit-keyframes glowing {
+      0% { background-color: #FFDF00; -webkit-box-shadow: 0 0 3px #FFDF00; }
+      50% { background-color: #FFD700; -webkit-box-shadow: 0 0 40px #FFD700; }
+      100% { background-color: #FFDF00; -webkit-box-shadow: 0 0 3px #FFDF00; }
+    }
 
+    @-moz-keyframes glowing {
+      0% { background-color: #FFDF00; -moz-box-shadow: 0 0 3px #FFDF00; }
+      50% { background-color: #FFD700; -moz-box-shadow: 0 0 40px #FFD700; }
+      100% { background-color: #FFDF00; -moz-box-shadow: 0 0 3px #FFDF00; }
+    }
+
+    @-o-keyframes glowing {
+      0% { background-color: #FFDF00; box-shadow: 0 0 3px #FFDF00; }
+      50% { background-color: #FFD700; box-shadow: 0 0 40px #FFD700; }
+      100% { background-color: #FFDF00; box-shadow: 0 0 3px #FFDF00; }
+    }
+
+    @keyframes glowing {
+      0% { background-color: #FFDF00; box-shadow: 0 0 3px #FFDF00; }
+      50% { background-color: #FFD700; box-shadow: 0 0 40px #FFD700; }
+      100% { background-color: #FFDF00; box-shadow: 0 0 3px #FFDF00; }
+    }
+    @media (max-width: 1000px) {
+        .span-btn-br {
+            display: block
+        }
+        .big-btn {
+            width: 80% !important;
+        }
+    }
+    </style>
 </head>
 
 <body>
@@ -93,10 +140,13 @@
                         <span id="span-control"></span>
                         <div id="wrapper-compete"><span id="span-compete"></span></div>
 
-                        <p class="mt-5">
-                            <a style="width:40%; font-size:2.5em;"
-                            href="https://canvas.pixelproperty.io" class="btn btn-white mt-3 mb-2 page-scroll">DRAW</a>
-                        </p>
+                        <div>
+                            <a style="width:40%; font-size:2.5em; margin-right: 5px;"
+                            href="https://canvas.pixelproperty.io" class="btn big-btn btn-white mt-3 mb-2 page-scroll">DRAW</a>
+                            <span class="span-btn-br"></span>
+                            <a style="width:40%; font-size:2.5em" class="btn big-btn glowing-btn mt-3 mb-2 page-scroll"
+                            href="airdrop">GIVEAWAY!</a>
+                        </div>
                     </div>
                 </div>
             </div>

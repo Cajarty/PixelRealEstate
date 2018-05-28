@@ -59,7 +59,7 @@ $(function() {
 
     setInterval(() => {
         var timestamp = new Date().getTime();
-        var src = './img/canvas.png';
+        var src = './img/canvas.png' + '?' + timestamp;
         let img = new Image();
         img.onload = () => {
             $('#canvas-image').attr('src', img.src);

@@ -264,8 +264,9 @@ a {
 #wrapper-canvas {
     margin: auto;
     display: block;
-    height: 100%;
-    width: 100%;
+    width: 40vw;
+    height: 40vw;
+    margin-bottom: 40px;
     text-align: center;
     overflow: hidden;
 }
@@ -357,6 +358,14 @@ a {
     }
     .iphone-mt-small {
         margin-top: 1em !important;
+    }
+    #wrapper-canvas {
+        margin: auto;
+        display: block;
+        width: 90vw;
+        height: 90vw;
+        text-align: center;
+        overflow: hidden;
     }
 }
 /**

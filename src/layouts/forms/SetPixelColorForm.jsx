@@ -7,9 +7,10 @@ import { ChromePicker } from 'react-color';
 import * as Assets from '../../const/assets';
 import Info from '../ui/Info';
 import * as Strings from '../../const/strings';
-import { Modal, ModalContent, ModalHeader, Button, Divider, Input, List, Popup, Label, ModalActions, Icon, Segment, Grid, GridColumn, GridRow, ButtonGroup, Message, Loader } from 'semantic-ui-react';
+import { Modal, ModalContent, ModalHeader, Button, Divider, Input, List, Popup, Label, ModalActions, Icon, Segment, Grid, GridColumn, GridRow, ButtonGroup, Message, Loader, ImageComponent } from 'semantic-ui-react';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
 import {TUTORIAL_STATE} from '../../functions/GlobalState';
+import PXLBalanceItem from '../ui/PXLBalanceItem';
 
 const PREVIEW_WIDTH = 100;
 const PREVIEW_HEIGHT = 100;
@@ -30,6 +31,8 @@ class SetPixelColorForm extends Component {
             select: {x1: -1, y1: -1, x2: -1, y2: -1, w: 0, h: 0},
             multiRect: false,
             ppt: '0',
+            SDMInit: 0,
+            maxPayout: 5,
             ctxLrg: null,
             ctxSml: null,
             canvasLrg: null,
@@ -44,6 +47,12 @@ class SetPixelColorForm extends Component {
             isOpen: false,
             pendingState: Const.FORM_STATE.IDLE,
         };
+    }
+
+    componentDidMount() {
+        GFD.listen('ServerDataManagerInit', 'UpdatePixel', (SDMInit) => {
+            this.setState({SDMInit});
+        })
     }
     
     componentWillReceiveProps(newProps) {
@@ -79,8 +88,9 @@ class SetPixelColorForm extends Component {
     }
 
     handlePrice(key, value) {
-        let obj = {};
-        obj[key] = parseInt(value) < 0 ? 0 : parseInt(value);
+        let obj = {maxPayout: 0};
+        obj[key] = isNaN(parseInt(value)) ? '' : Math.max(0, parseInt(value));
+        obj.maxPayout = ((obj[key] === '' ? 0 : obj[key]) + 1) * 5;
         this.setState(obj);
     }
 
@@ -109,6 +119,8 @@ class SetPixelColorForm extends Component {
                 this.attemptDraw(ev);
         };
         GFD.listen('select', 'UpdatePixel', (select) => {
+            if (select.x1 == this.state.select.x1 && select.x2 == this.state.select.x2 && select.y1 == this.state.select.y1 && select.y2 == this.state.select.y2)
+                return;
             let multiRect = select.x2 != -1 && select.y2 != -1 && (select.x1 != select.x2 || select.y1 != select.y2);
             select.w = Math.abs(select.x2 - select.x1) + 1;
             select.h = Math.abs(select.y2 - select.y1) + 1;
@@ -348,6 +360,37 @@ class SetPixelColorForm extends Component {
         return ret;
     }
 
+    setPixelsSimple() {
+        let editor = this.getEditorSize();
+        let pixelData = this.state.ctxSml.getImageData(0, 0, editor.w / 10, editor.h / 10).data;
+        this.setState({pendingState: Const.FORM_STATE.PENDING});
+        if (this.state.multiRect) {
+            let xx = 0;
+            for (let x = this.state.select.x1; x <= this.state.select.x2; x++) {
+                let yy = 0;
+                for (let y = this.state.select.y1; y <= this.state.select.y2; y++) {
+                    let pixelDataSection = this.getImageDataFromRect(pixelData, xx, yy, this.state.select.w, this.state.select.h);
+                    SDM.setSimpleColors(x - 1, y - 1, pixelDataSection, (result) => {
+                        if (result === 'pending')
+                            ctr.sendResults(LISTENERS.PendingSetPixelUpdate, {x: x - 1, y: y - 1, pixelData: pixelDataSection});
+                        if (this.state.pendingState !== Const.FORM_STATE.IDLE && result !== 'pending')
+                            this.setState({pendingState: result ? Const.FORM_STATE.COMPLETE : Const.FORM_STATE.FAILED});
+                    });
+                    yy++;
+                }
+                xx++;
+            }
+        } else {
+            SDM.setSimpleColors(this.state.x - 1, this.state.y - 1, pixelData, (result) => {
+                if (result === 'pending')
+                    ctr.sendResults(LISTENERS.PendingSetPixelUpdate, {x: this.state.x - 1, y: this.state.y - 1, pixelData});
+                if (this.state.pendingState !== Const.FORM_STATE.IDLE && result !== 'pending')
+                    this.setState({pendingState: result ? Const.FORM_STATE.COMPLETE : Const.FORM_STATE.FAILED});
+            });
+        }
+
+    }
+
     setPixels() {
         let editor = this.getEditorSize();
         let pixelData = this.state.ctxSml.getImageData(0, 0, editor.w / 10, editor.h / 10).data;
@@ -434,7 +477,7 @@ class SetPixelColorForm extends Component {
                 className={TUTORIAL_STATE.getClassName(this.props.tutorialState.index, 4) + ' actions'}
             >
             <ModalHeader>Update Property Image</ModalHeader>
-            <ModalContent>     
+            <ModalContent>
                 <Grid>
                     <GridRow columns={2} stretched>
                         <GridColumn width={7}>
@@ -578,7 +621,7 @@ class SetPixelColorForm extends Component {
                                     <Grid divided>
                                         <GridRow>
                                             <GridColumn width={16} stretched>
-                                                <Info messages={Strings.FORM_SET_IMAGE}/>
+                                                <Info messages={this.state.SDMInit >= 2 ? Strings.FORM_SET_IMAGE : Strings.FORM_SET_IMAGE_SIMPLE}/>
                                             </GridColumn>
                                         </GridRow>
                                         <GridRow columns={2}>
@@ -592,60 +635,93 @@ class SetPixelColorForm extends Component {
                                             </GridColumn>
                                             <GridColumn width={9} stretched>
                                                 <GridRow>
-                                                    <Input
-                                                        placeholder="1 - 100"
-                                                        type={this.state.multiRect ? 'text' : 'number'}
-                                                        className='oneColumnFull'
-                                                        fluid
-                                                        disabled={this.state.multiRect}
-                                                        label={<Popup
-                                                            trigger={<Label className='uniform'>X</Label>}
-                                                            content='X Position'
-                                                            className='Popup'
-                                                            size='tiny'
-                                                        />}
-                                                        value={this.state.multiRect ? this.state.select.x1 + ' - ' + this.state.select.x2 : this.state.x} 
-                                                        onChange={(e) => this.setX(e.target.value)}
-                                                    />
-                                                </GridRow>
-                                                <GridRow>
-                                                    <Input
-                                                        placeholder="1 - 100"
-                                                        type={this.state.multiRect ? 'text' : 'number'}
-                                                        label={<Popup
-                                                            trigger={<Label className='uniform'>Y</Label>}
-                                                            content='Y Position'
-                                                            className='Popup'
-                                                            size='tiny'
-                                                        />}
-                                                        className='oneColumnFull'
-                                                        fluid
-                                                        disabled={this.state.multiRect}
-                                                        value={this.state.multiRect ? this.state.select.y1 + ' - ' + this.state.select.y2 : this.state.y} 
-                                                        onChange={(e) => this.setY(e.target.value)}
-                                                    />
-                                                </GridRow>
-                                                <GridRow>
-                                                    <Input 
-                                                        fluid
-                                                        labelPosition='right' 
-                                                        type={"number"}
-                                                        placeholder={"Enter Optional PXL"}
-                                                        value={this.state.ppt}
-                                                    >
-                                                        <Popup
-                                                            trigger={<Label><Icon className='uniform' name='money'/></Label>}
-                                                            content='PXL to Spend'
-                                                            className='Popup'
-                                                            size='tiny'
+                                                    <div className='twoColumn w50 right'>
+                                                        <Input
+                                                            placeholder="1 - 100"
+                                                            type={this.state.multiRect ? 'text' : 'number'}
+                                                            className='oneColumnFull'
+                                                            fluid
+                                                            disabled={this.state.multiRect}
+                                                            label={<Popup
+                                                                trigger={<Label className='uniform'>X</Label>}
+                                                                content='X Position'
+                                                                className='Popup'
+                                                                size='tiny'
+                                                            />}
+                                                            value={this.state.multiRect ? this.state.select.x1 + ' - ' + this.state.select.x2 : this.state.x} 
+                                                            onChange={(e) => this.setX(e.target.value)}
                                                         />
-                                                        <input 
-                                                        className='bid'
-                                                        onChange={(e) => this.handlePrice('ppt', e.target.value)}
+                                                    </div>
+                                                    <div className='twoColumn w50 right'>
+                                                        <Input
+                                                            placeholder="1 - 100"
+                                                            type={this.state.multiRect ? 'text' : 'number'}
+                                                            label={<Popup
+                                                                trigger={<Label className='uniform'>Y</Label>}
+                                                                content='Y Position'
+                                                                className='Popup'
+                                                                size='tiny'
+                                                            />}
+                                                            className='oneColumnFull'
+                                                            fluid
+                                                            disabled={this.state.multiRect}
+                                                            value={this.state.multiRect ? this.state.select.y1 + ' - ' + this.state.select.y2 : this.state.y} 
+                                                            onChange={(e) => this.setY(e.target.value)}
                                                         />
-                                                        <Label>PXL</Label>
-                                                    </Input>
+                                                    </div>
                                                 </GridRow>
+                                                {this.state.SDMInit == 1 &&
+                                                    <GridRow>
+                                                        <Message success>
+                                                            Sign Up to become an Advanced User:
+                                                            <br/>
+                                                            <br/>
+                                                            - Earn PXL Token for drawing.
+                                                            <br/>
+                                                            - Drawings are shown for longer.
+                                                            <br/>
+                                                            - Own parts of the canvas.
+                                                        </Message>
+                                                    </GridRow>
+                                                }
+                                                {this.state.SDMInit >= 2 &&
+                                                    <GridRow>
+                                                        <PXLBalanceItem/>
+                                                    </GridRow>
+                                                }
+                                                {this.state.SDMInit >= 2 &&
+                                                    <GridRow>
+                                                        <Input 
+                                                            fluid
+                                                            labelPosition='right' 
+                                                            type={"number"}
+                                                            placeholder={"Enter Optional PXL"}
+                                                            value={this.state.ppt}
+                                                        >
+                                                            <Popup
+                                                                trigger={<Label><Icon className='uniform' name='money'/></Label>}
+                                                                content='PXL to Spend'
+                                                                className='Popup'
+                                                                size='tiny'
+                                                            />
+                                                            <input 
+                                                            className='bid'
+                                                            onChange={(e) => this.handlePrice('ppt', e.target.value)}
+                                                            />
+                                                            <Label>PXL</Label>
+                                                        </Input>
+                                                    </GridRow>
+                                                }
+                                                {this.state.SDMInit >= 2 &&
+                                                    <GridRow>
+                                                        {' = ' + Func.NumberWithCommas(this.state.maxPayout) + 'PXL earned maximum per Property'}
+                                                    </GridRow>
+                                                }
+                                                {this.state.SDMInit >= 2 &&
+                                                    <GridRow>
+                                                        {'+25 PXL for initial Property upload'}
+                                                    </GridRow>
+                                                }
                                             </GridColumn>
                                         </GridRow>
                                     </Grid>
@@ -657,7 +733,9 @@ class SetPixelColorForm extends Component {
                 {this.props.tutorialState.index != 4 && 
                 <ModalActions>
                     <Label className={this.state.pendingState.name} color={this.state.pendingState.color}>{this.state.pendingState.message}</Label>
-                    <Button primary onClick={() => this.setPixels()}>Change Image</Button>
+                    <Button secondary onClick={() => this.toggleModal(false)}>Cancel</Button>
+                    <Button primary={this.state.SDMInit == 1} onClick={() => this.setPixelsSimple()}>{'Change Image' + (this.state.SDMInit >= 2 ? ' (Simple)' : '')}</Button>
+                    {this.state.SDMInit >= 2 && <Button primary onClick={() => this.setPixels()}>Change Image (Advanced)</Button>}
                 </ModalActions>}
             </Modal>
         );

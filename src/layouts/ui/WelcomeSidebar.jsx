@@ -7,6 +7,7 @@ import { Segment, Header, Image , Button, Message, Form, List, Divider, Statisti
 import * as Assets from '../../const/assets';
 import SignUpForm from '../forms/SignUpForm';
 import browser from 'browser-detect';
+import PixelDescriptionBoxSimple from './PixelDescriptionBoxSimple';
 
 const _rel = 1525194000000;
 const RELEASE_DATE = new Date(_rel);
@@ -62,26 +63,14 @@ class WelcomeSidebar extends Component {
 
     render() {
         return (
-            <Segment className='WelcomeSidebar' compact >
-                <Header style={{textAlign: 'center'}} size='large'>
-                    PixelProperty
-                </Header>
-                <Statistic.Group style={stats}>
-                    <Statistic style={stats}>
-                        <Statistic.Value>{this.state.freeSetCounter}</Statistic.Value>
-                        <Statistic.Label>b o n u s  -  P X L</Statistic.Label>
-                    </Statistic>
-                </Statistic.Group>
-                {null && <Message color='orange'>
-                    We are currently experiencing a slow network; PixelProperty.io may have missing information until then.
-                </Message>}
-                {console.info(this.state.browser)}
+            <div>
                 {(this.state.browser.name !== 'chrome') &&
                     <Message color='red'>
                         It is recommended to use Chrome while PixelProperty is in Beta. We apologize for the inconvenience.
                     </Message>
                 }
-            </Segment>
+                <PixelDescriptionBoxSimple/>
+            </div>
         );
     }
 }
@@ -100,26 +89,26 @@ export default WelcomeSidebar
 
 /*
 
- <Message className='message' id='message'>
-                    <Message.Header size='large'>
-                        Change Log
-                    </Message.Header>
-                    <Divider/>
-                    <Message.Content>
-                    <List divided relaxed>
-                    {Strings.CHANGELOG.map((log, i) => {
-                        return (
-                            <List.Item key={i} as='li' value='*'>{log.title + ' - ' + log.date.toDateString()}
-                                <List.Item as='ol'>
-                                {log.messages.map((msg, ii) => {
-                                    return (<List.Item key={ii} as='li' value='-'>{msg}</List.Item>);
-                                })}
-                                </List.Item>
-                            </List.Item>
-                        );
+<Message className='message' id='message'>
+    <Message.Header size='large'>
+        Change Log
+    </Message.Header>
+    <Divider/>
+    <Message.Content>
+        <List divided relaxed>
+        {Strings.CHANGELOG.map((log, i) => {
+            return (
+                <List.Item key={i} as='li' value='*'>{log.title + ' - ' + log.date.toDateString()}
+                    <List.Item as='ol'>
+                    {log.messages.map((msg, ii) => {
+                        return (<List.Item key={ii} as='li' value='-'>{msg}</List.Item>);
                     })}
-                    </List>
-                </Message.Content>
-                </Message>
+                    </List.Item>
+                </List.Item>
+            );
+        })}
+        </List>
+    </Message.Content>
+</Message>
 
 */

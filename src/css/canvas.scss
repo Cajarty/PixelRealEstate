@@ -150,7 +150,7 @@
     margin-right: 15px !important;
     height: calc(100vh - 30px);
     min-height: 430px;
-    .left {
+    .leftContainer {
         width: calc(((100vw - (100vh - 30px) - 120px) / 2)) !important;
         max-width: calc((100vw - 460px) / 2) !important;
         overflow-y: auto;
@@ -158,11 +158,11 @@
         border-top-left-radius: 5px !important;
         border-bottom-left-radius: 5px !important;
     }
-    .center {
+    .centerContainer {
         width: calc(100vh - 75px) !important;
         min-width: 400px;
     }
-    .right {
+    .rightContainer {
         width: calc(((100vw - (100vh - 30px) - 120px) / 2)) !important;
         max-width: calc((100vw - 460px) / 2) !important;
         overflow-y: auto;
@@ -178,6 +178,15 @@
 .lowerSegment {
     margin: 0px 1rem 1rem 1rem !important;
     max-height: 800px;
+}
+
+.chatAndBrowseSegment {
+    margin: -1rem 0 0 0 !important;
+    .chatAndLogs {
+        .topPane {
+            height: 434px !important;
+        }
+    }
 }
 
 #footer.footer {

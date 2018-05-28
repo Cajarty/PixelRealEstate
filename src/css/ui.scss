@@ -467,14 +467,30 @@ div.hoverLabel.ui {
 .ui.compact.segment.WelcomeSidebar {
     height: 100%;
     background: linear-gradient(to bottom right, lighten($color3, 10%), darken($color3, 5%));
-    .message#message {
-        background: linear-gradient(to bottom right, darken($color3, 5%), lighten($color3, 10%));
+    .message {
+        background: linear-gradient(to bottom right, darken($color3, 5%), lighten($color3, 10%)) !important;
+    }
+}
+
+.message {
+    &.changeLogList {
+        overflow-y: auto;
+        background: $color1;
     }
 }
 
 .ui.image.downloadImage {
-    background-color: lighten($color3, 10%);
+    background-color: lighten($color4, 10%);
     margin: auto;
+}
+
+.becomeAdvanced {
+    .ui.list {
+        margin: 0;
+    }
+    h2 {
+        margin: 0;
+    }
 }
 
 canvas {
@@ -493,4 +509,30 @@ For transaction pending labels to notify the user on the status of their transac
 .PENDING,
 .COMPLETE {
     @include animation(fadein, .8s);
+}
+
+.ui.buttons.buttonRefreshBalance {
+    margin-top: 2px !important;
+}
+
+.gif {
+    &.text {
+        text-align: center;
+        margin: auto;
+        vertical-align: middle;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-left: -50%;
+        margin-top: -50%;
+        width: 100%;
+        height: 100%;
+        z-index: 21000;
+    }
+    &.image {
+        width: 100%;
+        height: auto;
+        margin: auto;
+    }
+    .ui.input {}
 }

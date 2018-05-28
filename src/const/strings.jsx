@@ -17,9 +17,13 @@ export const FORM_SET_LINK = ["Sets a visitable link for all your owned Properti
     "Users can click on your properties to visit this website. The maximum length is 64 characters."];
 export const FORM_SET_TEXT = ["Sets a phrase for all your owned Properties.", 
     "Users will see this phrase when inspecting one of your Properties. The maximum length is 64 characters."];
+export const FORM_SET_IMAGE_SIMPLE = [
+    "Updates the artwork of this Property.", "Reserved Properties cannot be drawn on until they are public again."
+];
 export const FORM_SET_IMAGE = ["Updates the artwork of this property and earns you PXL.", 
     "If the Property has an owner, the owner will be paid an equal amount of PXL as the user. Spending additional PXL will increase the maximum payout and reserve time of this Property."];
-export const FORM_TRANSFER = ["Transfer this Property to another address.", 
+export const FORM_TRANSFER = ['Send PXL from your address to another address.'];
+export const FORM_TRANSFER_PROPERTY = ["Transfer this Property to another address.", 
     "Make sure the recipient address is correct, or the Property is unclaimable."];
 export const FORM_BID = ["Place a bid offer on this Property.", 
     "Bids cost 1 PXL, but does not offer any PXL to the Property owner. Bids only notify the owner of your potential offer, trades must still be done through the market."];
@@ -27,6 +31,48 @@ export const TUTORIAL_START_DIALOG = ["Pixel Property is easy to use. Just in ca
     "If you'd like to skip it now, the tutorial can be accessed again from the bottom of the page."];
 
 export const CHANGELOG = [
+    {
+        date: new Date('2018-5-26'),
+        title: 'Free Drawing!',
+        messages: 
+        ["We've introduced Simple users, which allows for anyone to draw without an account or MetaMask!",
+        "Features are limited for Simple users as they do not interact with Ethereum."],
+    },
+    {
+        date: new Date('2018-5-16'),
+        title: 'PXL Token Update',
+        messages: 
+        ['Token contract updates to be compliant with other MyEtherDelta and other Ethereum services.',
+        <div style={{display: 'inline'}}><span style={{color: 'red'}}>IMPORTANT! </span>Old artwork on the canvas previous to this update will not trigger PXL payouts until the art is changed.</div>],
+    },
+    {
+        date: new Date('2018-5-8'),
+        title: 'Bugfixes',
+        messages: 
+        ['Hotfix for users who do not have MetaMask sometimes freezing.'],
+    },
+    {
+        date: new Date('2018-5-7'),
+        title: 'Send PXL & GIF Generator',
+        messages: 
+        ['Send PXL to another Ethereum address easily.',
+        'Anyone can now generate a GIF of PixelProperty in any location over any timespan!'],
+    },
+    {
+        date: new Date('2018-5-3'),
+        title: 'Beta Updates #1',
+        messages: 
+        ['Transactions taking a longer time do not report errors.',
+        'Estimated gas is better calculated.'],
+    },
+    {
+        date: new Date('2018-5-1'),
+        title: 'Beta Release!',
+        messages: 
+        ['PixelProperty is released to the Ethereum network.',
+        'Event and log server storage and other client improvements.',
+        'Refresh button on PXL balance.'],
+    },
     {
         date: new Date('2018-4-25'),
         title: 'General Fixes & Updates',
@@ -50,11 +96,11 @@ export const CHANGELOG = [
     },
     {
         date: new Date('2018-4-10'),
-        title: 'Beta Testing',
+        title: 'Pre-Release Testing',
         messages: 
         ['Live on the Rinkeby test network!', 
         'Change your MetaMask network from "Main" to "Rinkeby" to begin testing.', 
-        <div>You'll need funds from the Rinkeby faucet at: <a href="https://www.rinkeby.io/#faucet" target='_blank'>Rinkeby.io</a></div>],
+        <p style={{display: 'inline'}}>You'll need funds from the Rinkeby faucet at: <a href="https://www.rinkeby.io/#faucet" target='_blank'>Rinkeby.io</a></p>],
     }
 ];
 

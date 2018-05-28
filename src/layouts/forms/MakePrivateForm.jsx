@@ -7,6 +7,7 @@ import {GFD, GlobalState} from '../../functions/GlobalState';
 import * as Strings from '../../const/strings';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 import {Segment, ModalContent, ModalHeader, Divider, Modal, Grid, Label, Input, Container, Icon, Button, Popup, ModalActions, Message} from 'semantic-ui-react';
+import PXLBalanceItem from '../ui/PXLBalanceItem';
 
 const TOKENS_TO_MINUTES = 1;
 
@@ -160,6 +161,7 @@ class MakePrivateForm extends Component {
                         onChange={(e) => this.setY(e.target.value)}
                     />
                 </div>
+                <PXLBalanceItem/>
                 <Divider horizontal>Duration</Divider>
 
                 <Grid columns={3}>

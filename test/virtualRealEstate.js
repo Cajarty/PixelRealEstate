@@ -9,6 +9,7 @@ let byteArrayTwos = [2,2];
 let byteArrayLong = [3,3];
 let byteArrayShort = [4,4];
 
+
 let stringToBigInts = (string) => {
   let result = [];
   let innerResult = new bigInt("0", 10);
@@ -623,3 +624,34 @@ contract('VirtualRealEstate', function(accounts) {
    });
  });*/
 });
+
+/*
+contract('PixelPropertyToken', function(accounts) {
+  it("PixelPropertyToken Deployent & Migration", function() {
+    return PixelPropertyToken.deployed(pxlPropertyInstance.address).then(function(instance) {
+      PixelPropertyTokenInstance = instance;
+      console.log("PixelPropertyToken - Test colors for zeros");
+      return PixelPropertyTokenInstance.getPropertyColors(0, {from: accounts[0]});
+    }).then(function(result) {
+      console.log(result, "PixelPropertyToken - About To Migrate");
+      return PixelPropertyTokenInstance.migratePropertyOwnership([0,1,2,3,4,5,6,7,8,9], {from: accounts[0]});
+    }).then(function(result) {
+      console.info("Post Migrate", result);
+      return PixelPropertyTokenInstance.getPropertyData(0, { from: accounts[0] });
+    }).then(function(result) {
+      console.info(result);
+      return PixelPropertyTokenInstance.getPropertyData(1, { from: accounts[0] });
+    }).then(function(result) {
+      console.info(result);
+      return PixelPropertyTokenInstance.getPropertyData(2, { from: accounts[0] });
+    }).then(function(result) {
+      console.info(result);
+      return PixelPropertyTokenInstance.getPropertyData(3, { from: accounts[0] });
+    }).then(function(result) {
+      console.info(result);
+      return PixelPropertyTokenInstance.getPropertyData(4, { from: accounts[0] });
+    });
+  });
+});
+*/
+

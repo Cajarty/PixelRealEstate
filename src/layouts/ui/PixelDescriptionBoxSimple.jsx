@@ -7,7 +7,7 @@ import {GFD, GlobalState, TUTORIAL_STATE} from '../../functions/GlobalState';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
 import Hours from '../ui/Hours';
 import Moment from 'react-moment';
-import Message, { Label, Input, Item, Button, Popup, Icon, Grid, Segment, SegmentGroup, Divider } from 'semantic-ui-react';
+import { Message, Label, Input, Item, Button, Popup, Icon, Grid, Segment, SegmentGroup, Divider } from 'semantic-ui-react';
 import BuyPixelForm from '../forms/BuyPixelForm';
 import SellPixelForm from '../forms/SellPixelForm';
 import SetPixelColorForm from '../forms/SetPixelColorForm';
@@ -22,7 +22,7 @@ import ErrorBox from '../ErrorBox';
 
 const NOBODY = '0x0000000000000000000000000000000000000000';
 
-class PixelDescriptionBox extends Component {
+class PixelDescriptionBoxSimple extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -94,19 +94,11 @@ class PixelDescriptionBox extends Component {
             dataCtx,
         });
 
-        GFD.listen('tutorialStateIndex', 'pixelBrowse', (newID) => {
-            this.setState({tutorialState: TUTORIAL_STATE[Object.keys(TUTORIAL_STATE)[newID]]})
-        });
-        GFD.listen('noAccount', 'pixelBrowse', (noAccount) => {
-            this.setState({noAccount});
-        })
-
         GFD.listen('x', 'pixelBrowse', (x) => {
             this.setState({x});
         })
         GFD.listen('y', 'pixelBrowse', (y) => {
-            if (!GFD.getData('noMetaMask'))
-                this.loadProperty(GFD.getData('x') - 1, y - 1);
+            this.loadProperty(GFD.getData('x') - 1, y - 1);
             this.setState({y});
         })
 
@@ -120,86 +112,7 @@ class PixelDescriptionBox extends Component {
         })
 
         this.setState({timerUpdater: setInterval(() => this.timerUpdate(), 60000)});
-
-        ctr.listenForResults(LISTENERS.ServerDataManagerInit, 'PixelBox', (results) => {
-            if (results.imageLoaded && GFD.getData('ServerDataManagerInit') == 1) {
-                let data = SDM.getPropertyData(this.state.x - 1, this.state.y - 1);
-                let ethp = data.ETHPrice;
-                let ppcp = data.PPCPrice;
-                let reserved = data.becomePublic;
-                let lastUpdate = data.lastUpdate;
-                let maxEarnings = ((reserved - lastUpdate) / 30) * 5;
-                this.setState({
-                    owner: data.owner,
-                    isForSale: ppcp != 0,
-                    ETHPrice: ethp ,
-                    PPCPrice: ppcp,
-                    lastUpdate,
-                    isInPrivate: data.isInPrivate,
-                    reserved,
-                    latestBid: data.lastestBid,
-                    maxEarnings,
-                    earnings: Func.calculateEarnings(lastUpdate, maxEarnings),
-                });
-    
-                this.timerUpdate(lastUpdate, reserved);
-                
-                let canvasData = SDM.getPropertyImage(this.state.x - 1, this.state.y - 1);
-                
-                this.setCanvas(canvasData);
-    
-                this.startTokenEarnedInterval();
-            } else if (!GFD.getData('noMetaMask')) {
-                ctr.stopListeningForResults(LISTENERS.ServerDataManagerInit, 'PixelBox');
-            }
-        });
-
-        if (GFD.getData('noMetaMask')) {
-            GFD.listen('noMetaMask', 'DescBox', this.setup);
-            return;
-        }
-        this.setup(false);
     }
-
-    setup(noMetaMask) {            
-        if (noMetaMask)
-            return;
-        GFD.close('noMetaMask', 'DescBox');
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (evH1) => {
-            this.setState({evH1});
-            evH1.watch((error, log) => {
-                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                let xx = GFD.getData('x') - 1
-                let yy = GFD.getData('y') - 1;
-                if (id.x == xx && id.y == yy) {
-                    let colors = Func.ContractDataToRGBAArray(log.args.colors);
-                    this.loadProperty(id.x, id.y, colors);
-                }
-            });
-        });
-
-        ctr.watchEventLogs(EVENTS.PropertyBought, {}, (evH2) => {
-            this.setState({evH2});
-            evH2.watch((error, log) => {
-                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                let xx = GFD.getData('x') - 1
-                let yy = GFD.getData('y') - 1;
-                if (id.x == xx && id.y == yy)
-                    this.loadProperty(xx, yy);
-            });
-        });
-
-        ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (evH3) => {
-            this.setState({evH3});
-            evH3.watch((error, log) => {
-                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                let xx = GFD.getData('x') - 1
-                let yy = GFD.getData('y') - 1;
-                if (id.x == xx && id.y == yy)
-                    this.loadProperty(xx, yy);
-            });
-        });
-    };
 
     timerUpdate(lastUpdate = this.state.lastUpdate, reserved = this.state.reserved) {
         let lastUpdateFormatted = Func.TimeSince(lastUpdate * 1000) + " ago";
@@ -267,46 +180,30 @@ class PixelDescriptionBox extends Component {
     loadProperty(x, y, canvasData = null) {
         if (x === '' || y === '')
             return;
-        ctr.getPropertyData(x, y, (data) => {  
-            let ethp = Func.BigNumberToNumber(data[1]);
-            let ppcp = Func.BigNumberToNumber(data[2]);
-            let reserved = Func.BigNumberToNumber(data[5]);
-            let lastUpdate = Func.BigNumberToNumber(data[3]);
-            let maxEarnings = ((reserved - lastUpdate) / 30) * 5;
-            this.setState({
-                owner: data[0],
-                isForSale: ppcp != 0,
-                ETHPrice: ethp,
-                PPCPrice: ppcp,
-                lastUpdate,
-                isInPrivate: data[4],
-                reserved,
-                latestBid: Func.BigNumberToNumber(data[6]),
-                maxEarnings,
-                earnings: Func.calculateEarnings(lastUpdate, maxEarnings),
-            });
-            ctr.getHoverText(data[0], (data) => {
-                this.setState({hoverText: (data != null && data.length > 0 ? data : null)});
-            });
-            ctr.getLink(data[0], (data) => {
-                    this.setState({link: (data != null && data.length > 0 ? data : null)});
-            });
-            ctr.getBalance((balance) => {
-                this.setState({PPCOwned: balance});
-            });
-            this.timerUpdate(lastUpdate, reserved);
+        let propData = SDM.getPropertyData(x, y);
+        let lastUpdate = propData.lastUpdate;
+        let isInPrivate = propData.isInPrivate;
+        let reserved = lastUpdate + ((propData.reserved - lastUpdate) * 10);
+        this.setState({
+            lastUpdate,
+            isInPrivate,
+            reserved,
         });
-        if (canvasData === null) {
-            ctr.getPropertyColors(x, y, (x, y, canvasData, isUnset) => {
-                if (isUnset) {
-                    this.setCanvas(SDM.getPropertyImage(x, y));
-                } else {
-                    this.setCanvas(canvasData);
-                }
-            });
-        } else {
-            this.setCanvas(canvasData);
-        }
+        this.timerUpdate(lastUpdate, reserved);
+        
+        //     ctr.getHoverText(data[0], (data) => {
+        //         this.setState({hoverText: (data != null && data.length > 0 ? data : null)});
+        //     });
+        //     ctr.getLink(data[0], (data) => {
+        //             this.setState({link: (data != null && data.length > 0 ? data : null)});
+        //     });
+        //     ctr.getBalance((balance) => {
+        //         this.setState({PPCOwned: balance});
+        //     });
+        //     this.timerUpdate(lastUpdate, reserved);
+        // });
+        this.setCanvas(SDM.getPropertyImage(x, y));
+        
         this.stopTokenEarnedInterval();
         this.startTokenEarnedInterval();
     }
@@ -325,25 +222,6 @@ class PixelDescriptionBox extends Component {
         clearInterval(this.state.tokenEarnedInterval);
     }
 
-    placeBid() {
-        ctr.getBalance((balance) => {
-            if (balance < 1) {
-                this.setState({showMessage: true});
-                return;
-            }
-            this.toggleAction('PLACE_BID');
-        });
-    }
-
-    getPriceFormat() {
-        // if (this.state.ETHPrice == 0 && this.state.PPCPrice == 0) 
-        //     return "Not for sale"
-        let s = this.state.ETHPrice == 0 ? '' : Func.WeiToEth( this.state.ETHPrice ) + ' ETH';
-        s += this.state.ETHPrice != 0 && this.state.PPCPrice != 0 ? ' - ' : '';
-        s += this.state.PPCPrice == 0 ? '' : Func.NumberWithCommas( this.state.PPCPrice ) + ' PXL';
-        return s;
-    }
-
     toggleAction(key) {
         if (this.state.tutorialState.index == 3 && key === 'SET_IMAGE') {
             GFD.setData('tutorialStateIndex', 1);
@@ -356,36 +234,10 @@ class PixelDescriptionBox extends Component {
 
     getActionsList() {
         let actions = [];
-        if (!this.state.isInPrivate || this.state.tutorialState.index == 3 || this.state.multiRect) {
+        if (!this.state.isInPrivate || this.state.multiRect) {
             actions.push(
                 <Button fluid onClick={() => this.toggleAction('SET_IMAGE')}>Update Image</Button>
             );
-        }
-        if (this.state.multiRect)
-            return actions;
-        // actions.push(new Action("Place Offer", null));
-        if (this.state.isForSale && this.state.owner != ctr.account)
-            actions.push(
-                <Button fluid onClick={(this.state.tutorialState.index == 3 ? () => {} : () => this.toggleAction('BUY'))}>Buy</Button>
-            );
-        if (!this.state.isForSale && this.state.owner == ctr.account)
-            actions.push(
-                <Button fluid onClick={() => this.toggleAction('SELL')}>Sell</Button>
-            );
-        if (this.state.isForSale && this.state.owner == ctr.account)
-            actions.push(
-                <Button fluid onClick={() => this.toggleAction('CANCEL_SALE')}>Delist</Button>
-            );
-        if (this.state.owner == ctr.account) {
-            if (this.state.isInPrivate) { //for this switch, we need to check to make sure we are the setter
-                actions.push(
-                    <Button fluid onClick={() => this.toggleAction('SET_PUBLIC')}>Set Public</Button>
-                );
-            } else {
-                actions.push(
-                    <Button fluid onClick={() => this.toggleAction('SET_PRIVATE')}>Set Private</Button>
-                );
-            }
         }
         return actions;
     }
@@ -395,20 +247,15 @@ class PixelDescriptionBox extends Component {
         win.focus();
     }
 
-    getCurrentPayout() {
-        if (this.state.isInPrivate) {
-            return "N/A";
-        } else if (this.state.lastUpdate == 0) {
-            return "None";
-        } else {
-            return (this.state.earnings + '/' + this.state.maxEarnings) + " PXL";
-        }
-    }
-
     render() {
         return (
             <div className='pixelDescriptionBox'>
-                <div className='colorPreview'>
+                {this.state.x === '' && this.state.y === '' &&
+                    <Message>Click on the canvas to draw!</Message>
+                }
+                <div
+                    className={(this.state.x === '' && this.state.y === '' && !this.state.multiRect ? 'colorPreview hideElement' : 'colorPreview')}
+                >
                     <Item className='colorPreivewCanvasContainer'>
                         <canvas id='colorPreviewCanvas' width={100} height={100} ref={(canvas) => { this.canvas = canvas; }} ></canvas>
                     </Item>
@@ -451,59 +298,6 @@ class PixelDescriptionBox extends Component {
                     <div>
                         <div>
                             <Divider/>
-                            {this.state.owner !== NOBODY &&
-                            <Input
-                                placeholder="Address"
-                                fluid disabled
-                                className='oneColumn'
-                                value={(this.state.owner === ctr.account ? "You" : this.state.owner)} 
-                                label={<Popup
-                                    trigger={<Label><Icon className='uniform' name='user'/></Label>}
-                                    content='Owner Address'
-                                    className='Popup'
-                                    size='tiny'
-                                />}
-                            />}
-                            {this.state.latestBid != 0 &&
-                            <Input 
-                                fluid disabled
-                                labelPosition='right' 
-                                type="text"
-                                placeholder={"Enter PXL"}
-                                className='oneColumn bidInput'
-                                value={this.state.latestBid}
-                                onChange={(e) => this.setState({latestBid: e.target.value})}
-                            >
-                                <Popup
-                                    trigger={<Label><Icon name='legal'/></Label>}
-                                    content='Lastest Bid'
-                                    className='Popup'
-                                    size='tiny'
-                                />
-                                <input className='bid'/>
-                                <Label as='a'
-                                    className='bidButton'
-                                    onClick={() => this.placeBid()} 
-                                >Bid</Label>
-                            </Input>}
-                            <MessageModal 
-                                title='Not Enough PXL!'
-                                description='You must have at least 1 PXL to place a bid.'
-                                isOpen={this.state.showMessage} 
-                                onClose={() => {this.setState({showMessage: false})}}
-                            />
-                            {(this.state.ETHPrice != 0 || this.state.PPCPrice != 0) &&
-                            <Input
-                                label={<Popup
-                                    trigger={<Label><Icon className='uniform' name='dollar'/></Label>}
-                                    content='Price'
-                                    className='Popup'
-                                    size='tiny'
-                                />} 
-                                disabled
-                                className='oneColumn'
-                                value={this.getPriceFormat()} 
-                            />}
                             {this.state.lastUpdate != 0 &&
                             <Input
                                 fluid disabled
@@ -515,18 +309,6 @@ class PixelDescriptionBox extends Component {
                                 />}
                                 className='oneColumn'
                                 value={this.state.lastUpdate == 0 ? 'Never' : this.state.lastUpdateFormatted}
-                            />}
-                            {!this.state.isInPrivate && this.state.lastUpdate != 0 &&
-                            <Input
-                                fluid disabled
-                                label={<Popup
-                                    trigger={<Label><Icon className='uniform' name='money'/></Label>}
-                                    content='Current/Maximum Payout'
-                                    className='Popup'
-                                    size='tiny'
-                                />}
-                                className='oneColumn'
-                                value={this.getCurrentPayout()}
                             />}
                             {(this.state.isInPrivate || (this.state.reserved != 0 && this.state.reserved * 1000 > new Date().getTime())) &&
                             <Input
@@ -595,7 +377,7 @@ class PixelDescriptionBox extends Component {
                 {((this.state.x != '' && this.state.y != '') || this.state.multiRect) && !this.state.noAccount && 
                     <div className={(this.state.tutorialState.index == 3 ? TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 3) + ' actions' : '')}>
                         <Divider/>
-                        <Grid columns='2' divided>
+                        <Grid columns={1} divided>
                             {this.getActionsList().map((action, i) => (
                                 <Grid.Column key={i}>
                                     {action}
@@ -609,17 +391,11 @@ class PixelDescriptionBox extends Component {
                     <Divider/>
                     <ErrorBox/>
                 </div>}
-            
-                <BuyPixelForm tutorialState={this.state.tutorialState} isOpen={this.state.isOpen.BUY} close={this.toggleAction.bind(this)}/>
-                <SellPixelForm isOpen={this.state.isOpen.SELL} close={this.toggleAction.bind(this)}/>
+
                 <SetPixelColorForm tutorialState={this.state.tutorialState} isOpen={this.state.isOpen.SET_IMAGE} close={this.toggleAction.bind(this)}/>
-                <CancelSaleForm isOpen={this.state.isOpen.CANCEL_SALE} close={this.toggleAction.bind(this)}/>
-                <MakePublicForm isOpen={this.state.isOpen.SET_PUBLIC} close={this.toggleAction.bind(this)}/>
-                <MakePrivateForm isOpen={this.state.isOpen.SET_PRIVATE} close={this.toggleAction.bind(this)}/>
-                <PlaceBidForm isOpen={this.state.isOpen.PLACE_BID} close={this.toggleAction.bind(this)}/>
             </div>
         );
     }
 }
 
-export default PixelDescriptionBox
+export default PixelDescriptionBoxSimple

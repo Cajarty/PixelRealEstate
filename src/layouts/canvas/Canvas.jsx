@@ -150,10 +150,34 @@ class Canvas extends Component {
             }
         });
 
+        GFD.listen('imagePNG', 'canvasBox', (PNG) => {
+            if (PNG != null)
+                this.setCanvasWithImage(PNG);
+        })
+
         GFD.listen('select', 'canvasBox', (select) => {
             if (select.x1 == -1 || select.y1 == -1 || select.x2 == -1 || select.y2 == -1)
                 return;
             this.updateSelectRect(select.x1 - 1, select.y1 - 1, select.x2 - 1, select.y2 - 1);
+        });
+
+        GFD.listen('x', 'canvasBox', (x) => {
+            let select = GFD.state.select;
+            let y = GFD.getData('y');
+            select.x1 = x;
+            select.y1 = y;
+            select.x2 = x;
+            select.y2 = y;
+            GFD.setData('select', select);
+        });
+        GFD.listen('y', 'canvasBox', (y) => {
+            let select = GFD.state.select;
+            let x = GFD.getData('x');
+            select.x1 = x;
+            select.y1 = y;
+            select.x2 = x;
+            select.y2 = y;
+            GFD.setData('select', select);
         });
     }
 
@@ -269,6 +293,16 @@ class Canvas extends Component {
         }
         //if pending show loading icon
         this.state.ctx.putImageData(ctxID, x * 10, y * 10);
+
+        let select = GFD.getData('select');
+        let hoverX = GFD.getData('hoverX');
+        let hoverY = GFD.getData('hoverY');
+        if ((x >= select.x1 - 1 || x <= select.x2 + 1) && (y >= select.y1 - 1 || y <= select.y2 + 1))
+            GFD.setData('select', select);
+        if ((x >= hoverX - 1 || x <= hoverX + 1) && (y >= hoverY - 1 || y <= hoverY + 1)) {
+            GFD.setData('hoverX', hoverX);
+            GFD.setData('hoverY', hoverY);
+        }
     }
 
     setCanvasWithImage(img) {
@@ -278,6 +312,8 @@ class Canvas extends Component {
         for (let y = 0; y < 1000; y++) {
             SDM.pixelData[y] = pxlData.slice(y * 4000, (y + 1) * 4000);
         }
+        GFD.setData('select', GFD.getData('select'));
+        this.setCanvasPointer(GFD.getData('hoverX'), GFD.getData('hoverY'));
     }
 
     setCanvas(rgbArr) {

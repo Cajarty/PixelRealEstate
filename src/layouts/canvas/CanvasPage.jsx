@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
 import Canvas from './Canvas.jsx'
 import * as EVENTS from '../../const/events';
-import {Contract, ctr, LISTENERS} from '../../contract/contract.jsx';
+import { Contract, ctr, LISTENERS } from '../../contract/contract.jsx';
 import ErrorBox from '../ErrorBox';
 import ZoomCanvas from './ZoomCanvas';
 import Axios from '../../network/Axios.jsx';
-import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
+import { SDM, ServerDataManager } from '../../contract/ServerDataManager.jsx';
 import HoverLabel from './HoverLabel';
-import {GFD, GlobalState, TUTORIAL_STATE} from '../../functions/GlobalState';
+import { GFD, GlobalState, TUTORIAL_STATE } from '../../functions/GlobalState';
 import * as Strings from '../../const/strings';
 import * as Assets from '../../const/assets';
 import ClickLoader from '../ui/ClickLoader';
@@ -19,9 +19,11 @@ import PropertySalesLog from '../logs/PropertySalesLog';
 import PropertySalesLogTopPXL from '../logs/PropertySalesLogTopPXL';
 import PropertySalesLogTopETH from '../logs/PropertySalesLogTopETH';
 import Info from '../ui/Info';
-import { Segment, SegmentGroup, Button, Divider, Label, 
-    LabelDetail, Input, Icon, Item, ItemContent, ItemImage, 
-    ItemGroup, Tab, Header, Grid, Sidebar, MenuItem, TabPane, Menu, Checkbox, Popup, Modal, ModalContent, ModalHeader, GridRow, GridColumn} from 'semantic-ui-react';
+import {
+    Segment, SegmentGroup, Button, Divider, Label,
+    LabelDetail, Input, Icon, Item, ItemContent, ItemImage, Message, List,
+    ItemGroup, Tab, Header, Grid, Sidebar, MenuItem, TabPane, Menu, Checkbox, Popup, Modal, ModalContent, ModalHeader, GridRow, GridColumn, ButtonGroup
+} from 'semantic-ui-react';
 import SetHoverText from '../forms/SetHoverText';
 import SetLink from '../forms/SetLink';
 import PropertiesOwned from '../ui/PropertiesOwned';
@@ -29,9 +31,13 @@ import PropertiesForSale from '../ui/PropertiesForSale';
 import PropertyChangeLogTop from '../logs/PropertyChangeLogTop';
 import Tutorial from '../Tutorial';
 import WelcomeSidebar from '../ui/WelcomeSidebar';
-import {FB, FireBase} from '../../const/firebase';
+import ChangeLog from '../ui/ChangeLog';
+import Chat from '../ui/Chat';
+import { FB, FireBase } from '../../const/firebase';
 import GetStarted from '../GetStarted';
 import * as Func from '../../functions/functions';
+import ViewTimelapse from '../forms/ViewTimelapse';
+import PXLBalanceItem from '../ui/PXLBalanceItem';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -51,25 +57,34 @@ class CanvasPage extends Component {
         }
     }
 
-    componentDidMount() {
-        GFD.listen('tutorialStateIndex', 'CanvasPage', (newID) => {
-            this.setState({tutorialState: TUTORIAL_STATE[Object.keys(TUTORIAL_STATE)[newID]]})
-        });
-
+    updateBalance() {
+        this.setState({ loadingPPC: true });
         ctr.getBalance((balance) => {
             GFD.setData('balance', balance);
-            this.setState({PPCOwned: balance, loadingPPC: false});
+            this.setState({ PPCOwned: balance, loadingPPC: false });
+        });
+    }
+
+    componentDidMount() {
+        GFD.listen('tutorialStateIndex', 'CanvasPage', (newID) => {
+            this.setState({ tutorialState: TUTORIAL_STATE[Object.keys(TUTORIAL_STATE)[newID]] })
+        });
+
+        GFD.listen('ServerDataManagerInit', 'CanvasPage', (initState) => {
+            if (initState > 1) {
+                this.updateBalance();
+            }
+            if (initState >= 2 && GFD.getData('userExists')) {
+                this.changeMode(true);
+            }
         });
 
         ctr.watchEventLogs(EVENTS.Transfer, {}, (handle) => {
             let eventHandleTransfer = handle;
-            this.setState({eventHandleTransfer});
+            this.setState({ eventHandleTransfer });
             eventHandleTransfer.watch((error, log) => {
                 if (log.args._from === ctr.account || log.args._to === ctr.account) {
-                    this.setState({loadingPPC: true});
-                    ctr.getBalance((balance) => {
-                        this.setState({PPCOwned: balance, loadingPPC: false});
-                    });
+                    this.updateBalance();
                 }
             });
         });
@@ -77,40 +92,32 @@ class CanvasPage extends Component {
         ctr.listenForEvent(EVENTS.AccountChange, 'CanvasPagePPCListener', (data) => {
             FB.signIn();
             ctr.updateNetwork();
-            this.setState({loadingPPC: true});
-            ctr.getBalance((balance) => {
-                this.setState({PPCOwned: balance, loadingPPC: false});
-            });
+            this.updateBalance();
         });
 
-        ctr.watchEventLogs(EVENTS.PropertyBought, {newOwner: ctr.account}, (handle) => {
+        ctr.watchEventLogs(EVENTS.PropertyBought, { newOwner: ctr.account }, (handle) => {
             let eventHandleBought = handle;
-            this.setState({eventHandleBought});
+            this.setState({ eventHandleBought });
             eventHandleBought.watch((error, log) => {
-                this.setState({loadingPPC: true});
-                ctr.getBalance((balance) => {
-                    this.setState({PPCOwned: balance, loadingPPC: false});
-                });
+                this.updateBalance();
             });
         });
 
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {lastUpdaterPayee: ctr.account}, (handle) => {
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, { lastUpdaterPayee: ctr.account }, (handle) => {
             let eventHandleUpdate = handle;
-            this.setState({eventHandleUpdate});
+            this.setState({ eventHandleUpdate });
             eventHandleUpdate.watch((error, log) => {
-                this.setState({loadingPPC: true});
-                ctr.getBalance((balance) => {
-                    this.setState({PPCOwned: balance, loadingPPC: false});
-                });
+                this.updateBalance();
             });
         });
         GFD.listen('advancedMode', 'CanvasPage', (advancedMode) => {
-            this.setState({advancedMode})
+            this.setState({ advancedMode });
+            this.updateBalance();
         });
         this.updateScreen();
         window.onresize = (ev) => this.updateScreen;
         if (localStorage.getItem('startInAdvancedMode')) {
-            this.setState({advancedMode: true});
+            this.setState({ advancedMode: true });
             localStorage.removeItem('startInAdvancedMode');
         }
     }
@@ -133,16 +140,20 @@ class CanvasPage extends Component {
         this.portfolioLink.click();
     }
 
+    visitTelegram() {
+        this.telegramLink.click();
+    }
+
     changeMode(newMode = !this.state.advancedMode) {
         if (newMode)
             ctr.getAccounts();
         GFD.setData('advancedMode', newMode);
-        this.setState({advancedMode: newMode, askForTutorial: false})
+        this.setState({ advancedMode: newMode, askForTutorial: false })
     }
 
     toggleForSaleProperties(e, data) {
-        this.setState({showPopertiesForSale: data.checked});
-        ctr.sendResults(LISTENERS.ShowForSale, {show: data.checked});
+        this.setState({ showPopertiesForSale: data.checked });
+        ctr.sendResults(LISTENERS.ShowForSale, { show: data.checked });
     }
 
     startTutorial() {
@@ -155,128 +166,176 @@ class CanvasPage extends Component {
             this.changeMode();
             return;
         }
-        this.setState({askForTutorial: true});
+        this.setState({ askForTutorial: true });
     }
 
     render() {
         let browsePanes = [
-            { 
-                menuItem: 'Owned', 
-                render: () => <TabPane 
+            {
+                menuItem: 'Owned',
+                render: () => <TabPane
                     as='div'
-                    className='topPane' 
+                    className='topPane'
                     loading={this.state.tab1Loading}
-                    ><PropertiesOwned 
-                        isLoading={(r) => this.setState({tab1Loading: r})}
-                /></TabPane> 
+                ><PropertiesOwned
+                        isLoading={(r) => this.setState({ tab1Loading: r })}
+                    /></TabPane>
             },
-            { 
-                menuItem: 'For Sale', 
-                render: () => <TabPane 
-                as='div'
-                    className='topPane' 
+            {
+                menuItem: 'For Sale',
+                render: () => <TabPane
+                    as='div'
+                    className='topPane'
                     loading={this.state.tab2Loading}
-                    ><PropertiesForSale 
-                        isLoading={(r) => this.setState({tab2Loading: r})}
-                /></TabPane> 
+                ><PropertiesForSale
+                        isLoading={(r) => this.setState({ tab2Loading: r })}
+                    /></TabPane>
             }];
 
+            let chatAndLog = [
+                {
+                    menuItem: 'Chat',
+                    render: () => <TabPane
+                        as='div'
+                        className='topPane'
+                    >
+                        <Chat style={{height: '434px'}}/>
+                    </TabPane>
+                },
+                {
+                    menuItem: 'Change Log',
+                    render: () => <TabPane
+                        as='div'
+                        className='topPane'
+                        loading={this.state.tab2Loading}
+                    >
+                        <ChangeLog/>
+                    </TabPane>
+                }];
+
         let payoutPanes = [
-            { menuItem: 'Top 10', render: () => <TabPane className='middlePane' attached={false}><PropertyChangeLogTop/></TabPane> },
-            { menuItem: 'Recent', render: () => <TabPane className='middlePane' attached={false}><PropertyChangeLog/></TabPane> },
-            { menuItem: 'You', render: () => <TabPane className='middlePane' attached={false}><PropertyChangeLogYou/></TabPane> }
+            { menuItem: 'Top 10', render: () => <TabPane className='middlePane' attached={false}><PropertyChangeLogTop /></TabPane> },
+            { menuItem: 'Recent', render: () => <TabPane className='middlePane' attached={false}><PropertyChangeLog /></TabPane> },
+            { menuItem: 'You', render: () => <TabPane className='middlePane' attached={false}><PropertyChangeLogYou /></TabPane> }
         ];
 
         let tradePanes = [
-            { menuItem: 'Top 10 PXL', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLogTopPXL/></TabPane> },
-            { menuItem: 'Top 10 ETH', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLogTopETH/></TabPane> },
-            { menuItem: 'Recent', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLog/></TabPane> },
-            { menuItem: 'You', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLogYou/></TabPane> }
+            { menuItem: 'Top 10 PXL', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLogTopPXL /></TabPane> },
+            { menuItem: 'Top 10 ETH', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLogTopETH /></TabPane> },
+            { menuItem: 'Recent', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLog /></TabPane> },
+            { menuItem: 'You', render: () => <TabPane className='bottomPane' attached={false}><PropertySalesLogYou /></TabPane> }
         ];
 
         return (
             <div>
-                <SegmentGroup horizontal className='mainSegmentGroup'> 
-                    <Segment className='left'>
-                                <div id='logo' className='logo'>
-                                    <img src={Assets.LOGO_BETA}/>
-                                </div>
-                                <Divider/>
-                                <ZoomCanvas/>
-                                <Divider/>
-                                {this.state.advancedMode &&
-                                    <div>
-                                        <ItemGroup>
-                                            <Item className='pixelsOwnedItem'>
-                                                <ItemImage size='mini' src={this.state.loadingPPC ? Assets.LOADING : Assets.TOKEN}  />
-                                                <ItemContent verticalAlign='middle'>{Func.NumberWithCommas(this.state.PPCOwned)} </ItemContent>
-                                            </Item>
-                                        </ItemGroup>
-                                        <Divider/>
-                                    </div>
-                                }
-                                <Button onClick={() => this.visitPortfolio()} fluid>Visit PixelProperty.io</Button>
-                                <a 
-                                    href='https://pixelproperty.io/' 
-                                    target='_blank' 
-                                    className='hideElement' 
-                                    ref={(portfolioLink) => { this.portfolioLink = portfolioLink; }} 
-                                />
-                                <Divider/>
+                <SegmentGroup horizontal className='mainSegmentGroup'>
+                    <Segment className='leftContainer'>
+                        <div id='logo' className='logo'>
+                            <img src={Assets.LOGO_BETA} />
+                        </div>
+                        <Divider />
+                        <ZoomCanvas />
+                        <Divider />
+                        <Grid>
+                            <GridRow width={16}>
+                                <GridColumn width={8}>
+                                    <Button onClick={() => this.visitPortfolio()} fluid>PixelProperty.io</Button>
+                                    <a
+                                        href='https://pixelproperty.io/'
+                                        target='_blank'
+                                        className='hideElement'
+                                        ref={(portfolioLink) => { this.portfolioLink = portfolioLink; }}
+                                    />
+                                </GridColumn>
+                                <GridColumn width={8}>
+                                    <Button style={{width: '100%'}} onClick={() => this.visitTelegram()} content='Telegram' icon='telegram' labelPosition='right' />
+                                    <a
+                                        href='https://web.telegram.org/#/im?p=@pixelpropertyio'
+                                        target='_blank'
+                                        className='hideElement'
+                                        ref={(telegramLink) => { this.telegramLink = telegramLink; }}
+                                    />
+                                </GridColumn>
+                            </GridRow>
+                        </Grid>
+                        <Divider />
 
-                                {!this.state.advancedMode && 
-                                <Button 
-                                    className='modeButton' 
-                                    primary={!this.state.advancedMode} 
-                                    onClick={() => {this.changeMode()}} 
-                                    fluid
-                                    size={this.state.advancedMode ? 'medium' : 'massive'}
-                                >
-                                    {this.state.advancedMode ? 'Viewing Mode' : 'Get Started'}
-                                </Button>}
-                                {!this.state.advancedMode && <Divider/>}
-                                {this.state.advancedMode &&
-                                    <div>
-                                        <Grid columns='2' divided>
-                                            <GridColumn stretched>
-                                                <SetHoverText/>
-                                            </GridColumn>
-                                            <GridColumn stretched>
-                                                <SetLink/>
-                                            </GridColumn>
-                                        </Grid>
-                                        <Divider/>
-                                        <Checkbox 
-                                            label={'Show Properties for sale'} 
-                                            checked={this.state.showPopertiesForSale}
-                                            onChange={(e, data) => {this.toggleForSaleProperties(e, data)}}
-                                        />
-                                    </div>
-                                }
-                        <GetStarted 
+                        {!this.state.advancedMode &&
+                            <Button
+                                className='modeButton'
+                                primary={!this.state.advancedMode}
+                                onClick={() => { this.changeMode() }}
+                                fluid
+                                size={this.state.advancedMode ? 'medium' : 'massive'}
+                            >
+                                {this.state.advancedMode ? 'Viewing Mode' : <div>Advanced Mode</div>}
+                            </Button>}
+                        {!this.state.advancedMode && <Divider />}
+                        {this.state.advancedMode &&
+                            <div>
+                                <Grid columns='2' divided>
+                                    <GridRow>
+                                        <GridColumn width={16}>
+                                            <PXLBalanceItem showSend/>
+                                        </GridColumn>
+                                    </GridRow>
+                                    <GridRow>
+                                        <GridColumn stretched width={8}>
+                                            <SetHoverText />
+                                        </GridColumn>
+                                        <GridColumn stretched width={8}>
+                                            <SetLink />
+                                        </GridColumn>
+                                    </GridRow>
+                                </Grid>
+                                <Divider />
+                                <Checkbox
+                                    label={'Show Properties for sale'}
+                                    checked={this.state.showPopertiesForSale}
+                                    onChange={(e, data) => { this.toggleForSaleProperties(e, data) }}
+                                />
+                                <Divider />
+                                <ViewTimelapse/>
+                            </div>
+                        }
+                        <GetStarted
                             advancedMode={this.state.advancedMode}
-                            changeMode={() => {this.changeMode()}}
+                            changeMode={() => { this.changeMode() }}
                         />
                     </Segment>
-                    <Segment id='step1' className={'center' + TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 1)}>
-                        <HoverLabel showPrices={this.state.showPopertiesForSale}/>
-                        {this.state.tutorialState.index == 0 && <ClickLoader/>}
-                        <Canvas/>
+                    <Segment id='step1' className={'centerContainer ' + TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 1)}>
+                        <HoverLabel showPrices={this.state.showPopertiesForSale} />
+                        {this.state.tutorialState.index == 0 && <ClickLoader />}
+                        <Canvas />
                     </Segment>
-                    <Segment id={(this.state.tutorialState.index == 3 ? 'hiddenForward' : '')} className={'right' + TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 2) + (this.state.tutorialState.index == 3 ? ' hiddenForward' : '')}>
-                            {this.state.advancedMode ? 
-                                <PixelDescriptionBox/>
-                            : 
-                                <WelcomeSidebar/>
-                            }
+                    <Segment id={(this.state.tutorialState.index == 3 ? 'hiddenForward' : '')} className={'rightContainer ' + TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 2) + (this.state.tutorialState.index == 3 ? ' hiddenForward' : '')}>
+                        {this.state.advancedMode ?
+                            <PixelDescriptionBox />
+                            :
+                            <WelcomeSidebar />
+                        }
                     </Segment>
                 </SegmentGroup>
-                <Segment className={(this.state.advancedMode ? 'lowerSegment one' : 'lowerSegment one hideElement')}>
-                    <div>
-                        <Header>Property Browse</Header>
-                        <Tab menu={{ secondary: true, pointing: true }} panes={browsePanes} />
-                    </div>
-                </Segment>
+                <Grid 
+                    stretched
+                    className={(this.state.advancedMode ? 'chatAndBrowseSegment' : 'chatAndBrowseSegment hideElement')}
+                >
+                    <GridRow
+                    style={{ margin: 0}} 
+                    >
+                        <GridColumn width={6}>
+                            <Segment className='chatAndLogs'>
+                                <Tab menu={{ secondary: true, pointing: true }} panes={chatAndLog} />
+                            </Segment>
+                        </GridColumn>
+                        <GridColumn width={10} style={{paddingLeft: 0}}>
+                            <Segment className='browse'>
+                                <Header>Property Browse</Header>
+                                <Tab menu={{ secondary: true, pointing: true }} panes={browsePanes} />
+                            </Segment>
+                        </GridColumn>
+                    </GridRow>
+                </Grid>
                 <Segment className={(this.state.advancedMode ? 'lowerSegment two' : 'lowerSegment two hideElement')}>
                     <div>
                         <Header>Payout History</Header>
@@ -291,28 +350,28 @@ class CanvasPage extends Component {
                 </Segment>
                 <Sidebar id='footer' className='footer' as={Menu} animation='push' direction='bottom' visible inverted>
                     <MenuItem name='file text outline' onClick={() => {
-                        window.open("https://www.pixelproperty.io/privacy-policy.html","_self");
+                        window.open("https://www.pixelproperty.io/privacy-policy.html", "_self");
                     }}>
-                    <Icon name='file text outline'/>
-                    Privacy Policy
+                        <Icon name='file text outline' />
+                        Privacy Policy
                     </MenuItem>
                     <MenuItem name='file text outline' onClick={() => {
-                        window.open("https://www.pixelproperty.io/terms-of-service.html","_self");
+                        window.open("https://www.pixelproperty.io/terms-of-service.html", "_self");
                     }} >
-                    <Icon name='file text outline'/>
-                    TOS
+                        <Icon name='file text outline' />
+                        TOS
                     </MenuItem>
                     <MenuItem name='file text outline' onClick={() => {
                         this.startTutorial();
                     }}>
-                    <Icon name='help circle' />
-                    Tutorial
+                        <Icon name='help circle' />
+                        Tutorial
                     </MenuItem>
-                    <MenuItem position='right' name='settings' onClick={() => {ctr.setupContracts()}}>
-                    <Icon name='settings'></Icon>
+                    <MenuItem position='right' name='settings' onClick={() => { ctr.setupContracts() }}>
+                        <Icon name='settings'></Icon>
                     </MenuItem>
                 </Sidebar>
-                <Tutorial/>
+                <Tutorial />
             </div>
         );
     }

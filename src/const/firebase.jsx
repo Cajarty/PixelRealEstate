@@ -45,10 +45,14 @@ export class FireBase {
         this.checkUserExists(ctr.account, (exists, user) => {
             if (!exists) {
                 console.info('User not registered, requires sign up.');
-                //we need to require account creation
+                GFD.setData('advancedMode', false);
+                GFD.setData('userExists', false);
+                GFD.setData('user', null);
             } else {
                 console.info('User registered!');
-                //unlock stuff for our verified user.
+                GFD.setData('advancedMode', true);
+                GFD.setData('userExists', exists);
+                GFD.setData('user', user);
             }
         });
     }

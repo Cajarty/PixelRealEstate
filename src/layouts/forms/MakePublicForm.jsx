@@ -7,6 +7,7 @@ import * as Const from '../../const/const';
 import * as Strings from '../../const/strings';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager.jsx';
 import {Segment, ModalContent, Divider, Modal, Grid, Label, Input, Container, Icon, Button, Popup, ModalActions, ModalHeader, Message} from 'semantic-ui-react';
+import PXLBalanceItem from '../ui/PXLBalanceItem';
 
 const TOKENS_TO_MINUTES = 1;
 
@@ -154,6 +155,7 @@ class MakePublicForm extends Component {
                         onChange={(e) => this.setY(e.target.value)}
                     />
                 </div>
+                <PXLBalanceItem/>
                 {this.state.isPrivate || this.state.becomePublic != 0 ?
                     <div>
                         <Divider/>

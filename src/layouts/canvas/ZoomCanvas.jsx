@@ -89,7 +89,11 @@ class ZoomCanvas extends Component {
                 }
             }
         });
-       
+
+        GFD.listen('imagePNG', 'zoomCanvas', (PNG) => {
+            if (PNG != null)
+                this.setCanvasWithImage(PNG);
+        })
 
         GFD.listen('hoverX', 'zoomCanvas', (hoverX) => {
             this.drawWindow(hoverX, GFD.getData('hoverY'));

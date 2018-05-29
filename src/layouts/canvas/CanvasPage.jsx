@@ -269,7 +269,7 @@ class CanvasPage extends Component {
                                 fluid
                                 size={this.state.advancedMode ? 'medium' : 'massive'}
                             >
-                                {this.state.advancedMode ? 'Viewing Mode' : <div>Advanced Mode</div>}
+                                {this.state.advancedMode ? 'Viewing Mode' : <div>Become a Member</div>}
                             </Button>}
                         {!this.state.advancedMode && <Divider />}
                         {this.state.advancedMode &&

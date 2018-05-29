@@ -9,6 +9,7 @@ import {GFD, GlobalState, TUTORIAL_STATE} from '../functions/GlobalState';
 import Info from './ui/Info';
 import * as Assets from '../const/assets';
 import SignUpForm from './forms/SignUpForm';
+const queryString = require('query-string');
 
 class GetStarted extends Component {
     constructor(props) {
@@ -31,6 +32,12 @@ class GetStarted extends Component {
         this.setState({continueAdvancedMode: true})
     }
 
+    checkStartInAdvancedMode() {
+        let query = queryString.parse(location.search);
+        if (query != null && query.showAdvanced)
+            GFD.setData('advancedMode', true);
+    }
+
     componentDidMount() {
         GFD.listen('noMetaMask', 'getStarted', (noMetaMask) => {
             this.setState({noMetaMask});
@@ -46,6 +53,7 @@ class GetStarted extends Component {
         if (localStorage.getItem('hideAdvancedModeDialog')) {
             this.setState({continueAdvancedMode: true})
         }
+        this.checkStartInAdvancedMode();
     }
 
     componentWillUnmount() {
@@ -64,30 +72,30 @@ class GetStarted extends Component {
                     closeOnRootNodeClick={false}
                     className='becomeAdvanced'
                 >
-                    <ModalHeader>Advanced User Sign Up</ModalHeader>
+                    <ModalHeader>Register</ModalHeader>
                     <ModalContent>  
                         <Message success>
                             The PixelProperty canvas is a cryptocollectable! 
                             
-                            This means advanced users are able to own and trade parts of PixelProperty. 
+                            Registered users are able to own and trade parts of PixelProperty. 
                             
                             Sign up for free now to store and trade your crypto assets securely.
                         </Message>
                         <Message warning>
-                            <h2>Simple Users</h2>
+                            <h2>Basic Users</h2>
                             <br/>
                             <List>
                                 <List.Item>
                                     <List.Icon name='check' />
                                     <List.Content>
                                     <List.Header>Free Drawing</List.Header>
-                                    <List.Description>Draw anywhere that isn't reserved by an Advanced User.</List.Description>
+                                    <List.Description>Draw anywhere that isn't reserved by an Registered User.</List.Description>
                                     </List.Content>
                                 </List.Item>
                             </List>
                         </Message>
                         <Message success>
-                            <h2>Advanced Users</h2>
+                            <h2>Registered Users</h2>
                             <br/>
                             <List>
                                 <List.Item>

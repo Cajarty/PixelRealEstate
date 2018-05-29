@@ -9,7 +9,6 @@ import {GFD, GlobalState, TUTORIAL_STATE} from '../functions/GlobalState';
 import Info from './ui/Info';
 import * as Assets from '../const/assets';
 import SignUpForm from './forms/SignUpForm';
-const queryString = require('query-string');
 
 class GetStarted extends Component {
     constructor(props) {
@@ -23,9 +22,9 @@ class GetStarted extends Component {
     }
 
     reloadForMetaMask() {
-        localStorage.setItem('startInAdvancedMode', true);
-        localStorage.setItem('hideAdvancedModeDialog', true);
-        location.reload();
+        // localStorage.setItem('startInAdvancedMode', true);
+        // localStorage.setItem('hideAdvancedModeDialog', true);
+        // location.reload();
     }
 
     chooseAdvancedMode() {

@@ -20,6 +20,8 @@ the data and will not set the user to logged in.
 */
 export class FireBase {
     constructor() {
+        this.chatListenerToken = null;
+        this.chatRemoveListenerToken = null;
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 GFD.setData('userSignedIn', true);
@@ -29,6 +31,59 @@ export class FireBase {
                 GFD.setData('userSignedIn', false);
             }
         });
+    }
+
+    watchChat(msgReceivedCallback, msgDeletedCallback) {
+        this.stopWatchingChat();
+        this.chatListenerToken = firebase.database().ref('/Chat').on('child_added', msgReceivedCallback);
+        this.chatRemoveListenerToken = firebase.database().ref('/Chat').on('child_removed', msgDeletedCallback);
+    }
+
+    stopWatchingChat() {
+        if (this.chatListenerToken != null)
+            firebase.database().ref('/Chat').off('child_added', this.chatListenerToken);
+        if (this.chatRemoveListenerToken != null)
+            firebase.database().ref('/Chat').off('child_removed', this.chatRemoveListenerToken);
+    }
+
+    sendChatMessage(message, callback) {
+        if (!GFD.state.userExists) {
+            callback('fail');
+            return;
+        }
+
+        if (GFD.state.user != null && GFD.state.user.mutedUntil != null && GFD.state.user.mutedUntil >= new Date().getTime()) {
+            callback('muted');
+            return;
+        }
+
+        this.checkUserExists(ctr.account, (exists, user) => {
+            if (exists && (user.mutedUntil == null || user.mutedUntil < new Date().getTime())) {
+
+                message = message.substring(0, Math.min(message.length, 100));
+
+                firebase.database().ref('/Chat').push({
+                    walletID: GFD.state.user.wallet,
+                    username: GFD.state.user.username,
+                    timestamp: new Date().getTime(),
+                    message,
+                }).then(() => {
+                    callback('success');
+                }).catch((error) => {
+                    console.info(error);
+                    callback('fail');
+                });
+
+            }
+        });
+    }
+
+    deleteChatMessage(messageID) {
+        firebase.database().ref('/Chat').child(messageID).remove();
+    }
+
+    muteChatUser(walletID, until) {
+        firebase.database().ref('/Accounts').child(walletID).child('/mutedUntil').set(until);
     }
 
     signIn() {

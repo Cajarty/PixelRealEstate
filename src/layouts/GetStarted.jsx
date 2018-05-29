@@ -35,7 +35,6 @@ class GetStarted extends Component {
     checkStartInAdvancedMode() {
         let query = Query.search(location.href).query;
 
-        console.info(query);
         if (query.length > 1 && query[0] === 'showAdvanced' && query[1] == 'true')
             GFD.setData('advancedMode', true);
     }
@@ -64,7 +63,6 @@ class GetStarted extends Component {
     }
 
     render() {
-        console.info(this.state)
         if (!this.props.advancedMode)
             return null;
         return(

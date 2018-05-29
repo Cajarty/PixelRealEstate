@@ -163,14 +163,6 @@ class CanvasPage extends Component {
         this.changeMode(true);
     }
 
-    showAskForTutorial() {
-        if (this.state.advancedMode || FB.userLoggedIn) {
-            this.changeMode();
-            return;
-        }
-        this.setState({ askForTutorial: true });
-    }
-
     render() {
         let browsePanes = [
             {

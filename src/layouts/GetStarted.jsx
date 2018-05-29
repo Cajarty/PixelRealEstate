@@ -16,7 +16,7 @@ class GetStarted extends Component {
         super(props);
         this.state = {
             continueAdvancedMode: false, //user sees first modal explaining advanced mode and clicks yes.
-            noMetaMask: true, //metamask is installed
+            noMetaMask: true, //metamask is not installed
             network: Const.NETWORK_DEV, //network.
             userExists: false, //the user exists.
         };
@@ -50,11 +50,11 @@ class GetStarted extends Component {
         });
 
         GFD.listen('userExists', 'getStarted', (userExists) => {
-            console.info(userExists)
             this.setState({userExists});
         });
         if (localStorage.getItem('hideAdvancedModeDialog')) {
             this.setState({continueAdvancedMode: true})
+            localStorage.removeItem('hideAdvancedModeDialog');
         }
         this.checkStartInAdvancedMode();
     }
@@ -64,6 +64,7 @@ class GetStarted extends Component {
     }
 
     render() {
+        console.info(this.state)
         if (!this.props.advancedMode)
             return null;
         return(

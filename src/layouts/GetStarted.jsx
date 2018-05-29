@@ -9,6 +9,7 @@ import {GFD, GlobalState, TUTORIAL_STATE} from '../functions/GlobalState';
 import Info from './ui/Info';
 import * as Assets from '../const/assets';
 import SignUpForm from './forms/SignUpForm';
+import Query from 'url-query-parser';
 
 class GetStarted extends Component {
     constructor(props) {
@@ -22,9 +23,9 @@ class GetStarted extends Component {
     }
 
     reloadForMetaMask() {
-        // localStorage.setItem('startInAdvancedMode', true);
-        // localStorage.setItem('hideAdvancedModeDialog', true);
-        // location.reload();
+        localStorage.setItem('startInAdvancedMode', true);
+        localStorage.setItem('hideAdvancedModeDialog', true);
+        location.reload();
     }
 
     chooseAdvancedMode() {
@@ -32,8 +33,10 @@ class GetStarted extends Component {
     }
 
     checkStartInAdvancedMode() {
-        let query = queryString.parse(location.search);
-        if (query != null && query.showAdvanced)
+        let query = Query.search(location.href).query;
+
+        console.info(query);
+        if (query.length > 1 && query[0] === 'showAdvanced' && query[1] == 'true')
             GFD.setData('advancedMode', true);
     }
 
@@ -47,6 +50,7 @@ class GetStarted extends Component {
         });
 
         GFD.listen('userExists', 'getStarted', (userExists) => {
+            console.info(userExists)
             this.setState({userExists});
         });
         if (localStorage.getItem('hideAdvancedModeDialog')) {

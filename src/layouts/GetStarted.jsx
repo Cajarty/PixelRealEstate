@@ -92,7 +92,7 @@ class GetStarted extends Component {
                                     <List.Icon name='check' />
                                     <List.Content>
                                     <List.Header>Free Drawing</List.Header>
-                                    <List.Description>Draw anywhere that isn't reserved by an Registered User.</List.Description>
+                                    <List.Description>Draw anywhere that isn't reserved by a Registered User.</List.Description>
                                     </List.Content>
                                 </List.Item>
                             </List>
@@ -105,7 +105,7 @@ class GetStarted extends Component {
                                     <List.Icon name='check' />
                                     <List.Content>
                                         <List.Header>Blockchain Verified Drawing</List.Header>
-                                        <List.Description>Earn PXL Token for drawing. Draw priority over simple users.</List.Description>
+                                        <List.Description>Earn PXL Token for drawing. Draw priority over basic users.</List.Description>
                                     </List.Content>
                                 </List.Item>
                                 <List.Item>

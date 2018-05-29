@@ -20,6 +20,7 @@ the data and will not set the user to logged in.
 */
 export class FireBase {
     constructor() {
+        this.chatListenerToken = null;
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 GFD.setData('userSignedIn', true);
@@ -28,6 +29,34 @@ export class FireBase {
             } else {
                 GFD.setData('userSignedIn', false);
             }
+        });
+    }
+
+    watchChat(msgReceivedCallback) {
+        this.stopWatchingChat();
+        this.chatListenerToken = firebase.database().ref('/Chat').on('child_added', msgReceivedCallback);
+    }
+
+    stopWatchingChat() {
+        if (this.chatListenerToken != null)
+            firebase.database().ref('/Chat').off('child_added', this.chatListenerToken);
+    }
+
+    sendChatMessage(message, callback) {
+        if (!GFD.state.userExists)
+            return;
+
+        message = message.substring(0, Math.min(message.length, 100));
+
+        firebase.database().ref('/Chat').push({
+            username: GFD.state.user.username,
+            timestamp: new Date().getTime(),
+            message,
+        }).then(() => {
+            callback(true);
+        }).catch((error) => {
+            console.info(error);
+            callback(false);
         });
     }
 

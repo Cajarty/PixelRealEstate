@@ -9,7 +9,7 @@ import {GFD, GlobalState, TUTORIAL_STATE} from '../functions/GlobalState';
 import Info from './ui/Info';
 import * as Assets from '../const/assets';
 import SignUpForm from './forms/SignUpForm';
-const queryString = require('query-string');
+import Query from 'url-query-parser';
 
 class GetStarted extends Component {
     constructor(props) {
@@ -33,9 +33,9 @@ class GetStarted extends Component {
     }
 
     checkStartInAdvancedMode() {
-        let query = queryString.parse(location.search);
-        if (query != null && query.showAdvanced)
-            GFD.setData('advancedMode', true);
+        let query = Query.get('showAdvanced')
+        console.info(query)
+        GFD.setData('advancedMode', true);
     }
 
     componentDidMount() {

@@ -70,7 +70,7 @@ class GetStarted extends Component {
             <div>
                 <Modal
                     size='small'
-                    open={(this.state.noMetaMask || ctr.account === null) && !this.state.continueAdvancedMode}
+                    open={(this.state.noMetaMask || !this.state.userExists) && !this.state.continueAdvancedMode}
                     closeOnEscape={false}
                     closeOnRootNodeClick={false}
                     className='becomeAdvanced'

@@ -120,6 +120,7 @@ class CanvasPage extends Component {
         if (localStorage.getItem('startInAdvancedMode')) {
             this.setState({ advancedMode: true });
             localStorage.removeItem('startInAdvancedMode');
+            localStorage.removeItem('hideAdvancedModeDialog');
         }
     }
 

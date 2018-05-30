@@ -57,12 +57,22 @@ $(function() {
         }
     }
 
+    // hacky - change later
+    // wait 1 second and fade in canvas because of blocky initial load
+    var timestamp = new Date().getTime();
+    var src = './img/canvas.png' + '?' + timestamp;
+    let img = new Image();
+    setTimeout(function() {
+        $('#canvas-image').fadeIn(3000);
+    }, 1000);
+    
     setInterval(() => {
         var timestamp = new Date().getTime();
         var src = './img/canvas.png' + '?' + timestamp;
         let img = new Image();
         img.onload = () => {
             $('#canvas-image').attr('src', img.src);
+            $('#canvas-image').fadeIn('fast');
         };
         img.src = src + '?' + timestamp;
     }, 5000);

@@ -37,7 +37,7 @@ export default class Chat extends Component {
     }
 
     componentDidMount() {
-        this.attemptScrollIntoView(0);
+        this.attemptScrollIntoView();
     }
 
     removeMessage(message) {
@@ -64,9 +64,8 @@ export default class Chat extends Component {
         this.attemptScrollIntoView();
     }
 
-    attemptScrollIntoView(pxFromBottom = 50) {
+    attemptScrollIntoView(pxFromBottom = 100) {
         let chatMessages = document.getElementById('chatMessages');
-        console.info(chatMessages.scrollHeight, chatMessages.clientHeight, chatMessages.scrollTop);
         if (chatMessages.scrollHeight < (chatMessages.clientHeight + chatMessages.scrollTop + pxFromBottom))
             chatMessages.scrollTop = chatMessages.scrollHeight - chatMessages.clientHeight;
     }

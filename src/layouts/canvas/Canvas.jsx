@@ -151,8 +151,12 @@ class Canvas extends Component {
         });
 
         GFD.listen('imagePNG', 'canvasBox', (PNG) => {
-            if (PNG != null)
-                this.setCanvasWithImage(PNG);
+            if (PNG == null)
+                return;
+            this.setCanvasWithImage(PNG);
+            if (this.state.showForSale) {
+                this.showPropertiesForSale();
+            }
         })
 
         GFD.listen('select', 'canvasBox', (select) => {
@@ -202,6 +206,7 @@ class Canvas extends Component {
         });
 
         ctr.listenForResults(LISTENERS.ShowForSale, 'Canvas', (data) => {
+            this.setState({showForSale: data.show});
             if (data.show)
                 this.showPropertiesForSale();
             else

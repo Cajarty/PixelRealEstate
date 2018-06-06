@@ -18,7 +18,7 @@ export default class Chat extends Component {
         this.showAdminOptionsModal = this.showAdminOptionsModal.bind(this);
     }
 
-    componentDidMount() {
+    componentWillMount() {
         GFD.listen('userExists', 'chat', (userExists) => {
             if (userExists) {
                 FB.watchChat((newMessage) => {
@@ -34,6 +34,10 @@ export default class Chat extends Component {
                 GFD.close('userExists', 'chat');
             }
         })
+    }
+
+    componentDidMount() {
+        this.attemptScrollIntoView(0);
     }
 
     removeMessage(message) {
@@ -57,8 +61,12 @@ export default class Chat extends Component {
     }
 
     componentDidUpdate() {
+        this.attemptScrollIntoView();
+    }
+
+    attemptScrollIntoView(pxFromBottom = 50) {
         let chatMessages = document.getElementById('chatMessages');
-        if (chatMessages.scrollHeight < (chatMessages.clientHeight + chatMessages.scrollTop + 50))
+        if (chatMessages.scrollHeight < (chatMessages.clientHeight + chatMessages.scrollTop + pxFromBottom))
             chatMessages.scrollTop = chatMessages.scrollHeight - chatMessages.clientHeight;
     }
 

@@ -66,6 +66,7 @@ export default class Chat extends Component {
 
     attemptScrollIntoView(pxFromBottom = 50) {
         let chatMessages = document.getElementById('chatMessages');
+        console.info(chatMessages.scrollHeight, chatMessages.clientHeight, chatMessages.scrollTop);
         if (chatMessages.scrollHeight < (chatMessages.clientHeight + chatMessages.scrollTop + pxFromBottom))
             chatMessages.scrollTop = chatMessages.scrollHeight - chatMessages.clientHeight;
     }

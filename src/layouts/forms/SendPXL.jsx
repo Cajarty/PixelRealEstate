@@ -26,6 +26,10 @@ class SendPXL extends Component {
         });
     }
 
+    componentWillUnmount() {
+        GFD.closeAll('SendPXL');
+    }
+
     sendPXL() {
         if (this.state.PXL > this.state.PXLOwned)
             return;

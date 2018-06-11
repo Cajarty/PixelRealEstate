@@ -9,13 +9,14 @@ import {GFD, GlobalState, TUTORIAL_STATE} from '../functions/GlobalState';
 import Info from './ui/Info';
 import * as Assets from '../const/assets';
 import SignUpForm from './forms/SignUpForm';
+import Query from 'url-query-parser';
 
 class GetStarted extends Component {
     constructor(props) {
         super(props);
         this.state = {
             continueAdvancedMode: false, //user sees first modal explaining advanced mode and clicks yes.
-            noMetaMask: true, //metamask is installed
+            noMetaMask: true, //metamask is not installed
             network: Const.NETWORK_DEV, //network.
             userExists: false, //the user exists.
         };
@@ -29,6 +30,13 @@ class GetStarted extends Component {
 
     chooseAdvancedMode() {
         this.setState({continueAdvancedMode: true})
+    }
+
+    checkStartInAdvancedMode() {
+        let query = Query.search(location.href).query;
+
+        if (query.length > 1 && query[0] === 'showAdvanced' && query[1] == 'true')
+            GFD.setData('advancedMode', true);
     }
 
     componentDidMount() {
@@ -45,7 +53,9 @@ class GetStarted extends Component {
         });
         if (localStorage.getItem('hideAdvancedModeDialog')) {
             this.setState({continueAdvancedMode: true})
+            localStorage.removeItem('hideAdvancedModeDialog');
         }
+        this.checkStartInAdvancedMode();
     }
 
     componentWillUnmount() {
@@ -59,42 +69,42 @@ class GetStarted extends Component {
             <div>
                 <Modal
                     size='small'
-                    open={(this.state.noMetaMask || ctr.account === null) && !this.state.continueAdvancedMode}
+                    open={(this.state.noMetaMask || !this.state.userExists) && !this.state.continueAdvancedMode}
                     closeOnEscape={false}
                     closeOnRootNodeClick={false}
                     className='becomeAdvanced'
                 >
-                    <ModalHeader>Advanced User Sign Up</ModalHeader>
+                    <ModalHeader>Register</ModalHeader>
                     <ModalContent>  
                         <Message success>
                             The PixelProperty canvas is a cryptocollectable! 
                             
-                            This means advanced users are able to own and trade parts of PixelProperty. 
+                            Registered users are able to own and trade parts of PixelProperty. 
                             
                             Sign up for free now to store and trade your crypto assets securely.
                         </Message>
                         <Message warning>
-                            <h2>Simple Users</h2>
+                            <h2>Basic Users</h2>
                             <br/>
                             <List>
                                 <List.Item>
                                     <List.Icon name='check' />
                                     <List.Content>
                                     <List.Header>Free Drawing</List.Header>
-                                    <List.Description>Draw anywhere that isn't reserved by an Advanced User.</List.Description>
+                                    <List.Description>Draw anywhere that isn't reserved by a Registered User.</List.Description>
                                     </List.Content>
                                 </List.Item>
                             </List>
                         </Message>
                         <Message success>
-                            <h2>Advanced Users</h2>
+                            <h2>Registered Users</h2>
                             <br/>
                             <List>
                                 <List.Item>
                                     <List.Icon name='check' />
                                     <List.Content>
                                         <List.Header>Blockchain Verified Drawing</List.Header>
-                                        <List.Description>Earn PXL Token for drawing. Draw priority over simple users.</List.Description>
+                                        <List.Description>Earn PXL Token for drawing. Draw priority over basic users.</List.Description>
                                     </List.Content>
                                 </List.Item>
                                 <List.Item>

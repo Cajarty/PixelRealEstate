@@ -673,7 +673,7 @@ class SetPixelColorForm extends Component {
                                                 {this.state.SDMInit == 1 &&
                                                     <GridRow>
                                                         <Message success>
-                                                            Sign Up to become an Advanced User:
+                                                            Sign Up to become a Member:
                                                             <br/>
                                                             <br/>
                                                             - Earn PXL Token for drawing.
@@ -734,8 +734,8 @@ class SetPixelColorForm extends Component {
                 <ModalActions>
                     <Label className={this.state.pendingState.name} color={this.state.pendingState.color}>{this.state.pendingState.message}</Label>
                     <Button secondary onClick={() => this.toggleModal(false)}>Cancel</Button>
-                    <Button primary={this.state.SDMInit == 1} onClick={() => this.setPixelsSimple()}>{'Change Image' + (this.state.SDMInit >= 2 ? ' (Simple)' : '')}</Button>
-                    {this.state.SDMInit >= 2 && <Button primary onClick={() => this.setPixels()}>Change Image (Advanced)</Button>}
+                    <Button primary={this.state.SDMInit == 1} onClick={() => this.setPixelsSimple()}>{'Change Image - ' + (this.state.SDMInit >= 2 ? 'Basic' : '')}</Button>
+                    {this.state.SDMInit >= 2 && <Button primary onClick={() => this.setPixels()}>Change Image - PXL</Button>}
                 </ModalActions>}
             </Modal>
         );

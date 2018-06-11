@@ -38,6 +38,7 @@ import GetStarted from '../GetStarted';
 import * as Func from '../../functions/functions';
 import ViewTimelapse from '../forms/ViewTimelapse';
 import PXLBalanceItem from '../ui/PXLBalanceItem';
+import PixelDescriptionBoxSimple from '../ui/PixelDescriptionBoxSimple';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -119,6 +120,7 @@ class CanvasPage extends Component {
         if (localStorage.getItem('startInAdvancedMode')) {
             this.setState({ advancedMode: true });
             localStorage.removeItem('startInAdvancedMode');
+            localStorage.removeItem('hideAdvancedModeDialog');
         }
     }
 
@@ -159,14 +161,6 @@ class CanvasPage extends Component {
     startTutorial() {
         GFD.setData('tutorialStateIndex', 1);
         this.changeMode(true);
-    }
-
-    showAskForTutorial() {
-        if (this.state.advancedMode || FB.userLoggedIn) {
-            this.changeMode();
-            return;
-        }
-        this.setState({ askForTutorial: true });
     }
 
     render() {
@@ -268,7 +262,7 @@ class CanvasPage extends Component {
                                 fluid
                                 size={this.state.advancedMode ? 'medium' : 'massive'}
                             >
-                                {this.state.advancedMode ? 'Viewing Mode' : <div>Advanced Mode</div>}
+                                {this.state.advancedMode ? 'Viewing Mode' : <div>Become a Member</div>}
                             </Button>}
                         {!this.state.advancedMode && <Divider />}
                         {this.state.advancedMode &&
@@ -309,10 +303,11 @@ class CanvasPage extends Component {
                         <Canvas />
                     </Segment>
                     <Segment id={(this.state.tutorialState.index == 3 ? 'hiddenForward' : '')} className={'rightContainer ' + TUTORIAL_STATE.getClassName(this.state.tutorialState.index, 2) + (this.state.tutorialState.index == 3 ? ' hiddenForward' : '')}>
+                        <WelcomeSidebar />
                         {this.state.advancedMode ?
                             <PixelDescriptionBox />
                             :
-                            <WelcomeSidebar />
+                            <PixelDescriptionBoxSimple/>
                         }
                     </Segment>
                 </SegmentGroup>

@@ -86,6 +86,7 @@
         "sass": "^1.1.1",
         "save-file": "^1.2.0",
         "semantic-ui-react": "^0.78.3",
+        "url-query-parser": "^1.1.0",
         "utf8": "^3.0.0",
         "web3": "^1.0.0-beta.33",
         "web3-requestmanager": "^1.0.0-beta.14",

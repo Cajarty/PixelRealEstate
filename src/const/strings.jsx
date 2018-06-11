@@ -32,6 +32,18 @@ export const TUTORIAL_START_DIALOG = ["Pixel Property is easy to use. Just in ca
 
 export const CHANGELOG = [
     {
+        date: new Date('2018-6-06'),
+        title: 'Bugfixes',
+        messages: 
+        ["Fixes to some graphical bugs on the canvas."],
+    },
+    {
+        date: new Date('2018-5-29'),
+        title: 'Chat Box',
+        messages: 
+        ["Members can now chat to other users within the DApp."],
+    },
+    {
         date: new Date('2018-5-26'),
         title: 'Free Drawing!',
         messages: 

@@ -72,6 +72,7 @@ export class GlobalState {
             ServerDataManagerInit: 0, //has the data from the server been loaded? 0 = no, 1 = yes but no events because we have no metamask, 2 = yes
             tutorialStateIndex: 0,
             imagePNG: null, //the canvas image loaded from the server or local.
+            useLocalData: false, //if this is set (it is if img request fails), we read a cached version.
         };
         this.limiters = {
             

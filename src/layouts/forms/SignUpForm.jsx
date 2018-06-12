@@ -37,12 +37,6 @@ class SignUpForm extends Component {
         ctr.listenForEvent(EVENTS.AccountChange, 'SignUpForm', (data) => {
             this.setState({wallet: data});
         });
-        SDM.requestIP((ip) => {
-            if (ip == null)
-                return;
-                console.info(ip);
-            this.setState({ipAddress: ip});
-        })
     }
 
     updateEmail(value) {
@@ -61,12 +55,14 @@ class SignUpForm extends Component {
         this.setState({errors});
         if (errors.length > 0)
             return;
-        FB.signUp(this.state.wallet, this.state.username, 
-            this.state.email, Const.TOS_VERSION, 
-            this.state.referralAddress, this.state.ipAddress,
-             (result, messages) => {
-            if (!result)
-                this.setState({errors: errors.concat(messages)});
+        SDM.requestIPs((ips) => {
+            FB.signUp(this.state.wallet, this.state.username, 
+                this.state.email, Const.TOS_VERSION, 
+                this.state.referralAddress, ips,
+                (result, messages) => {
+                    if (!result)
+                        this.setState({errors: errors.concat(messages)});
+                });
         });
     }
 

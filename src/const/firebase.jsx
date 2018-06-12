@@ -136,7 +136,7 @@ export class FireBase {
         });
     }
 
-    signUp(wallet, username, email, tosVersion, referralAddress, ipAddress, callback) {
+    signUp(wallet, username, email, tosVersion, referralAddress, ipAddresses, callback) {
         this.checkUserExists(wallet, (userExists, user) => {
             if (userExists) {
                 return callback(true, ["User already signed up!"]);
@@ -188,8 +188,8 @@ export class FireBase {
                                         updates['/Emails/' + email.replace(/\./g, ',')] = true;
                                         updates['/Usernames/' + username.toLowerCase()] = username;
                                         this.signIn();
-                                        if (ipAddress != null && referralAddress != '' && referralAddress != null) {
-                                            updates['/Referral/' + referralAddress.toLowerCase() +'/ips/' + ipAddress.replace(/\./g, ',')] = {
+                                        if (ipAddresses != null && Array.isArray(ipAddresses) && referralAddress != '' && referralAddress != null) {
+                                            updates['/Referral/' + referralAddress.toLowerCase() +'/ips/' + ipAddresses[ipAddresses.length - 1].replace(/\./g, ',')] = {
                                                 wallet,
                                                 verified: false,
                                             };

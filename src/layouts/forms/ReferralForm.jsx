@@ -14,7 +14,7 @@ import * as Const from '../../const/const';
 import ErrorBox from '../ErrorBox';
 import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
 
-const REFERRAL_BASE_URL = 'https://canvas.pixelproperty.io/referral=';
+const REFERRAL_BASE_URL = 'https://canvas.pixelproperty.io/?referral=';
 
 class ReferralForm extends Component {
     constructor(props) {

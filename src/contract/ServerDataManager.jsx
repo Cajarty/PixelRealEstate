@@ -248,11 +248,13 @@ export class ServerDataManager {
         });
     }
 
-    requestIP(callback) {
-        axios.get('https://jsonip.com/',).then((r) => {
-            if (r.data.ip == null || !/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(r.data.ip))
+    requestIPs(callback) {
+        ax.get('/getIP',).then((r) => {
+            if (r.status == 200 && typeof r.data === 'object') {
+                return callback(r.data.ips);
+            } else {
                 return callback(null);
-            return callback(r.data.ip);
+            }
         }).catch((e) => {
             console.info(e)
             return callback(null);

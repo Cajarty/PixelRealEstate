@@ -197,6 +197,12 @@ export class FireBase {
                             ];   
                             ctr.sign(params, wallet, (result, message, signature) => {
                                 if (result) {
+
+                                    let userIP = null;
+                                    if (ipAddresses != null && Array.isArray(ipAddresses) && ipAddresses.length > 0) {
+                                        userIP = ipAddresses[ipAddresses.length - 1];
+                                    }
+
                                     firebase.database().ref('/Accounts/' + wallet.toLowerCase()).set({
                                         wallet,
                                         email,
@@ -204,13 +210,14 @@ export class FireBase {
                                         username,
                                         tosVersion,
                                         registerTime: new Date().getTime(),
+                                        ip: userIP, 
                                     }).then(() => {
                                         let updates = {};
                                         updates['/Emails/' + email.replace(/\./g, ',')] = true;
                                         updates['/Usernames/' + username.toLowerCase()] = username;
                                         this.signIn();
-                                        if (ipAddresses != null && Array.isArray(ipAddresses) && referralAddress != '' && referralAddress != null) {
-                                            updates['/Referral/' + referralAddress.toLowerCase() +'/ips/' + ipAddresses[ipAddresses.length - 1].replace(/\./g, ',')] = {
+                                        if (userIP != null && referralAddress != '' && referralAddress != null) {
+                                            updates['/Referral/' + referralAddress.toLowerCase() +'/ips/' + userIP.replace(/\./g, ',')] = {
                                                 wallet,
                                                 verified: false,
                                             };

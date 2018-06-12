@@ -134,14 +134,14 @@ class ReferralForm extends Component {
                         <Statistic style={{margin: '1em 0px', width: '50%'}}>
                         <Statistic.Value>
                             <Image src={Assets.TOKEN} style={{margin: '0px 8px', display: 'inline-block'}}/>
-                            {this.state.PXLPending}
+                            {Func.NumberWithCommas(this.state.PXLPending)}
                         </Statistic.Value>
                         <Statistic.Label>Pending Rewards</Statistic.Label>
                         </Statistic>
                         <Statistic style={{margin: '1em 0px', width: '50%'}}>
                         <Statistic.Value>
                             <Icon name='user plus'/>
-                            {this.state.referredUsers}
+                            {Func.NumberWithCommas(this.state.referredUsers)}
                         </Statistic.Value>
                         <Statistic.Label>Users Referred</Statistic.Label>
                         </Statistic>

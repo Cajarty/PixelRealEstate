@@ -59,6 +59,7 @@
         "firebase": "^4.12.1",
         "gifencoder": "^1.1.0",
         "gulp": "^3.9.1",
+        "install": "^0.11.0",
         "js-base64": "^2.4.3",
         "lodash": "^4.17.5",
         "lzwcompress": "^0.2.4",

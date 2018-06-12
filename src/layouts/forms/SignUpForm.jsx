@@ -11,11 +11,14 @@ import {FB, FireBase} from '../../const/firebase';
 import * as EVENTS from '../../const/events';
 import * as Const from '../../const/const';
 import ErrorBox from '../ErrorBox';
+import {SDM, ServerDataManager} from '../../contract/ServerDataManager';
 
 class SignUpForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            ipAddress: null,
+            referralAddress: '',
             wallet: '',
             email: '',
             username: '',
@@ -24,12 +27,22 @@ class SignUpForm extends Component {
         };
     }
 
+    componentWillReceiveProps(newProps) {
+        this.setState({referralAddress: newProps.referralAddress});
+    }
+
     componentDidMount() {
         if (!GFD.getData('noAccount') && ctr.account != null)   
             this.setState({wallet: ctr.account});
         ctr.listenForEvent(EVENTS.AccountChange, 'SignUpForm', (data) => {
             this.setState({wallet: data});
         });
+        SDM.requestIP((ip) => {
+            if (ip == null)
+                return;
+                console.info(ip);
+            this.setState({ipAddress: ip});
+        })
     }
 
     updateEmail(value) {
@@ -48,7 +61,10 @@ class SignUpForm extends Component {
         this.setState({errors});
         if (errors.length > 0)
             return;
-        FB.signUp(this.state.wallet, this.state.username, this.state.email, Const.TOS_VERSION, (result, messages) => {
+        FB.signUp(this.state.wallet, this.state.username, 
+            this.state.email, Const.TOS_VERSION, 
+            this.state.referralAddress, this.state.ipAddress,
+             (result, messages) => {
             if (!result)
                 this.setState({errors: errors.concat(messages)});
         });

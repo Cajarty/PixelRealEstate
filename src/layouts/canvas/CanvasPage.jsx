@@ -39,6 +39,7 @@ import * as Func from '../../functions/functions';
 import ViewTimelapse from '../forms/ViewTimelapse';
 import PXLBalanceItem from '../ui/PXLBalanceItem';
 import PixelDescriptionBoxSimple from '../ui/PixelDescriptionBoxSimple';
+import ReferralForm from '../forms/ReferralForm';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -289,7 +290,16 @@ class CanvasPage extends Component {
                                     onChange={(e, data) => { this.toggleForSaleProperties(e, data) }}
                                 />
                                 <Divider />
-                                <ViewTimelapse/>
+                                <Grid>
+                                    <GridRow width={16}>
+                                        <GridColumn width={8}>
+                                            <ViewTimelapse/>
+                                        </GridColumn>
+                                        <GridColumn width={8}>
+                                            <ReferralForm/>
+                                        </GridColumn>
+                                    </GridRow>
+                                </Grid>
                             </div>
                         }
                         <GetStarted

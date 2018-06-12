@@ -2,6 +2,7 @@
 import * as EVENTS from '../const/events';
 import {ctr, Contract, LISTENERS} from './contract.jsx';
 import {ax, Axios} from '../network/Axios.jsx';
+import axios from 'axios';
 import * as Func from '../functions/functions.jsx';
 import * as Assets from '../const/assets';
 import * as Struct from '../const/structs';
@@ -245,6 +246,17 @@ export class ServerDataManager {
                 resultCallback(false);
             }
         });
+    }
+
+    requestIP(callback) {
+        axios.get('https://jsonip.com/',).then((r) => {
+            if (r.data.ip == null || !/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(r.data.ip))
+                return callback(null);
+            return callback(r.data.ip);
+        }).catch((e) => {
+            console.info(e)
+            return callback(null);
+        })
     }
 
     requestServerImage(resultCallback) {

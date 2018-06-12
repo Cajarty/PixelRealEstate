@@ -32,11 +32,18 @@ class GetStarted extends Component {
         this.setState({continueAdvancedMode: true})
     }
 
-    checkStartInAdvancedMode() {
+    checkURLQuery() {
         let query = Query.search(location.href).query;
 
-        if (query.length > 1 && query[0] === 'showAdvanced' && query[1] == 'true')
-            GFD.setData('advancedMode', true);
+        for (let i = 0; i < query.length; i+=2) {
+            if (query[i] === 'showAdvanced') {
+                GFD.setData('advancedMode', query[i+1] == 'true' ? true : false);
+            }
+            if (query[i] === 'referral') {
+                console.info(query[i+1])
+                this.setState({referralAddress: query[i+1]});
+            }
+        }
     }
 
     componentDidMount() {
@@ -55,7 +62,7 @@ class GetStarted extends Component {
             this.setState({continueAdvancedMode: true})
             localStorage.removeItem('hideAdvancedModeDialog');
         }
-        this.checkStartInAdvancedMode();
+        this.checkURLQuery();
     }
 
     componentWillUnmount() {
@@ -206,6 +213,7 @@ class GetStarted extends Component {
                 </Modal>
                 <SignUpForm
                     open={!this.state.noMetaMask && this.state.network === Const.NETWORK_MAIN && ctr.account !== null && !this.state.userExists && this.state.continueAdvancedMode}
+                    referralAddress={this.state.referralAddress}
                     onCancel={() => this.props.changeMode()}
                 />
             </div>

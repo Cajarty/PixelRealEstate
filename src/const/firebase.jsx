@@ -22,6 +22,9 @@ export class FireBase {
     constructor() {
         this.chatListenerToken = null;
         this.chatRemoveListenerToken = null;
+        this.refersListenerToken = null;
+        this.earnedListenerToken = null
+        this.listenerReferrerWallet = null;
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 GFD.setData('userSignedIn', true);
@@ -31,6 +34,24 @@ export class FireBase {
                 GFD.setData('userSignedIn', false);
             }
         });
+    }
+
+    watchReferrals(wallet, refersUpdatedCallback, earnedUpdatedCallback) {
+        this.stopWatchingReferrals();
+        console.info('/Referral/'+wallet+'/refers')
+        this.refersListenerToken = firebase.database().ref('/Referral/'+wallet+'/refers').on('value', refersUpdatedCallback);
+        this.earnedListenerToken = firebase.database().ref('/Referral/'+wallet+'/earned').on('value', earnedUpdatedCallback);
+        this.listenerReferrerWallet = wallet;
+
+    }
+
+    stopWatchingReferrals() {
+        if (this.listenerReferrerWallet == null)
+            return;
+        if (this.refersListenerToken != null)
+            firebase.database().ref('/Referral/'+this.listenerReferrerWallet+'/refers').on('value', this.refersListenerToken);
+        if (this.earnedListenerToken != null)
+            firebase.database().ref('/Referral/'+this.listenerReferrerWallet+'/earned').on('value', this.earnedListenerToken);
     }
 
     watchChat(msgReceivedCallback, msgDeletedCallback) {

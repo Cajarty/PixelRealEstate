@@ -105,7 +105,7 @@ class ReferralForm extends Component {
                             <GridColumn width={3}>
                                 <Image src={Assets.TOKEN}/>
                             </GridColumn>
-                            <GridColumn width={13} floated fluid style={{margin: 'auto', textAlign: 'center'}}>
+                            <GridColumn width={13} style={{margin: 'auto', textAlign: 'center'}}>
                                 <h1 style={{margin: 'auto'}}>Referral Rewards</h1>
                             </GridColumn>
                         </GridRow>

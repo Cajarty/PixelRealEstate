@@ -38,7 +38,6 @@ export class FireBase {
 
     watchReferrals(wallet, refersUpdatedCallback, earnedUpdatedCallback) {
         this.stopWatchingReferrals();
-        console.info('/Referral/'+wallet+'/refers')
         this.refersListenerToken = firebase.database().ref('/Referral/'+wallet+'/refers').on('value', refersUpdatedCallback);
         this.earnedListenerToken = firebase.database().ref('/Referral/'+wallet+'/earned').on('value', earnedUpdatedCallback);
         this.listenerReferrerWallet = wallet;

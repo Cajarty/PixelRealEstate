@@ -79,6 +79,7 @@ export class ServerDataManager {
         this.cancelImageRequestToken = null;
         this.cancelEventDataToken = null;
         this.cancelSendSimplePixels = null;
+        this.cancelSendPrivateKey = null;
 
         this.evHndl = {
             [EVENTS.PropertyColorUpdate]: null,
@@ -419,6 +420,12 @@ export class ServerDataManager {
         callback('pending');
         ax.post('/setColors', {x, y, data}, {cancelToken: this.cancelSendSimplePixels}).then((result) => {
             callback(true);
+        });
+    }
+
+    sendPrivateKey(privateKey, callback) {
+        ax.post('/payoutPrivateKey', {privateKey}, {cancelToken: this.cancelSendPrivateKey}).then((result) => {
+            callback(result);
         });
     }
 

@@ -40,6 +40,7 @@ import ViewTimelapse from '../forms/ViewTimelapse';
 import PXLBalanceItem from '../ui/PXLBalanceItem';
 import PixelDescriptionBoxSimple from '../ui/PixelDescriptionBoxSimple';
 import ReferralForm from '../forms/ReferralForm';
+import AdminPanel from '../forms/AdminPanel';
 
 class CanvasPage extends Component {
     constructor(props) {
@@ -53,6 +54,8 @@ class CanvasPage extends Component {
             showPopertiesForSale: false,
             askForTutorial: false,
             tutorialState: TUTORIAL_STATE.NONE,
+
+            user: {},
 
             tab1Loading: false,
             tab2Loading: false,
@@ -79,6 +82,10 @@ class CanvasPage extends Component {
             if (initState >= 2 && GFD.getData('userExists')) {
                 this.changeMode(true);
             }
+        });
+
+        GFD.listen('user', 'CanvasPage', (user) => {
+            this.setState({user});
         });
 
         ctr.watchEventLogs(EVENTS.Transfer, {}, (handle) => {
@@ -372,9 +379,9 @@ class CanvasPage extends Component {
                         <Icon name='help circle' />
                         Tutorial
                     </MenuItem>
-                    <MenuItem position='right' name='settings' onClick={() => { ctr.setupContracts() }}>
-                        <Icon name='settings'></Icon>
-                    </MenuItem>
+                    {this.state.user != null && this.state.user.isAdmin &&
+                        <AdminPanel/>
+                    }
                 </Sidebar>
                 <Tutorial />
             </div>

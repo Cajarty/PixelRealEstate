@@ -173,7 +173,15 @@ export const HexToString = function(hex) {
     return utf8.decode(str);
 };
 
+export const BigNumberToString = (big) => {
+    if (typeof big === "number")
+        return big;
+    return big.toString();
+}
+
 export const BigNumberToNumber = (big) => {
+    if (typeof big === "number")
+        return big;
     return big.toNumber();
 }
 
@@ -188,7 +196,7 @@ export const VisitPage = (path) => {
 export const ContractDataToRGBAArray = (/*uint256[5]*/ contractDataArray) => {
     let result = [];
     for(let i = CONTRACT_DATA_ARRAY_SIZE - 1; i >= 0; i--) {
-        let uint256 = bigInt(contractDataArray[i].toString(2), 2);
+        let uint256 = bigInt(contractDataArray[i].toString(2));
         for (let j = 0; j < COLORS_PER_256; j++) {
             result.unshift(255);
             let lNumerator = uint256.and(LNUMBER - 1).toJSNumber();

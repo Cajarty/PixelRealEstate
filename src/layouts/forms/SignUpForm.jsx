@@ -32,8 +32,10 @@ class SignUpForm extends Component {
     }
 
     componentDidMount() {
-        if (!GFD.getData('noAccount') && ctr.account != null)   
-            this.setState({wallet: ctr.account});
+        ctr.getAccount((acc) => {
+            console.info(acc)
+            this.setState({wallet: acc.address});
+        }); 
         ctr.listenForEvent(EVENTS.AccountChange, 'SignUpForm', (data) => {
             this.setState({wallet: data});
         });

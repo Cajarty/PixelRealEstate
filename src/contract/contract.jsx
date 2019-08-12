@@ -8,6 +8,8 @@ import * as EVENTS from '../const/events';
 import { default as contract } from 'truffle-contract';
 import {GFD, GlobalState} from '../functions/GlobalState';
 import {SDM, ServerDataManager} from '../contract/ServerDataManager';
+const ethers = require('ethers');
+const CTRDATA = require('./ContractData');
 
 // Import our contract artifacts and turn them into usable abstractions.
 import VirtualRealEstate from '../../build/contracts/VirtualRealEstate.json'
@@ -31,14 +33,16 @@ export const LISTENERS = {
 export class Contract {
     constructor() {
 
+        this.provider = null;
+
         this.accounts = null;
         this.account = null;
-        this.VRE = contract(VirtualRealEstate);
-        this.PXLPP = contract(PXLProperty);
-        this.ST = contract(StandardToken);
+        this.VRE = null;//contract(VirtualRealEstate);
+        this.PXLPP = null;//contract(PXLProperty);
+        this.ST = null;//contract(StandardToken);
 
         this.startLoadBlock = 0;
-        this.gasBuffer = 1.1; //extra gas added onto calculation.
+        this.gasBuffer = 1.01; //extra gas added onto calculation.
 
         this.VREInstance = null;
         this.PXLPPInstance = null;
@@ -46,7 +50,6 @@ export class Contract {
 
         this.propertyTradeLog = [];
 
-        this.getAccountsInterval = null;
         this.setupRetryInterval = null;
 
         this.events = {
@@ -76,35 +79,21 @@ export class Contract {
             if (typeof web3 !== 'undefined') {
                 window.web3 = new Web3(window.web3.currentProvider);
                 console.info('Web3 & MetaMask.');            
-                
-                this.VRE.setProvider(window.web3.currentProvider);
-                this.PXLPP.setProvider(window.web3.currentProvider);
-                this.ST.setProvider(window.web3.currentProvider);
+
+                this.provider = new ethers.providers.Web3Provider(window.web3.currentProvider);
     
                 this.updateNetwork((id) => {
                     if (id === Const.NETWORK_MAIN) {
-                        this.getAccounts();
-        
-                        this.break = false;
+                         this.getAccount();
             
-                        this.PXLPP.deployed().then((PXLPPInstance) => {
-                            this.VRE.deployed().then((VREInstance) => {
-                                this.VREInstance = VREInstance;
-                                this.PXLPPInstance = PXLPPInstance;
-                                SDM.init();
-                                window.web3.eth.getBlock('latest').then((latestBlock) => {
-                                    this.startLoadBlock = latestBlock.number - 1;
-                                });
-                            });
+                        SDM.init();
+                        window.web3.eth.getBlock('latest').then((latestBlock) => {
+                            this.startLoadBlock = latestBlock.number - 1;
                         });
     
-                        this.getAccountsInterval = setInterval(() => this.getAccounts(), 1000);
-                        GFD.setData('noMetaMask', false);
-                    } else {
-                        SDM.initNoMetaMask();
                         GFD.setData('noMetaMask', false);
                     }
-                })
+                });
             } else {
                 console.info('No MetaMask.');
                 GFD.setData('noMetaMask', true);
@@ -113,37 +102,44 @@ export class Contract {
         });
     }
 
-    getAccounts() {
+    getAccount(callback = () => {}) {
         if (GFD.getData('noMetaMask'))
-            return;
-        window.web3.eth.getAccounts((err, accs) => {
-            if (err != null) {
-                if (GFD.getData('advancedMode')) {
-                    this.sendResults(LISTENERS.Error, {errorId: 1, errorType: ERROR_TYPE.Error, message: "In order to fully interact with the client, it is required to have the MetaMask.io web-plugin installed. MetaMask allows you to store your earnings securely in your own Ethereum lite-wallet. "});
-                } else {
-                    this.sendResults(LISTENERS.Error, {errorId: 1, errorType: ERROR_TYPE.Error, message: "The canvas is updating every 15 seconds. Get instant updates with https://metamask.io/ ."});
-                }
-                return;
-            }
+            return callback(null);
 
-            if (accs.length == 0) {
-                if (GFD.getData('advancedMode')) {
-                    this.sendResults(LISTENERS.Error, {errorId: 0, errorType: ERROR_TYPE.Error, message: "Couldn't retrieve any accounts! Make sure you're logged into Metamask."});
-                }
-                GFD.setData('noAccount', true);
-                return;
-            }
-
-            GFD.setData('noAccount', false);
-            this.sendResults(LISTENERS.Error, {removeErrors: [0, 1], message: ''});
-
-            this.accounts = accs;
-            if (this.account !== this.accounts[0].toLowerCase()) {
-                this.account = this.accounts[0].toLowerCase();
-                this.sendEvent(EVENTS.AccountChange, this.account);
-                SDM.init();
-            }
+        if (this.account == null) {
+            this.account = this.provider.getSigner(0);
+        }
+        this.account.getAddress().then((address) => {
+            this.account.address = address;
+            callback(this.account);
         });
+
+            // if (err != null) {
+            //     if (GFD.getData('advancedMode')) {
+            //         this.sendResults(LISTENERS.Error, {errorId: 1, errorType: ERROR_TYPE.Error, message: "In order to fully interact with the client, it is required to have the MetaMask.io web-plugin installed. MetaMask allows you to store your earnings securely in your own Ethereum lite-wallet. "});
+            //     } else {
+            //         this.sendResults(LISTENERS.Error, {errorId: 1, errorType: ERROR_TYPE.Error, message: "The canvas is updating every 15 seconds. Get instant updates with https://metamask.io/ ."});
+            //     }
+            //     return;
+            // }
+
+            // if (accs.length == 0) {
+            //     if (GFD.getData('advancedMode')) {
+            //         this.sendResults(LISTENERS.Error, {errorId: 0, errorType: ERROR_TYPE.Error, message: "Couldn't retrieve any accounts! Make sure you're logged into Metamask."});
+            //     }
+            //     GFD.setData('noAccount', true);
+            //     return;
+            // }
+
+            // GFD.setData('noAccount', false);
+            // this.sendResults(LISTENERS.Error, {removeErrors: [0, 1], message: ''});
+
+            // this.accounts = accs;
+            // if (this.account !== this.accounts[0].toLowerCase()) {
+            //     this.account = this.accounts[0].toLowerCase();
+            //     this.sendEvent(EVENTS.AccountChange, this.account);
+            //     SDM.init();
+            // }
     }
 
     /*
@@ -220,52 +216,40 @@ export class Contract {
             return;
         }
 
-        // VRE DApp Events
-        this.VRE.deployed().then((i) => {
+        let filter = {
+            fromBlock: this.startLoadBlock - blocks, 
+            toBlock: 'latest',
+            address: Const.VirtualRealEstate,
+        };
 
-            let filter = {
-                fromBlock: this.startLoadBlock - blocks, 
-                toBlock: 'latest',
-                address: Const.VirtualRealEstate,
-            };
+        switch (event) {
+            case EVENTS.PropertyBought:
+            case EVENTS.PropertyColorUpdate:
+            case EVENTS.SetUserHoverText:
+            case EVENTS.SetUserSetLink:
+            case EVENTS.PropertySetForSale:
+            case EVENTS.DelistProperty:
+            case EVENTS.SetPropertyPublic:
+            case EVENTS.SetPropertyPrivate:
+            case EVENTS.Bid:
+                return this._watchVREEventLogs(event, callback);
+            case EVENTS.Transfer:
+            case EVENTS.Approval:
+                return this._watchPXLEventLogs(event, callback);
+            default:
+                return;
+        }
+    }
 
-            switch(event) {
-                case EVENTS.PropertyBought:
-                    return callback(i.PropertyBought(params, filter));
-                case EVENTS.PropertyColorUpdate:
-                    return callback( i.PropertyColorUpdate(params, filter));
-                case EVENTS.SetUserHoverText:
-                    return callback( i.SetUserHoverText(params, filter));
-                case EVENTS.SetUserSetLink:
-                    return callback( i.SetUserSetLink(params, filter));
-                case EVENTS.PropertySetForSale:
-                    return callback( i.PropertySetForSale(params, filter));
-                case EVENTS.DelistProperty:
-                    return callback( i.DelistProperty(params, filter));
-                case EVENTS.SetPropertyPublic:
-                    return callback( i.SetPropertyPublic(params, filter));
-                case EVENTS.SetPropertyPrivate:
-                    return callback( i.SetPropertyPrivate(params, filter));
-                case EVENTS.Bid:
-                    return callback( i.Bid(params, filter));
-            }
+    _watchVREEventLogs(event, callback) {
+        this.getVREContract((i) => {
+            i.on(event, callback);
         });
+    }
 
-        // PXL ERC20 Events
-        this.PXLPP.deployed().then((i) => {
-
-            let filter = {
-                fromBlock: this.startLoadBlock, 
-                toBlock: 'latest',
-                address: Const.PXLProperty,
-            };
-
-            switch(event) {
-                case EVENTS.Transfer:
-                    return callback( i.Transfer(params, filter));
-                case EVENTS.Approval:
-                    return callback( i.Approval(params, filter));
-            }
+    _watchPXLEventLogs(event, callback) {
+        this.getPXLContract((i) => {
+            i.on(event, callback);
         });
     }
 
@@ -280,25 +264,18 @@ export class Contract {
         return obj;
     }
 
-    getVREInstance() {
-        if (this.VREInstance)
-            return new Promise((res, rej) => {res(this.VREInstance);});
-        else
-            return this.VRE.deployed();
+    getVREContract(callback/*(contract)*/) {
+        if (!this.VRE) {
+            this.VRE = new ethers.Contract(CTRDATA.VRE_Address, CTRDATA.VRE_ABI, this.provider);
+        }
+        return callback(this.VRE);
     }
 
-    getSTInstance() {
-        if (this.STInstance)
-            return new Promise((res, rej) => {res(this.STInstance);});
-        else
-            return this.ST.deployed();
-    }
-
-    getPXLPPInstance() {
-        if (this.PXLPPInstance)
-            return new Promise((res, rej) => {res(this.PXLPPInstance);});
-        else
-            return this.PXLPP.deployed();
+    getPXLContract(callback/*(contract)*/) {
+        if (!this.PXLPP) {
+            this.PXLPP = new ethers.Contract(CTRDATA.PXL_Address, CTRDATA.PXL_ABI, this.provider);
+        }
+        return callback(this.PXLPP);
     }
 
     updateNetwork(callback = () => {}) {
@@ -375,18 +352,19 @@ export class Contract {
     // ---------------------------------------------------------------------------------------------------------
 
     setupContracts() {
-        this.PXLPP.deployed().then((PXLPPInstance) => {
-            this.VRE.deployed().then((VREInstance) => {
-                PXLPPInstance.setPixelPropertyContract(VREInstance.address, {from: this.account}).then((r) => {console.info(r)}).catch((e) => {console.info(e)});
-                VREInstance.setPXLPropertyContract(PXLPPInstance.address, {from: this.account}).then((r) => {console.info(r)}).catch((e) => {console.info(e)});
-            });
-        });
+        // for connecting new contracts together so we know which are the current ones
+        // this.PXLPP.deployed().then((PXLPPInstance) => {
+        //     this.VRE.deployed().then((VREInstance) => {
+        //         PXLPPInstance.setPixelPropertyContract(VREInstance.address, {from: this.account}).then((r) => {console.info(r)}).catch((e) => {console.info(e)});
+        //         VREInstance.setPXLPropertyContract(PXLPPInstance.address, {from: this.account}).then((r) => {console.info(r)}).catch((e) => {console.info(e)});
+        //     });
+        // });
     }
 
     buyProperty(x, y, eth, ppc, callback) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return callback(false);
-        this.getVREInstance().then((i) => {
+        this.getVREContract((i) => {
             if (eth == 0)
                 return i.buyPropertyInPXL.estimateGas(this.toID(x, y), ppc, {from: this.account }).then((gas) => {
                     return i.buyPropertyInPXL(this.toID(x, y), ppc, {from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
@@ -429,7 +407,7 @@ export class Contract {
     sellProperty(x, y, price, callback) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return;
-        this.getVREInstance().then((i) => {
+        this.getVREContract((i) => {
             return i.listForSale.estimateGas(this.toID(parseInt(x), parseInt(y)), price, {from: this.account }).then((gas) => {
                 return i.listForSale(this.toID(parseInt(x), parseInt(y)), price, {from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
             }).then(() => {
@@ -450,7 +428,7 @@ export class Contract {
     delistProperty(x, y, callback) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return callback(false);
-        this.getVREInstance().then((i) => {
+        this.getVREContract((i) => {
             i.delist.estimateGas(this.toID(parseInt(x), parseInt(y)), {from: this.account }).then((gas) => {
                 return i.delist(this.toID(parseInt(x), parseInt(y)), {from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
             }).then(() => {
@@ -471,7 +449,7 @@ export class Contract {
     setPropertyMode(x, y, isPrivate, minutesPrivate, callback) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return callback(false);
-        this.getVREInstance().then((i) => {
+        this.getVREContract((i) => {
             return i.setPropertyMode.estimateGas(this.toID(parseInt(x), parseInt(y)), isPrivate, minutesPrivate, {from: this.account }).then((gas) => {
                 return i.setPropertyMode(this.toID(parseInt(x), parseInt(y)), isPrivate, minutesPrivate, {from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
             }).then((r) => {
@@ -492,7 +470,7 @@ export class Contract {
     setHoverText(text, callback) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return;
-        this.getVREInstance().then((i) => {
+        this.getVREContract((i) => {
             return i.setHoverText.estimateGas(Func.StringToBigInts(text), {from: this.account}).then((gas) => {
                 return i.setHoverText(Func.StringToBigInts(text), {from: this.account, gas: Math.ceil(gas * this.gasBuffer)});
             }).then(function() {
@@ -514,7 +492,7 @@ export class Contract {
     setLink(text, callback) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return;
-        this.getVREInstance().then((i) => {
+        this.getVREContract((i) => {
             return i.setLink.estimateGas(Func.StringToBigInts(text), {from: this.account }).then((gas) => {
                 return i.setLink(Func.StringToBigInts(text), {from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
             }).then(function() {
@@ -539,7 +517,7 @@ export class Contract {
             this.sendResults(LISTENERS.Alert, {result: false, message: "Not a valid address! Aborting."});
             return callback(false);
         }
-        this.getVREInstance().then((i) => {
+        this.getVREContract((i) => {
             return i.transferProperty.estimateGas(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account}).then((gas) => {
                 return i.transferProperty(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account, gas: Math.ceil(gas * this.gasBuffer)}).then((r) => {
                     return callback(true);
@@ -559,7 +537,7 @@ export class Contract {
     makeBid(x, y, bid, callback) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return callback(false);
-        this.getVREInstance().then((i) => {
+        this.getVREContract((i) => {
             return i.makeBid.estimateGas(this.toID(x, y), bid, {from: this.account }).then((gas) => {
                 return i.makeBid(this.toID(x, y), bid, {from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
             }).then(() => {
@@ -580,7 +558,7 @@ export class Contract {
     setColors(x, y, data, PPT, callback) {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return callback(false);
-        this.getVREInstance().then((i) => {
+        this.getVREContract((i) => {
             callback('pending');
             i.setColors.estimateGas(this.toID(x, y), Func.RGBArrayToContractData(data), PPT, {from: this.account }).then((gas) => {
                 return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), PPT, {from: this.account, gas: Math.ceil(gas * this.gasBuffer)});
@@ -653,20 +631,19 @@ export class Contract {
     getBalance(callback) {
         if (GFD.getData('noMetaMask'))
             return callback(0);
-        this.getPXLPPInstance().then((i) => {
-            i.balanceOf(this.account, { from: this.account }).then((r) => {
-                callback(Func.BigNumberToNumber(r));
+        this.getPXLContract((pxlCtr) => {
+            this.getAccount((acc) => {
+                pxlCtr.balanceOf(acc.address).then((r) => {
+                    callback(Func.BigNumberToNumber(r));
+                });
             });
-        }).catch((e) => {
-            console.info(e);
-            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to retrieve PPC balance."});
         });
     }
 
     getBalanceOf(address, callback) {
         if (GFD.getData('noMetaMask'))
             return callback(0);
-        this.getPXLPPInstance().then((i) => {
+        this.getPXLContract((i) => {
             i.balanceOf(address, { from: this.account }).then((r) => {
                 callback(Func.BigNumberToNumber(r));
             });
@@ -679,7 +656,7 @@ export class Contract {
     getSystemSalePrices(callback) {
         if (GFD.getData('noMetaMask'))
             return callback(null);
-        this.getVREInstance().then((i) => {
+        this.getVREContract((i) => {
             return i.getSystemSalePrices.call().then((r) => {
                 return callback(r);
             });
@@ -691,7 +668,7 @@ export class Contract {
     getForSalePrices(x, y, callback) {
         if (GFD.getData('noMetaMask'))
             return callback(false);
-        this.getVREInstance().then((i) => {
+        this.getVREContract((i) => {
             return i.getForSalePrices.call(this.toID(x, y)).then((r) => {
                 return callback(r);
             });
@@ -703,8 +680,8 @@ export class Contract {
     getHoverText(address, callback) {
         if (GFD.getData('noMetaMask'))
             return callback(false);
-        this.getPXLPPInstance().then((i) => {
-            return i.getOwnerHoverText.call(address).then((r) => {
+        this.getPXLContract((i) => {
+            return i.getOwnerHoverText(address).then((r) => {
                 return callback(Func.BigIntsToString(r));
             });
         });
@@ -713,8 +690,8 @@ export class Contract {
     getLink(address, callback) {
         if (GFD.getData('noMetaMask'))
             return callback(false);
-        this.getPXLPPInstance().then((i) => {
-            return i.getOwnerLink.call(address).then((r) => {
+        this.getPXLContract((i) => {
+            return i.getOwnerLink(address).then((r) => {
                 return callback(Func.BigIntsToString(r));
             });
         }).catch((e) => {
@@ -725,7 +702,7 @@ export class Contract {
     getPropertyColorsOfRow(x, row, callback) {
         if (GFD.getData('noMetaMask'))
             return callback(false);
-        this.getPXLPPInstance().then((i) => {
+        this.getPXLContract((i) => {
             return i.getPropertyColorsOfRow.call(x, row).then((r) => {
                 callback(x, row, Func.ContractDataToRGBAArray(r));
             });
@@ -737,15 +714,13 @@ export class Contract {
     getPropertyColors(x, y, callback) {
         if (GFD.getData('noMetaMask'))
             return callback(false);
-        this.getPXLPPInstance().then((i) => {
-            return i.getPropertyColors.call(this.toID(x, y)).then((r) => {
+        this.getPXLContract((i) => {
+            return i.getPropertyColors(this.toID(x, y)).then((r) => {
                 if (r[0] == 0 && r[1] == 0 && r[2] == 0 && r[3] == 0 && r[4] == 0)
                     callback(x, y, Func.ContractDataToRGBAArray(r), true);
                 else
                     callback(x, y, Func.ContractDataToRGBAArray(r), false);
             });
-        }).catch((e) => {
-            console.log(e);
         });
     }
 
@@ -753,12 +728,10 @@ export class Contract {
         if (GFD.getData('noMetaMask'))
             return callback(false);
         //returns address, price, renter, rent length, rentedUntil, rentPrice
-        this.getVREInstance().then((i) => {
-            i.getPropertyData.call(this.toID(x, y)).then((r) => {
+        this.getVREContract((i) => {
+            i.getPropertyData(this.toID(x, y)).then((r) => {
                 return callback(r);
             });
-        }).catch((e) => {
-            console.log(e);
         });
     }
 

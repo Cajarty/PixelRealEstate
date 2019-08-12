@@ -268,7 +268,7 @@ class PixelDescriptionBox extends Component {
         if (x === '' || y === '')
             return;
         ctr.getPropertyData(x, y, (data) => {  
-            let ethp = Func.BigNumberToNumber(data[1]);
+            let ethp = Func.BigNumberToString(data[1]);
             let ppcp = Func.BigNumberToNumber(data[2]);
             let reserved = Func.BigNumberToNumber(data[5]);
             let lastUpdate = Func.BigNumberToNumber(data[3]);

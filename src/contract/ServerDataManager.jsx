@@ -315,7 +315,7 @@ export class ServerDataManager {
 
     forceUpdatePropertyData(x, y, callback = () => {}) {
         ctr.getPropertyData(x, y, (data) => {
-            let ethp = Func.BigNumberToNumber(data[1]);
+            let ethp = Func.BigNumberToString(data[1]);
             let ppcp = Func.BigNumberToNumber(data[2]);
             let update = {
                 owner: data[0],

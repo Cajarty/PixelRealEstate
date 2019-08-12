@@ -41,20 +41,24 @@ class ReferralForm extends Component {
     }
 
     componentDidMount() {
-        if (!GFD.getData('noAccount') && ctr.account != null)   
-            this.setState({
-                wallet: ctr.account,
-                referralLink: REFERRAL_BASE_URL + ctr.account,
+        ctr.getAccount((acc) => {
+            if (!GFD.getData('noAccount') && acc != null)   {
+                let accAddress = acc.address;
+                this.setState({
+                    wallet: accAddress,
+                    referralLink: REFERRAL_BASE_URL + accAddress,
+                });
+                this.listenForReferrals(accAddress);
+            }
+            ctr.listenForEvent(EVENTS.AccountChange, 'SignUpForm', (data) => {
+                this.setState({
+                    wallet: data,
+                    referralLink: REFERRAL_BASE_URL + data,
+                });
+                this.listenForReferrals(data);
             });
-            this.listenForReferrals(ctr.account);
-        ctr.listenForEvent(EVENTS.AccountChange, 'SignUpForm', (data) => {
-            this.setState({
-                wallet: data,
-                referralLink: REFERRAL_BASE_URL + data,
-            });
-            this.listenForReferrals(data);
-        });
-        this.updateExampleSlider(this.state.exampleReferrees);
+            this.updateExampleSlider(this.state.exampleReferrees);
+        })
     }
 
     componentWillUnmount() {

@@ -18,8 +18,10 @@ class SetHoverText extends Component {
 
     componentDidMount() {
         this.setState({pendingState: Const.FORM_STATE.IDLE});
-        ctr.getHoverText(ctr.account, (data) => {
-            this.setState({hoverText: data});
+        ctr.getAccount((acc) => {
+            ctr.getHoverText(acc.address, (data) => {
+                this.setState({hoverText: data});
+            });
         });
     }
 

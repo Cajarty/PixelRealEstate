@@ -9,6 +9,7 @@ import * as FBC from '../private/firebaseConfig';
     : FBC.devConfig;
 
 if (!firebase.apps.length) {
+    console.info(config)
   firebase.initializeApp(config);
 }
 

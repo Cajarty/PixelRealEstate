@@ -6,7 +6,7 @@ import * as Strings from '../../const/strings';
 import Info from '../ui/Info';
 import {Modal, ModalActions, ModalHeader, ModalContent, Input, Button, Divider, Message, Label} from 'semantic-ui-react';
 
-class SetHoverText extends Component {
+class SetLink extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -17,8 +17,10 @@ class SetHoverText extends Component {
 
     componentDidMount() {
         this.setState({pendingState: Const.FORM_STATE.IDLE});
-        ctr.getLink(ctr.account, (data) => {
-            this.setState({linkText: data});
+        ctr.getAccount((acc) => {
+            ctr.getLink(acc.address, (data) => {
+                this.setState({linkText: data});
+            });
         });
     }
 
@@ -65,4 +67,4 @@ class SetHoverText extends Component {
     }
 }
 
-export default SetHoverText
+export default SetLink

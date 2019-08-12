@@ -156,7 +156,7 @@ class CanvasPage extends Component {
 
     changeMode(newMode = !this.state.advancedMode) {
         if (newMode)
-            ctr.getAccounts();
+            ctr.getAccount();
         GFD.setData('advancedMode', newMode);
         this.setState({ advancedMode: newMode, askForTutorial: false })
     }

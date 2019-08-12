@@ -33,7 +33,6 @@ class SignUpForm extends Component {
 
     componentDidMount() {
         ctr.getAccount((acc) => {
-            console.info(acc)
             this.setState({wallet: acc.address});
         }); 
         ctr.listenForEvent(EVENTS.AccountChange, 'SignUpForm', (data) => {

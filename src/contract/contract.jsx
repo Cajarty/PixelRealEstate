@@ -7,6 +7,7 @@ import sigUtil from 'eth-sig-util';
 import * as EVENTS from '../const/events';
 import { default as contract } from 'truffle-contract';
 import {GFD, GlobalState} from '../functions/GlobalState';
+const FB = require('../const/firebase').FB;
 import {SDM, ServerDataManager} from '../contract/ServerDataManager';
 const ethers = require('ethers');
 const CTRDATA = require('./ContractData');
@@ -81,17 +82,22 @@ export class Contract {
                 console.info('Web3 & MetaMask.');            
 
                 this.provider = new ethers.providers.Web3Provider(window.web3.currentProvider);
+                this.provider.resetEventsBlock(0);
     
                 this.updateNetwork((id) => {
                     if (id === Const.NETWORK_MAIN) {
-                         this.getAccount();
+                        GFD.setData('noMetaMask', false);
+                         this.getAccount((acc) => {
+                             if (acc) {
+                                FB.checkSignIn();
+                             }
+                         });
             
                         SDM.init();
                         window.web3.eth.getBlock('latest').then((latestBlock) => {
                             this.startLoadBlock = latestBlock.number - 1;
                         });
     
-                        GFD.setData('noMetaMask', false);
                     }
                 });
             } else {
@@ -103,8 +109,10 @@ export class Contract {
     }
 
     getAccount(callback = () => {}) {
-        if (GFD.getData('noMetaMask'))
+        if (GFD.getData('noMetaMask')) {
+            console.info('No MetaMask.');
             return callback(null);
+        }
 
         if (this.account == null) {
             this.account = this.provider.getSigner(0);
@@ -152,52 +160,34 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return;
 
-        // VRE DApp Events
-        this.VRE.deployed().then((i) => {
-            let filter = {
-                fromBlock: startBlock, 
-                toBlock: endBlock,
-                address: Const.VirtualRealEstate,
-            };
+        let eventTopic = ethers.utils.id(event.eventAbi);
 
-            switch(event) {
-                case EVENTS.PropertyBought:
-                    return i.PropertyBought(params, filter).get(callback);
-                case EVENTS.PropertyColorUpdate:
-                    return i.PropertyColorUpdate(params, filter).get(callback);
-                case EVENTS.SetUserHoverText:
-                    return i.SetUserHoverText(params, filter).get(callback);
-                case EVENTS.SetUserSetLink:
-                    return i.SetUserSetLink(params, filter).get(callback);
-                case EVENTS.PropertySetForSale:
-                    return i.PropertySetForSale(params, filter).get(callback);
-                case EVENTS.DelistProperty:
-                    return i.DelistProperty(params, filter).get(callback);
-                case EVENTS.SetPropertyPublic:
-                    return i.SetPropertyPublic(params, filter).get(callback);
-                case EVENTS.SetPropertyPrivate:
-                    return i.SetPropertyPrivate(params, filter).get(callback);
-                case EVENTS.Bid:
-                    return i.Bid(params, filter).get(callback);
-            }
-        });
+        let filter = {
+            topics: [eventTopic],
+            address: CTRDATA.VRE_Address,
+            fromBlock: 0,
+        };
 
-        // PXL ERC20 Events
-        this.PXLPP.deployed().then((i) => {
+        switch (event) {
+            case EVENTS.PropertyBought:
+            case EVENTS.PropertyColorUpdate:
+            case EVENTS.SetUserHoverText:
+            case EVENTS.SetUserSetLink:
+            case EVENTS.PropertySetForSale:
+            case EVENTS.DelistProperty:
+            case EVENTS.SetPropertyPublic:
+            case EVENTS.SetPropertyPrivate:
+            case EVENTS.Bid:
+                break;
+            case EVENTS.Transfer:
+            case EVENTS.Approval:
+                filter.address = CTRDATA.PXL_Address;
+                break;
+            default:
+                return;
+        }
 
-            let filter = {
-                fromBlock: this.startLoadBlock, 
-                toBlock: 'latest',
-                address: Const.PXLProperty,
-            };
-
-            switch(event) {
-                case EVENTS.Transfer:
-                    return i.Transfer(params, filter).get(callback);
-                case EVENTS.Approval:
-                    return i.Approval(params, filter).get(callback);
-            }
-        });
+        return this._getEventLogs(filter, callback);
     }
 
     /*
@@ -216,10 +206,12 @@ export class Contract {
             return;
         }
 
+        let eventTopic = ethers.utils.id(event.eventAbi);
+
         let filter = {
-            fromBlock: this.startLoadBlock - blocks, 
-            toBlock: 'latest',
-            address: Const.VirtualRealEstate,
+            topics: [eventTopic],
+            address: CTRDATA.VRE_Address,
+            fromBlock: 0,
         };
 
         switch (event) {
@@ -232,25 +224,23 @@ export class Contract {
             case EVENTS.SetPropertyPublic:
             case EVENTS.SetPropertyPrivate:
             case EVENTS.Bid:
-                return this._watchVREEventLogs(event, callback);
+                break;
             case EVENTS.Transfer:
             case EVENTS.Approval:
-                return this._watchPXLEventLogs(event, callback);
+                filter.address = CTRDATA.PXL_Address;
+                break;
             default:
                 return;
         }
+        this._watchEventLogs(filter, callback);
     }
 
-    _watchVREEventLogs(event, callback) {
-        this.getVREContract((i) => {
-            i.on(event, callback);
-        });
+    _watchEventLogs(event, callback) {
+        this.provider.on(event, callback);
     }
 
-    _watchPXLEventLogs(event, callback) {
-        this.getPXLContract((i) => {
-            i.on(event, callback);
-        });
+    _getEventLogs(event, callback) {
+        this.provider.once(event, callback);
     }
 
     toID(x, y) {

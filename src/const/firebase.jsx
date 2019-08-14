@@ -27,11 +27,11 @@ export class FireBase {
         this.listenerReferrerWallet = null;
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                GFD.setData('userSignedIn', true);
-                if (ctr.account != null)
-                    this.checkSignIn();
-            } else {
-                GFD.setData('userSignedIn', false);
+                ctr.getAccount((acc) => {
+                    GFD.setData('userSignedIn', ctr != null);
+                    if (acc != null)
+                        this.checkSignIn();
+                });
             }
         });
     }
@@ -77,12 +77,12 @@ export class FireBase {
             return;
         }
 
-        this.checkUserExists(ctr.account, (exists, user) => {
+        this.checkUserExists(ctr.account.address, (exists, user) => {
             if (exists && (user.mutedUntil == null || user.mutedUntil < new Date().getTime())) {
 
                 message = message.substring(0, Math.min(message.length, 100));
 
-                firebase.database().ref('/Chat').push({
+                firebase.database().ref('Chat').push({
                     walletID: GFD.state.user.wallet,
                     username: GFD.state.user.username,
                     timestamp: new Date().getTime(),
@@ -117,7 +117,7 @@ export class FireBase {
     }
 
     checkSignIn() {
-        this.checkUserExists(ctr.account, (exists, user) => {
+        this.checkUserExists(ctr.account.address, (exists, user) => {
             if (!exists) {
                 console.info('User not registered, requires sign up.');
                 GFD.setData('userExists', false);

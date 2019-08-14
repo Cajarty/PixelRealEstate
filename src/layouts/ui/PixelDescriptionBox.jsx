@@ -364,19 +364,19 @@ class PixelDescriptionBox extends Component {
         if (this.state.multiRect)
             return actions;
         // actions.push(new Action("Place Offer", null));
-        if (this.state.isForSale && this.state.owner != ctr.account)
+        if (this.state.isForSale && this.state.owner != ctr.account.address)
             actions.push(
                 <Button fluid onClick={(this.state.tutorialState.index == 3 ? () => {} : () => this.toggleAction('BUY'))}>Buy</Button>
             );
-        if (!this.state.isForSale && this.state.owner == ctr.account)
+        if (!this.state.isForSale && this.state.owner == ctr.account.address)
             actions.push(
                 <Button fluid onClick={() => this.toggleAction('SELL')}>Sell</Button>
             );
-        if (this.state.isForSale && this.state.owner == ctr.account)
+        if (this.state.isForSale && this.state.owner == ctr.account.address)
             actions.push(
                 <Button fluid onClick={() => this.toggleAction('CANCEL_SALE')}>Delist</Button>
             );
-        if (this.state.owner == ctr.account) {
+        if (this.state.owner == ctr.account.address) {
             if (this.state.isInPrivate) { //for this switch, we need to check to make sure we are the setter
                 actions.push(
                     <Button fluid onClick={() => this.toggleAction('SET_PUBLIC')}>Set Public</Button>
@@ -456,7 +456,7 @@ class PixelDescriptionBox extends Component {
                                 placeholder="Address"
                                 fluid disabled
                                 className='oneColumn'
-                                value={(this.state.owner === ctr.account ? "You" : this.state.owner)} 
+                                value={(this.state.owner === ctr.account.address ? "You" : this.state.owner)} 
                                 label={<Popup
                                     trigger={<Label><Icon className='uniform' name='user'/></Label>}
                                     content='Owner Address'

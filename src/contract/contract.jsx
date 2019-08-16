@@ -261,6 +261,9 @@ export class Contract {
         if (!this.VRE) {
             this.getAccount((acc) => {
                 this.VRE = new ethers.Contract(CTRDATA.VRE_Address, CTRDATA.VRE_ABI, acc || this.provider);
+                if (acc) {
+                    this.VRE.connect(acc);
+                }
                 return callback(this.VRE);
             });
         } else {
@@ -272,6 +275,9 @@ export class Contract {
         if (!this.PXLPP) {
             this.getAccount((acc) => {
                 this.PXLPP = new ethers.Contract(CTRDATA.PXL_Address, CTRDATA.PXL_ABI, acc || this.provider);
+                if (acc) {
+                    this.PXLPP.connect(acc);
+                }
                 return callback(this.PXLPP);
             });
         } else {

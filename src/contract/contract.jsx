@@ -34,7 +34,8 @@ export const LISTENERS = {
 export class Contract {
     constructor() {
 
-        this.provider = null;
+        this.metamaskProvider = null; //for account connection to ETH
+        this.provider = null; //for connection to ethereum for events
 
         this.accounts = null;
         this.account = null;
@@ -81,7 +82,9 @@ export class Contract {
                 window.web3 = new Web3(window.web3.currentProvider);
                 console.info('Web3 & MetaMask.');            
 
-                this.provider = new ethers.providers.Web3Provider(window.web3.currentProvider);
+                this.metamaskProvider = new ethers.providers.Web3Provider(window.web3.currentProvider);
+
+                this.provider = new ethers.getDefaultProvider();
                 this.provider.resetEventsBlock(0);
     
                 this.updateNetwork((id) => {
@@ -115,7 +118,7 @@ export class Contract {
         }
 
         if (this.account == null) {
-            this.account = this.provider.getSigner(0);
+            this.account = this.metamaskProvider.getSigner(0);
         }
         this.account.getAddress().then((address) => {
             this.account.address = address;
@@ -256,16 +259,24 @@ export class Contract {
 
     getVREContract(callback/*(contract)*/) {
         if (!this.VRE) {
-            this.VRE = new ethers.Contract(CTRDATA.VRE_Address, CTRDATA.VRE_ABI, this.provider);
+            this.getAccount((acc) => {
+                this.VRE = new ethers.Contract(CTRDATA.VRE_Address, CTRDATA.VRE_ABI, acc || this.provider);
+                return callback(this.VRE);
+            });
+        } else {
+            return callback(this.VRE);
         }
-        return callback(this.VRE);
     }
 
     getPXLContract(callback/*(contract)*/) {
         if (!this.PXLPP) {
-            this.PXLPP = new ethers.Contract(CTRDATA.PXL_Address, CTRDATA.PXL_ABI, this.provider);
+            this.getAccount((acc) => {
+                this.PXLPP = new ethers.Contract(CTRDATA.PXL_Address, CTRDATA.PXL_ABI, acc || this.provider);
+                return callback(this.PXLPP);
+            });
+        } else {
+            return callback(this.PXLPP);
         }
-        return callback(this.PXLPP);
     }
 
     updateNetwork(callback = () => {}) {
@@ -650,8 +661,6 @@ export class Contract {
             return i.getSystemSalePrices.call().then((r) => {
                 return callback(r);
             });
-        }).catch((e) => {
-            console.log(e);
         });
     }
 

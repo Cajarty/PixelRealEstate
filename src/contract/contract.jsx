@@ -227,23 +227,23 @@ export class Contract {
             case EVENTS.SetPropertyPublic:
             case EVENTS.SetPropertyPrivate:
             case EVENTS.Bid:
-                break;
+                return this._watchVREEventLogs(event, callback);
             case EVENTS.Transfer:
             case EVENTS.Approval:
-                filter.address = CTRDATA.PXL_Address;
-                break;
-            default:
-                return;
+                return this._watchPXLEventLogs(event, callback);
         }
-        this._watchEventLogs(filter, callback);
     }
 
-    _watchEventLogs(event, callback) {
-        this.provider.on(event, callback);
+    _watchVREEventLogs(event, callback) {
+        this.getVREContract((i) => {
+            i.on(event, callback);
+        });
     }
 
-    _getEventLogs(event, callback) {
-        this.provider.once(event, callback);
+    _watchPXLEventLogs(event, callback) {
+        this.getPXLContract((i) => {
+            i.on(event, callback);
+        });
     }
 
     toID(x, y) {
@@ -325,14 +325,14 @@ export class Contract {
             from: signer,
         }, (err, result) => {
             if (err) {
-                console.info(err);
-                this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to sign message with this wallet."});
-                return callback(false, "Unable to sign message with this wallet.", null);
+                this.sendResults(LISTENERS.Alert, {result: false, message: 'Unable to sign message with this wallet.'});
+                return callback(false, 'Unable to sign message with this wallet.', null);
             }
-            if (this.verify(params, result.result, signer))
+            if (this.verify(params, result.result, signer)) {
                 callback(true, 'Message signed successfully', result.result);
-            else
-                callback(false, "Unable to sign message with this wallet.", null);
+            } else {
+                callback(false, 'Unable to sign message with this wallet.', null);
+            }
         })
     }
 
@@ -341,7 +341,7 @@ export class Contract {
             data: params,
             sig: signature
         })
-        return recovered === signer;
+        return recovered === signer.toLowerCase();
     }
 
     // ---------------------------------------------------------------------------------------------------------
@@ -530,14 +530,6 @@ export class Contract {
                     return callback(true);
                 });
             });
-        }).catch((e) => {
-            if (!e.toString().includes("wasn't processed in")) {
-                callback(false);
-                this.sendResults(LISTENERS.Alert, {result: false, message: "Error transfering Property " + (x + 1) + "x" + (y + 1) + "."});
-            } else {
-                console.info('Timed out.')
-            }
-            callback(true);
         });
     }
 
@@ -567,9 +559,7 @@ export class Contract {
             return callback(false);
         this.getVREContract((i) => {
             callback('pending');
-            i.setColors.estimateGas(this.toID(x, y), Func.RGBArrayToContractData(data), PPT, {from: this.account }).then((gas) => {
-                return i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), PPT, {from: this.account, gas: Math.ceil(gas * this.gasBuffer)});
-            }).then(() => {
+            i.setColors(this.toID(x, y), Func.RGBArrayToContractData(data), PPT).then((tx) => {
                 callback(true);
                 this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " pixels changed."});
             }).catch((e) => {
@@ -591,8 +581,8 @@ export class Contract {
             this.sendResults(LISTENERS.Alert, {result: false, message: "Not a valid address! Aborting."});
             return callback(false);
         }
-        this.getSTInstance().then((i) => {
-            i.transfer(address, PXL, {from: this.account}).then(() => {
+        this.getPXLContract((i) => {
+            i.transfer(address, PXL).then(() => {
                 callback(true);
                 this.sendResults(LISTENERS.Alert, {result: true, message: PXL + " PXL sent to address " + address + "."});
             }).catch((e) => {
@@ -654,10 +644,7 @@ export class Contract {
             i.balanceOf(address, { from: this.account }).then((r) => {
                 callback(Func.BigNumberToNumber(r));
             });
-        }).catch((e) => {
-            console.info(e);
-            this.sendResults(LISTENERS.Error, {result: false, message: "Unable to retrieve PPC balance."});
-        });
+        })
     }
 
     getSystemSalePrices(callback) {
@@ -677,9 +664,7 @@ export class Contract {
             return i.getForSalePrices.call(this.toID(x, y)).then((r) => {
                 return callback(r);
             });
-        }).catch((e) => {
-            console.error(e);
-        });
+        })
     }
 
     getHoverText(address, callback) {
@@ -699,9 +684,7 @@ export class Contract {
             return i.getOwnerLink(address).then((r) => {
                 return callback(Func.BigIntsToString(r));
             });
-        }).catch((e) => {
-            console.error(e);
-        });
+        })
     }
 
     getPropertyColorsOfRow(x, row, callback) {
@@ -711,9 +694,7 @@ export class Contract {
             return i.getPropertyColorsOfRow.call(x, row).then((r) => {
                 callback(x, row, Func.ContractDataToRGBAArray(r));
             });
-        }).catch((e) => {
-            console.log(e);
-        });
+        })
     }
 
     getPropertyColors(x, y, callback) {

@@ -225,7 +225,7 @@ export const RGBArrayToContractData = (rgbArray) => {
             innerResult = innerResult.shiftLeft(HBITS + SBITS + LBITS);
             innerResult = innerResult.or(binary);
         }
-        result.push(new BigNumber(innerResult.toString(10), 10));
+        result.push(innerResult.toString(10));
     }
     return result;
 }

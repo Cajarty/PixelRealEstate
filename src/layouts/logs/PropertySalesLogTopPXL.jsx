@@ -26,53 +26,52 @@ class PropertySalesLogTopPXL extends Component {
             if (SDM.eventData.topTenPXLTrades.length > 0) {
                 this.setState({changeLog: SDM.eventData.topTenPXLTrades, isLoading: false});
             }
-            ctr.watchEventLogs(EVENTS.PropertyBought, {}, (handle) => {
-                let eventHandle = handle;
-                this.setState({
-                    eventHandle,
-                    loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
-                });
-                eventHandle.watch((error, log) => {
-                    let old = SDM.eventData.topTenPXLTrades;
-                    let PXLPrice = Func.BigNumberToNumber(log.args.PXLAmount);
-                    let ETHPrice = Func.BigNumberToNumber(log.args.ethAmount);
-                    let timeSold = Func.BigNumberToNumber(log.args.timestamp);
-                    if (PXLPrice == 0)
-                        return;
-                    let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                    let newData = {
-                        x: id.x,
-                        y: id.y,
-                        PXLPrice,
-                        ETHPrice,
-                        oldOwner: log.args.oldOwner == ctr.account ? "You" : (log.args.oldOwner === Struct.NOBODY ? 'PixelProperty' : log.args.oldOwner),
-                        newOwner: log.args.newOwner == ctr.account ? "You" : log.args.newOwner,
-                        timeSold: timeSold * 1000,
-                        transaction: log.transactionHash,
-                    };
-                    if (old.length == 0) {
-                        old.unshift(newData);
-                        if (old.length > 20)
-                            old.pop();
-                        SDM.eventData.topTenPXLTrades = old;
-                        this.setState({ changeLog: old, isLoading: false });
-                    } else {
-                        for (let i = Math.min(old.length - 1, 9); i >= 0; i--) {
-                            if (PXLPrice <= old[i].PXLPrice || (i == 0 && PXLPrice > old[i].PXLPrice)) {
-                                if (i < 9) {
-                                    if (PXLPrice <= old[i].PXLPrice)
-                                        old.splice(i + 1, 0, newData);
-                                    else
-                                        old.splice(i, 0, newData);
-                                    old.splice(10);
-                                    SDM.eventData.topTenPXLTrades = old;
-                                    this.setState({ changeLog: old});
-                                }
-                                return;
+            let caller = this;
+            ctr.watchEventLogs(EVENTS.PropertyBought, {}, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner) => {
+                // let eventHandle = handle;
+                // this.setState({
+                //     eventHandle,
+                //     loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
+                // });
+                let old = SDM.eventData.topTenPXLTrades;
+                let PXLPrice = Func.BigNumberToNumber(PXLAmount);
+                let ETHPrice = Func.BigNumberToNumber(ethAmount);
+                let timeSold = Func.BigNumberToNumber(timestamp);
+                if (PXLPrice == 0)
+                    return;
+                let id = ctr.fromID(Func.BigNumberToNumber(property));
+                let newData = {
+                    x: id.x,
+                    y: id.y,
+                    PXLPrice,
+                    ETHPrice,
+                    oldOwner: oldOwner == ctr.account ? "You" : (oldOwner === Struct.NOBODY ? 'PixelProperty' : oldOwner),
+                    newOwner: newOwner == ctr.account ? "You" : newOwner,
+                    timeSold: timeSold * 1000,
+                    transaction: undefined //log.transactionHash, // ? We don't have a transaction hash anymore
+                };
+                if (old.length == 0) {
+                    old.unshift(newData);
+                    if (old.length > 20)
+                        old.pop();
+                    SDM.eventData.topTenPXLTrades = old;
+                    this.setState({ changeLog: old, isLoading: false });
+                } else {
+                    for (let i = Math.min(old.length - 1, 9); i >= 0; i--) {
+                        if (PXLPrice <= old[i].PXLPrice || (i == 0 && PXLPrice > old[i].PXLPrice)) {
+                            if (i < 9) {
+                                if (PXLPrice <= old[i].PXLPrice)
+                                    old.splice(i + 1, 0, newData);
+                                else
+                                    old.splice(i, 0, newData);
+                                old.splice(10);
+                                SDM.eventData.topTenPXLTrades = old;
+                                this.setState({ changeLog: old});
                             }
+                            return;
                         }
                     }
-                });
+                }
             });
         });
     }

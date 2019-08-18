@@ -26,33 +26,32 @@ class PropertyChangeLog extends Component {
             if (SDM.eventData.recentPayouts.length > 0) {
                 this.setState({changeLog: SDM.eventData.recentPayouts, isLoading: false});
             }
-            ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (handle) => {
-                let eventHandle = handle;
-                this.setState({
-                    eventHandle,
-                    loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
-                });
-            
-                eventHandle.watch((error, log) => {
-                    let old = SDM.eventData.recentPayouts;
-                    let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                    let last = Func.BigNumberToNumber(log.args.lastUpdate);
-                    let reserved = Func.BigNumberToNumber(log.args.becomePublic);
-                    let maxEarnings = ((reserved - last) / 30) * 5;
-                    let newData = {
-                        x: id.x,
-                        y: id.y,
-                        lastChange: last * 1000,
-                        payout: Func.calculateEarnings(last, maxEarnings),
-                        maxPayout: maxEarnings,
-                        transaction: log.transactionHash,
-                    };
-                    old.unshift(newData);
-                    if (old.length > 20)
-                        old.pop();
-                    SDM.eventData.recentPayouts = old;
-                    this.setState({ changeLog: old, isLoading: false });
-                });
+
+            let caller = this;
+            ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (property, colors, lastUpdate, lastUpdaterPayee, becomePublic) => {
+                // this.setState({
+                //     eventHandle,
+                //     loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
+                // });
+        
+                let old = SDM.eventData.recentPayouts;
+                let id = ctr.fromID(Func.BigNumberToNumber(property));
+                let last = Func.BigNumberToNumber(lastUpdate);
+                let reserved = Func.BigNumberToNumber(becomePublic);
+                let maxEarnings = ((reserved - last) / 30) * 5;
+                let newData = {
+                    x: id.x,
+                    y: id.y,
+                    lastChange: last * 1000,
+                    payout: Func.calculateEarnings(last, maxEarnings),
+                    maxPayout: maxEarnings,
+                    transaction: undefined //log.transactionHash,
+                };
+                old.unshift(newData);
+                if (old.length > 20)
+                    old.pop();
+                SDM.eventData.recentPayouts = old;
+                caller.setState({ changeLog: old, isLoading: false });
             });
         });
     }

@@ -71,20 +71,19 @@ class ZoomCanvas extends Component {
                         this.setCanvasProperty(this.state.queuedUpdates[i].x, this.state.queuedUpdates[i].y, this.state.queuedUpdates[i].colors);
                     }
 
-                    ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (eventHandle) => {
-                        this.setState({eventHandle});
-                        eventHandle.watch((error, log) => {
-                            //console.info('zoom event');
-                            let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                            let colors = Func.ContractDataToRGBAArray(log.args.colors);
-                            if (this.state.loaded) {
-                                this.setCanvasProperty(id.x, id.y, colors);
-                            } else {
-                                let update = this.state.queuedUpdates;
-                                update.push(Struct.CondensedColorUpdate(id.x, id.y, colors));
-                                this.setState({queuedUpdates: update});
-                            }
-                        });
+                    let caller = this;
+                    ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (property, colors, lastUpdate, lastUpdaterPayee, becomePublic) => {
+                        // this.setState({eventHandle});
+                        //console.info('zoom event');
+                        let id = ctr.fromID(Func.BigNumberToNumber(property));
+                        colors = Func.ContractDataToRGBAArray(colors);
+                        if (caller.state.loaded) {
+                            caller.setCanvasProperty(id.x, id.y, colors);
+                        } else {
+                            let update = caller.state.queuedUpdates;
+                            update.push(Struct.CondensedColorUpdate(id.x, id.y, colors));
+                            caller.setState({queuedUpdates: update});
+                        }
                     });
                 }
             }

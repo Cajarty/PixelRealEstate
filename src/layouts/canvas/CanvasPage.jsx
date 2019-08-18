@@ -88,14 +88,12 @@ class CanvasPage extends Component {
             this.setState({user});
         });
 
-        ctr.watchEventLogs(EVENTS.Transfer, {}, (handle) => {
-            let eventHandleTransfer = handle;
-            this.setState({ eventHandleTransfer });
-            eventHandleTransfer.watch((error, log) => {
-                if (log.args._from === ctr.account || log.args._to === ctr.account) {
-                    this.updateBalance();
-                }
-            });
+        let caller = this;
+        ctr.watchEventLogs(EVENTS.Transfer, {}, (_from, _to, _value) => {
+            // this.setState({ eventHandleTransfer }); // No longer have handle
+            if (_from === ctr.account || _to === ctr.account) {
+                caller.updateBalance();
+            }
         });
 
         ctr.listenForEvent(EVENTS.AccountChange, 'CanvasPagePPCListener', (data) => {
@@ -104,20 +102,14 @@ class CanvasPage extends Component {
             this.updateBalance();
         });
 
-        ctr.watchEventLogs(EVENTS.PropertyBought, { newOwner: ctr.account }, (handle) => {
-            let eventHandleBought = handle;
-            this.setState({ eventHandleBought });
-            eventHandleBought.watch((error, log) => {
-                this.updateBalance();
-            });
+        ctr.watchEventLogs(EVENTS.PropertyBought, { newOwner: ctr.account }, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner) => {
+            // this.setState({ eventHandleBought });
+            caller.updateBalance();
         });
 
         ctr.watchEventLogs(EVENTS.PropertyColorUpdate, { lastUpdaterPayee: ctr.account }, (handle) => {
-            let eventHandleUpdate = handle;
-            this.setState({ eventHandleUpdate });
-            eventHandleUpdate.watch((error, log) => {
-                this.updateBalance();
-            });
+            // this.setState({ eventHandleUpdate });
+            caller.updateBalance();
         });
         GFD.listen('advancedMode', 'CanvasPage', (advancedMode) => {
             this.setState({ advancedMode });

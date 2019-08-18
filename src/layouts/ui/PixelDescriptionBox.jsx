@@ -165,39 +165,34 @@ class PixelDescriptionBox extends Component {
         if (noMetaMask)
             return;
         GFD.close('noMetaMask', 'DescBox');
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (evH1) => {
-            this.setState({evH1});
-            evH1.watch((error, log) => {
-                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                let xx = GFD.getData('x') - 1
-                let yy = GFD.getData('y') - 1;
-                if (id.x == xx && id.y == yy) {
-                    let colors = Func.ContractDataToRGBAArray(log.args.colors);
-                    this.loadProperty(id.x, id.y, colors);
-                }
-            });
+        let caller = this;
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (property, colors, lastUpdate, lastUpdaterPayee, becomePublic) => {
+            // this.setState({evH1});
+            let id = ctr.fromID(Func.BigNumberToNumber(property));
+            let xx = GFD.getData('x') - 1
+            let yy = GFD.getData('y') - 1;
+            if (id.x == xx && id.y == yy) {
+                colors = Func.ContractDataToRGBAArray(colors);
+                caller.loadProperty(id.x, id.y, colors);
+            }
         });
 
-        ctr.watchEventLogs(EVENTS.PropertyBought, {}, (evH2) => {
-            this.setState({evH2});
-            evH2.watch((error, log) => {
-                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                let xx = GFD.getData('x') - 1
-                let yy = GFD.getData('y') - 1;
-                if (id.x == xx && id.y == yy)
-                    this.loadProperty(xx, yy);
-            });
+        ctr.watchEventLogs(EVENTS.PropertyBought, {}, (property, newOwnerAddress, ethAmount, PXLAmount, timestamp) => {
+            // this.setState({evH2});
+            let id = ctr.fromID(Func.BigNumberToNumber(property));
+            let xx = GFD.getData('x') - 1
+            let yy = GFD.getData('y') - 1;
+            if (id.x == xx && id.y == yy)
+                caller.loadProperty(xx, yy);
         });
 
-        ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (evH3) => {
-            this.setState({evH3});
-            evH3.watch((error, log) => {
-                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                let xx = GFD.getData('x') - 1
-                let yy = GFD.getData('y') - 1;
-                if (id.x == xx && id.y == yy)
-                    this.loadProperty(xx, yy);
-            });
+        ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (property, forSalePrice) => {
+            // this.setState({evH3});
+            let id = ctr.fromID(Func.BigNumberToNumber(property));
+            let xx = GFD.getData('x') - 1
+            let yy = GFD.getData('y') - 1;
+            if (id.x == xx && id.y == yy)
+                caller.loadProperty(xx, yy);
         });
     };
 

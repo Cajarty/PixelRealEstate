@@ -105,20 +105,17 @@ export class ServerDataManager {
 
     setupEvents() {
 
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (args) => {
-            let id = ctr.fromID(Func.BigNumberToNumber(args.property));
-            let colors = Func.ContractDataToRGBAArray(args.colors);
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (propertyId, colorsArray, lastUpdateTimestamp, lastUpdaterPayeeAddress, becomesPublicTimestamp, rewardedCoinsAmount) => {
+            let id = ctr.fromID(Func.BigNumberToNumber(propertyId));
+            let colors = Func.ContractDataToRGBAArray(colorsArray);
             this.forceUpdatePropertyData(id.x, id.y);
             this.insertPropertyImage(id.x, id.y, colors);
         });
 
-        ctr.watchEventLogs(EVENTS.PropertyBought, {}, (handle) => {
-            this.evHndl[EVENTS.PropertyBought] = handle;
-            this.evHndl[EVENTS.PropertyBought].watch((error, log) => {
-                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                this.updateProperty(id.x, id.y, {owner: log.args.newOwner, isForSale: false,});
-                this.organizeProperty(id.x, id.y);
-            });
+        ctr.watchEventLogs(EVENTS.PropertyBought, {}, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner) => {
+            let id = ctr.fromID(Func.BigNumberToNumber(property));
+            this.updateProperty(id.x, id.y, {owner: newOwner, isForSale: false,});
+            this.organizeProperty(id.x, id.y);
         });
 
         //not really required to listen to
@@ -136,59 +133,40 @@ export class ServerDataManager {
         //     });
         // });
 
-        ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (handle) => {
-            this.evHndl[EVENTS.PropertySetForSale] = handle;
-            this.evHndl[EVENTS.PropertySetForSale].watch((error, log) => {
-                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                this.updateProperty(id.x, id.y, {isForSale: true, PPCPrice: Func.BigNumberToNumber(log.args.forSalePrice)});
-                this.organizeProperty(id.x, id.y);
-            });
+        ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (propertyId, forSalePrice) => {
+            let id = ctr.fromID(Func.BigNumberToNumber(propertyId));
+            this.updateProperty(id.x, id.y, {isForSale: true, PPCPrice: Func.BigNumberToNumber(forSalePrice)});
+            this.organizeProperty(id.x, id.y);
         });
 
-        ctr.watchEventLogs(EVENTS.DelistProperty, {}, (handle) => {
-            this.evHndl[EVENTS.DelistProperty] = handle;
-            this.evHndl[EVENTS.DelistProperty].watch((error, log) => {
-                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                this.updateProperty(id.x, id.y, {isForSale: false, PPCPrice: 0});
-                this.organizeProperty(id.x, id.y);
-            });
+        ctr.watchEventLogs(EVENTS.DelistProperty, {}, (propertyId) => {
+            let id = ctr.fromID(Func.BigNumberToNumber(propertyId));
+            this.updateProperty(id.x, id.y, {isForSale: false, PPCPrice: 0});
+            this.organizeProperty(id.x, id.y);
         });
 
-        ctr.watchEventLogs(EVENTS.SetPropertyPublic, {}, (handle) => {
-            this.evHndl[EVENTS.SetPropertyPublic] = handle;
-            this.evHndl[EVENTS.SetPropertyPublic].watch((error, log) => {
-                console.info(log);
-                throw 'Need to update the correct data here.';
-                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                this.updateProperty(id.x, id.y, {isInPrivate: false, becomePublic: 0});
-                this.organizeProperty(id.x, id.y);
-            });
+        ctr.watchEventLogs(EVENTS.SetPropertyPublic, {}, (propertyId) => {
+            let id = ctr.fromID(Func.BigNumberToNumber(propertyId));
+            this.updateProperty(id.x, id.y, {isInPrivate: false, becomePublic: 0});
+            this.organizeProperty(id.x, id.y);
         });
 
-        ctr.watchEventLogs(EVENTS.SetPropertyPrivate, {}, (handle) => {
-            this.evHndl[EVENTS.SetPropertyPrivate] = handle;
-            this.evHndl[EVENTS.SetPropertyPrivate].watch((error, log) => {
-                console.info(log);
-                throw 'Need to update the correct data here.';
-                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                this.updateProperty(id.x, id.y, {isInPrivate: true, becomePublic: Func.BigNumberToNumber(log.args.numMinutesPrivate)});
-                this.organizeProperty(id.x, id.y);
-            });
+        ctr.watchEventLogs(EVENTS.SetPropertyPrivate, {}, (propertyId, numHoursMinsPrivate) => {
+            let id = ctr.fromID(Func.BigNumberToNumber(propertyId));
+            this.updateProperty(id.x, id.y, {isInPrivate: true, becomePublic: Func.BigNumberToNumber(numHoursMinsPrivate)});
+            this.organizeProperty(id.x, id.y);
         });
 
-        ctr.watchEventLogs(EVENTS.Bid, {}, (handle) => {
-            this.evHndl[EVENTS.Bid] = handle;
-            this.evHndl[EVENTS.Bid].watch((error, log) => {
-                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                let bid = Func.BigNumberToNumber(log.args.bid);
-                let timestamp = Func.BigNumberToNumber(log.args.timestamp);
-                let x = id.x, y = id.y;
-                if (this.bids[x] == null) 
-                    this.bids[x] = {};
-                if (this.bids[x][y] == null)
-                    this.bids[x][y] = {};
-                this.bids[x][y][timestamp] = bid;
-            });
+        ctr.watchEventLogs(EVENTS.Bid, {}, (propertyId, bid, timestamp) => {
+            propertyId = ctr.fromID(Func.BigNumberToNumber(propertyId));
+            bid = Func.BigNumberToNumber(bid);
+            timestamp = Func.BigNumberToNumber(timestamp);
+            let x = propertyId.x, y = propertyId.y;
+            if (this.bids[x] == null) 
+                this.bids[x] = {};
+            if (this.bids[x][y] == null)
+                this.bids[x][y] = {};
+            this.bids[x][y][timestamp] = bid;
         });
     }
 

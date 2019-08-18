@@ -26,48 +26,46 @@ class PropertyChangeLogTop extends Component {
             if (SDM.eventData.topTenPayouts.length > 0) {
                 this.setState({changeLog: SDM.eventData.topTenPayouts, isLoading: false});
             }
-            ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (handle) => {
-                let eventHandle = handle;
-                this.setState({
-                    eventHandle,
-                    loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
-                });
-                eventHandle.watch((error, log) => {
-                    let old = SDM.eventData.topTenPayouts;
-                    let last = Func.BigNumberToNumber(log.args.lastUpdate);
-                    let reserved = Func.BigNumberToNumber(log.args.becomePublic);
-                    let maxEarnings = ((reserved - last) / 30) * 5;
-                    let payout = Func.calculateEarnings(last, maxEarnings);
-                    let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                    let newData = {
-                        x: id.x,
-                        y: id.y,
-                        lastChange: last * 1000,
-                        payout,
-                        maxPayout: maxEarnings,
-                        transaction: log.transactionHash,
-                    };
-                    if (old.length == 0) {
-                        old.unshift(newData);
-                        SDM.eventData.topTenPayouts = old;
-                        this.setState({ changeLog: old, isLoading: false });
-                    } else {
-                        for (let i = Math.min(old.length - 1, 9); i >= 0; i--) {
-                            if (payout <= old[i].payout || (i == 0 && payout > old[i].payout)) {
-                                if (i < 9) {
-                                    if (payout <= old[i].payout)
-                                        old.splice(i + 1, 0, newData);
-                                    else
-                                        old.splice(i, 0, newData);
-                                    old.splice(10);
-                                    SDM.eventData.topTenPayouts = old;
-                                    this.setState({ changeLog: old });
-                                }
-                                return;
+            ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (property, colors, lastUpdate, lastUpdaterPayee, becomePublic) => {
+                // let eventHandle = handle;
+                // this.setState({
+                //     eventHandle,
+                //     loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
+                // });
+                let old = SDM.eventData.topTenPayouts;
+                let last = Func.BigNumberToNumber(lastUpdate);
+                let reserved = Func.BigNumberToNumber(becomePublic);
+                let maxEarnings = ((reserved - last) / 30) * 5;
+                let payout = Func.calculateEarnings(last, maxEarnings);
+                let id = ctr.fromID(Func.BigNumberToNumber(property));
+                let newData = {
+                    x: id.x,
+                    y: id.y,
+                    lastChange: last * 1000,
+                    payout,
+                    maxPayout: maxEarnings,
+                    transaction: undefined //log.transactionHash,
+                };
+                if (old.length == 0) {
+                    old.unshift(newData);
+                    SDM.eventData.topTenPayouts = old;
+                    this.setState({ changeLog: old, isLoading: false });
+                } else {
+                    for (let i = Math.min(old.length - 1, 9); i >= 0; i--) {
+                        if (payout <= old[i].payout || (i == 0 && payout > old[i].payout)) {
+                            if (i < 9) {
+                                if (payout <= old[i].payout)
+                                    old.splice(i + 1, 0, newData);
+                                else
+                                    old.splice(i, 0, newData);
+                                old.splice(10);
+                                SDM.eventData.topTenPayouts = old;
+                                this.setState({ changeLog: old });
                             }
+                            return;
                         }
                     }
-                });
+                }
             });
         });
     }

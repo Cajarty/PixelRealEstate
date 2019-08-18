@@ -236,13 +236,13 @@ export class Contract {
 
     _watchVREEventLogs(event, callback) {
         this.getVREContract((i) => {
-            i.on(event, callback);
+            i.on(event.id, callback);
         });
     }
 
     _watchPXLEventLogs(event, callback) {
         this.getPXLContract((i) => {
-            i.on(event, callback);
+            i.on(event.id, callback);
         });
     }
 

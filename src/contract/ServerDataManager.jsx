@@ -105,14 +105,11 @@ export class ServerDataManager {
 
     setupEvents() {
 
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (handle) => {
-            this.evHndl[EVENTS.PropertyColorUpdate] = handle;
-            this.evHndl[EVENTS.PropertyColorUpdate].watch((error, log) => {
-                let id = ctr.fromID(Func.BigNumberToNumber(log.args.property));
-                let colors = Func.ContractDataToRGBAArray(log.args.colors);
-                this.forceUpdatePropertyData(id.x, id.y);
-                this.insertPropertyImage(id.x, id.y, colors);
-            });
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (args) => {
+            let id = ctr.fromID(Func.BigNumberToNumber(args.property));
+            let colors = Func.ContractDataToRGBAArray(args.colors);
+            this.forceUpdatePropertyData(id.x, id.y);
+            this.insertPropertyImage(id.x, id.y, colors);
         });
 
         ctr.watchEventLogs(EVENTS.PropertyBought, {}, (handle) => {

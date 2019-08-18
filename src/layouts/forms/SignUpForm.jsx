@@ -52,7 +52,6 @@ class SignUpForm extends Component {
         let errors = [];
         if (!this.state.agreeTos)
             errors.push('Please agree to the Terms of Service & Privacy Policy.');
-
         this.setState({errors});
         if (errors.length > 0)
             return;

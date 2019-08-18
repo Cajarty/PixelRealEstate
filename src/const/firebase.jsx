@@ -2,7 +2,7 @@ import * as firebase from 'firebase';
 import {Contract, ctr, LISTENERS} from '../contract/contract';
 import * as Const from '../const/const';
 import {GFD, GlobalState} from '../functions/GlobalState';
-import * as FBC from '../private/firebaseConfig';
+import * as FBC from '../../private/firebaseConfig';
 
   const config = process.env.NODE_ENV === 'production'
     ? FBC.prodConfig

@@ -105,9 +105,9 @@ export class ServerDataManager {
 
     setupEvents() {
 
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (propertyId, colorsArray, lastUpdateTimestamp, lastUpdaterPayeeAddress, becomesPublicTimestamp, rewardedCoinsAmount) => {
-            let id = ctr.fromID(Func.BigNumberToNumber(propertyId));
-            let colors = Func.ContractDataToRGBAArray(colorsArray);
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (property, colors, lastUpdateTimestamp, lastUpdaterPayeeAddress, becomesPublicTimestamp, rewardedCoinsAmount) => {
+            let id = ctr.fromID(Func.BigNumberToNumber(property));
+            colors = Func.ContractDataToRGBAArray(colors);
             this.forceUpdatePropertyData(id.x, id.y);
             this.insertPropertyImage(id.x, id.y, colors);
         });

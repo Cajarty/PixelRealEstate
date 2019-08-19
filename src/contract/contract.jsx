@@ -83,6 +83,7 @@ export class Contract {
                 console.info('Web3 & MetaMask.');            
 
                 this.metamaskProvider = new ethers.providers.Web3Provider(window.web3.currentProvider);
+                this.metamaskProvider.resetEventsBlock(0);
 
                 this.provider = new ethers.getDefaultProvider();
                 this.provider.resetEventsBlock(0);
@@ -177,19 +178,19 @@ export class Contract {
             fromBlock: 0,
         };
 
-        switch (event) {
-            case EVENTS.PropertyBought:
-            case EVENTS.PropertyColorUpdate:
-            case EVENTS.SetUserHoverText:
-            case EVENTS.SetUserSetLink:
-            case EVENTS.PropertySetForSale:
-            case EVENTS.DelistProperty:
-            case EVENTS.SetPropertyPublic:
-            case EVENTS.SetPropertyPrivate:
-            case EVENTS.Bid:
+        switch (event.id) {
+            case EVENTS.PropertyBought.id:
+            case EVENTS.PropertyColorUpdate.id:
+            case EVENTS.SetUserHoverText.id:
+            case EVENTS.SetUserSetLink.id:
+            case EVENTS.PropertySetForSale.id:
+            case EVENTS.DelistProperty.id:
+            case EVENTS.SetPropertyPublic.id:
+            case EVENTS.SetPropertyPrivate.id:
+            case EVENTS.Bid.id:
                 break;
-            case EVENTS.Transfer:
-            case EVENTS.Approval:
+            case EVENTS.Transfer.id:
+            case EVENTS.Approval.id:
                 filter.address = CTRDATA.PXL_Address;
                 break;
             default:
@@ -208,7 +209,7 @@ export class Contract {
             return;
 
         this.updateNewestBlock();
-        
+
         let eventTopic = ethers.utils.id(event.eventAbi);
 
         let filter = {
@@ -217,20 +218,23 @@ export class Contract {
             fromBlock: 0,
         };
 
-        switch (event) {
-            case EVENTS.PropertyBought:
-            case EVENTS.PropertyColorUpdate:
-            case EVENTS.SetUserHoverText:
-            case EVENTS.SetUserSetLink:
-            case EVENTS.PropertySetForSale:
-            case EVENTS.DelistProperty:
-            case EVENTS.SetPropertyPublic:
-            case EVENTS.SetPropertyPrivate:
-            case EVENTS.Bid:
+        switch (event.id) {
+            case EVENTS.PropertyBought.id:
+            case EVENTS.PropertyColorUpdate.id:
+            case EVENTS.SetUserHoverText.id:
+            case EVENTS.SetUserSetLink.id:
+            case EVENTS.PropertySetForSale.id:
+            case EVENTS.DelistProperty.id:
+            case EVENTS.SetPropertyPublic.id:
+            case EVENTS.SetPropertyPrivate.id:
+            case EVENTS.Bid.id:
                 return this._watchVREEventLogs(event, callback);
-            case EVENTS.Transfer:
-            case EVENTS.Approval:
+            case EVENTS.Transfer.id:
+            case EVENTS.Approval.id:
                 return this._watchPXLEventLogs(event, callback);
+            default:
+                console.warn('Error on event', event);
+                return;
         }
     }
 
@@ -258,7 +262,7 @@ export class Contract {
     }
 
     getVREContract(callback/*(contract)*/) {
-        if (!this.VRE) {
+        if (!this.VRE || this.account == null) {
             this.getAccount((acc) => {
                 this.VRE = new ethers.Contract(CTRDATA.VRE_Address, CTRDATA.VRE_ABI, acc || this.provider);
                 if (acc) {
@@ -272,7 +276,7 @@ export class Contract {
     }
 
     getPXLContract(callback/*(contract)*/) {
-        if (!this.PXLPP) {
+        if (!this.PXLPP || this.account == null) {
             this.getAccount((acc) => {
                 this.PXLPP = new ethers.Contract(CTRDATA.PXL_Address, CTRDATA.PXL_ABI, acc || this.provider);
                 if (acc) {

@@ -90,16 +90,14 @@ export class Contract {
                 this.updateNetwork((id) => {
                     if (id === Const.NETWORK_MAIN) {
                         GFD.setData('noMetaMask', false);
-                         this.getAccount((acc) => {
-                             if (acc) {
-                                FB.checkSignIn();
-                             }
-                         });
-            
-                        SDM.init();
-                        window.web3.eth.getBlock('latest').then((latestBlock) => {
-                            this.startLoadBlock = latestBlock.number - 1;
+                        this.getAccount((acc) => {
+                            if (acc) {
+                            FB.checkSignIn();
+                            }
                         });
+            
+                        this.updateNewestBlock();
+                        SDM.init();
     
                     }
                 });
@@ -153,6 +151,14 @@ export class Contract {
             // }
     }
 
+    updateNewestBlock() {
+        if (this.startLoadBlock <= 0) {
+            this.metamaskProvider.getBlockNumber().then((blockNumber) => {
+                this.startLoadBlock = blockNumber;
+            });
+        }
+    }
+
     /*
     Requests all events of event type EVENT.
     event = event type
@@ -201,14 +207,8 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return;
 
-        if (this.startLoadBlock <= 0) {
-            window.web3.eth.getBlock('latest').then((latestBlock) => {
-                this.startLoadBlock = latestBlock.number;
-                this.watchEventLogs(event, params, callback, blocks);
-            });
-            return;
-        }
-
+        this.updateNewestBlock();
+        
         let eventTopic = ethers.utils.id(event.eventAbi);
 
         let filter = {

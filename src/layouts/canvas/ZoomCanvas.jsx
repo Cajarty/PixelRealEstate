@@ -72,17 +72,17 @@ class ZoomCanvas extends Component {
                     }
 
                     let caller = this;
-                    ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (property, colors, lastUpdate, lastUpdaterPayee, becomePublic, awardedAmount, event) => {
-                        this.setState({eventHandle: event});
-                        let id = ctr.fromID(Func.BigNumberToNumber(property));
-                        colors = Func.ContractDataToRGBAArray(colors);
-                        if (caller.state.loaded) {
-                            caller.setCanvasProperty(id.x, id.y, colors);
-                        } else {
-                            let update = caller.state.queuedUpdates;
-                            update.push(Struct.CondensedColorUpdate(id.x, id.y, colors));
-                            caller.setState({queuedUpdates: update});
-                        }
+                    this.setState({eventHandle: ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (property, colors, lastUpdate, lastUpdaterPayee, becomePublic, awardedAmount, event) => {
+                            let id = ctr.fromID(Func.BigNumberToNumber(property));
+                            colors = Func.ContractDataToRGBAArray(colors);
+                            if (caller.state.loaded) {
+                                caller.setCanvasProperty(id.x, id.y, colors);
+                            } else {
+                                let update = caller.state.queuedUpdates;
+                                update.push(Struct.CondensedColorUpdate(id.x, id.y, colors));
+                                caller.setState({queuedUpdates: update});
+                            }
+                        }),
                     });
                 }
             }

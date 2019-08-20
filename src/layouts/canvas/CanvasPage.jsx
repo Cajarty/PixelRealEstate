@@ -89,11 +89,11 @@ class CanvasPage extends Component {
         });
 
         let caller = this;
-        ctr.watchEventLogs(EVENTS.Transfer, {}, (_from, _to, _value, event) => {
-            this.setState({ eventHandleTransfer: event }); // No longer have handle
-            if (_from === ctr.account || _to === ctr.account) {
-                caller.updateBalance();
-            }
+        this.setState({ eventHandleTransfer: ctr.watchEventLogs(EVENTS.Transfer, {}, (_from, _to, _value, event) => {
+                if (_from === ctr.account || _to === ctr.account) {
+                    caller.updateBalance();
+                }
+            }),
         });
 
         ctr.listenForEvent(EVENTS.AccountChange, 'CanvasPagePPCListener', (data) => {
@@ -106,10 +106,10 @@ class CanvasPage extends Component {
                 caller.updateBalance();
             }),
         });
-
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, { lastUpdaterPayee: ctr.account }, (propertyId, colorsArray, lastUpdateTimestamp, lastUpdaterPayeeAddress, becomesPublicTimestamp, rewardedCoinsAmount, event) => {
-            this.setState({ eventHandle: event });
-            caller.updateBalance();
+        this.setState({ eventHandle:
+            ctr.watchEventLogs(EVENTS.PropertyColorUpdate, { lastUpdaterPayee: ctr.account }, (propertyId, colorsArray, lastUpdateTimestamp, lastUpdaterPayeeAddress, becomesPublicTimestamp, rewardedCoinsAmount, event) => {
+                caller.updateBalance();
+            }),
         });
         GFD.listen('advancedMode', 'CanvasPage', (advancedMode) => {
             this.setState({ advancedMode });

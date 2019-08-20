@@ -31,10 +31,10 @@ class PropertiesOwned extends Component {
             if (!loggedIn)
                 return;
             //add right owner
-            ctr.watchEventLogs(EVENTS.PropertyBought, {}, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner, event) => {
-                this.setState({eventHandle: event});
-                this.reorderItems();
-                this.forceUpdate();
+            this.setState({eventHandle: ctr.watchEventLogs(EVENTS.PropertyBought, {}, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner, event) => {
+                    this.reorderItems();
+                    this.forceUpdate();
+                }),
             });
             this.reorderItems();
         });

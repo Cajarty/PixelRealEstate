@@ -27,50 +27,49 @@ class PropertySalesLogTopPXL extends Component {
                 this.setState({changeLog: SDM.eventData.topTenPXLTrades, isLoading: false});
             }
             let caller = this;
-            ctr.watchEventLogs(EVENTS.PropertyBought, {}, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner, event) => {
-                this.setState({
-                    eventHandle: event,
-                    loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
-                });
-                let old = SDM.eventData.topTenPXLTrades;
-                let PXLPrice = Func.BigNumberToNumber(PXLAmount);
-                let ETHPrice = Func.BigNumberToNumber(ethAmount);
-                let timeSold = Func.BigNumberToNumber(timestamp);
-                if (PXLPrice == 0)
-                    return;
-                let id = ctr.fromID(Func.BigNumberToNumber(property));
-                let newData = {
-                    x: id.x,
-                    y: id.y,
-                    PXLPrice,
-                    ETHPrice,
-                    oldOwner: oldOwner == ctr.account ? "You" : (oldOwner === Struct.NOBODY ? 'PixelProperty' : oldOwner),
-                    newOwner: newOwner == ctr.account ? "You" : newOwner,
-                    timeSold: timeSold * 1000,
-                    transaction: event.transactionHash,
-                };
-                if (old.length == 0) {
-                    old.unshift(newData);
-                    if (old.length > 20)
-                        old.pop();
-                    SDM.eventData.topTenPXLTrades = old;
-                    this.setState({ changeLog: old, isLoading: false });
-                } else {
-                    for (let i = Math.min(old.length - 1, 9); i >= 0; i--) {
-                        if (PXLPrice <= old[i].PXLPrice || (i == 0 && PXLPrice > old[i].PXLPrice)) {
-                            if (i < 9) {
-                                if (PXLPrice <= old[i].PXLPrice)
-                                    old.splice(i + 1, 0, newData);
-                                else
-                                    old.splice(i, 0, newData);
-                                old.splice(10);
-                                SDM.eventData.topTenPXLTrades = old;
-                                this.setState({ changeLog: old});
+            this.setState({
+                eventHandle: ctr.watchEventLogs(EVENTS.PropertyBought, {}, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner, event) => {
+                    let old = SDM.eventData.topTenPXLTrades;
+                    let PXLPrice = Func.BigNumberToNumber(PXLAmount);
+                    let ETHPrice = Func.BigNumberToNumber(ethAmount);
+                    let timeSold = Func.BigNumberToNumber(timestamp);
+                    if (PXLPrice == 0)
+                        return;
+                    let id = ctr.fromID(Func.BigNumberToNumber(property));
+                    let newData = {
+                        x: id.x,
+                        y: id.y,
+                        PXLPrice,
+                        ETHPrice,
+                        oldOwner: oldOwner == ctr.account ? "You" : (oldOwner === Struct.NOBODY ? 'PixelProperty' : oldOwner),
+                        newOwner: newOwner == ctr.account ? "You" : newOwner,
+                        timeSold: timeSold * 1000,
+                        transaction: event.transactionHash,
+                    };
+                    if (old.length == 0) {
+                        old.unshift(newData);
+                        if (old.length > 20)
+                            old.pop();
+                        SDM.eventData.topTenPXLTrades = old;
+                        this.setState({ changeLog: old, isLoading: false });
+                    } else {
+                        for (let i = Math.min(old.length - 1, 9); i >= 0; i--) {
+                            if (PXLPrice <= old[i].PXLPrice || (i == 0 && PXLPrice > old[i].PXLPrice)) {
+                                if (i < 9) {
+                                    if (PXLPrice <= old[i].PXLPrice)
+                                        old.splice(i + 1, 0, newData);
+                                    else
+                                        old.splice(i, 0, newData);
+                                    old.splice(10);
+                                    SDM.eventData.topTenPXLTrades = old;
+                                    this.setState({ changeLog: old});
+                                }
+                                return;
                             }
-                            return;
                         }
                     }
-                }
+                }),
+                loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
             });
         });
     }

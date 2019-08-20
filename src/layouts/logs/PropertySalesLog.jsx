@@ -27,31 +27,30 @@ class PropertySalesLog extends Component {
                 this.setState({changeLog: SDM.eventData.recentTrades, isLoading: false});
             }
             let caller = this;
-            ctr.watchEventLogs(EVENTS.PropertyBought, {}, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner, event) => {
-                this.setState({
-                    eventHandle: event,
-                    loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
-                });
-                let old = SDM.eventData.recentTrades;
-                let id = ctr.fromID(Func.BigNumberToNumber(property));
-                let PXLPrice = Func.BigNumberToNumber(PXLAmount);
-                let ETHPrice = Func.BigNumberToNumber(ethAmount);
-                let timeSold = Func.BigNumberToNumber(timestamp);
-                let newData = {
-                    x: id.x,
-                    y: id.y,
-                    PXLPrice,
-                    ETHPrice,
-                    oldOwner: oldOwner == ctr.account ? "You" : (oldOwner === Struct.NOBODY ? 'PixelProperty' : oldOwner),
-                    newOwner: newOwner == ctr.account ? "You" : newOwner,
-                    timeSold: timeSold * 1000,
-                    transaction: event.transactionHash,
-                };
-                old.unshift(newData);
-                if (old.length > 20)
-                    old.pop();
-                SDM.eventData.recentTrades = old;
-                caller.setState({ changeLog: old, isLoading: false });
+            this.setState({
+                eventHandle: ctr.watchEventLogs(EVENTS.PropertyBought, {}, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner, event) => {
+                    let old = SDM.eventData.recentTrades;
+                    let id = ctr.fromID(Func.BigNumberToNumber(property));
+                    let PXLPrice = Func.BigNumberToNumber(PXLAmount);
+                    let ETHPrice = Func.BigNumberToNumber(ethAmount);
+                    let timeSold = Func.BigNumberToNumber(timestamp);
+                    let newData = {
+                        x: id.x,
+                        y: id.y,
+                        PXLPrice,
+                        ETHPrice,
+                        oldOwner: oldOwner == ctr.account ? "You" : (oldOwner === Struct.NOBODY ? 'PixelProperty' : oldOwner),
+                        newOwner: newOwner == ctr.account ? "You" : newOwner,
+                        timeSold: timeSold * 1000,
+                        transaction: event.transactionHash,
+                    };
+                    old.unshift(newData);
+                    if (old.length > 20)
+                        old.pop();
+                    SDM.eventData.recentTrades = old;
+                    caller.setState({ changeLog: old, isLoading: false });
+                }),                    
+                loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
             });
         });
     }

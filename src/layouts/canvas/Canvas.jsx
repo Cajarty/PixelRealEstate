@@ -186,17 +186,17 @@ class Canvas extends Component {
     }
 
     setup() {
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (propertyId, colorsArray, lastUpdateTimestamp, lastUpdaterPayeeAddress, becomesPublicTimestamp, rewardedCoinsAmount, event) => {
-            this.setState({eventHandle : event});
-            let id = ctr.fromID(Func.BigNumberToNumber(propertyId));
-            let colors = Func.ContractDataToRGBAArray(colorsArray);
-            if (this.state.loaded) {
-                this.setCanvasProperty(id.x, id.y, colors);
-            } else {
-                let update = this.state.queuedUpdates;
-                update.push(Struct.CondensedColorUpdate(id.x, id.y, colors));
-                this.setState({queuedUpdates: update});
-            }
+        this.setState({eventHandle: ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (propertyId, colorsArray, lastUpdateTimestamp, lastUpdaterPayeeAddress, becomesPublicTimestamp, rewardedCoinsAmount, event) => {
+                let id = ctr.fromID(Func.BigNumberToNumber(propertyId));
+                let colors = Func.ContractDataToRGBAArray(colorsArray);
+                if (this.state.loaded) {
+                    this.setCanvasProperty(id.x, id.y, colors);
+                } else {
+                    let update = this.state.queuedUpdates;
+                    update.push(Struct.CondensedColorUpdate(id.x, id.y, colors));
+                    this.setState({queuedUpdates: update});
+                }
+            }),
         });
 
         ctr.listenForResults(LISTENERS.PendingSetPixelUpdate, 'Canvas', (data) => {

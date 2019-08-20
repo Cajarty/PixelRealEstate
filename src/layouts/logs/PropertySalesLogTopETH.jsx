@@ -26,50 +26,49 @@ class PropertySalesLogTopETH extends Component {
             if (SDM.eventData.topTenETHTrades.length > 0) {
                 this.setState({changeLog: SDM.eventData.topTenETHTrades, isLoading: false});
             }
-            ctr.watchEventLogs(EVENTS.PropertyBought, {}, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner, event) => {
-                this.setState({
-                    eventHandle: event,
-                    loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
-                });
-                let old = SDM.eventData.topTenETHTrades;
-                let PXLPrice = Func.BigNumberToNumber(PXLAmount);
-                let ETHPrice = Func.BigNumberToNumber(ethAmount);
-                let timeSold = Func.BigNumberToNumber(timestamp);
-                if (ETHPrice == 0)
-                    return;
-                let id = ctr.fromID(Func.BigNumberToNumber(property));
-                let newData = {
-                    x: id.x,
-                    y: id.y,
-                    PXLPrice,
-                    ETHPrice,
-                    oldOwner: oldOwner == ctr.account ? "You" : (oldOwner === Struct.NOBODY ? 'PixelProperty' : oldOwner),
-                    newOwner: newOwner == ctr.account ? "You" : newOwner,
-                    timeSold: timeSold * 1000,
-                    transaction: event.transactionHash,
-                };
-                if (old.length == 0) {
-                    old.unshift(newData);
-                    if (old.length > 20)
-                        old.pop();
-                    SDM.eventData.topTenETHTrades = old;
-                    this.setState({ changeLog: old, isLoading: false });
-                } else {
-                    for (let i = Math.min(old.length - 1, 9); i >= 0; i--) {
-                        if (ETHPrice <= old[i].ETHPrice || (i == 0 && ETHPrice > old[i].ETHPrice)) {
-                            if (i < 9) {
-                                if (ETHPrice <= old[i].ETHPrice)
-                                    old.splice(i + 1, 0, newData);
-                                else
-                                    old.splice(i, 0, newData);
-                                old.splice(10);
-                                SDM.eventData.topTenETHTrades = old;
-                                this.setState({ changeLog: old });
+            this.setState({
+                eventHandle: ctr.watchEventLogs(EVENTS.PropertyBought, {}, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner, event) => {
+                    let old = SDM.eventData.topTenETHTrades;
+                    let PXLPrice = Func.BigNumberToNumber(PXLAmount);
+                    let ETHPrice = Func.BigNumberToNumber(ethAmount);
+                    let timeSold = Func.BigNumberToNumber(timestamp);
+                    if (ETHPrice == 0)
+                        return;
+                    let id = ctr.fromID(Func.BigNumberToNumber(property));
+                    let newData = {
+                        x: id.x,
+                        y: id.y,
+                        PXLPrice,
+                        ETHPrice,
+                        oldOwner: oldOwner == ctr.account ? "You" : (oldOwner === Struct.NOBODY ? 'PixelProperty' : oldOwner),
+                        newOwner: newOwner == ctr.account ? "You" : newOwner,
+                        timeSold: timeSold * 1000,
+                        transaction: event.transactionHash,
+                    };
+                    if (old.length == 0) {
+                        old.unshift(newData);
+                        if (old.length > 20)
+                            old.pop();
+                        SDM.eventData.topTenETHTrades = old;
+                        this.setState({ changeLog: old, isLoading: false });
+                    } else {
+                        for (let i = Math.min(old.length - 1, 9); i >= 0; i--) {
+                            if (ETHPrice <= old[i].ETHPrice || (i == 0 && ETHPrice > old[i].ETHPrice)) {
+                                if (i < 9) {
+                                    if (ETHPrice <= old[i].ETHPrice)
+                                        old.splice(i + 1, 0, newData);
+                                    else
+                                        old.splice(i, 0, newData);
+                                    old.splice(10);
+                                    SDM.eventData.topTenETHTrades = old;
+                                    this.setState({ changeLog: old });
+                                }
+                                return;
                             }
-                            return;
                         }
                     }
-                }
+                }),
+                loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
             });
         });
     }

@@ -27,29 +27,28 @@ class PropertyChangeLogYou extends Component {
                 this.setState({changeLog: SDM.eventData.yourPayouts, isLoading: false});
             }
             let caller = this;
-            ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {lastUpdaterPayee: ctr.account}, (property, colors, lastUpdate, lastUpdaterPayee, becomePublic, awardedAmount, event) => {
-                this.setState({
-                    eventHandle: event,
-                    loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
-                });
-                let old = caller.state.changeLog;
-                let id = ctr.fromID(Func.BigNumberToNumber(property));
-                let last = Func.BigNumberToNumber(lastUpdate);
-                let reserved = Func.BigNumberToNumber(becomePublic);
-                let maxEarnings = ((reserved - last) / 30) * 5;
-                let newData = {
-                    x: id.x,
-                    y: id.y,
-                    lastChange: last * 1000,
-                    payout: Func.calculateEarnings(last, maxEarnings),
-                    maxPayout: maxEarnings,
-                    transaction: event.transactionHash,
-                };
-                old.unshift(newData);
-                if (old.length > 20)
-                    old.pop();
-                caller.setState({ changeLog: old, isLoading: false });
-            }, 10000);
+            this.setState({
+                eventHandle: ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {lastUpdaterPayee: ctr.account}, (property, colors, lastUpdate, lastUpdaterPayee, becomePublic, awardedAmount, event) => {
+                    let old = caller.state.changeLog;
+                    let id = ctr.fromID(Func.BigNumberToNumber(property));
+                    let last = Func.BigNumberToNumber(lastUpdate);
+                    let reserved = Func.BigNumberToNumber(becomePublic);
+                    let maxEarnings = ((reserved - last) / 30) * 5;
+                    let newData = {
+                        x: id.x,
+                        y: id.y,
+                        lastChange: last * 1000,
+                        payout: Func.calculateEarnings(last, maxEarnings),
+                        maxPayout: maxEarnings,
+                        transaction: event.transactionHash,
+                    };
+                    old.unshift(newData);
+                    if (old.length > 20)
+                        old.pop();
+                    caller.setState({ changeLog: old, isLoading: false });
+                }, 10000),                    
+                loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
+            });
         });
     }
 

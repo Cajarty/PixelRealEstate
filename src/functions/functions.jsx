@@ -182,7 +182,10 @@ export const BigNumberToString = (big) => {
 export const BigNumberToNumber = (big) => {
     if (typeof big === "number")
         return big;
-    return big.toNumber();
+    if (big.lt(Number.MAX_SAFE_INTEGER))
+        return big.toNumber();
+    else
+        return big.toString();
 }
 
 export const NumberToBigNumber = (num) => {

@@ -102,9 +102,9 @@ class CanvasPage extends Component {
             this.updateBalance();
         });
 
-        ctr.watchEventLogs(EVENTS.PropertyBought, { newOwner: ctr.account }, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner, event) => {
-            this.setState({ eventHandleBought: event });
-            caller.updateBalance();
+        this.setState({ eventHandleBought: ctr.watchEventLogs(EVENTS.PropertyBought, { newOwner: ctr.account }, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner, event) => {
+                caller.updateBalance();
+            }),
         });
 
         ctr.watchEventLogs(EVENTS.PropertyColorUpdate, { lastUpdaterPayee: ctr.account }, (propertyId, colorsArray, lastUpdateTimestamp, lastUpdaterPayeeAddress, becomesPublicTimestamp, rewardedCoinsAmount, event) => {

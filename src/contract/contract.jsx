@@ -241,12 +241,30 @@ export class Contract {
     _watchVREEventLogs(event, callback) {
         this.getVREContract((i) => {
             i.on(event.id, callback);
+            let obj = {
+                eventID: event.id,
+                eventCallback: callback,
+                stopWatching: () => {
+                    i.removeListener(obj.eventID, obj.eventCallback);
+                    delete obj.eventCallback;
+                }
+            };
+            return obj;
         });
     }
 
     _watchPXLEventLogs(event, callback) {
         this.getPXLContract((i) => {
             i.on(event.id, callback);
+            let obj = {
+                eventID: event.id,
+                eventCallback: callback,
+                stopWatching: () => {
+                    i.removeListener(obj.eventID, obj.eventCallback);
+                    delete obj.eventCallback;
+                }
+            };
+            return obj;
         });
     }
 

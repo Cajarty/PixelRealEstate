@@ -28,9 +28,8 @@ class PropertySalesLogYou extends Component {
                 this.setState({changeLog: SDM.eventData.yourTrades, isLoading: false});
             }
             let caller = this;
-            ctr.watchEventLogs(EVENTS.PropertyBought, {newOwner: ctr.account}, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner) => {
-                // let eventHandle1 = handle;
-                // this.setState({eventHandle1});
+            ctr.watchEventLogs(EVENTS.PropertyBought, {newOwner: ctr.account}, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner, event) => {
+                this.setState({eventHandle1: event});
                 let old = caller.state.changeLog;
                 let id = ctr.fromID(Func.BigNumberToNumber(property));
                 let PXLPrice = Func.BigNumberToNumber(PXLAmount);
@@ -44,7 +43,7 @@ class PropertySalesLogYou extends Component {
                     oldOwner: oldOwner == ctr.account ? "You" : (oldOwner === Struct.NOBODY ? 'PixelProperty' : oldOwner),
                     newOwner: newOwner == ctr.account ? "You" : newOwner,
                     timeSold: timeSold * 1000,
-                    transaction: undefined //log.transactionHash, // We dont have a transaction hash anymore
+                    transaction: event.transactionHash
                 };
                 old.unshift(newData);
                 if (old.length > 20)
@@ -52,12 +51,11 @@ class PropertySalesLogYou extends Component {
                 caller.setState({ changeLog: old, isLoading: false });
             }, 10000);
 
-            ctr.watchEventLogs(EVENTS.PropertyBought, {oldOwner: ctr.account}, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner) => {
-                // let eventHandle2 = handle;
-                // this.setState({
-                //     eventHandle2,
-                //     loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
-                // });
+            ctr.watchEventLogs(EVENTS.PropertyBought, {oldOwner: ctr.account}, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner, event) => {
+                this.setState({
+                    eventHandle2: event,
+                    loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
+                });
                 let old = this.state.changeLog;
                 let id = ctr.fromID(Func.BigNumberToNumber(property));
                 let PXLPrice = Func.BigNumberToNumber(PXLAmount);
@@ -71,7 +69,7 @@ class PropertySalesLogYou extends Component {
                     oldOwner: oldOwner == ctr.account ? "You" : (oldOwner === Struct.NOBODY ? 'PixelProperty' : oldOwner),
                     newOwner: newOwner == ctr.account ? "You" : newOwner,
                     timeSold: timeSold * 1000,
-                    transaction: undefined //log.transactionHash, // We dont have a transaction hash anymore
+                    transaction: event.transactionHash
                 };
                 old.unshift(newData);
                 if (old.length > 20)

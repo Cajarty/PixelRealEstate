@@ -27,12 +27,11 @@ class PropertySalesLogTopPXL extends Component {
                 this.setState({changeLog: SDM.eventData.topTenPXLTrades, isLoading: false});
             }
             let caller = this;
-            ctr.watchEventLogs(EVENTS.PropertyBought, {}, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner) => {
-                // let eventHandle = handle;
-                // this.setState({
-                //     eventHandle,
-                //     loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
-                // });
+            ctr.watchEventLogs(EVENTS.PropertyBought, {}, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner, event) => {
+                this.setState({
+                    eventHandle: event,
+                    loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
+                });
                 let old = SDM.eventData.topTenPXLTrades;
                 let PXLPrice = Func.BigNumberToNumber(PXLAmount);
                 let ETHPrice = Func.BigNumberToNumber(ethAmount);
@@ -48,7 +47,7 @@ class PropertySalesLogTopPXL extends Component {
                     oldOwner: oldOwner == ctr.account ? "You" : (oldOwner === Struct.NOBODY ? 'PixelProperty' : oldOwner),
                     newOwner: newOwner == ctr.account ? "You" : newOwner,
                     timeSold: timeSold * 1000,
-                    transaction: undefined //log.transactionHash, // ? We don't have a transaction hash anymore
+                    transaction: event.transactionHash,
                 };
                 if (old.length == 0) {
                     old.unshift(newData);

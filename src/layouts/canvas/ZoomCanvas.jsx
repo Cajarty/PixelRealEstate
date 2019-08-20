@@ -72,9 +72,8 @@ class ZoomCanvas extends Component {
                     }
 
                     let caller = this;
-                    ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (property, colors, lastUpdate, lastUpdaterPayee, becomePublic) => {
-                        // this.setState({eventHandle});
-                        //console.info('zoom event');
+                    ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (property, colors, lastUpdate, lastUpdaterPayee, becomePublic, awardedAmount, event) => {
+                        this.setState({eventHandle: event});
                         let id = ctr.fromID(Func.BigNumberToNumber(property));
                         colors = Func.ContractDataToRGBAArray(colors);
                         if (caller.state.loaded) {

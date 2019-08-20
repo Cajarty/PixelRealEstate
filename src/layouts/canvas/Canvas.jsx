@@ -186,8 +186,8 @@ class Canvas extends Component {
     }
 
     setup() {
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (propertyId, colorsArray, lastUpdateTimestamp, lastUpdaterPayeeAddress, becomesPublicTimestamp, rewardedCoinsAmount) => {
-            // this.setState({eventHandle}); // No longer have a handle
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (propertyId, colorsArray, lastUpdateTimestamp, lastUpdaterPayeeAddress, becomesPublicTimestamp, rewardedCoinsAmount, event) => {
+            this.setState({eventHandle : event});
             let id = ctr.fromID(Func.BigNumberToNumber(propertyId));
             let colors = Func.ContractDataToRGBAArray(colorsArray);
             if (this.state.loaded) {

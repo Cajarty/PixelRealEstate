@@ -27,12 +27,11 @@ class PropertyChangeLogYou extends Component {
                 this.setState({changeLog: SDM.eventData.yourPayouts, isLoading: false});
             }
             let caller = this;
-            ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {lastUpdaterPayee: ctr.account}, (property, colors, lastUpdate, lastUpdaterPayee, becomePublic) => {
-                // let eventHandle = handle;
-                // this.setState({
-                //     eventHandle,
-                //     loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
-                // });
+            ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {lastUpdaterPayee: ctr.account}, (property, colors, lastUpdate, lastUpdaterPayee, becomePublic, awardedAmount, event) => {
+                this.setState({
+                    eventHandle: event,
+                    loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
+                });
                 let old = caller.state.changeLog;
                 let id = ctr.fromID(Func.BigNumberToNumber(property));
                 let last = Func.BigNumberToNumber(lastUpdate);
@@ -44,7 +43,7 @@ class PropertyChangeLogYou extends Component {
                     lastChange: last * 1000,
                     payout: Func.calculateEarnings(last, maxEarnings),
                     maxPayout: maxEarnings,
-                    transaction: undefined //log.transactionHash,
+                    transaction: event.transactionHash,
                 };
                 old.unshift(newData);
                 if (old.length > 20)

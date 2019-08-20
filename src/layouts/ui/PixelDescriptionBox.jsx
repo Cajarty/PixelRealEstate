@@ -166,8 +166,8 @@ class PixelDescriptionBox extends Component {
             return;
         GFD.close('noMetaMask', 'DescBox');
         let caller = this;
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (property, colors, lastUpdate, lastUpdaterPayee, becomePublic) => {
-            // this.setState({evH1});
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (property, colors, lastUpdate, lastUpdaterPayee, becomesPublic, rewardedCoins, event) => {
+            this.setState({evH1: event});
             let id = ctr.fromID(Func.BigNumberToNumber(property));
             let xx = GFD.getData('x') - 1
             let yy = GFD.getData('y') - 1;
@@ -177,8 +177,8 @@ class PixelDescriptionBox extends Component {
             }
         });
 
-        ctr.watchEventLogs(EVENTS.PropertyBought, {}, (property, newOwnerAddress, ethAmount, PXLAmount, timestamp) => {
-            // this.setState({evH2});
+        ctr.watchEventLogs(EVENTS.PropertyBought, {}, (property, newOwnerAddress, ethAmount, PXLAmount, timestamp, event) => {
+            this.setState({evH2: event});
             let id = ctr.fromID(Func.BigNumberToNumber(property));
             let xx = GFD.getData('x') - 1
             let yy = GFD.getData('y') - 1;
@@ -186,8 +186,8 @@ class PixelDescriptionBox extends Component {
                 caller.loadProperty(xx, yy);
         });
 
-        ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (property, forSalePrice) => {
-            // this.setState({evH3});
+        ctr.watchEventLogs(EVENTS.PropertySetForSale, {}, (property, forSalePrice, event) => {
+            this.setState({evH3: event});
             let id = ctr.fromID(Func.BigNumberToNumber(property));
             let xx = GFD.getData('x') - 1
             let yy = GFD.getData('y') - 1;

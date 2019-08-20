@@ -26,12 +26,11 @@ class PropertyChangeLogTop extends Component {
             if (SDM.eventData.topTenPayouts.length > 0) {
                 this.setState({changeLog: SDM.eventData.topTenPayouts, isLoading: false});
             }
-            ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (property, colors, lastUpdate, lastUpdaterPayee, becomePublic) => {
-                // let eventHandle = handle;
-                // this.setState({
-                //     eventHandle,
-                //     loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
-                // });
+            ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (property, colors, lastUpdate, lastUpdaterPayee, becomePublic, rewardedCoins, event) => {
+                this.setState({
+                    eventHandle: event,
+                    loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
+                });
                 let old = SDM.eventData.topTenPayouts;
                 let last = Func.BigNumberToNumber(lastUpdate);
                 let reserved = Func.BigNumberToNumber(becomePublic);
@@ -44,7 +43,7 @@ class PropertyChangeLogTop extends Component {
                     lastChange: last * 1000,
                     payout,
                     maxPayout: maxEarnings,
-                    transaction: undefined //log.transactionHash,
+                    transaction: event.transactionHash,
                 };
                 if (old.length == 0) {
                     old.unshift(newData);
@@ -113,7 +112,8 @@ class PropertyChangeLogTop extends Component {
                     </GridColumn>
                 </GridRow>
                 {this.state.changeLog.map((log, i) => (
-                    <GridRow className='gridItem' onClick={() => this.setLocation(log.x + 1, log.y + 1) }  key={log.transaction + Math.random()} columns={6} textAlign='center'> 
+                    
+                    <GridRow className='gridItem' onClick={() => { console.info(log, i); this.setLocation(log.x + 1, log.y + 1); } }  key={log.transaction + Math.random()} columns={6} textAlign='center'> 
                         <GridColumn verticalAlign='middle' width={1}>{i + 1}</GridColumn>
                         <GridColumn verticalAlign='middle' width={1}><PanelPropertyCanvas x={log.x} y={log.y} width={20}/></GridColumn>
                         <GridColumn verticalAlign='middle' width={2}>{log.x + 1}</GridColumn>

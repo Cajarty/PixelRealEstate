@@ -89,8 +89,8 @@ class CanvasPage extends Component {
         });
 
         let caller = this;
-        ctr.watchEventLogs(EVENTS.Transfer, {}, (_from, _to, _value) => {
-            // this.setState({ eventHandleTransfer }); // No longer have handle
+        ctr.watchEventLogs(EVENTS.Transfer, {}, (_from, _to, _value, event) => {
+            this.setState({ eventHandleTransfer: event }); // No longer have handle
             if (_from === ctr.account || _to === ctr.account) {
                 caller.updateBalance();
             }
@@ -102,13 +102,13 @@ class CanvasPage extends Component {
             this.updateBalance();
         });
 
-        ctr.watchEventLogs(EVENTS.PropertyBought, { newOwner: ctr.account }, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner) => {
-            // this.setState({ eventHandleBought });
+        ctr.watchEventLogs(EVENTS.PropertyBought, { newOwner: ctr.account }, (property, newOwner, ethAmount, PXLAmount, timestamp, oldOwner, event) => {
+            this.setState({ eventHandleBought: event });
             caller.updateBalance();
         });
 
-        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, { lastUpdaterPayee: ctr.account }, (handle) => {
-            // this.setState({ eventHandleUpdate });
+        ctr.watchEventLogs(EVENTS.PropertyColorUpdate, { lastUpdaterPayee: ctr.account }, (propertyId, colorsArray, lastUpdateTimestamp, lastUpdaterPayeeAddress, becomesPublicTimestamp, rewardedCoinsAmount, event) => {
+            this.setState({ eventHandle: event });
             caller.updateBalance();
         });
         GFD.listen('advancedMode', 'CanvasPage', (advancedMode) => {

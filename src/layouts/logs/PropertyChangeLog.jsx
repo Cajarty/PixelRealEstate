@@ -28,11 +28,11 @@ class PropertyChangeLog extends Component {
             }
 
             let caller = this;
-            ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (property, colors, lastUpdate, lastUpdaterPayee, becomePublic) => {
-                // this.setState({
-                //     eventHandle,
-                //     loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
-                // });
+            ctr.watchEventLogs(EVENTS.PropertyColorUpdate, {}, (property, colors, lastUpdate, lastUpdaterPayee, becomePublic, rewardedCoins, event) => {
+                this.setState({
+                    eventHandle : event,
+                    loadTimeout: setTimeout(() => {this.setState({isLoading: false})}, 15000),
+                });
         
                 let old = SDM.eventData.recentPayouts;
                 let id = ctr.fromID(Func.BigNumberToNumber(property));
@@ -45,7 +45,7 @@ class PropertyChangeLog extends Component {
                     lastChange: last * 1000,
                     payout: Func.calculateEarnings(last, maxEarnings),
                     maxPayout: maxEarnings,
-                    transaction: undefined //log.transactionHash,
+                    transaction: event.transactionHash,
                 };
                 old.unshift(newData);
                 if (old.length > 20)

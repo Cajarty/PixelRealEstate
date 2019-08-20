@@ -282,7 +282,7 @@ export class Contract {
     getVREContract(callback/*(contract)*/) {
         if (!this.VRE || this.account == null) {
             this.getAccount((acc) => {
-                this.VRE = new ethers.Contract(CTRDATA.VRE_Address, CTRDATA.VRE_ABI, acc || this.provider);
+                this.VRE = new ethers.Contract(CTRDATA.VRE_Address, CTRDATA.VRE_ABI, this.provider);
                 if (acc) {
                     this.VRE.connect(acc);
                 }
@@ -296,7 +296,7 @@ export class Contract {
     getPXLContract(callback/*(contract)*/) {
         if (!this.PXLPP || this.account == null) {
             this.getAccount((acc) => {
-                this.PXLPP = new ethers.Contract(CTRDATA.PXL_Address, CTRDATA.PXL_ABI, acc || this.provider);
+                this.PXLPP = new ethers.Contract(CTRDATA.PXL_Address, CTRDATA.PXL_ABI, this.provider);
                 if (acc) {
                     this.PXLPP.connect(acc);
                 }

@@ -91,8 +91,8 @@ class PropertyChangeLogYou extends Component {
                         Tx
                     </GridColumn>
                 </GridRow>
-                {this.state.changeLog.map((log) => (
-                    <GridRow className='gridItem' onClick={() => this.setLocation(log.x + 1, log.y + 1) }  key={log.transaction} columns={6} textAlign='center'> 
+                {this.state.changeLog.map((log, i) => (
+                    <GridRow className='gridItem' onClick={() => this.setLocation(log.x + 1, log.y + 1) }  key={i} columns={6} textAlign='center'> 
                         <GridColumn verticalAlign='middle' width={1}><PanelPropertyCanvas x={log.x} y={log.y} width={20}/></GridColumn>
                         <GridColumn verticalAlign='middle' width={2}>{log.x + 1}</GridColumn>
                         <GridColumn verticalAlign='middle' width={2}>{log.y + 1}</GridColumn>

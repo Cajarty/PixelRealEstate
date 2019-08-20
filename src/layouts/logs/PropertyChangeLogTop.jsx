@@ -111,8 +111,7 @@ class PropertyChangeLogTop extends Component {
                     </GridColumn>
                 </GridRow>
                 {this.state.changeLog.map((log, i) => (
-                    
-                    <GridRow className='gridItem' onClick={() => { console.info(log, i); this.setLocation(log.x + 1, log.y + 1); } }  key={log.transaction + Math.random()} columns={6} textAlign='center'> 
+                    <GridRow key={i} className='gridItem' onClick={() => { console.info(log, i); this.setLocation(log.x + 1, log.y + 1); } } columns={6} textAlign='center'> 
                         <GridColumn verticalAlign='middle' width={1}>{i + 1}</GridColumn>
                         <GridColumn verticalAlign='middle' width={1}><PanelPropertyCanvas x={log.x} y={log.y} width={20}/></GridColumn>
                         <GridColumn verticalAlign='middle' width={2}>{log.x + 1}</GridColumn>

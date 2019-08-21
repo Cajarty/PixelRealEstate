@@ -217,6 +217,9 @@ export class Contract {
             address: CTRDATA.VRE_Address,
             fromBlock: 0,
         };
+        
+        this.metamaskProvider.resetEventsBlock(0);
+        this.provider.resetEventsBlock(0);
 
         switch (event.id) {
             case EVENTS.PropertyBought.id:

@@ -50,7 +50,7 @@
         "whatwg-fetch": "1.0.0"
     },
     "dependencies": {
-        "axios": "^0.17.1",
+        "axios": "^0.21.1",
         "big-integer": "^1.6.27",
         "bignumber.js": "^5.0.0",
         "browser-detect": "^0.2.27",

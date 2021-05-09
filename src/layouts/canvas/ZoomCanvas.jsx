@@ -38,6 +38,8 @@ class ZoomCanvas extends Component {
         this.setState({hideCanvas: false})
         if (this.state.ctx == null)
             return;
+        if (this.state.hoverX == x && this.state.hoverY == y)
+            return;
         
         //the commented out code is for snapping as grid
 

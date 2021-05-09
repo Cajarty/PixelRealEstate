@@ -21,6 +21,7 @@ class PropertySalesLog extends Component {
 
     componentDidMount() {
         GFD.listen('ServerDataManagerInit', 'Log-PSL', (initVersion) => {
+            console.info(SDM)
             if (initVersion < 2)
                 return;
             if (SDM.eventData.recentTrades.length > 0) {

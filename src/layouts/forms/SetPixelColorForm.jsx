@@ -467,6 +467,16 @@ class SetPixelColorForm extends Component {
     }
 
     render() {
+        if (!this.state.isOpen && this.props.tutorialState.index != 4) {
+            return (<Modal size='large'
+                open={this.state.isOpen || this.props.tutorialState.index == 4} 
+                closeIcon={this.props.tutorialState.index != 4}
+                closeOnRootNodeClick={false}
+                dimmer={this.props.tutorialState.index != 4}
+                onClose={() => this.toggleModal(false)}
+                className={TUTORIAL_STATE.getClassName(this.props.tutorialState.index, 4) + ' actions'}
+            ></Modal>);
+        }
         return (
             <Modal size='large'
                 open={this.state.isOpen || this.props.tutorialState.index == 4} 

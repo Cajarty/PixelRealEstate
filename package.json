@@ -56,7 +56,7 @@
         "browser-detect": "^0.2.27",
         "ccapture.js": "github:aceslowman/ccapture.js#npm-fix",
         "eth-sig-util": "^1.4.2",
-        "ethers": "^4.0.33",
+        "ethers": "^4.0.48",
         "firebase": "^4.13.1",
         "gifencoder": "^1.1.0",
         "gulp": "^3.9.1",

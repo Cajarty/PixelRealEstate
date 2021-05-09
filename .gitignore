@@ -66,3 +66,6 @@ typings/
 
 #private data
 /src/private/
+/private/
+
+/build_webpack/

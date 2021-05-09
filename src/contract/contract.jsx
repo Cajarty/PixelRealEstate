@@ -80,28 +80,34 @@ export class Contract {
         window.addEventListener('load', (ev) => {
             if (typeof web3 !== 'undefined') {
                 window.web3 = new Web3(window.web3.currentProvider);
-                console.info('Web3 & MetaMask.');            
+                console.info('Web3 & MetaMask.'); 
 
-                this.metamaskProvider = new ethers.providers.Web3Provider(window.web3.currentProvider);
-                this.metamaskProvider.resetEventsBlock(0);
+                window.ethereum.enable().then((accounts) => {
 
-                this.provider = new ethers.getDefaultProvider();
-                this.provider.resetEventsBlock(0);
-    
-                this.updateNetwork((id) => {
-                    if (id === Const.NETWORK_MAIN) {
-                        GFD.setData('noMetaMask', false);
-                        this.getAccount((acc) => {
-                            if (acc) {
-                            FB.checkSignIn();
+                    this.metamaskProvider = new ethers.providers.Web3Provider(window.ethereum);
+                     this.metamaskProvider.ready.then((a,b,c) => {
+                        this.metamaskProvider.resetEventsBlock(0);
+                        console.info(this.metamaskProvider, accounts)
+        
+                        this.provider = new ethers.getDefaultProvider();
+                        this.provider.resetEventsBlock(0);
+            
+                        this.updateNetwork((id) => {
+                            if (id === Const.NETWORK_MAIN) {
+                                GFD.setData('noMetaMask', false);
+                                this.getAccount((acc) => {
+                                    if (acc) {
+                                    FB.checkSignIn();
+                                    }
+                                });
+                    
+                                this.updateNewestBlock();
+                                SDM.init();
+            
                             }
                         });
-            
-                        this.updateNewestBlock();
-                        SDM.init();
-    
-                    }
-                });
+                     });
+                });           
             } else {
                 console.info('No MetaMask.');
                 GFD.setData('noMetaMask', true);
@@ -397,42 +403,40 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return callback(false);
         this.getVREContract((i) => {
-            if (eth == 0)
-                return i.buyPropertyInPXL.estimateGas(this.toID(x, y), ppc, {from: this.account }).then((gas) => {
-                    return i.buyPropertyInPXL(this.toID(x, y), ppc, {from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
+            if (eth == 0) {
+                return i.buyPropertyInPXL(this.toID(x, y), ppc).then((tx) => {
+                    this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " purchase complete."});
+                    callback(true);
+                    return;
                 }).catch((e) => {
+                    this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to purchase property " + (x + 1) + "x" + (y + 1) + "."});
                     console.info(e);
                     callback(false);
                     return;
                 })
-            else if (ppc == 0)
-                return i.buyPropertyInETH.estimateGas(this.toID(x, y), { value: eth + 10, from: this.account}).then((gas) => {
-                    return i.buyPropertyInETH(this.toID(x, y), { value: eth + 10, from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
+            } else if (ppc == 0) {
+                return i.buyPropertyInETH(this.toID(x, y)).then((tx) => {
+                    this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " purchase complete."});
+                    callback(true);
+                    return;
                 }).catch((e) => {
+                    this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to purchase property " + (x + 1) + "x" + (y + 1) + "."});
                     console.info(e);
                     callback(false);
                     return;
                 })
-            else 
-                return i.buyProperty.estimateGas(this.toID(x, y), ppc, {value: eth + 10, from: this.account}).then((gas) => {
-                    return i.buyProperty(this.toID(x, y), ppc, {value: eth + 10, from: this.account, gas: Math.ceil(gas * this.gasBuffer)});
-                }).catch((e) => {
-                    console.info(e);
-                    callback(false);
-                    return;
-                })
-        }).then(() => {
-            callback(true);
-            this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " purchase complete."});
-        }).catch((e) => {
-            if (!e.toString().includes("wasn't processed in")) {
-                console.info(e);
-                callback(false);
-                this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to purchase property " + (x + 1) + "x" + (y + 1) + "."});
             } else {
-                console.info('Timed out.')
+                return i.buyProperty(this.toID(x, y), ppc).then((tx) => {
+                    this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " purchase complete."});
+                    callback(true);
+                    return;
+                }).catch((e) => {
+                    this.sendResults(LISTENERS.Alert, {result: false, message: "Unable to purchase property " + (x + 1) + "x" + (y + 1) + "."});
+                    console.info(e);
+                    callback(false);
+                    return;
+                })
             }
-            callback(true);
         });
     }
 
@@ -440,11 +444,9 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return;
         this.getVREContract((i) => {
-            return i.listForSale.estimateGas(this.toID(parseInt(x), parseInt(y)), price, {from: this.account }).then((gas) => {
-                return i.listForSale(this.toID(parseInt(x), parseInt(y)), price, {from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
-            }).then(() => {
-                callback(true);
+            return i.listForSale(this.toID(parseInt(x), parseInt(y)), price).then((tx) => {
                 this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " listed for sale."});
+                return callback(true);
             }).catch((e) => {
                 if (!e.toString().includes("wasn't processed in")) {
                     callback(false);
@@ -461,9 +463,7 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return callback(false);
         this.getVREContract((i) => {
-            i.delist.estimateGas(this.toID(parseInt(x), parseInt(y)), {from: this.account }).then((gas) => {
-                return i.delist(this.toID(parseInt(x), parseInt(y)), {from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
-            }).then(() => {
+            i.delist(this.toID(parseInt(x), parseInt(y))).then((tx) => {
                 callback(true);
                 this.sendResults(LISTENERS.Alert, {result: true, message: "Property " + (x + 1) + "x" + (y + 1) + " listed for sale."});
             }).catch((e) => {
@@ -482,9 +482,7 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return callback(false);
         this.getVREContract((i) => {
-            return i.setPropertyMode.estimateGas(this.toID(parseInt(x), parseInt(y)), isPrivate, minutesPrivate, {from: this.account }).then((gas) => {
-                return i.setPropertyMode(this.toID(parseInt(x), parseInt(y)), isPrivate, minutesPrivate, {from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
-            }).then((r) => {
+            return i.setPropertyMode(this.toID(parseInt(x), parseInt(y)), isPrivate, minutesPrivate).then((tx) => {
                 return callback(true);
             }).catch((e) => {
                 if (!e.toString().includes("wasn't processed in")) {
@@ -503,9 +501,7 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return;
         this.getVREContract((i) => {
-            return i.setHoverText.estimateGas(Func.StringToBigInts(text), {from: this.account}).then((gas) => {
-                return i.setHoverText(Func.StringToBigInts(text), {from: this.account, gas: Math.ceil(gas * this.gasBuffer)});
-            }).then(function() {
+            return i.setHoverText(Func.StringToBigInts(text)).then((tx) => {
                 callback(true);
                 console.info("Hover text set!");
             }).catch((e) => {
@@ -525,9 +521,7 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return;
         this.getVREContract((i) => {
-            return i.setLink.estimateGas(Func.StringToBigInts(text), {from: this.account }).then((gas) => {
-                return i.setLink(Func.StringToBigInts(text), {from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
-            }).then(function() {
+            return i.setLink(Func.StringToBigInts(text)).then((tx) => {
                 callback(true);
                 console.info("Property link updated!");
             }).catch((e) => {
@@ -550,10 +544,8 @@ export class Contract {
             return callback(false);
         }
         this.getVREContract((i) => {
-            return i.transferProperty.estimateGas(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account}).then((gas) => {
-                return i.transferProperty(this.toID(parseInt(x), parseInt(y)), newOwner, {from: this.account, gas: Math.ceil(gas * this.gasBuffer)}).then((r) => {
-                    return callback(true);
-                });
+            return i.transferProperty(this.toID(parseInt(x), parseInt(y)), newOwner).then((tx) => {
+                return callback(true);
             });
         });
     }
@@ -562,9 +554,7 @@ export class Contract {
         if (GFD.getData('noMetaMask') || GFD.getData('noAccount') || GFD.getData('network') !== Const.NETWORK_MAIN)
             return callback(false);
         this.getVREContract((i) => {
-            return i.makeBid.estimateGas(this.toID(x, y), bid, {from: this.account }).then((gas) => {
-                return i.makeBid(this.toID(x, y), bid, {from: this.account, gas: Math.ceil(gas * this.gasBuffer) });
-            }).then(() => {
+            return i.makeBid(this.toID(x, y), bid).then((tx) => {
                 callback(true);
                 this.sendResults(LISTENERS.Alert, {result: true, message: "Bid for " + (x + 1) + "x" + (y + 1) + " sent to owner."});
             }).catch((e) => {
@@ -607,7 +597,7 @@ export class Contract {
             return callback(false);
         }
         this.getPXLContract((i) => {
-            i.transfer(address, PXL).then(() => {
+            i.transfer(address, PXL).then((tx) => {
                 callback(true);
                 this.sendResults(LISTENERS.Alert, {result: true, message: PXL + " PXL sent to address " + address + "."});
             }).catch((e) => {
@@ -676,7 +666,7 @@ export class Contract {
         if (GFD.getData('noMetaMask'))
             return callback(null);
         this.getVREContract((i) => {
-            return i.getSystemSalePrices.call().then((r) => {
+            return i.getSystemSalePrices().then((r) => {
                 return callback(r);
             });
         });
@@ -686,7 +676,7 @@ export class Contract {
         if (GFD.getData('noMetaMask'))
             return callback(false);
         this.getVREContract((i) => {
-            return i.getForSalePrices.call(this.toID(x, y)).then((r) => {
+            return i.getForSalePrices(this.toID(x, y)).then((r) => {
                 return callback(r);
             });
         })
@@ -716,7 +706,7 @@ export class Contract {
         if (GFD.getData('noMetaMask'))
             return callback(false);
         this.getPXLContract((i) => {
-            return i.getPropertyColorsOfRow.call(x, row).then((r) => {
+            return i.getPropertyColorsOfRow(x, row).then((r) => {
                 callback(x, row, Func.ContractDataToRGBAArray(r));
             });
         })

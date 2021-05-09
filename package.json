@@ -60,7 +60,7 @@
         "gifencoder": "^1.1.0",
         "gulp": "^3.9.1",
         "js-base64": "^2.4.3",
-        "lodash": "^4.17.5",
+        "lodash": "^4.17.21",
         "lzwcompress": "^0.2.4",
         "moment": "^2.22.0",
         "npm": "^5.8.0",

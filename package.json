@@ -62,7 +62,7 @@
         "js-base64": "^2.4.3",
         "lodash": "^4.17.5",
         "lzwcompress": "^0.2.4",
-        "moment": "^2.22.0",
+        "moment": "^2.29.4",
         "npm": "^5.8.0",
         "querystringify": "^1.0.0",
         "react": "^15.4.2",
